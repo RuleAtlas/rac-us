@@ -1,0 +1,104 @@
+name: Validate Encodings
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout cosilico-us
+        uses: actions/checkout@v4
+
+      - name: Checkout cosilico-validators
+        uses: actions/checkout@v4
+        with:
+          repository: CosilicoAI/cosilico-validators
+          path: validators
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install validators
+        run: |
+          cd validators
+          pip install -e ".[policyengine]"
+
+      - name: Run CTC validation
+        id: ctc
+        run: |
+          python -m cosilico_validators.cli validate 26/24/a/tests.yaml -v ctc -y 2024 -o results-ctc.json
+        continue-on-error: true
+
+      - name: Run Standard Deduction validation
+        id: std_ded
+        run: |
+          python -m cosilico_validators.cli validate 26/63/c/tests.yaml -v standard_deduction -y 2024 -o results-std-ded.json
+        continue-on-error: true
+
+      - name: Run SNAP validation
+        id: snap
+        run: |
+          python -m cosilico_validators.cli validate 7/2017/a/tests.yaml -v snap_allotment -y 2024 -o results-snap.json --no-taxsim
+        continue-on-error: true
+
+      - name: Combine results
+        run: |
+          python << 'EOF'
+          import json
+          import os
+          from datetime import datetime
+
+          sections = []
+          for f in ['results-ctc.json', 'results-std-ded.json', 'results-snap.json']:
+              if os.path.exists(f):
+                  with open(f) as fp:
+                      sections.append(json.load(fp))
+
+          total_tests = sum(s.get('summary', {}).get('total', 0) for s in sections)
+          total_matches = sum(s.get('summary', {}).get('matches', 0) for s in sections)
+
+          report = {
+              'timestamp': datetime.utcnow().isoformat() + 'Z',
+              'commit': os.environ.get('GITHUB_SHA', 'unknown')[:7],
+              'sections': sections,
+              'overall': {
+                  'totalTests': total_tests,
+                  'totalMatches': total_matches,
+                  'matchRate': total_matches / total_tests if total_tests > 0 else 0,
+                  'averageReward': 1.0  # TODO: calculate from sections
+              },
+              'validators': [
+                  {'name': 'policyengine', 'available': True},
+                  {'name': 'taxsim', 'available': True},
+                  {'name': 'taxact', 'available': False}
+              ]
+          }
+
+          with open('validation-results.json', 'w') as fp:
+              json.dump(report, fp, indent=2)
+
+          print(f"Validation: {total_matches}/{total_tests} tests passing")
+          EOF
+
+      - name: Upload results artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-results
+          path: validation-results.json
+
+      - name: Update dashboard (on main only)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DISPATCH_TOKEN }}
+          repository: CosilicoAI/cosilico-validation
+          event-type: update-results
+          client-payload: '{"commit": "${{ github.sha }}"}'
