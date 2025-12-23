@@ -1,24 +1,32 @@
 # cosilico-us
 
-Executable encodings of US federal tax and benefit law in Cosilico DSL.
+**THE home for US federal tax and benefit statute encodings.**
+
+All US-specific .cosilico files belong here, NOT in cosilico-engine.
 
 ## Structure
 
-Files organized by source document type and citation path:
+Files organized under `statute/` by title and section:
 
 ```
 cosilico-us/
-├── 26/                    # Title 26 (IRC) statutes
-│   ├── 24/               # § 24 - Child Tax Credit
-│   │   ├── a/credit.cosilico
-│   │   ├── b/1/threshold.yaml
-│   │   └── h/2/credit_amount.yaml
-│   └── 63/               # § 63 - Standard Deduction
-│       └── c/standard_deduction.cosilico
-│
-├── 7/                     # Title 7 (Agriculture) statutes
-│   └── 2017/a/           # § 2017(a) - SNAP Allotment
-│       └── allotment.cosilico
+├── statute/               # All enacted statutes
+│   ├── 26/               # Title 26 (IRC)
+│   │   ├── 24/          # § 24 - Child Tax Credit
+│   │   │   ├── a/credit.cosilico
+│   │   │   ├── b/2/phaseout.cosilico
+│   │   │   └── d/1/B/refundable_credit.cosilico
+│   │   ├── 32/          # § 32 - EITC
+│   │   │   ├── a/1/earned_income_credit.cosilico
+│   │   │   └── c/2/A/earned_income.cosilico
+│   │   ├── 62/          # § 62 - AGI
+│   │   │   └── a/adjusted_gross_income.cosilico
+│   │   └── 63/          # § 63 - Standard Deduction
+│   │       └── c/standard_deduction.cosilico
+│   │
+│   └── 7/               # Title 7 (Agriculture)
+│       └── 2017/a/      # § 2017(a) - SNAP Allotment
+│           └── allotment.cosilico
 │
 ├── irs/                   # IRS guidance (Rev. Procs, etc.)
 │   └── rev-proc-2023-34/
@@ -27,6 +35,16 @@ cosilico-us/
 └── usda/fns/              # USDA Food & Nutrition Service guidance
     └── snap-fy2024-cola/
         └── parameters.yaml
+```
+
+## References in .cosilico files
+
+Cross-file references use paths relative to the repo root:
+```
+references {
+  earned_income: statute/26/32/c/2/A/earned_income
+  agi: statute/26/62/a/adjusted_gross_income
+}
 ```
 
 ## File Types
