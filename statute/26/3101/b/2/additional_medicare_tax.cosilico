@@ -14,12 +14,23 @@
 module statute.26.3101.b.2
 version "2024.1"
 
-references {
-  # Wages subject to Medicare tax
-  employment_income: statute/26/61/a/1/wages
+# Filing status values per §1 - used for threshold determination
+enum FilingStatus {
+  SINGLE
+  JOINT
+  SEPARATE
+  HEAD_OF_HOUSEHOLD
+  SURVIVING_SPOUSE
+}
 
-  # Self-employment income - §1401(b)(2) applies same thresholds
-  self_employment_income: statute/26/1401/self_employment_income
+references {
+  # Wages subject to Medicare tax per §3121(a)
+  # Uses IRS employment income (excludes pre-tax 401k, FSA, etc.)
+  irs_employment_income: statute/26/3121/a/irs_employment_income
+
+  # Taxable self-employment income per §1401(b)(2)
+  # Net SE income after deductions, includes S-corp income
+  taxable_self_employment_income: statute/26/1401/taxable_self_employment_income
 
   # Filing status for threshold determination
   filing_status: statute/26/1/filing_status
@@ -36,7 +47,13 @@ variable medicare_wages {
   formula {
     # Both wages and self-employment income are subject to the tax
     # Per §3101(b)(2) and §1401(b)(2)
-    return employment_income + self_employment_income
+    #
+    # Uses IRS employment income (W-2 wages after pre-tax deductions)
+    # and taxable SE income (net after SE deductions, includes S-corp)
+    let total_wages = sum(members, irs_employment_income)
+    let total_se = sum(members, taxable_self_employment_income)
+
+    return total_wages + total_se
   }
 }
 
@@ -50,6 +67,9 @@ variable additional_medicare_tax {
 
   formula {
     # Get threshold for filing status per §3101(b)(2)(A)-(C)
+    # (A) Joint return = $250k
+    # (B) Married filing separately = $125k
+    # (C) Any other case = $200k (includes Single, HOH, Surviving Spouse)
     let threshold = if filing_status == JOINT then
       250000
     else if filing_status == SEPARATE then

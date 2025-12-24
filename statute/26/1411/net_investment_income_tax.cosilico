@@ -11,12 +11,28 @@
 module statute.26.1411
 version "2024.1"
 
+# Filing status values per §1 - used for threshold determination
+enum FilingStatus {
+  SINGLE
+  JOINT
+  SEPARATE
+  HEAD_OF_HOUSEHOLD
+  SURVIVING_SPOUSE
+}
+
 references {
   # Income components for NII - §1411(c)(1)(A)
-  interest_income: statute/26/61/a/4/interest_income
+  # Uses taxable interest (excludes tax-exempt municipal bond interest)
+  taxable_interest_income: statute/26/61/a/4/taxable_interest_income
+
+  # Dividends at person level, aggregated to tax unit
   dividend_income: statute/26/61/a/7/dividend_income
-  long_term_capital_gains: statute/26/61/a/3/gains_from_property
-  short_term_capital_gains: statute/26/61/a/3/short_term_gains
+
+  # Capital gains with $3,000 loss limitation applied per §1211(b)
+  # This is a TaxUnit-level variable, already aggregated
+  loss_limited_net_capital_gains: statute/26/1211/b/loss_limited_net_capital_gains
+
+  # Rental income at person level
   rental_income: statute/26/32/i/2/C/net_rent_royalty_income
 
   # MAGI for NIIT purposes
@@ -41,13 +57,17 @@ variable net_investment_income {
     # §1411(c)(1)(A) - Net investment income includes:
     # (i) gross income from interest, dividends, annuities, royalties, and rents
     # (iii) net gain from disposition of property
-    return max(0,
-      interest_income +
-      dividend_income +
-      long_term_capital_gains +
-      short_term_capital_gains +
-      rental_income
-    )
+    #
+    # Note: Uses taxable interest (excludes tax-exempt muni bonds per §103)
+    # Capital gains use loss-limited amount per §1211(b) ($3k limit)
+    let total_interest = sum(members, taxable_interest_income)
+    let total_dividends = sum(members, dividend_income)
+    let total_rental = sum(members, rental_income)
+
+    # loss_limited_net_capital_gains is already at TaxUnit level
+    let total_cap_gains = loss_limited_net_capital_gains
+
+    return max(0, total_interest + total_dividends + total_rental + total_cap_gains)
   }
 }
 
@@ -60,9 +80,13 @@ variable net_investment_income_tax {
   description "3.8% tax on investment income for high earners per §1411(a)"
 
   formula {
-    # Get threshold for filing status
-    # §1411(b): Joint=$250k, Separate=$125k, Single/HOH=$200k
+    # Get threshold for filing status per §1411(b)
+    # §1411(b)(1): Joint return OR surviving spouse (§2(a)) = $250k
+    # §1411(b)(2): Married filing separately = $125k
+    # §1411(b)(3): Any other case = $200k (Single, HOH)
     let threshold = if filing_status == JOINT then
+      250000
+    else if filing_status == SURVIVING_SPOUSE then
       250000
     else if filing_status == SEPARATE then
       125000
