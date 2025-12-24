@@ -14,12 +14,12 @@ credit_percentage:
   description: EITC credit percentage (phase-in rate) by number of qualifying children
   unit: rate
   reference: "26 USC § 32(b)(1)"
-  indexed_by: [num_qualifying_children]
+  indexed_by: statute/26/32/c/3/A/num_qualifying_children
 
   values:
     - effective_from: 2024-01-01
       source: "26 USC § 32(b)(1), Rev. Proc. 2023-34"
-      by_num_qualifying_children:
+      breakdown:
         0: 0.0765
         1: 0.34
         2: 0.40
@@ -29,12 +29,12 @@ phaseout_percentage:
   description: EITC phaseout percentage by number of qualifying children
   unit: rate
   reference: "26 USC § 32(b)(1)"
-  indexed_by: [num_qualifying_children]
+  indexed_by: statute/26/32/c/3/A/num_qualifying_children
 
   values:
     - effective_from: 2024-01-01
       source: "26 USC § 32(b)(1), Rev. Proc. 2023-34"
-      by_num_qualifying_children:
+      breakdown:
         0: 0.0765
         1: 0.1598
         2: 0.2106
