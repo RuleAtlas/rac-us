@@ -1,0 +1,26 @@
+# 26 USC §32(b)(2)(A) - Earned Income and Phaseout Amounts
+#
+# "The earned income amount and the phaseout amount shall be determined
+# as follows:"
+#
+# These are the STATUTORY BASE AMOUNTS as written in the law.
+# They are subject to inflation adjustment per §32(j)(1) with base year 1995.
+
+reference: "26 USC § 32(b)(2)(A)"
+inflation_adjustment:
+  section: "§32(j)(1)"
+  base_year: 1995
+
+# Statutory table from 26 USC §32(b)(2)(A)
+# Indexed by: num_qualifying_children
+earned_income_amount:
+  0: 4220    # "No qualifying children"
+  1: 6330    # "1 qualifying child"
+  2: 8890    # "2 or more qualifying children"
+  3: 8890    # (same as 2+)
+
+phaseout_amount:
+  0: 5280    # "No qualifying children"
+  1: 11610   # "1 qualifying child"
+  2: 11610   # "2 or more qualifying children"
+  3: 11610   # (same as 2+)

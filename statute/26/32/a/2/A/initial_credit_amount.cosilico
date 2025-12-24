@@ -11,9 +11,11 @@ references {
   # Input: earned income from §32(c)(2)
   earned_income: statute/26/32/c/2/A/earned_income
 
-  # Parameters from §32(b) - the percentages and amounts table
+  # Credit percentage from §32(b)(1) - fixed, not inflation-adjusted
   credit_percentage: statute/26/32/b/1/credit_percentage
-  earned_income_amount: statute/26/32/b/2/A/earned_income_amount
+
+  # Earned income amount from §32(b)(2)(A) - engine resolves IRS override automatically
+  earned_income_amount: statute/26/32/b/2/A/base_amounts#earned_income_amount
 
   # Number of qualifying children affects which row of the table we use
   num_qualifying_children: statute/26/32/c/3/A/num_qualifying_children

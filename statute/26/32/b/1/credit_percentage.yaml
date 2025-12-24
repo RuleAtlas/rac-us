@@ -1,43 +1,22 @@
 # 26 USC §32(b)(1) - Credit and Phaseout Percentages
 #
-# "The credit percentage and the phaseout percentage shall be determined
-# as follows:"
-#
-# | Qualifying Children | Credit % | Phaseout % |
-# |---------------------|----------|------------|
-# | 0                   | 7.65%    | 7.65%      |
-# | 1                   | 34%      | 15.98%     |
-# | 2                   | 40%      | 21.06%     |
-# | 3+                  | 45%      | 21.06%     |
+# Statutory rates from the Internal Revenue Code.
+# These do NOT change with inflation.
 
+# Credit percentage (phase-in rate)
+# Indexed by: statute/26/32/c/3/A/num_qualifying_children
 credit_percentage:
-  description: EITC credit percentage (phase-in rate) by number of qualifying children
-  unit: rate
-  reference: "26 USC § 32(b)(1)"
-  indexed_by: statute/26/32/c/3/A/num_qualifying_children
+  reference: "26 USC § 32(b)(1)(A)"
+  0: 0.0765
+  1: 0.34
+  2: 0.40
+  3: 0.45
 
-  values:
-    # Statutory rates - do not change with inflation
-    - effective_from: 1975-01-01
-      source: "26 USC § 32(b)(1)(A)"
-      breakdown:
-        0: 0.0765
-        1: 0.34
-        2: 0.40
-        3: 0.45
-
+# Phaseout percentage
+# Indexed by: statute/26/32/c/3/A/num_qualifying_children
 phaseout_percentage:
-  description: EITC phaseout percentage by number of qualifying children
-  unit: rate
-  reference: "26 USC § 32(b)(1)"
-  indexed_by: statute/26/32/c/3/A/num_qualifying_children
-
-  values:
-    # Statutory rates - do not change with inflation
-    - effective_from: 1975-01-01
-      source: "26 USC § 32(b)(1)(B)"
-      breakdown:
-        0: 0.0765
-        1: 0.1598
-        2: 0.2106
-        3: 0.2106
+  reference: "26 USC § 32(b)(1)(B)"
+  0: 0.0765
+  1: 0.1598
+  2: 0.2106
+  3: 0.2106

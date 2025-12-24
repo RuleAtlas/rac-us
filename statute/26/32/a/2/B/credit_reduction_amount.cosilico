@@ -15,10 +15,12 @@ references {
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
   filing_status: statute/26/1/filing_status
 
-  # Parameters from §32(b)
+  # Phaseout percentage from §32(b)(1) - fixed, not inflation-adjusted
   phaseout_percentage: statute/26/32/b/1/phaseout_percentage
-  phaseout_amount: statute/26/32/b/2/A/phaseout_amount
-  joint_return_adjustment: statute/26/32/b/2/B/joint_return_adjustment
+
+  # Amounts from statute - engine resolves IRS override automatically
+  phaseout_amount: statute/26/32/b/2/A/base_amounts#phaseout_amount
+  joint_return_adjustment: statute/26/32/b/2/B/base_joint_return_adjustment#joint_return_adjustment
 
   # Number of qualifying children
   num_qualifying_children: statute/26/32/c/3/A/num_qualifying_children
