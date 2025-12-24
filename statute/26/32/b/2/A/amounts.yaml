@@ -29,31 +29,21 @@ earned_income_amount:
         3: 17400
 
 phaseout_amount:
-  description: Income threshold where EITC phase-out begins
+  description: Base income threshold where EITC phase-out begins (single filers)
   unit: USD
   reference: "26 USC § 32(b)(2)(A)"
-  indexed_by:
-    - statute/26/32/c/3/A/num_qualifying_children
-    - statute/26/1/filing_status
+  indexed_by: statute/26/32/c/3/A/num_qualifying_children
   inflation_adjustment: "§32(j)"
+  note: "Joint filers add joint_return_adjustment per §32(b)(2)(B)"
 
   values:
     - effective_from: 2024-01-01
       source: "Rev. Proc. 2023-34, Section 3.06"
       breakdown:
-        # Single/HOH/Qualifying Widow(er)
-        0:
-          SINGLE: 10330
-          JOINT: 17250
-        1:
-          SINGLE: 22720
-          JOINT: 29640
-        2:
-          SINGLE: 22720
-          JOINT: 29640
-        3:
-          SINGLE: 22720
-          JOINT: 29640
+        0: 10330
+        1: 22720
+        2: 22720
+        3: 22720
 
 agi_limit:
   description: Maximum AGI for EITC eligibility (income at which credit phases out completely)
