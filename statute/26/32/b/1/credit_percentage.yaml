@@ -17,13 +17,14 @@ credit_percentage:
   indexed_by: statute/26/32/c/3/A/num_qualifying_children
 
   values:
-    - effective_from: 2024-01-01
-      source: "26 USC § 32(b)(1), Rev. Proc. 2023-34"
+    # Statutory rates - do not change with inflation
+    - effective_from: 1975-01-01
+      source: "26 USC § 32(b)(1)(A)"
       breakdown:
         0: 0.0765
         1: 0.34
         2: 0.40
-        3: 0.45  # "3 or more"
+        3: 0.45
 
 phaseout_percentage:
   description: EITC phaseout percentage by number of qualifying children
@@ -32,10 +33,11 @@ phaseout_percentage:
   indexed_by: statute/26/32/c/3/A/num_qualifying_children
 
   values:
-    - effective_from: 2024-01-01
-      source: "26 USC § 32(b)(1), Rev. Proc. 2023-34"
+    # Statutory rates - do not change with inflation
+    - effective_from: 1975-01-01
+      source: "26 USC § 32(b)(1)(B)"
       breakdown:
         0: 0.0765
         1: 0.1598
         2: 0.2106
-        3: 0.2106  # "3 or more"
+        3: 0.2106

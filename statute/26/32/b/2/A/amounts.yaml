@@ -21,28 +21,39 @@ earned_income_amount:
 
   values:
     - effective_from: 2024-01-01
-      source: "Rev. Proc. 2023-34, Section 3.07"
+      source: "Rev. Proc. 2023-34, Section 3.06"
       breakdown:
-        0: 8260  # $632 max / 7.65% = $8,261
+        0: 8260
         1: 12390
         2: 17400
-        3: 17400  # "3 or more"
+        3: 17400
 
 phaseout_amount:
   description: Income threshold where EITC phase-out begins
   unit: USD
   reference: "26 USC § 32(b)(2)(A)"
-  indexed_by: statute/26/32/c/3/A/num_qualifying_children
+  indexed_by:
+    - statute/26/32/c/3/A/num_qualifying_children
+    - statute/26/1/filing_status
   inflation_adjustment: "§32(j)"
 
   values:
     - effective_from: 2024-01-01
-      source: "Rev. Proc. 2023-34, Section 3.07"
+      source: "Rev. Proc. 2023-34, Section 3.06"
       breakdown:
-        0: 9800
-        1: 21560
-        2: 21560
-        3: 21560  # "3 or more"
+        # Single/HOH/Qualifying Widow(er)
+        0:
+          SINGLE: 10330
+          JOINT: 17250
+        1:
+          SINGLE: 22720
+          JOINT: 29640
+        2:
+          SINGLE: 22720
+          JOINT: 29640
+        3:
+          SINGLE: 22720
+          JOINT: 29640
 
 agi_limit:
   description: Maximum AGI for EITC eligibility (income at which credit phases out completely)
