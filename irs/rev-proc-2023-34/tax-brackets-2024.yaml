@@ -1,0 +1,71 @@
+# Rev. Proc. 2023-34, Section 3.01 - Income Tax Rate Schedules for 2024
+#
+# Inflation-adjusted bracket thresholds per 26 USC § 1(f)
+# Effective for tax year 2024
+#
+# Source: https://www.irs.gov/irb/2023-48_IRB#RP-2023-34
+
+source:
+  document: "Rev. Proc. 2023-34"
+  section: "3.01"
+  url: "https://www.irs.gov/irb/2023-48_IRB#RP-2023-34"
+  effective_date: 2024-01-01
+
+# Rate brackets are NOT indexed - they are fixed in statute
+# Only the thresholds are indexed per § 1(f)
+
+# Bracket thresholds for Single filers (§ 1(c) as modified by § 1(j)(2)(A))
+single:
+  implements: statute/26/1/f  # Authority for inflation adjustment
+  overrides: statute/26/1/brackets/base_thresholds#single
+  indexed_by: rate
+  values:
+    0.10: 0        # 10% bracket: $0 - $11,600
+    0.12: 11600    # 12% bracket: $11,600 - $47,150
+    0.22: 47150    # 22% bracket: $47,150 - $100,525
+    0.24: 100525   # 24% bracket: $100,525 - $191,950
+    0.32: 191950   # 32% bracket: $191,950 - $243,725
+    0.35: 243725   # 35% bracket: $243,725 - $609,350
+    0.37: 609350   # 37% bracket: over $609,350
+
+# Bracket thresholds for Married Filing Jointly and Surviving Spouses (§ 1(a) as modified by § 1(j)(2)(B))
+married_filing_jointly:
+  implements: statute/26/1/f
+  overrides: statute/26/1/brackets/base_thresholds#married_filing_jointly
+  indexed_by: rate
+  values:
+    0.10: 0        # 10% bracket: $0 - $23,200
+    0.12: 23200    # 12% bracket: $23,200 - $94,300
+    0.22: 94300    # 22% bracket: $94,300 - $201,050
+    0.24: 201050   # 24% bracket: $201,050 - $383,900
+    0.32: 383900   # 32% bracket: $383,900 - $487,450
+    0.35: 487450   # 35% bracket: $487,450 - $731,200
+    0.37: 731200   # 37% bracket: over $731,200
+
+# Bracket thresholds for Head of Household (§ 1(b) as modified by § 1(j)(2)(C))
+head_of_household:
+  implements: statute/26/1/f
+  overrides: statute/26/1/brackets/base_thresholds#head_of_household
+  indexed_by: rate
+  values:
+    0.10: 0        # 10% bracket: $0 - $16,550
+    0.12: 16550    # 12% bracket: $16,550 - $63,100
+    0.22: 63100    # 22% bracket: $63,100 - $100,500
+    0.24: 100500   # 24% bracket: $100,500 - $191,950
+    0.32: 191950   # 32% bracket: $191,950 - $243,700
+    0.35: 243700   # 35% bracket: $243,700 - $609,350
+    0.37: 609350   # 37% bracket: over $609,350
+
+# Bracket thresholds for Married Filing Separately (§ 1(d) as modified by § 1(j)(2)(D))
+married_filing_separately:
+  implements: statute/26/1/f
+  overrides: statute/26/1/brackets/base_thresholds#married_filing_separately
+  indexed_by: rate
+  values:
+    0.10: 0        # 10% bracket: $0 - $11,600
+    0.12: 11600    # 12% bracket: $11,600 - $47,150
+    0.22: 47150    # 22% bracket: $47,150 - $100,525
+    0.24: 100525   # 24% bracket: $100,525 - $191,950
+    0.32: 191950   # 32% bracket: $191,950 - $243,725
+    0.35: 243725   # 35% bracket: $243,725 - $365,600
+    0.37: 365600   # 37% bracket: over $365,600 (half of MFJ)

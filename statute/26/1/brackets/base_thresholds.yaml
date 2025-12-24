@@ -1,0 +1,58 @@
+# 26 USC § 1(a)-(d), (j) - Income Tax Rate Brackets
+#
+# Rate brackets for taxable income, as modified by Tax Cuts and Jobs Act
+# (Pub. L. 115-97, § 11001), which replaced the prior rate structure.
+#
+# These are the TCJA BASE AMOUNTS for 2018.
+# They are subject to inflation adjustment per § 1(f) using C-CPI-U.
+
+reference: "26 USC § 1(a)-(d), (j)"
+description: Income tax bracket thresholds by filing status
+
+inflation_adjustment:
+  section: "§ 1(f)"
+  base_year: 2017
+  method: chained_cpi_u  # Per TCJA § 11002
+
+# TCJA 2018 base bracket thresholds
+# Indexed by filing_status, then by bracket rate
+
+# § 1(j)(2)(A) - Single (unmarried individuals other than heads of household and surviving spouses)
+single:
+  0.10: 0       # 10% bracket starts at $0
+  0.12: 9525    # 12% bracket starts at $9,525
+  0.22: 38700   # 22% bracket starts at $38,700
+  0.24: 82500   # 24% bracket starts at $82,500
+  0.32: 157500  # 32% bracket starts at $157,500
+  0.35: 200000  # 35% bracket starts at $200,000
+  0.37: 500000  # 37% bracket starts at $500,000
+
+# § 1(j)(2)(B) - Married Filing Jointly (and surviving spouses)
+married_filing_jointly:
+  0.10: 0       # 10% bracket starts at $0
+  0.12: 19050   # 12% bracket starts at $19,050
+  0.22: 77400   # 22% bracket starts at $77,400
+  0.24: 165000  # 24% bracket starts at $165,000
+  0.32: 315000  # 32% bracket starts at $315,000
+  0.35: 400000  # 35% bracket starts at $400,000
+  0.37: 600000  # 37% bracket starts at $600,000
+
+# § 1(j)(2)(C) - Head of Household
+head_of_household:
+  0.10: 0       # 10% bracket starts at $0
+  0.12: 13600   # 12% bracket starts at $13,600
+  0.22: 51800   # 22% bracket starts at $51,800
+  0.24: 82500   # 24% bracket starts at $82,500
+  0.32: 157500  # 32% bracket starts at $157,500
+  0.35: 200000  # 35% bracket starts at $200,000
+  0.37: 500000  # 37% bracket starts at $500,000
+
+# § 1(j)(2)(D) - Married Filing Separately
+married_filing_separately:
+  0.10: 0       # 10% bracket starts at $0
+  0.12: 9525    # 12% bracket starts at $9,525
+  0.22: 38700   # 22% bracket starts at $38,700
+  0.24: 82500   # 24% bracket starts at $82,500
+  0.32: 157500  # 32% bracket starts at $157,500
+  0.35: 200000  # 35% bracket starts at $200,000
+  0.37: 300000  # 37% bracket starts at $300,000

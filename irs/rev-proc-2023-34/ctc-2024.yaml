@@ -1,0 +1,20 @@
+# Rev. Proc. 2023-34, Section 3.10 - CTC Amounts for 2024
+#
+# Inflation-adjusted amounts per 26 USC § 24(h)(5)(B)
+# Effective for tax year 2024
+
+source:
+  document: "Rev. Proc. 2023-34"
+  section: "3.10"
+  url: "https://www.irs.gov/irb/2023-48_IRB#RP-2023-34"
+  effective_date: 2024-01-01
+
+# Refundable credit maximum per qualifying child
+# § 24(h)(5)(B): "$1,400 increased by an amount equal to..."
+refundable_maximum:
+  implements: statute/26/24/h/5  # Authority for inflation adjustment
+  overrides: statute/26/24/h/5/refundable_maximum#refundable_maximum
+  value: 1700
+  citations:
+    - "Rev. Proc. 2023-34, Section 3.10(2)"
+    - "26 USC § 24(h)(5)(B): $1,400 indexed for cost-of-living"

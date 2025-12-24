@@ -1,0 +1,38 @@
+# 26 USC § 1(j)(2) - Income Tax Rates
+#
+# The statutory tax rates as set by TCJA (Pub. L. 115-97, § 11001).
+# These rates are NOT subject to inflation adjustment - they are fixed.
+#
+# Rates are effective for tax years 2018 through 2025.
+# Under current law, rates revert to pre-TCJA rates after 2025.
+
+reference: "26 USC § 1(j)(2)"
+description: Federal income tax rate schedule
+
+# The seven bracket rates (fixed, not indexed)
+rates:
+  - 0.10   # 10%
+  - 0.12   # 12%
+  - 0.22   # 22%
+  - 0.24   # 24%
+  - 0.32   # 32%
+  - 0.35   # 35%
+  - 0.37   # 37%
+
+# Effective period for TCJA rates
+effective:
+  start: 2018-01-01
+  end: 2025-12-31
+  sunset_provision: "§ 11001(c) - applies only to taxable years beginning after 2017 and before 2026"
+
+# Pre-TCJA rates (for reference, sunset after 2025)
+pre_tcja_rates:
+  description: "Rates that will apply after 2025 sunset"
+  rates:
+    - 0.10   # 10%
+    - 0.15   # 15%
+    - 0.25   # 25%
+    - 0.28   # 28%
+    - 0.33   # 33%
+    - 0.35   # 35%
+    - 0.396  # 39.6%

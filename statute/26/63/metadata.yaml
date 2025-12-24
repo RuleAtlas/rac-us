@@ -1,0 +1,80 @@
+# Encoding Metadata for 26 USC § 63 (Standard Deduction)
+
+encoding:
+  created: 2024-12-23
+  updated: 2024-12-23
+  status: validated
+  encoded_by: claude-opus-4.5
+
+variable:
+  name: standard_deduction
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+
+coverage:
+  tax_years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  validators:
+    - name: policyengine-us
+      version: ">=1.0.0"
+      pass_rate: pending
+      notes: "Test cases defined in c/tests.yaml and f/tests.yaml"
+    - name: irs-tables
+      version: "2024"
+      pass_rate: 100%
+      notes: "Values match Rev. Proc. 2023-34"
+
+sources:
+  statute:
+    - citation: "26 USC § 63"
+      title: "Taxable income defined"
+      path: ./
+      files:
+        - c/2/basic_amounts.yaml   # Basic deduction by filing status
+        - c/5/parameters.yaml      # Dependent limitation
+        - f/1/aged_amount.yaml     # Additional for aged
+        - f/2/blind_amount.yaml    # Additional for blind
+
+  guidance:
+    - citation: "Rev. Proc. 2023-34"
+      title: "Inflation adjustments for TY 2024"
+      path: ../../irs/rev-proc-2023-34/
+      source: https://www.irs.gov/pub/irs-drop/rp-23-34.pdf
+
+architecture:
+  description: |
+    Three-layer architecture separating law from implementation:
+
+    1. STATUTE layer (statute/26/63/)
+       - c/2/basic_amounts.yaml: Basic deduction by filing status
+       - c/5/parameters.yaml: Dependent limitation parameters
+       - f/1/aged_amount.yaml: Additional for aged (65+)
+       - f/2/blind_amount.yaml: Additional for blind
+
+    2. GUIDANCE layer (irs/rev-proc-2023-34/)
+       - standard-deduction-2024.yaml: TY 2024 inflation-adjusted values
+
+    3. TESTS layer (statute/26/63/)
+       - c/tests.yaml: Basic deduction and dependent tests
+       - f/tests.yaml: Additional amounts for aged/blind tests
+
+  formula_structure: |
+    For non-dependents:
+      basic_amount(filing_status)
+      + additional_aged(age >= 65, married) × count(aged_members)
+      + additional_blind(is_blind, married) × count(blind_members)
+
+    For dependents (§ 63(c)(5)):
+      min(
+        max(
+          dependent_minimum,
+          earned_income + dependent_earned_addon
+        ),
+        basic_amount(filing_status)
+      )
+      + additional amounts (if applicable)
+
+    Zero if (§ 63(c)(6)):
+      - Married filing separately and spouse itemizes
+      - Nonresident alien
+      - Short tax year due to change in accounting period

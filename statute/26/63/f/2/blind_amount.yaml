@@ -1,19 +1,42 @@
 # 26 USC § 63(f)(2) - Additional Amount for Blind
 #
 # "an additional amount equal to the amount allowed under paragraph (1)"
+# Per the statute, blind amounts equal aged amounts from § 63(f)(1)
 
 additional_blind_unmarried:
   description: "Additional deduction for blind (single/HoH)"
   unit: currency-USD
+  indexing:
+    method: cpi-u
+    base_year: 2017
+    round_to: 50
   values:
+    2018-01-01: 1600
+    2019-01-01: 1650
+    2020-01-01: 1650
+    2021-01-01: 1700
+    2022-01-01: 1750
+    2023-01-01: 1850
     2024-01-01: 1950
+    2025-01-01: 2000
   citations:
-    - "§ 63(f)(2): same amount as aged"
+    - "§ 63(f)(2): same amount as aged (unmarried)"
 
 additional_blind_married:
   description: "Additional deduction for blind (married)"
   unit: currency-USD
+  indexing:
+    method: cpi-u
+    base_year: 2017
+    round_to: 50
   values:
+    2018-01-01: 1300
+    2019-01-01: 1300
+    2020-01-01: 1300
+    2021-01-01: 1350
+    2022-01-01: 1400
+    2023-01-01: 1500
     2024-01-01: 1550
+    2025-01-01: 1600
   citations:
-    - "§ 63(f)(2): same amount as aged"
+    - "§ 63(f)(2): same amount as aged (married)"

@@ -1,0 +1,46 @@
+# 26 USC § 1(f) - Cost-of-Living Adjustments
+#
+# "(1) IN GENERAL.—Not later than December 15 of 1993, and each subsequent
+# calendar year, the Secretary shall prescribe tables which shall apply in
+# lieu of the tables contained in subsections (a), (b), (c), (d), and (e)
+# with respect to taxable years beginning in the succeeding calendar year."
+#
+# As modified by TCJA § 11002, the adjustment uses Chained CPI-U (C-CPI-U)
+# instead of CPI-U for all parameters adjusted under this section.
+
+reference: "26 USC § 1(f)"
+description: Cost-of-living adjustment for income tax brackets
+
+# § 1(f)(3) - Cost-of-Living Adjustment Definition (as amended by TCJA)
+adjustment_method:
+  reference: "26 USC § 1(f)(3)"
+  index: chained_cpi_u  # C-CPI-U per TCJA § 11002
+
+  # TCJA changed from CPI-U to C-CPI-U
+  # "(A) IN GENERAL.—The term 'cost-of-living adjustment' for any calendar
+  # year is the percentage (if any) by which—
+  #   (i) the C-CPI-U for the preceding calendar year, exceeds
+  #   (ii) the CPI for calendar year 2016, multiplied by the amount
+  #        determined under subparagraph (B)."
+  pre_tcja_index: cpi_u  # Before TCJA
+  transition_year: 2018
+
+# § 1(f)(6) - Rounding Rules
+rounding:
+  reference: "26 USC § 1(f)(6)"
+  description: "Rounding to nearest multiple of $50"
+  rules:
+    # "(A) each bracket threshold which is a multiple of $50 shall be rounded
+    # to the next lowest multiple of $50"
+    bracket_thresholds: 50  # Round to nearest $50
+
+# Parameters subject to this adjustment
+applies_to:
+  - statute/26/1/brackets/base_thresholds.yaml#single
+  - statute/26/1/brackets/base_thresholds.yaml#married_filing_jointly
+  - statute/26/1/brackets/base_thresholds.yaml#head_of_household
+  - statute/26/1/brackets/base_thresholds.yaml#married_filing_separately
+
+# Effective dates for TCJA changes
+effective_from: 2018-01-01
+tcja_reference: "Pub. L. 115-97, § 11002"
