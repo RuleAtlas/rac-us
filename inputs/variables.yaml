@@ -2,8 +2,12 @@
 #
 # Maps microdata sources (CPS, PE) to Cosilico variable paths.
 # Used by validation runner to extract inputs for calculations.
+#
+# Note: These variable definitions are year-agnostic. The same variables
+# exist for all historical tax years - only parameter VALUES change by year.
+# Parameter values are handled separately in statute/*/parameters.yaml files.
 
-version: "2024.1"
+schema_version: "1.0"  # Schema format version (not tax year)
 
 # Entity definitions
 entities:
