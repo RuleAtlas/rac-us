@@ -1,0 +1,236 @@
+# Capital Gains Tax Brackets - 26 USC Section 1(h)
+#
+# Per Section 1(h), net capital gain and qualified dividend income are taxed
+# at preferential rates:
+#   - 0%  on portion within the 0% bracket (Section 1(h)(1)(B))
+#   - 15% on portion within the 15% bracket (Section 1(h)(1)(C))
+#   - 20% on portion above the 15% bracket (Section 1(h)(1)(D))
+#
+# The thresholds are indexed annually by IRS (Rev. Proc.).
+# Rates are fixed in statute and do not change.
+#
+# Sources:
+# - 26 USC 1(h): https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title26-section1
+# - Rev. Proc. 2023-34 (2024 thresholds): https://www.irs.gov/pub/irs-drop/rp-23-34.pdf
+# - Rev. Proc. 2024-40 (2025 thresholds): https://www.irs.gov/pub/irs-drop/rp-24-40.pdf
+
+gov.irs.capital_gains:
+  # ===========================================================================
+  # RATES (Fixed in statute - 26 USC 1(h)(1))
+  # ===========================================================================
+  rates:
+    description: "Capital gains and qualified dividend tax rates per 26 USC 1(h)(1)"
+    unit: rate
+    label: "Capital Gains Tax Rates"
+    reference: "26 USC 1(h)(1)(B), (C), (D)"
+    # Rates: [0%, 15%, 20%]
+    values:
+      2013-01-01: [0.00, 0.15, 0.20]
+      # Before 2013, rates were 0%, 15% (no 20% bracket)
+      2003-01-01: [0.00, 0.15]
+      # Before 2003, rates were different
+      1997-01-01: [0.10, 0.20]
+
+  # ===========================================================================
+  # THRESHOLDS - 0% Rate Maximum (Section 1(h)(1)(B))
+  # ===========================================================================
+  # 0% rate applies to preferential income up to this threshold
+  thresholds:
+    zero_pct_max:
+      single:
+        description: "Maximum taxable income for 0% capital gains rate (single filers)"
+        unit: currency-USD
+        period: year
+        label: "0% Rate Ceiling (Single)"
+        reference: "26 USC 1(h)(1)(B); Rev. Proc. 2023-34"
+        values:
+          2025-01-01: 48350
+          2024-01-01: 47025
+          2023-01-01: 44625
+          2022-01-01: 41675
+          2021-01-01: 40400
+          2020-01-01: 40000
+
+      joint:
+        description: "Maximum taxable income for 0% capital gains rate (married filing jointly)"
+        unit: currency-USD
+        period: year
+        label: "0% Rate Ceiling (Joint)"
+        reference: "26 USC 1(h)(1)(B); Rev. Proc. 2023-34"
+        values:
+          2025-01-01: 96700
+          2024-01-01: 94050
+          2023-01-01: 89250
+          2022-01-01: 83350
+          2021-01-01: 80800
+          2020-01-01: 80000
+
+      head_of_household:
+        description: "Maximum taxable income for 0% capital gains rate (head of household)"
+        unit: currency-USD
+        period: year
+        label: "0% Rate Ceiling (HOH)"
+        reference: "26 USC 1(h)(1)(B); Rev. Proc. 2023-34"
+        values:
+          2025-01-01: 64750
+          2024-01-01: 63000
+          2023-01-01: 59750
+          2022-01-01: 55800
+          2021-01-01: 54100
+          2020-01-01: 53600
+
+      married_filing_separately:
+        description: "Maximum taxable income for 0% capital gains rate (married filing separately)"
+        unit: currency-USD
+        period: year
+        label: "0% Rate Ceiling (MFS)"
+        reference: "26 USC 1(h)(1)(B); Rev. Proc. 2023-34"
+        values:
+          2025-01-01: 48350
+          2024-01-01: 47025
+          2023-01-01: 44625
+          2022-01-01: 41675
+          2021-01-01: 40400
+          2020-01-01: 40000
+
+      surviving_spouse:
+        description: "Maximum taxable income for 0% capital gains rate (surviving spouse)"
+        unit: currency-USD
+        period: year
+        label: "0% Rate Ceiling (Surviving Spouse)"
+        reference: "26 USC 1(h)(1)(B); Rev. Proc. 2023-34"
+        values:
+          2025-01-01: 96700
+          2024-01-01: 94050
+          2023-01-01: 89250
+          2022-01-01: 83350
+          2021-01-01: 80800
+          2020-01-01: 80000
+
+    # ===========================================================================
+    # THRESHOLDS - 15% Rate Maximum (Section 1(h)(1)(C))
+    # ===========================================================================
+    # 15% rate applies above 0% threshold up to this threshold; 20% above
+    fifteen_pct_max:
+      single:
+        description: "Maximum taxable income for 15% capital gains rate (single filers)"
+        unit: currency-USD
+        period: year
+        label: "15% Rate Ceiling (Single)"
+        reference: "26 USC 1(h)(1)(C); Rev. Proc. 2023-34"
+        values:
+          2025-01-01: 533400
+          2024-01-01: 518900
+          2023-01-01: 492300
+          2022-01-01: 459750
+          2021-01-01: 445850
+          2020-01-01: 441450
+
+      joint:
+        description: "Maximum taxable income for 15% capital gains rate (married filing jointly)"
+        unit: currency-USD
+        period: year
+        label: "15% Rate Ceiling (Joint)"
+        reference: "26 USC 1(h)(1)(C); Rev. Proc. 2023-34"
+        values:
+          2025-01-01: 600050
+          2024-01-01: 583750
+          2023-01-01: 553850
+          2022-01-01: 517200
+          2021-01-01: 501600
+          2020-01-01: 496600
+
+      head_of_household:
+        description: "Maximum taxable income for 15% capital gains rate (head of household)"
+        unit: currency-USD
+        period: year
+        label: "15% Rate Ceiling (HOH)"
+        reference: "26 USC 1(h)(1)(C); Rev. Proc. 2023-34"
+        values:
+          2025-01-01: 566700
+          2024-01-01: 551350
+          2023-01-01: 523050
+          2022-01-01: 488500
+          2021-01-01: 473750
+          2020-01-01: 469050
+
+      married_filing_separately:
+        description: "Maximum taxable income for 15% capital gains rate (married filing separately)"
+        unit: currency-USD
+        period: year
+        label: "15% Rate Ceiling (MFS)"
+        reference: "26 USC 1(h)(1)(C); Rev. Proc. 2023-34"
+        values:
+          2025-01-01: 300000
+          2024-01-01: 291850
+          2023-01-01: 276900
+          2022-01-01: 258600
+          2021-01-01: 250800
+          2020-01-01: 248300
+
+      surviving_spouse:
+        description: "Maximum taxable income for 15% capital gains rate (surviving spouse)"
+        unit: currency-USD
+        period: year
+        label: "15% Rate Ceiling (Surviving Spouse)"
+        reference: "26 USC 1(h)(1)(C); Rev. Proc. 2023-34"
+        values:
+          2025-01-01: 600050
+          2024-01-01: 583750
+          2023-01-01: 553850
+          2022-01-01: 517200
+          2021-01-01: 501600
+          2020-01-01: 496600
+
+  # ===========================================================================
+  # BRACKET STRUCTURE (for use with marginal_agg)
+  # ===========================================================================
+  # Combined structure for bracket functions.
+  # Rates are fixed in statute per 26 USC 1(h)(1), thresholds indexed annually.
+  # marginal_agg expects: brackets.rates = [rate0, rate1, rate2, ...]
+  #                       brackets.thresholds = {filing_status: [threshold0, ...]}
+  brackets:
+    description: "Capital gains bracket structure for marginal_agg"
+    reference: "26 USC 1(h)(1)(B), (C), (D)"
+    rates: [0.00, 0.15, 0.20]
+    thresholds:
+      # Single filer thresholds per Rev. Proc.
+      single:
+        2025: [0, 48350, 533400]
+        2024: [0, 47025, 518900]
+        2023: [0, 44625, 492300]
+        2022: [0, 41675, 459750]
+        2021: [0, 40400, 445850]
+        2020: [0, 40000, 441450]
+      # Married filing jointly per Rev. Proc.
+      joint:
+        2025: [0, 96700, 600050]
+        2024: [0, 94050, 583750]
+        2023: [0, 89250, 553850]
+        2022: [0, 83350, 517200]
+        2021: [0, 80800, 501600]
+        2020: [0, 80000, 496600]
+      # Head of household per Rev. Proc.
+      head_of_household:
+        2025: [0, 64750, 566700]
+        2024: [0, 63000, 551350]
+        2023: [0, 59750, 523050]
+        2022: [0, 55800, 488500]
+        2021: [0, 54100, 473750]
+        2020: [0, 53600, 469050]
+      # Married filing separately per Rev. Proc.
+      married_filing_separately:
+        2025: [0, 48350, 300000]
+        2024: [0, 47025, 291850]
+        2023: [0, 44625, 276900]
+        2022: [0, 41675, 258600]
+        2021: [0, 40400, 250800]
+        2020: [0, 40000, 248300]
+      # Surviving spouse (same as joint)
+      surviving_spouse:
+        2025: [0, 96700, 600050]
+        2024: [0, 94050, 583750]
+        2023: [0, 89250, 553850]
+        2022: [0, 83350, 517200]
+        2021: [0, 80800, 501600]
+        2020: [0, 80000, 496600]

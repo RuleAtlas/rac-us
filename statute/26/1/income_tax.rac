@@ -13,124 +13,52 @@ imports:
 # Filing status determines which rate schedule to use
   filing_status: statute/26/1/filing_status
 
-# Bracket thresholds by filing status
-# Parameters are loaded from brackets/thresholds_2024.yaml
-
 parameters:
-# Tax rates are fixed in statute - not subject to inflation adjustment
-  rates: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+# Bracket structure with rates and thresholds by filing status
+# - rates: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+# - thresholds: {single: [...], joint: [...], ...}
+  brackets: parameters#gov.irs.income_tax.brackets
 
-# Bracket thresholds vary by filing status and are indexed
-# These are loaded from parameters files per tax year
-  thresholds_single: brackets/thresholds_2024#single
-  thresholds_joint: brackets/thresholds_2024#married_filing_jointly
-  thresholds_hoh: brackets/thresholds_2024#head_of_household
-  thresholds_separate: brackets/thresholds_2024#married_filing_separately
-  thresholds_surviving: brackets/thresholds_2024#surviving_spouse
+# =============================================================================
+# Ordinary Income Tax
+# =============================================================================
+# Main income tax calculation using progressive marginal brackets.
+# The marginal_agg function handles all bracket math:
+# - Splits income into bracket portions
+# - Applies each rate to its portion
+# - Sums the results
 
-# Helper function to select thresholds based on filing status
+variable income_tax_before_credits:
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Income Tax Before Credits"
+  description "Federal income tax on ordinary income before credits per 26 USC Section 1"
 
-function get_thresholds(filing_status: FilingStatus) -> Array[Money]:
-match filing_status {
-SINGLE => thresholds_single
-MARRIED_FILING_JOINTLY => thresholds_joint
-HEAD_OF_HOUSEHOLD => thresholds_hoh
-MARRIED_FILING_SEPARATELY => thresholds_separate
-QUALIFYING_WIDOW => thresholds_surviving
+  formula:
+    return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
 
-# Main income tax calculation using progressive marginal brackets
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Income Tax Before Credits"
-description "Federal income tax on ordinary income before credits per 26 USC Section 1"
+  defined_for:
+    taxable_income > 0
 
-formula:
-  # Get bracket thresholds for this filing status
-  thresholds = get_thresholds(filing_status)
+  default 0
 
-  # Apply progressive marginal rates
-  # Each bracket is taxed only on income within that bracket
-  tax = 0
+---
 
-  # 10% bracket: $0 to threshold[0.12]
-  bracket_10 = min(taxable_income, thresholds[0.12]) - thresholds[0.10]
-  tax = tax + max(0, bracket_10) * 0.10
+# =============================================================================
+# Vectorized version (same formula - marginal_agg is already vectorized)
+# =============================================================================
 
-  # 12% bracket: threshold[0.12] to threshold[0.22]
-  bracket_12 = min(taxable_income, thresholds[0.22]) - thresholds[0.12]
-  tax = tax + max(0, bracket_12) * 0.12
+variable income_tax_before_credits_vectorized:
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Income Tax Before Credits (Vectorized)"
+  description "Vectorized implementation for microsimulation"
 
-  # 22% bracket: threshold[0.22] to threshold[0.24]
-  bracket_22 = min(taxable_income, thresholds[0.24]) - thresholds[0.22]
-  tax = tax + max(0, bracket_22) * 0.22
+  formula:
+    return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
 
-  # 24% bracket: threshold[0.24] to threshold[0.32]
-  bracket_24 = min(taxable_income, thresholds[0.32]) - thresholds[0.24]
-  tax = tax + max(0, bracket_24) * 0.24
-
-  # 32% bracket: threshold[0.32] to threshold[0.35]
-  bracket_32 = min(taxable_income, thresholds[0.35]) - thresholds[0.32]
-  tax = tax + max(0, bracket_32) * 0.32
-
-  # 35% bracket: threshold[0.35] to threshold[0.37]
-  bracket_35 = min(taxable_income, thresholds[0.37]) - thresholds[0.35]
-  tax = tax + max(0, bracket_35) * 0.35
-
-  # 37% bracket: above threshold[0.37]
-  bracket_37 = taxable_income - thresholds[0.37]
-  tax = tax + max(0, bracket_37) * 0.37
-
-  return tax
-
-# Only defined for positive taxable income
-
-defined_for:
-  taxable_income > 0
-
-default 0
-
-# Vectorized version for microsimulation (numpy-compatible)
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Income Tax Before Credits (Vectorized)"
-description "Vectorized implementation for microsimulation"
-
-formula:
-  # This formula is designed for vectorized execution with numpy arrays
-  # The compiler translates this to efficient numpy operations
-
-  thresholds = get_thresholds(filing_status)
-  n = len(taxable_income)
-
-  # Initialize tax array
-  tax = zeros(n)
-
-  # Vectorized bracket calculation
-  # Each bracket adds: max(0, min(income, ceiling) - floor) * rate
-
-  # 10% bracket
-  tax = tax + maximum(0, minimum(taxable_income, thresholds[0.12]) - thresholds[0.10]) * 0.10
-
-  # 12% bracket
-  tax = tax + maximum(0, minimum(taxable_income, thresholds[0.22]) - thresholds[0.12]) * 0.12
-
-  # 22% bracket
-  tax = tax + maximum(0, minimum(taxable_income, thresholds[0.24]) - thresholds[0.22]) * 0.22
-
-  # 24% bracket
-  tax = tax + maximum(0, minimum(taxable_income, thresholds[0.32]) - thresholds[0.24]) * 0.24
-
-  # 32% bracket
-  tax = tax + maximum(0, minimum(taxable_income, thresholds[0.35]) - thresholds[0.32]) * 0.32
-
-  # 35% bracket
-  tax = tax + maximum(0, minimum(taxable_income, thresholds[0.37]) - thresholds[0.35]) * 0.35
-
-  # 37% bracket (no ceiling)
-  tax = tax + maximum(0, taxable_income - thresholds[0.37]) * 0.37
-
-  return tax
+  default 0
