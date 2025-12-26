@@ -160,3 +160,37 @@ roth_401k_holding_period_years:
     2006-01-01: 5
   citations:
     - "26 USC 402A(d)(2)(B): 5-taxable-year period of participation"
+
+# ============================================================================
+# Uniform Lifetime Table - 401(a)(9)
+# ============================================================================
+# IRS Publication 590-B, Table III (Uniform Lifetime Table)
+# Used to calculate RMD when spouse is not sole beneficiary or is not
+# more than 10 years younger than account owner.
+#
+# Structure for use with cut() function:
+# divisor = cut(age, uniform_lifetime_table)
+#
+# Updated per Treasury Regulation 1.401(a)(9)-9 (effective 2022)
+
+uniform_lifetime_table:
+  description: "Life expectancy divisors for RMD calculation (Table III)"
+  reference: "Treas. Reg. 1.401(a)(9)-9(c) Table III"
+  unit: years
+  # Thresholds are ages; amounts are divisors
+  # Ages below 72 use the age-72 divisor
+  thresholds: [72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120]
+  amounts: [27.4, 26.5, 25.5, 24.6, 23.7, 22.9, 22.0, 21.1, 20.2, 19.4, 18.5, 17.7, 16.8, 16.0, 15.2, 14.4, 13.7, 12.9, 12.2, 11.5, 10.8, 10.1, 9.5, 8.9, 8.4, 7.8, 7.3, 6.8, 6.4, 6.0, 5.6, 5.2, 4.9, 4.6, 4.3, 4.1, 3.9, 3.7, 3.5, 3.4, 3.3, 3.1, 3.0, 2.9, 2.8, 2.7, 2.5, 2.3, 2.0]
+  # For ages below first threshold (72), use first amount (27.4)
+  # For ages above last threshold (120), use last amount (2.0)
+
+# Birth year thresholds for determining RMD applicable age
+rmd_birth_year_thresholds:
+  description: "Birth year thresholds for RMD age determination per SECURE 2.0"
+  reference: "SECURE 2.0 Act Section 107"
+  # Structure for cut(): applicable_age = cut(birth_year, rmd_birth_year_thresholds)
+  thresholds: [1951, 1960]
+  amounts: [72, 73, 75]
+  # Born 1950 or earlier: 72
+  # Born 1951-1959: 73
+  # Born 1960 or later: 75
