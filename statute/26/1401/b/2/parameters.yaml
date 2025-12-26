@@ -1,0 +1,60 @@
+# 26 USC 1401(b)(2) - Additional Medicare Tax on Self-Employment Income
+#
+# "(2) Additional tax -
+# In addition to the tax imposed by paragraph (1), there shall be imposed for
+# each taxable year, on the self-employment income of every individual, a tax
+# equal to 0.9 percent of so much of the self-employment income (as defined
+# in section 1402(b)) as exceeds -
+#   (A) in the case of a joint return, $250,000,
+#   (B) in the case of a married individual (as defined in section 7703)
+#       filing a separate return, $125,000, and
+#   (C) in any other case, $200,000."
+#
+# Enacted by Affordable Care Act (2010), effective 2013.
+# Thresholds are NOT indexed for inflation.
+
+additional_rate:
+  description: "Additional Medicare Tax rate on self-employment income above threshold per 26 USC 1401(b)(2)"
+  unit: /1
+  period: year
+  label: "Additional Medicare Tax rate (SE)"
+  values:
+    2013-01-01: 0.009  # 0.9% additional tax
+    # Prior to 2013: no additional Medicare tax
+  citations:
+    - "26 USC 1401(b)(2): additional tax equal to 0.9 percent"
+
+# Thresholds by filing status - identical to 3101(b)(2) for wages
+# These are NOT indexed for inflation
+
+threshold_joint:
+  description: "Additional Medicare Tax threshold for joint filers per 26 USC 1401(b)(2)(A)"
+  unit: currency-USD
+  period: year
+  label: "Additional Medicare Tax threshold (joint)"
+  values:
+    2013-01-01: 250000
+  citations:
+    - "26 USC 1401(b)(2)(A): $250,000 for joint returns"
+
+threshold_separate:
+  description: "Additional Medicare Tax threshold for married filing separately per 26 USC 1401(b)(2)(B)"
+  unit: currency-USD
+  period: year
+  label: "Additional Medicare Tax threshold (MFS)"
+  values:
+    2013-01-01: 125000
+  citations:
+    - "26 USC 1401(b)(2)(B): $125,000 for married filing separately"
+
+threshold_single:
+  description: "Additional Medicare Tax threshold for single filers and others per 26 USC 1401(b)(2)(C)"
+  unit: currency-USD
+  period: year
+  label: "Additional Medicare Tax threshold (single/HoH)"
+  values:
+    2013-01-01: 200000
+  citations:
+    - "26 USC 1401(b)(2)(C): $200,000 for any other case"
+  notes:
+    - "Applies to single, head of household, and surviving spouse filers"

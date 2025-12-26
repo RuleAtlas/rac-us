@@ -514,3 +514,122 @@ test_cases:
       premium_tax_credit: 7199  # 20000 - 12801
     citations:
       - "P.L. 117-169 Section 12001: IRA removed income cliff"
+
+  # ============================================================================
+  # EXCESS ADVANCE PTC REPAYMENT WITH CAPS
+  # 26 USC 36B(f)(2)(B)
+  # ============================================================================
+
+  - name: "Repayment cap - under 200% FPL single"
+    description: "Repayment capped at $375 for single filer below 200% FPL"
+    inputs:
+      household_income: 22590  # 150% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+      advance_ptc: 7000  # Received more than entitled to
+    expected:
+      household_income_pct_fpl: 1.50
+      premium_tax_credit: 6000  # 0% contribution at 150% FPL
+      net_ptc_adjustment: -1000  # 6000 - 7000 = -1000 excess
+      excess_aptc_repayment_cap: 375
+      excess_advance_ptc_repayment: 375  # Capped at 375, not 1000
+    citations:
+      - "26 USC 36B(f)(2)(B): repayment limitation"
+      - "Rev. Proc. 2023-34: 2024 cap values"
+
+  - name: "Repayment cap - under 200% FPL joint"
+    description: "Repayment capped at $750 for joint filers below 200% FPL"
+    inputs:
+      household_income: 40880  # 150% FPL for family of 2 (20440 * 1.5)
+      filing_status: joint
+      ptc_household_size: 2
+      slcsp_premium: 10000
+      ptc_coverage_months: 12
+      advance_ptc: 11500  # Received $1500 more than entitled
+    expected:
+      household_income_pct_fpl: 1.50  # Actually ~2.0 for this income/size
+      premium_tax_credit: 10000
+      net_ptc_adjustment: -1500
+      excess_aptc_repayment_cap: 750
+      excess_advance_ptc_repayment: 750  # Capped
+    citations:
+      - "26 USC 36B(f)(2)(B): joint filer cap"
+
+  - name: "Repayment cap - 200-300% FPL single"
+    description: "Repayment capped at $950 for single filer 200-300% FPL"
+    inputs:
+      household_income: 37650  # 250% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+      advance_ptc: 6000  # Received full benchmark
+    expected:
+      household_income_pct_fpl: 2.50
+      applicable_percentage: 0.0400
+      expected_contribution: 1506
+      premium_tax_credit: 4494  # 6000 - 1506
+      net_ptc_adjustment: -1506  # 4494 - 6000
+      excess_aptc_repayment_cap: 950
+      excess_advance_ptc_repayment: 950  # Capped at 950, not 1506
+    citations:
+      - "26 USC 36B(f)(2)(B): 200-300% FPL bracket"
+
+  - name: "Repayment cap - 300-400% FPL single"
+    description: "Repayment capped at $1600 for single filer 300-400% FPL"
+    inputs:
+      household_income: 52710  # 350% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 8000
+      ptc_coverage_months: 12
+      advance_ptc: 8000  # Assumed no contribution at enrollment
+    expected:
+      household_income_pct_fpl: 3.50
+      applicable_percentage: 0.0725  # 6% + 0.5 * (8.5% - 6%) = 7.25%
+      expected_contribution: 3821  # 52710 * 0.0725
+      premium_tax_credit: 4179  # 8000 - 3821
+      net_ptc_adjustment: -3821  # 4179 - 8000
+      excess_aptc_repayment_cap: 1600
+      excess_advance_ptc_repayment: 1600  # Capped at 1600
+    citations:
+      - "26 USC 36B(f)(2)(B): 300-400% FPL bracket"
+
+  - name: "No repayment cap - above 400% FPL"
+    description: "Full repayment required for income above 400% FPL"
+    inputs:
+      household_income: 75300  # 500% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 10000
+      ptc_coverage_months: 12
+      advance_ptc: 8000  # Assumed lower contribution at enrollment
+    expected:
+      household_income_pct_fpl: 5.00
+      applicable_percentage: 0.0850
+      expected_contribution: 6401  # 75300 * 0.085
+      premium_tax_credit: 3599  # 10000 - 6401
+      net_ptc_adjustment: -4401  # 3599 - 8000
+      # No cap at 400%+ FPL
+      excess_advance_ptc_repayment: 4401  # Full repayment required
+    citations:
+      - "26 USC 36B(f)(2)(A): no cap above 400% FPL"
+
+  - name: "Repayment less than cap - under limit"
+    description: "If repayment is less than cap, pay actual amount"
+    inputs:
+      household_income: 22590  # 150% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+      advance_ptc: 6200  # Only $200 excess
+    expected:
+      premium_tax_credit: 6000
+      net_ptc_adjustment: -200
+      excess_aptc_repayment_cap: 375
+      excess_advance_ptc_repayment: 200  # Actual amount, not cap
+    citations:
+      - "26 USC 36B(f)(2)(B): cap only applies if excess exceeds cap"

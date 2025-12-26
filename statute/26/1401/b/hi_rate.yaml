@@ -1,14 +1,27 @@
-# 26 USC 1401(b) - Hospital Insurance Rate
+# 26 USC 1401(b)(1) - Hospital Insurance Rate (Base Medicare Tax)
 #
 # "In addition to the tax imposed by the preceding subsection, there shall be
 # imposed for each taxable year, on the self-employment income of every individual,
 # a tax equal to 2.9 percent of the amount of the self-employment income..."
+#
+# Self-employed individuals pay both employee and employer shares (double the
+# employee rate of 1.45% = 2.9%).
+#
+# Note: Additional Medicare Tax of 0.9% on high earners is in 1401(b)(2).
 
 hi_rate:
-  description: "Medicare (Hospital Insurance) portion of self-employment tax rate"
+  description: "Base Medicare (Hospital Insurance) portion of self-employment tax rate per 26 USC 1401(b)(1)"
   unit: /1
+  period: year
+  label: "Self-employment Medicare rate"
   values:
     # Current rate since 1986
     1986-01-01: 0.029
+    # Historical rates (employee + employer combined)
+    1985-01-01: 0.027  # 1.35% + 1.35%
+    1984-01-01: 0.026  # 1.30% + 1.30%
   citations:
-    - "26 USC 1401(b): 2.9% rate on self-employment income"
+    - "26 USC 1401(b)(1): rate of 2.9 percent on self-employment income"
+    - "Medicare Catastrophic Coverage Act history"
+  notes:
+    - "This is the BASE rate. Additional 0.9% on high earners is in 1401(b)(2)"

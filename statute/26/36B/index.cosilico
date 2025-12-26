@@ -1,0 +1,100 @@
+# 26 USC 36B - Premium Tax Credit
+#
+# The Premium Tax Credit (PTC) is a refundable tax credit that helps eligible
+# individuals and families afford health insurance purchased through the
+# Health Insurance Marketplace (Exchanges established under the Affordable
+# Care Act).
+#
+# Statutory Structure:
+# - 36B(a): Allowance of credit
+# - 36B(b): Premium assistance credit amount calculation
+# - 36B(c): Definition of applicable taxpayer, coverage months, QHP
+# - 36B(d): Definitions (household income, family size, poverty line)
+# - 36B(e): Special rules
+# - 36B(f): Reconciliation of advance payments
+# - 36B(g): Regulations
+#
+# Key Formula per 36B(b)(2):
+#   Credit = Benchmark Premium - Expected Contribution
+#   Where:
+#     Benchmark = Second Lowest Cost Silver Plan (SLCSP) premium
+#     Expected Contribution = Household Income * Applicable Percentage
+#
+# Modified by:
+# - Inflation Reduction Act of 2022 (P.L. 117-169 Section 12001):
+#     Extended enhanced subsidies through 2025, removed 400% FPL cliff
+# - American Rescue Plan Act of 2021 (P.L. 117-2 Section 9661):
+#     Enhanced subsidies, reduced contribution percentages for 2021-2022
+# - Affordable Care Act of 2010 (P.L. 111-148):
+#     Original enactment, effective for taxable years ending after 2013
+#
+# Sources:
+# - https://www.law.cornell.edu/uscode/text/26/36B
+# - https://www.healthcare.gov/glossary/premium-tax-credit/
+# - https://www.irs.gov/affordable-care-act/individuals-and-families/premium-tax-credit
+
+imports:
+  # Section 36B(a) - Credit calculation
+  premium_tax_credit: statute/26/36B/a/premium_tax_credit
+  premium_assistance_credit_amount: statute/26/36B/a/premium_assistance_credit_amount
+
+  # Section 36B(b) - Applicable percentage
+  applicable_percentage: statute/26/36B/b/applicable_percentage
+  expected_contribution: statute/26/36B/b/expected_contribution
+
+  # Section 36B(c) - Applicable taxpayer
+  is_applicable_taxpayer: statute/26/36B/c/is_applicable_taxpayer
+  ptc_coverage_months: statute/26/36B/c/ptc_coverage_months
+
+  # Section 36B(d) - Definitions
+  household_income: statute/26/36B/d/household_income
+  household_income_pct_fpl: statute/26/36B/d/household_income_pct_fpl
+  ptc_federal_poverty_level: statute/26/36B/d/ptc_federal_poverty_level
+  slcsp_premium: statute/26/36B/d/slcsp_premium
+
+  # Section 36B(f) - Reconciliation
+  advance_ptc: statute/26/36B/a/advance_ptc
+  excess_advance_ptc_repayment: statute/26/36B/a/excess_advance_ptc_repayment
+
+# =============================================================================
+# PREMIUM TAX CREDIT SUMMARY
+# =============================================================================
+#
+# Eligibility Requirements per 36B(c)(1):
+# 1. Household income between 100-400% FPL (IRA: no upper limit through 2025)
+# 2. Not filing Married Filing Separately (with exceptions)
+# 3. Cannot be claimed as dependent by another taxpayer
+# 4. Enrolled in qualified health plan through Exchange
+# 5. Not eligible for minimum essential coverage (employer, Medicare, Medicaid)
+#
+# Credit Calculation:
+# 1. Determine household income as % of FPL
+# 2. Look up applicable percentage based on income bracket
+# 3. Calculate expected contribution (income * applicable %)
+# 4. Credit = max(0, SLCSP premium - expected contribution)
+# 5. Prorate for coverage months
+#
+# Advance Payment Reconciliation per 36B(f):
+# - Taxpayers can receive advance payments during the year
+# - At tax time, reconcile actual credit vs advance payments
+# - If actual < advance: repay excess (subject to caps for some income levels)
+# - If actual > advance: receive additional refund
+#
+# =============================================================================
+
+exports:
+  # Main credit
+  premium_tax_credit
+
+  # Eligibility
+  is_applicable_taxpayer
+  ptc_coverage_months
+
+  # Calculation components
+  applicable_percentage
+  expected_contribution
+  household_income_pct_fpl
+
+  # Reconciliation
+  advance_ptc
+  excess_advance_ptc_repayment

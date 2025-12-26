@@ -2,7 +2,7 @@
 
 encoding:
   created: 2024-12-24
-  updated: 2024-12-24
+  updated: 2024-12-26
   status: implemented
   encoded_by: claude-opus-4.5
 
@@ -15,16 +15,21 @@ variable:
 coverage:
   tax_years: [2020, 2021, 2022, 2023, 2024, 2025]
   notes: |
-    Self-employment tax consists of two components:
-    - OASDI (Social Security): 12.4% on net earnings up to wage base
-    - HI (Medicare): 2.9% on all net earnings (no cap)
-    - Total combined rate: 15.3%
+    Self-employment tax consists of three components:
+    - OASDI (Social Security): 12.4% on net earnings up to wage base per 1401(a)
+    - HI (Medicare): 2.9% on all net earnings (no cap) per 1401(b)(1)
+    - Additional Medicare Tax: 0.9% on SE income above threshold per 1401(b)(2)
 
     Net earnings = 92.35% of gross self-employment income per 1402(a).
     The 92.35% factor accounts for the employer-equivalent portion.
 
     W-2 wages already subject to payroll tax reduce the Social Security
     wage base available for self-employment income per 1402(b).
+
+    Additional Medicare Tax thresholds (1401(b)(2)):
+    - Joint: $250,000
+    - Married filing separately: $125,000
+    - Single/HOH/Surviving spouse: $200,000
 
     Half of SE tax is deductible per 164(f).
 
@@ -70,20 +75,26 @@ architecture:
        - Capped at Social Security wage base
        - a/oasdi_rate.yaml
 
-    2. 1401(b) - HI (Medicare) Tax
+    2. 1401(b)(1) - HI (Medicare) Tax
        - 2.9% rate on net SE earnings
        - No wage base cap
        - b/hi_rate.yaml
 
-    3. 1402(a) - Net Earnings Definition
+    3. 1401(b)(2) - Additional Medicare Tax
+       - 0.9% rate on SE income above threshold
+       - Thresholds vary by filing status (not indexed)
+       - b/2/parameters.yaml
+       - b/2/additional_medicare_tax.cosilico
+
+    4. 1402(a) - Net Earnings Definition
        - 92.35% of gross self-employment income
        - PolicyEngine's taxable_self_employment_income includes this adjustment
 
-    4. 1402(b) - Coordination with W-2 Wages
+    5. 1402(b) - Coordination with W-2 Wages
        - W-2 wages subject to SS reduce available wage base
        - social_security_cap_remaining variable
 
-    5. 164(f) - SE Tax Deduction
+    6. 164(f) - SE Tax Deduction
        - One-half of SE tax is deductible above-the-line
        - Reduces AGI
 
@@ -94,11 +105,20 @@ architecture:
       parameters:
         - a/oasdi_rate#oasdi_rate
 
-    - provision: "1401(b)"
-      description: "HI tax rate"
+    - provision: "1401(b)(1)"
+      description: "Base HI tax rate"
       variable: self_employment_medicare_tax
       parameters:
         - b/hi_rate#hi_rate
+
+    - provision: "1401(b)(2)"
+      description: "Additional Medicare Tax"
+      variable: self_employment_additional_medicare_tax
+      parameters:
+        - b/2/parameters.yaml#additional_rate
+        - b/2/parameters.yaml#threshold_joint
+        - b/2/parameters.yaml#threshold_separate
+        - b/2/parameters.yaml#threshold_single
 
     - provision: "1401 combined"
       description: "Total self-employment tax"
@@ -116,6 +136,8 @@ architecture:
       description: "Net earnings from self-employment"
     - path: statute/26/164/f
       description: "SE tax deduction (50%)"
+    - path: statute/26/1/filing_status
+      description: "Filing status for threshold determination"
 
 test_files:
   - tests.yaml  # Comprehensive test cases

@@ -1,0 +1,171 @@
+# 26 USC 36B(c) - Definition of Applicable Taxpayer
+#
+# "(c) DEFINITION AND RULES RELATING TO APPLICABLE TAXPAYER, COVERAGE MONTHS,
+#  AND QUALIFIED HEALTH PLAN.--
+#  (1) APPLICABLE TAXPAYER.--
+#    (A) IN GENERAL.--The term 'applicable taxpayer' means, with respect to
+#        any taxable year, a taxpayer whose household income for the taxable
+#        year equals or exceeds 100 percent but does not exceed 400 percent
+#        of an amount equal to the poverty line for a family of the size
+#        involved.
+#    (B) SPECIAL RULE FOR CERTAIN INDIVIDUALS LAWFULLY PRESENT IN THE
+#        UNITED STATES.--
+#    (C) MARRIED COUPLES MUST FILE JOINT RETURN.--If the taxpayer is married
+#        (within the meaning of section 7703) at the close of the taxable
+#        year, the taxpayer shall be treated as an applicable taxpayer only
+#        if the taxpayer and the taxpayer's spouse file a joint return for
+#        the taxable year.
+#    (D) DENIAL OF CREDIT TO DEPENDENTS.--No credit shall be allowed under
+#        this section to any individual with respect to whom a deduction
+#        under section 151 is allowable to another taxpayer for a taxable
+#        year beginning in the calendar year in which such individual's
+#        taxable year begins."
+#
+# Modified by:
+# - P.L. 117-169 Section 12001 (IRA): Removes 400% upper limit through 2025
+# - P.L. 117-2 Section 9661 (ARPA): Enhanced for 2021-2022
+#
+# Sources:
+# - https://www.law.cornell.edu/uscode/text/26/36B#c
+
+imports:
+  filing_status: statute/26/1/filing_status
+  household_income_pct_fpl: statute/26/36B/d/household_income_pct_fpl
+  income_lower_limit: statute/26/36B/income_eligibility/lower_limit
+  income_upper_limit_ira: statute/26/36B/income_eligibility/upper_limit_ira
+
+# =============================================================================
+# FILING STATUS ELIGIBILITY
+# 26 USC 36B(c)(1)(C)
+# =============================================================================
+
+variable ptc_filing_status_eligible:
+  entity TaxUnit
+  period Year
+  dtype Boolean
+  label "PTC Filing Status Eligible"
+  description "Eligible filing status per 26 USC 36B(c)(1)(C)"
+
+  formula:
+    # Married filing separately is generally ineligible
+    # Exception: Victims of domestic abuse or spousal abandonment (not modeled)
+    return filing_status != "separate"
+
+# =============================================================================
+# INCOME ELIGIBILITY
+# 26 USC 36B(c)(1)(A) - modified by IRA Section 12001
+# =============================================================================
+
+variable ptc_income_eligible:
+  entity TaxUnit
+  period Year
+  dtype Boolean
+  label "PTC Income Eligible"
+  description "Household income within eligible range per 26 USC 36B(c)(1)(A)"
+
+  formula:
+    income_pct = household_income_pct_fpl
+
+    # Must be at least 100% FPL
+    # Those below 100% may be eligible for Medicaid
+    if income_pct < income_lower_limit then
+      return false
+
+    # Under IRA (2021-2025): No upper limit
+    # Credit phases out naturally via 8.5% contribution rate
+    return income_pct <= income_upper_limit_ira
+
+# =============================================================================
+# DEPENDENT EXCLUSION
+# 26 USC 36B(c)(1)(D)
+# =============================================================================
+
+variable ptc_not_dependent:
+  entity TaxUnit
+  period Year
+  dtype Boolean
+  label "PTC Not Claimed as Dependent"
+  description "Not claimed as dependent by another per 26 USC 36B(c)(1)(D)"
+
+  formula:
+    # Taxpayer cannot be claimed as dependent by another
+    return not is_tax_unit_dependent
+
+# =============================================================================
+# COMBINED APPLICABLE TAXPAYER DETERMINATION
+# 26 USC 36B(c)(1)
+# =============================================================================
+
+variable is_applicable_taxpayer:
+  entity TaxUnit
+  period Year
+  dtype Boolean
+  label "Is Applicable Taxpayer for PTC"
+  description "Meets all applicable taxpayer requirements per 26 USC 36B(c)(1)"
+
+  formula:
+    # All conditions must be met
+    if not ptc_filing_status_eligible then
+      return false
+
+    if not ptc_income_eligible then
+      return false
+
+    if not ptc_not_dependent then
+      return false
+
+    return true
+
+# =============================================================================
+# COVERAGE MONTH DEFINITION
+# 26 USC 36B(c)(2)
+# =============================================================================
+
+# "(2) COVERAGE MONTH.--For purposes of this subsection--
+#  (A) IN GENERAL.--The term 'coverage month' means, with respect to an
+#      applicable taxpayer, any month if--
+#    (i) as of the first day of such month the taxpayer, the taxpayer's
+#        spouse, or any dependent of the taxpayer is covered by a qualified
+#        health plan... enrolled in through an Exchange...
+#    (ii) the premium for coverage under such plan for such month is paid by
+#        the taxpayer (or through advance payment of the credit under
+#        subsection (a)...
+#    (iii) such individual is not eligible for minimum essential coverage
+#        (as defined in section 5000A(f))...
+#  (B) EXCEPTION FOR MINIMUM ESSENTIAL COVERAGE.--
+#    (i) IN GENERAL.--The term 'coverage month' shall not include any month
+#        with respect to an individual if for such month the individual is
+#        eligible for minimum essential coverage..."
+
+variable ptc_coverage_months:
+  entity TaxUnit
+  period Year
+  dtype Integer
+  label "PTC Coverage Months"
+  description "Number of months enrolled in qualified health plan per 26 USC 36B(c)(2)"
+
+  # Input variable: This would typically be determined by:
+  # - Months enrolled in Marketplace plan
+  # - Months where premium was paid
+  # - Months where not eligible for MEC (employer, Medicare, Medicaid, etc.)
+
+  default 0
+
+# =============================================================================
+# QUALIFIED HEALTH PLAN
+# 26 USC 36B(c)(3)
+# =============================================================================
+
+# "(3) QUALIFIED HEALTH PLAN.--The term 'qualified health plan' has the
+#  meaning given such term by section 1301(a) of the Patient Protection and
+#  Affordable Care Act..."
+
+# This is an input indicating enrollment in Marketplace coverage
+variable enrolled_in_qualified_health_plan:
+  entity TaxUnit
+  period Year
+  dtype Boolean
+  label "Enrolled in Qualified Health Plan"
+  description "Enrolled in QHP through Marketplace per 26 USC 36B(c)(3)"
+
+  default false

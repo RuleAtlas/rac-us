@@ -6,9 +6,15 @@
 # Key 2024 parameters:
 # - OASDI rate: 12.4%
 # - HI rate: 2.9%
-# - Total SE rate: 15.3%
+# - Base SE rate: 15.3%
+# - Additional Medicare Tax: 0.9% on income above threshold
 # - SS wage base: $168,600
 # - Net earnings = 92.35% of gross SE income (per 1402(a))
+#
+# Additional Medicare Tax thresholds (1401(b)(2)):
+# - Joint: $250,000
+# - MFS: $125,000
+# - Single/HOH: $200,000
 
 reference: "26 USC 1401"
 tax_year: 2024
@@ -153,3 +159,145 @@ tests:
       self_employment_tax: 15314.84
       se_tax_deduction: 7657.42
     notes: "Mixed income exactly filling remaining wage base cap"
+
+# =============================================================================
+# ADDITIONAL MEDICARE TAX TESTS - 26 USC 1401(b)(2)
+# =============================================================================
+
+  # Test 9: SE income below Additional Medicare Tax threshold (single)
+  - name: "SE income below $200k threshold - no Additional Medicare Tax"
+    inputs:
+      self_employment_income: 150000  # 150000 * 0.9235 = 138525
+      taxable_self_employment_income: 138525
+      employment_income: 0
+      filing_status: SINGLE
+    expected:
+      # SS tax: 138525 * 0.124 = 17177.10
+      # Medicare tax: 138525 * 0.029 = 4017.23
+      # Base SE tax: 21194.33
+      # Additional Medicare Tax: 0 (below $200k threshold)
+      self_employment_social_security_tax: 17177.10
+      self_employment_medicare_tax: 4017.23
+      base_self_employment_tax: 21194.33
+      self_employment_additional_medicare_tax: 0
+    notes: "SE income below threshold - no additional tax"
+    citations:
+      - "26 USC 1401(b)(2)(C): $200,000 threshold for single"
+
+  # Test 10: SE income above threshold - single filer
+  - name: "SE income above $200k threshold - Additional Medicare Tax applies"
+    inputs:
+      self_employment_income: 300000  # 300000 * 0.9235 = 277050
+      taxable_self_employment_income: 277050
+      employment_income: 0
+      filing_status: SINGLE
+    expected:
+      # SS tax: 168600 (capped) * 0.124 = 20906.40
+      # Medicare tax: 277050 * 0.029 = 8034.45
+      # Base SE tax: 28940.85
+      # Additional Medicare Tax: (277050 - 200000) * 0.009 = 77050 * 0.009 = 693.45
+      self_employment_social_security_tax: 20906.40
+      self_employment_medicare_tax: 8034.45
+      base_self_employment_tax: 28940.85
+      se_income_subject_to_additional_medicare_tax: 77050
+      self_employment_additional_medicare_tax: 693.45
+    notes: "High SE income triggers Additional Medicare Tax"
+    citations:
+      - "26 USC 1401(b)(2): 0.9% on SE income above threshold"
+
+  # Test 11: Joint filers with SE income above $250k threshold
+  - name: "Joint filers - SE income above $250k threshold"
+    inputs:
+      self_employment_income: 400000  # 400000 * 0.9235 = 369400
+      taxable_self_employment_income: 369400
+      employment_income: 0
+      filing_status: JOINT
+    expected:
+      # SS tax: 168600 (capped) * 0.124 = 20906.40
+      # Medicare tax: 369400 * 0.029 = 10712.60
+      # Base SE tax: 31619.00
+      # Additional Medicare Tax: (369400 - 250000) * 0.009 = 119400 * 0.009 = 1074.60
+      self_employment_social_security_tax: 20906.40
+      self_employment_medicare_tax: 10712.60
+      base_self_employment_tax: 31619.00
+      additional_medicare_tax_threshold: 250000
+      se_income_subject_to_additional_medicare_tax: 119400
+      self_employment_additional_medicare_tax: 1074.60
+    notes: "Joint filers have higher $250k threshold"
+    citations:
+      - "26 USC 1401(b)(2)(A): $250,000 threshold for joint"
+
+  # Test 12: Married filing separately - lower $125k threshold
+  - name: "MFS filer - lower $125k threshold"
+    inputs:
+      self_employment_income: 200000  # 200000 * 0.9235 = 184700
+      taxable_self_employment_income: 184700
+      employment_income: 0
+      filing_status: SEPARATE
+    expected:
+      # SS tax: 168600 (capped) * 0.124 = 20906.40
+      # Medicare tax: 184700 * 0.029 = 5356.30
+      # Base SE tax: 26262.70
+      # Additional Medicare Tax: (184700 - 125000) * 0.009 = 59700 * 0.009 = 537.30
+      self_employment_social_security_tax: 20906.40
+      self_employment_medicare_tax: 5356.30
+      base_self_employment_tax: 26262.70
+      additional_medicare_tax_threshold: 125000
+      se_income_subject_to_additional_medicare_tax: 59700
+      self_employment_additional_medicare_tax: 537.30
+    notes: "MFS has lowest threshold - most additional tax"
+    citations:
+      - "26 USC 1401(b)(2)(B): $125,000 threshold for MFS"
+
+  # Test 13: Mixed W-2 and SE income - wages use threshold
+  - name: "Mixed income - wages partially use threshold"
+    inputs:
+      self_employment_income: 100000  # 100000 * 0.9235 = 92350
+      taxable_self_employment_income: 92350
+      employment_income: 150000  # W-2 wages
+      filing_status: SINGLE
+    expected:
+      # Combined income: 150000 + 92350 = 242350
+      # Threshold: $200k
+      # Wages use $150k of threshold, leaving $50k for SE
+      # SE above remaining threshold: 92350 - 50000 = 42350
+      # Additional Medicare Tax: 42350 * 0.009 = 381.15
+      combined_medicare_income: 242350
+      additional_medicare_tax_threshold: 200000
+      se_income_subject_to_additional_medicare_tax: 42350
+      self_employment_additional_medicare_tax: 381.15
+    notes: "W-2 wages reduce threshold available for SE income"
+    citations:
+      - "26 USC 1401(b)(2): combined wages and SE income"
+
+  # Test 14: W-2 wages already exceed threshold - all SE income taxed
+  - name: "W-2 wages exceed threshold - all SE income gets additional tax"
+    inputs:
+      self_employment_income: 50000  # 50000 * 0.9235 = 46175
+      taxable_self_employment_income: 46175
+      employment_income: 220000  # W-2 wages exceed $200k threshold
+      filing_status: SINGLE
+    expected:
+      # Wages ($220k) already exceed $200k threshold
+      # All SE income is subject to Additional Medicare Tax
+      combined_medicare_income: 266175
+      additional_medicare_tax_threshold: 200000
+      se_income_subject_to_additional_medicare_tax: 46175
+      self_employment_additional_medicare_tax: 415.58  # 46175 * 0.009
+    notes: "When wages exceed threshold, all SE income taxed at 0.9%"
+
+  # Test 15: Exactly at threshold - no additional tax
+  - name: "SE income exactly at threshold - no additional tax"
+    inputs:
+      self_employment_income: 216591  # 216591 * 0.9235 = 200017 (approximately)
+      taxable_self_employment_income: 200000  # Exactly at threshold
+      employment_income: 0
+      filing_status: SINGLE
+    expected:
+      combined_medicare_income: 200000
+      additional_medicare_tax_threshold: 200000
+      se_income_subject_to_additional_medicare_tax: 0
+      self_employment_additional_medicare_tax: 0
+    notes: "Income must EXCEED threshold, not equal it"
+    citations:
+      - "26 USC 1401(b)(2): income that 'exceeds' threshold"

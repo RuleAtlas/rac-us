@@ -3,12 +3,22 @@
 # "In addition to other taxes, there shall be imposed for each taxable year,
 # on the self-employment income of every individual, a tax equal to 12.4 percent
 # of the amount of the self-employment income..."
+#
+# Self-employed individuals pay both employee and employer shares (double the
+# employee rate of 6.2% = 12.4%).
 
 oasdi_rate:
-  description: "Social Security (OASDI) portion of self-employment tax rate"
+  description: "Social Security (OASDI) portion of self-employment tax rate per 26 USC 1401(a)"
   unit: /1
+  period: year
+  label: "Self-employment OASDI rate"
   values:
     # Current rate since 1990
     1990-01-01: 0.124
+    # Historical rates (employee + employer combined)
+    1988-01-01: 0.1510  # 7.55% + 7.55%
+    1985-01-01: 0.1410  # 7.05% + 7.05%
+    1984-01-01: 0.1140  # Self-employed paid reduced rate in 1984
   citations:
-    - "26 USC 1401(a): 12.4% rate on self-employment income"
+    - "26 USC 1401(a): rate of 12.4 percent on self-employment income"
+    - "Social Security Act history: combined employee+employer rate"

@@ -322,3 +322,101 @@ incarceration_exclusion:
     2014-01-01: true
   citations:
     - "26 USC 36B(c)(2)(B)(iv)"
+
+# =============================================================================
+# EXCESS ADVANCE PTC REPAYMENT CAPS
+# 26 USC 36B(f)(2)(B) - Limitation on repayment
+#
+# Taxpayers with household income below 400% FPL are protected by repayment
+# caps if they received excess advance premium tax credits.
+# =============================================================================
+
+repayment_caps:
+  description: "Maximum repayment of excess advance PTC per 26 USC 36B(f)(2)(B)"
+
+  # Income below 200% FPL
+  under_200_pct_fpl:
+    description: "Repayment cap for household income below 200% FPL"
+    single:
+      description: "Cap for single/head of household filers"
+      unit: currency-USD
+      values:
+        2024-01-01: 375
+        2023-01-01: 350
+        2022-01-01: 325
+        2021-01-01: 325
+        2014-01-01: 300
+      citations:
+        - "26 USC 36B(f)(2)(B)(i)"
+        - "Rev. Proc. 2023-34 (2024 indexed values)"
+    joint:
+      description: "Cap for married filing jointly"
+      unit: currency-USD
+      values:
+        2024-01-01: 750
+        2023-01-01: 700
+        2022-01-01: 650
+        2021-01-01: 650
+        2014-01-01: 600
+      citations:
+        - "26 USC 36B(f)(2)(B)(i)"
+        - "Rev. Proc. 2023-34"
+
+  # Income 200-300% FPL
+  200_to_300_pct_fpl:
+    description: "Repayment cap for household income 200-300% FPL"
+    single:
+      description: "Cap for single/head of household filers"
+      unit: currency-USD
+      values:
+        2024-01-01: 950
+        2023-01-01: 875
+        2022-01-01: 825
+        2021-01-01: 825
+        2014-01-01: 750
+      citations:
+        - "26 USC 36B(f)(2)(B)(i)"
+        - "Rev. Proc. 2023-34"
+    joint:
+      description: "Cap for married filing jointly"
+      unit: currency-USD
+      values:
+        2024-01-01: 1900
+        2023-01-01: 1750
+        2022-01-01: 1650
+        2021-01-01: 1650
+        2014-01-01: 1500
+      citations:
+        - "26 USC 36B(f)(2)(B)(i)"
+        - "Rev. Proc. 2023-34"
+
+  # Income 300-400% FPL
+  300_to_400_pct_fpl:
+    description: "Repayment cap for household income 300-400% FPL"
+    single:
+      description: "Cap for single/head of household filers"
+      unit: currency-USD
+      values:
+        2024-01-01: 1600
+        2023-01-01: 1500
+        2022-01-01: 1400
+        2021-01-01: 1400
+        2014-01-01: 1250
+      citations:
+        - "26 USC 36B(f)(2)(B)(i)"
+        - "Rev. Proc. 2023-34"
+    joint:
+      description: "Cap for married filing jointly"
+      unit: currency-USD
+      values:
+        2024-01-01: 3200
+        2023-01-01: 3000
+        2022-01-01: 2800
+        2021-01-01: 2800
+        2014-01-01: 2500
+      citations:
+        - "26 USC 36B(f)(2)(B)(i)"
+        - "Rev. Proc. 2023-34"
+
+  # Note: No cap for income at or above 400% FPL
+  # Full repayment required per 26 USC 36B(f)(2)(A)

@@ -1,0 +1,174 @@
+# 26 USC 36B(f) - Reconciliation of Credit and Advance Credit
+#
+# "(f) RECONCILIATION OF CREDIT AND ADVANCE CREDIT.--
+#  (1) IN GENERAL.--The amount of the credit allowed under this section for
+#      any taxable year shall be reduced (but not below zero) by the amount
+#      of any advance payment of such credit under section 1412 of the
+#      Patient Protection and Affordable Care Act.
+#  (2) EXCESS ADVANCE PAYMENTS.--
+#    (A) IN GENERAL.--If the advance payments to a taxpayer under section
+#        1412 of the Patient Protection and Affordable Care Act for a
+#        taxable year exceed the credit allowed by this section (determined
+#        without regard to paragraph (1)), the tax imposed by this chapter
+#        for the taxable year shall be increased by the amount of such
+#        excess.
+#    (B) LIMITATION ON INCREASE.--
+#      (i) IN GENERAL.--In the case of a taxpayer whose household income is
+#          less than 400 percent of the poverty line for the size of the
+#          family involved for the taxable year, the amount of the increase
+#          under subparagraph (A) shall in no event exceed the applicable
+#          dollar amount determined in accordance with the following table..."
+#
+# The repayment limitation table (for income below 400% FPL):
+# - Less than 200% FPL: $350 single / $700 joint
+# - 200-300% FPL: $875 single / $1,750 joint
+# - 300-400% FPL: $1,500 single / $3,000 joint
+#
+# NOTE: Under IRA (2021-2025), the 400% FPL cliff is removed, but repayment
+# caps still apply for those below 400% FPL.
+#
+# Sources:
+# - https://www.law.cornell.edu/uscode/text/26/36B#f
+# - IRS Form 8962 Instructions
+
+imports:
+  premium_tax_credit: statute/26/36B/a/premium_tax_credit
+  household_income_pct_fpl: statute/26/36B/d/household_income_pct_fpl
+  filing_status: statute/26/1/filing_status
+
+# Repayment caps from parameters
+  repay_cap_under_200_single: statute/26/36B/repayment_caps/under_200_pct_fpl/single
+  repay_cap_under_200_joint: statute/26/36B/repayment_caps/under_200_pct_fpl/joint
+  repay_cap_200_300_single: statute/26/36B/repayment_caps/200_to_300_pct_fpl/single
+  repay_cap_200_300_joint: statute/26/36B/repayment_caps/200_to_300_pct_fpl/joint
+  repay_cap_300_400_single: statute/26/36B/repayment_caps/300_to_400_pct_fpl/single
+  repay_cap_300_400_joint: statute/26/36B/repayment_caps/300_to_400_pct_fpl/joint
+
+# =============================================================================
+# ADVANCE PREMIUM TAX CREDIT (APTC)
+# Section 1412 of ACA / 26 USC 36B(f)(1)
+# =============================================================================
+
+variable advance_ptc:
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Advance Premium Tax Credit"
+  description "Advance payments of PTC made during year per 26 USC 36B(f)(1)"
+
+  # Input variable: Total advance payments made to insurer
+  # This is determined by:
+  # - Marketplace enrollment
+  # - Projected income and household size
+  # - Monthly payments made on behalf of taxpayer
+
+  default 0
+
+# =============================================================================
+# NET PTC ADJUSTMENT
+# 26 USC 36B(f)(1) and (2)
+# =============================================================================
+
+variable net_ptc_adjustment:
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Net PTC Adjustment"
+  description "Difference between actual PTC and advance payments per 26 USC 36B(f)"
+
+  formula:
+    actual_credit = premium_tax_credit
+    advance = advance_ptc
+
+    # Positive = Additional credit due (taxpayer gets refund)
+    # Negative = Excess advance (taxpayer owes repayment)
+    return actual_credit - advance
+
+# =============================================================================
+# REPAYMENT CAP DETERMINATION
+# 26 USC 36B(f)(2)(B)
+# =============================================================================
+
+variable excess_aptc_repayment_cap:
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Excess APTC Repayment Cap"
+  description "Maximum repayment of excess advance per 26 USC 36B(f)(2)(B)"
+
+  formula:
+    income_pct = household_income_pct_fpl
+    is_joint = filing_status == "joint"
+
+    # No cap for income at or above 400% FPL
+    if income_pct >= 4.00 then
+      return 999999999  # No limit
+
+    # Cap based on income bracket and filing status
+    if income_pct < 2.00 then
+      if is_joint then
+        return repay_cap_under_200_joint
+      else
+        return repay_cap_under_200_single
+
+    if income_pct < 3.00 then
+      if is_joint then
+        return repay_cap_200_300_joint
+      else
+        return repay_cap_200_300_single
+
+    # 300-400% FPL
+    if is_joint then
+      return repay_cap_300_400_joint
+    else
+      return repay_cap_300_400_single
+
+# =============================================================================
+# EXCESS ADVANCE PTC REPAYMENT
+# 26 USC 36B(f)(2)(A)
+# =============================================================================
+
+variable excess_advance_ptc_repayment:
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Excess Advance PTC Repayment"
+  description "Additional tax due for excess advance payments per 26 USC 36B(f)(2)"
+
+  formula:
+    adjustment = net_ptc_adjustment
+
+    # If adjustment is positive or zero, no repayment needed
+    if adjustment >= 0 then
+      return 0
+
+    # Excess advance (negative adjustment becomes positive repayment)
+    excess = -adjustment
+
+    # Apply repayment cap for those below 400% FPL
+    cap = excess_aptc_repayment_cap
+
+    return min(excess, cap)
+
+# =============================================================================
+# ADDITIONAL PTC REFUND
+# 26 USC 36B(f)(1) - Credit in excess of advance
+# =============================================================================
+
+variable additional_ptc_refund:
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Additional PTC Refund"
+  description "Additional refund if actual PTC exceeds advance payments"
+
+  formula:
+    adjustment = net_ptc_adjustment
+
+    # If positive, taxpayer is owed additional credit
+    return max(0, adjustment)
