@@ -37,15 +37,53 @@ cosilico-us/
         └── parameters.yaml
 ```
 
-## References in .rac files
+## .rac Variable Schema
 
-Cross-file references use paths relative to the repo root:
+Variables in .rac files use ONLY these attributes:
+
 ```
-references {
-  earned_income: statute/26/32/c/2/A/earned_income
-  agi: statute/26/62/a/adjusted_gross_income
-}
+# REQUIRED
+entity    # Person, TaxUnit, Household, State, Family
+period    # Year, Month, Week, Day, FederalFiscalYear
+dtype     # Money, Rate, Boolean, Integer, Enum[...]
+
+# OPTIONAL
+unit         # "USD", "months", "weeks", etc.
+label        # Short human-readable name
+description  # Longer explanation
+formula      # Calculation block
+default      # Default value (not default_value)
+defined_for  # Filter condition block
+
+# BLOCKS (for cross-file dependencies)
+imports      # Variable imports from other files
+parameters   # Parameter imports from .yaml files
 ```
+
+**NOT ALLOWED** (redundant with filepath):
+- `module` - filepath IS the module path
+- `version` - not needed
+- `jurisdiction` - implied by repo (cosilico-us)
+- `reference` - filepath IS the statute reference
+
+Filepath `statute/26/32/a/1/earned_income_credit.rac` implies:
+- Module: `statute.26.32.a.1`
+- Reference: 26 USC § 32(a)(1)
+
+## Formula Rules
+
+**No numeric literals in formulas** (except 0, 1, -1):
+```python
+# BAD - hardcoded values
+if age >= 65: ...
+threshold = income * 0.075
+
+# GOOD - parameterized
+if age >= elderly_age_threshold: ...
+threshold = income * medical_expense_threshold_rate
+```
+
+All policy values come from `parameters.yaml` files with legal citations.
 
 ## File Types
 
