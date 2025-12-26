@@ -25,6 +25,21 @@ income_limits:
   unit: USD
   period: year
 
+  # Maximum household size with specific limit (beyond this, use additional_per_person)
+  max_table_size:
+    description: "Maximum household size with specific income limit in tables"
+    unit: persons
+    values:
+      1937-01-01: 8
+
+# Time period conversion constants
+time_periods:
+  months_per_year:
+    description: "Number of months per year for monthly conversion"
+    unit: month
+    values:
+      1937-01-01: 12
+
   # Percentage thresholds (fixed by regulation)
   thresholds:
     very_low_income: 0.50       # 50% AMI - basic eligibility

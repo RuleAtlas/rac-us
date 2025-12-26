@@ -26,6 +26,7 @@ references:
   adjusted_income_rate: statute/42/1437f/tenant_contribution/income_rate
   gross_income_rate: statute/42/1437f/tenant_contribution/gross_income_rate
   minimum_rent: statute/42/1437f/tenant_contribution/minimum_rent/default
+  months_per_year: statute/42/1437f/parameters/time_periods/months_per_year
 
   # Income variables
   hcv_annual_income: statute/42/1437f/b/hcv_annual_income
@@ -64,7 +65,7 @@ variable hcv_contribution_10_gross:
 
   formula:
     let rate = parameter(gov.hud.hcv.tenant_contribution.gross_income_rate)
-    let monthly_gross = hcv_annual_income / 12
+    let monthly_gross = hcv_annual_income / months_per_year
     return round(monthly_gross * rate)
 
   default 0

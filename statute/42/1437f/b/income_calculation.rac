@@ -23,6 +23,7 @@ references:
   dependent_deduction_amount: statute/42/1437f/deductions/dependent
   elderly_disabled_deduction_amount: statute/42/1437f/deductions/elderly_disabled
   medical_threshold_rate: statute/42/1437f/deductions/medical/threshold_rate
+  months_per_year: statute/42/1437f/parameters/time_periods/months_per_year
 
 # ============================================================
 # ANNUAL INCOME - 24 CFR 5.609
@@ -243,6 +244,6 @@ variable hcv_monthly_adjusted_income:
   reference "24 CFR 5.628"
 
   formula:
-    return hcv_annual_adjusted_income / 12
+    return hcv_annual_adjusted_income / months_per_year
 
   default 0

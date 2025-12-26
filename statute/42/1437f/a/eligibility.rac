@@ -42,17 +42,20 @@ variable hcv_very_low_income_limit:
     "24 CFR 5.603(b)"
   )
 
+  parameters:
+    max_table_size: parameters#income_limits.max_table_size
+
   formula:
     # Income limit varies by household size
-    # For sizes > 8, add per-person amount
+    # For sizes > max_table_size, add per-person amount
     let limits = parameter(gov.hud.hcv.income_limits.very_low_income)
     let additional = parameter(gov.hud.hcv.income_limits.very_low_income.additional_per_person)
 
-    if household_size <= 8:
+    if household_size <= max_table_size:
       return limits[household_size]
     else:
-      let base = limits[8]
-      let extra_members = household_size - 8
+      let base = limits[max_table_size]
+      let extra_members = household_size - max_table_size
       return base + (additional * extra_members)
 
   default 0
@@ -70,15 +73,18 @@ variable hcv_extremely_low_income_limit:
     "24 CFR 5.603(b)"
   )
 
+  parameters:
+    max_table_size: parameters#income_limits.max_table_size
+
   formula:
     let limits = parameter(gov.hud.hcv.income_limits.extremely_low_income)
     let additional = parameter(gov.hud.hcv.income_limits.extremely_low_income.additional_per_person)
 
-    if household_size <= 8:
+    if household_size <= max_table_size:
       return limits[household_size]
     else:
-      let base = limits[8]
-      let extra_members = household_size - 8
+      let base = limits[max_table_size]
+      let extra_members = household_size - max_table_size
       return base + (additional * extra_members)
 
   default 0
@@ -93,15 +99,18 @@ variable hcv_low_income_limit:
   description "80% of Area Median Income limit for continued occupancy"
   reference "24 CFR 5.603(b)"
 
+  parameters:
+    max_table_size: parameters#income_limits.max_table_size
+
   formula:
     let limits = parameter(gov.hud.hcv.income_limits.low_income)
     let additional = parameter(gov.hud.hcv.income_limits.low_income.additional_per_person)
 
-    if household_size <= 8:
+    if household_size <= max_table_size:
       return limits[household_size]
     else:
-      let base = limits[8]
-      let extra_members = household_size - 8
+      let base = limits[max_table_size]
+      let extra_members = household_size - max_table_size
       return base + (additional * extra_members)
 
   default 0
