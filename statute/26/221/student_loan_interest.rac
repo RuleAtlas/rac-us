@@ -173,10 +173,10 @@ formula:
   return 0
 
 # Get base deduction (capped at maximum)
-let base = student_loan_interest_deduction_before_phaseout
+base = student_loan_interest_deduction_before_phaseout
 
 # Apply phase-out based on MAGI
-let phaseout = student_loan_interest_phaseout_ratio
+phaseout = student_loan_interest_phaseout_ratio
 
 # 26 USC 221(b)(2)(A) - Reduce by phase-out amount
 return base * (1 - phaseout)

@@ -104,12 +104,12 @@ formula:
   return 0
 
 # Determine phase-out range based on filing status
-let start = phaseout_single_start
-let end = phaseout_single_end
+start = phaseout_single_start
+end = phaseout_single_end
 
 # Note: Actual implementation would use tax unit's MAGI
 # This is simplified for demonstration
-let magi = adjusted_gross_income  # Circular reference - would need MAGI
+magi = adjusted_gross_income  # Circular reference - would need MAGI
 
 if magi <= start:
 return 0  # No phase-out

@@ -52,7 +52,7 @@ formula:
 # Deduction cannot exceed self-employment income
 # (after the self-employment tax deduction)
 # Simplified: use gross SE income as the limit
-let se_income_limit = self_employment_income
+se_income_limit = self_employment_income
 
 # Deduction is lesser of premiums paid or SE income
 return min(self_employed_health_insurance_premiums, se_income_limit)

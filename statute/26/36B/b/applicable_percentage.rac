@@ -125,7 +125,7 @@ default 0
 
 function interpolate_bracket(income_pct, lower_fpl, upper_fpl, initial_pct, final_pct):
   # Position within bracket (0 to 1)
-let position = (income_pct - lower_fpl) / (upper_fpl - lower_fpl)
+position = (income_pct - lower_fpl) / (upper_fpl - lower_fpl)
 
   # Linear interpolation
 return initial_pct + position * (final_pct - initial_pct)

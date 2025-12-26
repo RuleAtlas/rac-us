@@ -36,14 +36,14 @@ formula:
 # Helper function for pre-TCJA graduated rate calculation
 
 function compute_graduated_tax(income, brackets):
-let tax = 0
-let remaining = income
+tax = 0
+remaining = income
 
 for i in 0..len(brackets) - 1 {
-let bracket = brackets[i]
-let next_threshold = if i < len(brackets) - 1 : brackets[i + 1].threshold else infinity
+bracket = brackets[i]
+next_threshold = if i < len(brackets) - 1 : brackets[i + 1].threshold else infinity
 
-let bracket_income = min(remaining, next_threshold - bracket.threshold)
+bracket_income = min(remaining, next_threshold - bracket.threshold)
 if bracket_income > 0:
 tax = tax + (bracket_income * bracket.rate)
 remaining = remaining - bracket_income
