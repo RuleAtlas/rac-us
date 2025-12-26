@@ -1,0 +1,124 @@
+# 26 USC Section 71 - Alimony and Separate Maintenance Payments (Pre-2019)
+#
+# "(a) General rule.—Gross income includes amounts received as alimony
+# or separate maintenance payments."
+#
+# "(b) Alimony or separate maintenance payments defined.—For purposes of
+# this section—
+#   (1) In general.—The term 'alimony or separate maintenance payment'
+#       means any payment in cash if—
+#       (A) such payment is received by (or on behalf of) a spouse under
+#           a divorce or separation instrument,
+#       (B) the divorce or separation instrument does not designate such
+#           payment as a payment which is not includible in gross income
+#           under this section and not allowable as a deduction under
+#           section 215,
+#       (C) in the case of an individual legally separated from his spouse
+#           under a decree of divorce or of separate maintenance, the payee
+#           spouse and the payor spouse are not members of the same household
+#           at the time such payment is made, and
+#       (D) there is no liability to make any such payment for any period
+#           after the death of the payee spouse and there is no liability
+#           to make any payment (in cash or property) as a substitute for
+#           such payments after the death of the payee spouse."
+#
+# "(c) Payments to support children.—
+#   (1) In general.—Subsection (a) shall not apply to that part of any
+#       payment which the terms of the divorce or separation instrument
+#       fix (in terms of an amount of money or a part of the payment) as
+#       a sum which is payable for the support of children of the payor
+#       spouse."
+#
+# CRITICAL: The Tax Cuts and Jobs Act (TCJA) of 2017 (P.L. 115-97) repealed
+# Sections 71 and 215 for divorce or separation instruments:
+#   - Executed after December 31, 2018, OR
+#   - Modified after December 31, 2018, if the modification expressly
+#     provides that the TCJA amendments apply
+#
+# For agreements executed after 2018: Alimony is NOT included in recipient's
+# gross income and is NOT deductible by the payer.
+
+parameters:
+# Whether alimony is includible in gross income (recipient side)
+# Pre-2019: 1 (100% includible)
+# Post-2018: 0 (not includible)
+  alimony_income_inclusion_rate: statute/26/71/parameters/alimony_income_inclusion_rate
+
+imports:
+  filing_status: statute/26/1/filing_status
+
+# =============================================================================
+# INPUT VARIABLES
+# =============================================================================
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Alimony Received"
+description "Amount of alimony or separate maintenance payments received during the tax year"
+
+# Input variable - total alimony payments received by this person
+# To qualify as alimony under pre-2019 rules (26 USC 71(b)):
+# - Must be paid in cash (or cash equivalent)
+# - Must be under a divorce or separation instrument
+# - Instrument must not designate payment as non-alimony
+# - Spouses cannot be in same household (if legally separated)
+# - Payments must cease upon death of recipient
+# - Cannot include child support amounts
+
+entity Person
+period Year
+dtype Bool
+label "Pre-2019 Divorce Agreement"
+description "Whether the divorce or separation instrument was executed before January 1, 2019"
+
+# Input variable - determines which tax treatment applies
+# True = Pre-2019 rules apply (alimony includible for recipient, deductible for payer)
+# False = Post-2018 rules apply (no tax consequences for either party)
+
+# =============================================================================
+# ALIMONY INCOME CALCULATION
+# =============================================================================
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Taxable Alimony Income"
+description "Alimony included in gross income per 26 USC Section 71 (pre-2019 instruments only)"
+
+formula:
+  # Per TCJA: Only pre-2019 divorce instruments result in includible alimony income
+  if not is_pre_2019_divorce_agreement {
+    return 0
+
+  # Per 26 USC 71(a): Alimony received is gross income for pre-2019 agreements
+  # The alimony_income_inclusion_rate parameter confirms inclusion rules by year
+  # but the controlling factor is the agreement date, not the tax year
+  return alimony_received * alimony_income_inclusion_rate
+
+defined_for:
+  alimony_received > 0
+
+default 0
+
+# =============================================================================
+# TAX UNIT AGGREGATION
+# =============================================================================
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Tax Unit Taxable Alimony Income"
+description "Total alimony includible in gross income for the tax unit"
+
+formula:
+  # Sum taxable alimony across all members of the tax unit
+  return sum(members.taxable_alimony_income)
+
+defined_for:
+  any(members.alimony_received > 0)
+
+default 0

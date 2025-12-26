@@ -1,0 +1,109 @@
+# 26 USC Section 215 - Alimony, etc., Payments (Pre-2019)
+#
+# "(a) General rule.—In the case of an individual, there shall be allowed
+# as a deduction an amount equal to the alimony or separate maintenance
+# payments paid during such individual's taxable year."
+#
+# "(b) Alimony or separate maintenance payments defined.—For purposes of
+# this section, the term 'alimony or separate maintenance payment' means
+# any alimony or separate maintenance payment (as defined in section 71(b))
+# which is includible in the gross income of the recipient under section 71."
+#
+# This is an ABOVE-THE-LINE deduction per 26 USC 62(a)(10):
+# "(10) Alimony.—The deduction allowed by section 215."
+#
+# CRITICAL: The Tax Cuts and Jobs Act (TCJA) of 2017 (P.L. 115-97) repealed
+# Sections 71 and 215 for divorce or separation instruments:
+#   - Executed after December 31, 2018, OR
+#   - Modified after December 31, 2018, if the modification expressly
+#     provides that the TCJA amendments apply
+#
+# For agreements executed after 2018: Alimony payments are NOT deductible
+# by the payer and NOT includible by the recipient.
+
+parameters:
+# Whether alimony is deductible (payer side)
+# Pre-2019: 1 (100% deductible)
+# Post-2018: 0 (not deductible)
+  alimony_deduction_rate: statute/26/215/parameters/alimony_deduction_rate
+
+imports:
+  filing_status: statute/26/1/filing_status
+
+# =============================================================================
+# INPUT VARIABLES
+# =============================================================================
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Alimony Paid"
+description "Amount of alimony or separate maintenance payments paid during the tax year"
+
+# Input variable - total alimony payments made by this person
+# To qualify as alimony under pre-2019 rules (26 USC 71(b)):
+# - Must be paid in cash (or cash equivalent)
+# - Must be under a divorce or separation instrument
+# - Instrument must not designate payment as non-alimony
+# - Spouses cannot be in same household (if legally separated)
+# - Payments must cease upon death of recipient
+# - Cannot include child support amounts
+
+entity Person
+period Year
+dtype Bool
+label "Pre-2019 Divorce Agreement (Payer)"
+description "Whether the payer's divorce or separation instrument was executed before January 1, 2019"
+
+# Input variable - determines which tax treatment applies
+# True = Pre-2019 rules apply (alimony deductible for payer)
+# False = Post-2018 rules apply (no deduction allowed)
+# NOTE: This must match the recipient's is_pre_2019_divorce_agreement for consistency
+
+# =============================================================================
+# ALIMONY DEDUCTION CALCULATION
+# =============================================================================
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Alimony Deduction (Person)"
+description "Alimony deductible per 26 USC Section 215 (pre-2019 instruments only)"
+
+formula:
+  # Per TCJA: Only pre-2019 divorce instruments allow alimony deduction
+  if not is_pre_2019_divorce_agreement_payer {
+    return 0
+
+  # Per 26 USC 215(a): Alimony paid is deductible for pre-2019 agreements
+  # The alimony_deduction_rate parameter confirms deduction rules by year
+  # but the controlling factor is the agreement date, not the tax year
+  return alimony_paid * alimony_deduction_rate
+
+defined_for:
+  alimony_paid > 0
+
+default 0
+
+# =============================================================================
+# TAX UNIT AGGREGATION (ABOVE-THE-LINE DEDUCTION)
+# =============================================================================
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Alimony Deduction"
+description "Above-the-line deduction for alimony payments per 26 USC 62(a)(10) and 215"
+
+formula:
+  # Sum deductible alimony across all members of the tax unit
+  # Per 26 USC 62(a)(10): This is an above-the-line deduction
+  return sum(members.alimony_deduction_person)
+
+defined_for:
+  any(members.alimony_paid > 0)
+
+default 0

@@ -1,0 +1,176 @@
+# 26 USC Section 221(d) - Definitions
+#
+# "(d) Definitions
+#   For purposes of this section--
+#
+#   (1) Qualified education loan
+#     The term 'qualified education loan' means any indebtedness incurred
+#     by the taxpayer solely to pay qualified higher education expenses--
+#       (A) which are incurred on behalf of the taxpayer, the taxpayer's
+#           spouse, or any dependent of the taxpayer as of the time the
+#           indebtedness was incurred,
+#       (B) which are paid or incurred within a reasonable period of time
+#           before or after the indebtedness is incurred, and
+#       (C) which are attributable to education furnished during a period
+#           during which the recipient was an eligible student.
+#     Such term includes indebtedness used to refinance indebtedness which
+#     qualifies as a qualified education loan. The term 'qualified education
+#     loan' shall not include any indebtedness owed to a person who is
+#     related (within the meaning of section 267(b) or 707(b)(1)) to the
+#     taxpayer or to any person by reason of a loan under any qualified
+#     employer plan (as defined in section 72(p)(4)) or under any contract
+#     referred to in section 72(p)(5).
+#
+#   (4) Eligible student
+#     The term 'eligible student' has the meaning given such term by
+#     section 25A(b)(3).
+#
+#   (5) Dependent
+#     The term 'dependent' has the meaning given such term by section 152
+#     (determined without regard to subsections (b)(1), (b)(2), and (d)(1)(B)
+#     thereof).
+#
+#   (6) Qualified higher education expenses
+#     The term 'qualified higher education expenses' has the meaning given
+#     such term by section 529(e)(3) (determined by substituting 'eligible
+#     educational institution' for 'eligible educational institution (as
+#     defined in section 25A(f)(2))'."
+#
+# Cross-references:
+# - Section 25A(b)(3): Eligible student definition
+# - Section 152: Dependent definition
+# - Section 529(e)(3): Qualified higher education expenses
+# - Section 267(b): Related persons
+# - Section 707(b)(1): Related persons (partnerships)
+
+imports:
+  is_eligible_student: statute/26/25A/b/3/eligible_student
+  is_dependent: statute/26/152/dependent
+  qualified_higher_education_expenses: statute/26/529/e/3/expenses
+
+# =============================================================================
+# QUALIFIED EDUCATION LOAN DETERMINATION
+# =============================================================================
+
+entity Person
+period Year
+dtype Bool
+label "Has Qualified Education Loan"
+description "Whether the individual has a loan that qualifies under Section 221(d)(1)"
+
+variable has_qualified_education_loan:
+  # A loan is "qualified" if it meets all criteria in 221(d)(1):
+  # 1. Incurred solely to pay qualified higher education expenses
+  # 2. For taxpayer, spouse, or dependent at time debt was incurred
+  # 3. Paid/incurred within reasonable time before or after loan
+  # 4. Education was during period when recipient was eligible student
+  # 5. Not from related person or employer plan
+  #
+  # Note: This is typically a Boolean input or derived from loan data
+  default: false
+
+# =============================================================================
+# QUALIFIED HIGHER EDUCATION EXPENSES - 221(d)(6)
+# =============================================================================
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Qualified Higher Education Expenses"
+description "Expenses qualifying under Section 221(d)(6), referencing Section 529(e)(3)"
+
+variable qualified_higher_education_expenses_221:
+  # Per 221(d)(6), uses the 529(e)(3) definition:
+  # - Tuition and fees
+  # - Books, supplies, and equipment
+  # - Room and board (if at least half-time student)
+  # - Special needs services
+  # - Computer equipment and related expenses
+  #
+  # Expenses must be reduced by:
+  # - Tax-free educational assistance
+  # - Excludable employer-provided assistance
+  # - Any scholarship or grant amounts
+  default: 0
+
+# =============================================================================
+# ELIGIBLE EDUCATIONAL INSTITUTION
+# =============================================================================
+
+entity Person
+period Year
+dtype Bool
+label "Attends Eligible Educational Institution"
+description "Whether the individual attends an institution eligible under Section 221"
+
+variable attends_eligible_educational_institution:
+  # Per 221(d)(6), eligible institutions are those defined in
+  # Section 25A(f)(2) - generally Title IV institutions:
+  # - Accredited postsecondary institutions
+  # - Eligible for federal student aid programs
+  # - Includes most colleges, universities, vocational schools
+  default: false
+
+# =============================================================================
+# BENEFICIARY DETERMINATION - 221(d)(1)(A)
+# =============================================================================
+
+entity Person
+period Year
+dtype Bool
+label "Qualified Loan Beneficiary"
+description "Whether education expenses were for taxpayer, spouse, or dependent"
+
+variable is_qualified_loan_beneficiary:
+  formula:
+    # The loan must be for education of:
+    # - The taxpayer themselves, OR
+    # - The taxpayer's spouse, OR
+    # - A dependent of the taxpayer (at time debt incurred)
+    #
+    # Note: Dependent status is determined at time loan was incurred,
+    # not at time interest is paid
+    return true  # Typically input-based determination
+
+# =============================================================================
+# EXCLUDED LOANS - 221(d)(1)
+# =============================================================================
+
+entity Person
+period Year
+dtype Bool
+label "Has Excluded Related-Party Loan"
+description "Whether the loan is from a related person and thus excluded from Section 221"
+
+variable has_excluded_related_party_loan:
+  # Per 221(d)(1), loans from related persons are excluded:
+  # - Section 267(b) relationships (family, controlled entities)
+  # - Section 707(b)(1) relationships (partnerships)
+  # - Employer plan loans under 72(p)(4)
+  # - Annuity contracts under 72(p)(5)
+  #
+  # Common excluded sources:
+  # - Parents, grandparents, siblings
+  # - Entities controlled by family members
+  # - 401(k) loans from employer
+  default: false
+
+# =============================================================================
+# REFINANCED LOAN ELIGIBILITY
+# =============================================================================
+
+entity Person
+period Year
+dtype Bool
+label "Has Qualifying Refinanced Loan"
+description "Whether a refinanced loan qualifies under Section 221(d)(1)"
+
+variable has_qualifying_refinanced_loan:
+  # Per 221(d)(1), refinanced loans qualify if:
+  # - The original loan was a qualified education loan
+  # - The refinancing is used solely to pay off the original loan
+  #
+  # The refinanced loan inherits the qualified status of the original
+  # even if refinanced with a different lender
+  default: false

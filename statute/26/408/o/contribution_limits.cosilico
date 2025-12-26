@@ -1,0 +1,213 @@
+# 26 USC Section 408(o) - Designated Nondeductible Contributions
+# and Section 219(b) - Maximum Amount of Deduction (Contribution Limits)
+#
+# IRA contribution limits are established under multiple sections:
+# - 219(b)(1)(A): Maximum deductible amount
+# - 219(b)(5): Catch-up contributions for age 50+
+# - 408(o)(2)(B): Nondeductible contribution limits
+# - 408A(c)(2): Roth IRA contribution limits
+#
+# 2024 Limits:
+# - Base limit: $7,000
+# - Catch-up (age 50+): additional $1,000
+# - Total if 50+: $8,000
+#
+# Note: These limits apply across ALL IRAs (traditional + Roth combined)
+
+imports:
+  age: statute/26/person/age
+  earned_income: statute/26/32/c/2/A/earned_income
+  filing_status: statute/26/1/filing_status
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+
+# Input: Traditional IRA contributions during year
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Traditional IRA Contributions"
+description "Contributions made to traditional IRA during the taxable year"
+default 0
+
+---
+
+# Input: Roth IRA contributions during year
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Roth IRA Contributions"
+description "Contributions made to Roth IRA during the taxable year"
+default 0
+
+---
+
+# Derived: Total IRA contributions
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Total IRA Contributions"
+description "Combined traditional and Roth IRA contributions"
+
+formula:
+  return traditional_ira_contributions + roth_ira_contributions
+
+---
+
+# 219(b)(1)(A): Base IRA contribution limit
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Base Contribution Limit"
+description "Base maximum IRA contribution limit for the year"
+
+formula:
+  # 2024: $7,000
+  return 7000
+
+---
+
+# 219(b)(5)(B): Catch-up contribution amount for age 50+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Catch-Up Amount"
+description "Additional catch-up contribution allowed for age 50 and older"
+
+formula:
+  if age >= 50:
+    return 1000
+  return 0
+
+---
+
+# Derived: Maximum IRA contribution limit (base + catch-up)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Maximum Contribution"
+description "Maximum total IRA contribution including catch-up"
+
+formula:
+  return ira_base_contribution_limit + ira_catchup_amount
+
+---
+
+# 219(b)(1)(B): Compensation limit
+# IRA contributions cannot exceed compensation (earned income)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Compensation Limit"
+description "IRA contribution limited to taxpayer's compensation"
+
+formula:
+  return earned_income
+
+---
+
+# Derived: Effective IRA contribution limit
+# Lesser of maximum limit or compensation
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Contribution Limit"
+description "Actual maximum IRA contribution (lesser of limit or compensation)"
+
+formula:
+  return min(ira_maximum_contribution, ira_compensation_limit)
+
+---
+
+# Derived: Excess IRA contributions
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Excess IRA Contributions"
+description "IRA contributions exceeding allowable limit"
+
+formula:
+  return max(0, total_ira_contributions - ira_contribution_limit)
+
+---
+
+# 408A(c)(3): Roth IRA income-based phase-out
+# Roth IRA contributions are reduced or eliminated at higher incomes
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Roth IRA Contribution Limit"
+description "Maximum Roth IRA contribution after income phase-out"
+
+formula:
+  # 2024 phase-out thresholds:
+  # Single/HoH: $146,000 - $161,000
+  # MFJ: $230,000 - $240,000
+  # MFS: $0 - $10,000
+
+  base_limit = ira_contribution_limit
+
+  # Determine phase-out range based on filing status
+  if filing_status == SINGLE or filing_status == HEAD_OF_HOUSEHOLD:
+    phase_out_start = 146000
+    phase_out_end = 161000
+  elif filing_status == JOINT:
+    phase_out_start = 230000
+    phase_out_end = 240000
+  elif filing_status == SEPARATE:
+    phase_out_start = 0
+    phase_out_end = 10000
+  else:
+    # Default to single thresholds
+    phase_out_start = 146000
+    phase_out_end = 161000
+
+  # Calculate phase-out
+  if adjusted_gross_income <= phase_out_start:
+    return base_limit
+  elif adjusted_gross_income >= phase_out_end:
+    return 0
+  else:
+    # Pro-rata reduction
+    phase_out_range = phase_out_end - phase_out_start
+    income_over_threshold = adjusted_gross_income - phase_out_start
+    reduction_ratio = income_over_threshold / phase_out_range
+    reduced_limit = base_limit * (1 - reduction_ratio)
+    # Round up to nearest $10 (per IRS rules)
+    return max(200, (reduced_limit // 10 + 1) * 10)  # Minimum $200 if any allowed
+
+---
+
+# Derived: Excess Roth IRA contributions
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Excess Roth Contributions"
+description "Roth IRA contributions exceeding income-based limit"
+
+formula:
+  return max(0, roth_ira_contributions - roth_ira_contribution_limit)
+
+---
+
+# 4973: Excise tax on excess contributions
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Excess Contribution Penalty"
+description "6% excise tax on excess IRA contributions left in account"
+
+formula:
+  # 6% penalty on excess contributions not withdrawn by tax filing deadline
+  total_excess = excess_ira_contributions
+  return total_excess * 0.06

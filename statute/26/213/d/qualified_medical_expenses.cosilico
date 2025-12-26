@@ -1,0 +1,64 @@
+# 26 USC 213(d) - Definition of Medical Care
+#
+# "(d) Definitions.—For purposes of this section—
+#   (1) The term 'medical care' means amounts paid—
+#       (A) for the diagnosis, cure, mitigation, treatment, or prevention
+#           of disease, or for the purpose of affecting any structure or
+#           function of the body,
+#       (B) for transportation primarily for and essential to medical care
+#           referred to in subparagraph (A),
+#       (C) for qualified long-term care services (as defined in section 7702B(c)),
+#       (D) for insurance (including amounts paid as premiums under part B of
+#           title XVIII of the Social Security Act) covering medical care
+#           referred to in subparagraphs (A) and (B) or for any qualified
+#           long-term care insurance contract (as defined in section 7702B(b)).
+#
+# Per 213(a), qualifying expenses must be:
+#   - Not compensated by insurance or otherwise
+#   - For taxpayer, spouse, or dependent (per Section 152)"
+#
+# Note: Cosmetic surgery excluded per 213(d)(9) unless:
+#   - For deformity from congenital abnormality
+#   - For deformity from personal injury
+#   - For deformity from disfiguring disease
+
+imports:
+# Inputs for medical expenses
+  medical_expenses_paid: inputs/medical_expenses
+  insurance_reimbursements: inputs/medical_insurance_reimbursement
+  long_term_care_premiums: inputs/long_term_care_premiums
+
+# Long-term care premium limits by age
+parameters:
+  ltc: statute/26/213/parameters/long_term_care
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Qualifying Medical Expenses"
+description "Medical expenses eligible for deduction per 26 USC 213(d), net of insurance reimbursement"
+reference "26 USC 213(d)", "IRS Publication 502"
+
+formula:
+  # Step 1: Start with gross medical expenses paid during taxable year
+  gross_medical = medical_expenses_paid
+
+  # Step 2: Subtract insurance reimbursements per 213(a)
+  # "not compensated for by insurance or otherwise"
+  unreimbursed = max(0, gross_medical - insurance_reimbursements)
+
+  # Step 3: Add qualified long-term care premiums per 213(d)(1)(D)
+  # Note: Premium limits by age apply per 213(d)(10)
+  # Full implementation would cap LTC premiums based on taxpayer age:
+  #   Age 40 or under: $480 (2023), $470 (2024)
+  #   Age 41-50: $890 (2023), $880 (2024)
+  #   Age 51-60: $1,790 (2023), $1,760 (2024)
+  #   Age 61-70: $4,770 (2023), $4,710 (2024)
+  #   Over 70: $5,960 (2023), $5,880 (2024)
+  ltc_allowed = long_term_care_premiums
+
+  # Total qualifying expenses
+  return unreimbursed + ltc_allowed
+
+default 0

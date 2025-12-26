@@ -1,0 +1,487 @@
+# Tests for 26 USC Section 1411 - Net Investment Income Tax
+#
+# The NIIT is a 3.8% tax on the lesser of:
+# (1) Net investment income, or
+# (2) Excess of MAGI over threshold ($250k joint, $200k single, $125k MFS)
+#
+# Test scenarios cover:
+# - Filing status variations
+# - Income below, at, and above thresholds
+# - Various combinations of investment income types
+# - Edge cases (zero NII, zero excess MAGI, etc.)
+
+reference: "26 USC Section 1411"
+tax_year: 2024
+
+tests:
+  # ==========================================================================
+  # BASIC ELIGIBILITY - SINGLE FILER ($200,000 threshold)
+  # ==========================================================================
+
+  - name: "Single filer - below threshold, no NIIT"
+    description: "MAGI under $200,000 means no NIIT regardless of investment income"
+    inputs:
+      filing_status: SINGLE
+      wages: 150000
+      interest_income: 10000
+      dividend_income: 5000
+      capital_gains: 20000
+      adjusted_gross_income: 185000
+      foreign_earned_income_exclusion: 0
+    expected:
+      net_investment_income: 35000
+      magi: 185000
+      niit_threshold: 200000
+      excess_magi: 0
+      niit: 0
+    notes: "NII exists but MAGI below threshold"
+    citations:
+      - "26 USC 1411(a)(1)(B): excess of MAGI over threshold"
+      - "26 USC 1411(b)(3): $200,000 for single filers"
+
+  - name: "Single filer - at threshold, no NIIT"
+    description: "MAGI exactly at $200,000 threshold"
+    inputs:
+      filing_status: SINGLE
+      wages: 180000
+      interest_income: 20000
+      adjusted_gross_income: 200000
+    expected:
+      magi: 200000
+      excess_magi: 0
+      niit: 0
+    notes: "At threshold means excess is zero"
+
+  - name: "Single filer - above threshold, NIIT applies"
+    description: "MAGI over $200,000 with investment income"
+    inputs:
+      filing_status: SINGLE
+      wages: 180000
+      interest_income: 20000
+      dividend_income: 30000
+      adjusted_gross_income: 230000
+    expected:
+      net_investment_income: 50000
+      magi: 230000
+      excess_magi: 30000   # 230000 - 200000
+      taxable_niit_amount: 30000  # min(50000 NII, 30000 excess)
+      niit: 1140   # 30000 * 0.038
+    notes: "NIIT on lesser of NII or excess MAGI"
+    citations:
+      - "26 USC 1411(a)(1): lesser of (A) NII or (B) excess MAGI"
+
+  - name: "Single filer - high NII, lower excess"
+    description: "NII higher than excess MAGI - tax on excess only"
+    inputs:
+      filing_status: SINGLE
+      wages: 200000
+      interest_income: 50000
+      dividend_income: 50000
+      capital_gains: 100000
+      adjusted_gross_income: 400000
+    expected:
+      net_investment_income: 200000
+      magi: 400000
+      excess_magi: 200000  # 400000 - 200000
+      taxable_niit_amount: 200000  # min(200000 NII, 200000 excess)
+      niit: 7600   # 200000 * 0.038
+    notes: "Equal NII and excess - full NIIT on excess"
+
+  - name: "Single filer - lower NII, higher excess"
+    description: "Excess MAGI higher than NII - tax on NII only"
+    inputs:
+      filing_status: SINGLE
+      wages: 350000
+      interest_income: 10000
+      dividend_income: 5000
+      adjusted_gross_income: 365000
+    expected:
+      net_investment_income: 15000
+      magi: 365000
+      excess_magi: 165000  # 365000 - 200000
+      taxable_niit_amount: 15000  # min(15000 NII, 165000 excess)
+      niit: 570   # 15000 * 0.038
+    notes: "High earner with modest investments - NIIT limited to NII"
+
+  # ==========================================================================
+  # MARRIED FILING JOINTLY ($250,000 threshold)
+  # ==========================================================================
+
+  - name: "MFJ - below threshold, no NIIT"
+    description: "Joint filers with MAGI under $250,000"
+    inputs:
+      filing_status: JOINT
+      wages: 200000
+      interest_income: 15000
+      dividend_income: 20000
+      adjusted_gross_income: 235000
+    expected:
+      net_investment_income: 35000
+      magi: 235000
+      niit_threshold: 250000
+      excess_magi: 0
+      niit: 0
+    citations:
+      - "26 USC 1411(b)(1): $250,000 for joint returns"
+
+  - name: "MFJ - above threshold, NIIT applies"
+    description: "Joint filers exceeding $250,000 threshold"
+    inputs:
+      filing_status: JOINT
+      wages: 250000
+      interest_income: 25000
+      dividend_income: 30000
+      capital_gains: 45000
+      adjusted_gross_income: 350000
+    expected:
+      net_investment_income: 100000
+      magi: 350000
+      excess_magi: 100000  # 350000 - 250000
+      taxable_niit_amount: 100000  # min(100000 NII, 100000 excess)
+      niit: 3800   # 100000 * 0.038
+    notes: "NII equals excess MAGI - full NIIT on both"
+
+  - name: "MFJ - high income couple with investment portfolio"
+    description: "Wealthy couple with substantial investment income"
+    inputs:
+      filing_status: JOINT
+      wages: 400000
+      interest_income: 50000
+      dividend_income: 75000
+      capital_gains: 150000
+      rental_income: 25000
+      adjusted_gross_income: 700000
+    expected:
+      net_investment_income: 300000
+      magi: 700000
+      excess_magi: 450000  # 700000 - 250000
+      taxable_niit_amount: 300000  # min(300000 NII, 450000 excess)
+      niit: 11400   # 300000 * 0.038
+    notes: "NIIT limited to NII when excess is higher"
+
+  # ==========================================================================
+  # MARRIED FILING SEPARATELY ($125,000 threshold)
+  # ==========================================================================
+
+  - name: "MFS - lower threshold applies"
+    description: "MFS has half the joint threshold"
+    inputs:
+      filing_status: SEPARATE
+      wages: 100000
+      interest_income: 10000
+      dividend_income: 20000
+      adjusted_gross_income: 130000
+    expected:
+      net_investment_income: 30000
+      magi: 130000
+      niit_threshold: 125000
+      excess_magi: 5000   # 130000 - 125000
+      taxable_niit_amount: 5000  # min(30000 NII, 5000 excess)
+      niit: 190   # 5000 * 0.038
+    citations:
+      - "26 USC 1411(b)(2): half of joint threshold for MFS"
+
+  - name: "MFS - below threshold"
+    description: "MFS under $125,000 threshold"
+    inputs:
+      filing_status: SEPARATE
+      wages: 100000
+      dividend_income: 10000
+      adjusted_gross_income: 110000
+    expected:
+      magi: 110000
+      niit_threshold: 125000
+      excess_magi: 0
+      niit: 0
+
+  # ==========================================================================
+  # HEAD OF HOUSEHOLD ($200,000 threshold - same as single)
+  # ==========================================================================
+
+  - name: "HOH - uses $200,000 threshold"
+    description: "Head of Household uses same threshold as single"
+    inputs:
+      filing_status: HEAD_OF_HOUSEHOLD
+      wages: 175000
+      interest_income: 15000
+      dividend_income: 20000
+      capital_gains: 10000
+      adjusted_gross_income: 220000
+    expected:
+      net_investment_income: 45000
+      magi: 220000
+      niit_threshold: 200000
+      excess_magi: 20000
+      taxable_niit_amount: 20000
+      niit: 760   # 20000 * 0.038
+    citations:
+      - "26 USC 1411(b)(3): $200,000 for 'any other case'"
+
+  # ==========================================================================
+  # SURVIVING SPOUSE ($250,000 threshold - same as joint)
+  # ==========================================================================
+
+  - name: "Surviving spouse - uses joint threshold"
+    description: "Surviving spouse gets $250,000 threshold per Section 2(a)"
+    inputs:
+      filing_status: SURVIVING_SPOUSE
+      wages: 200000
+      interest_income: 30000
+      dividend_income: 40000
+      adjusted_gross_income: 270000
+    expected:
+      net_investment_income: 70000
+      magi: 270000
+      niit_threshold: 250000
+      excess_magi: 20000
+      niit: 760   # 20000 * 0.038
+    citations:
+      - "26 USC 1411(b)(1): surviving spouse per Section 2(a)"
+
+  # ==========================================================================
+  # INVESTMENT INCOME TYPES
+  # ==========================================================================
+
+  - name: "Interest income only"
+    description: "NII from taxable interest alone"
+    inputs:
+      filing_status: SINGLE
+      wages: 190000
+      interest_income: 25000
+      adjusted_gross_income: 215000
+    expected:
+      net_investment_income: 25000
+      excess_magi: 15000
+      niit: 570   # 15000 * 0.038
+
+  - name: "Dividend income - qualified and ordinary"
+    description: "NII includes all dividend income"
+    inputs:
+      filing_status: SINGLE
+      wages: 150000
+      qualified_dividends: 40000
+      ordinary_dividends: 20000
+      adjusted_gross_income: 210000
+    expected:
+      net_investment_income: 60000
+      excess_magi: 10000
+      niit: 380
+
+  - name: "Capital gains - long and short term"
+    description: "Net capital gains included in NII (loss-limited)"
+    inputs:
+      filing_status: JOINT
+      wages: 200000
+      long_term_capital_gains: 80000
+      short_term_capital_gains: 20000
+      adjusted_gross_income: 300000
+    expected:
+      net_investment_income: 100000
+      excess_magi: 50000
+      niit: 1900   # 50000 * 0.038
+
+  - name: "Rental income - net"
+    description: "Net rental income (after expenses) included"
+    inputs:
+      filing_status: JOINT
+      wages: 225000
+      rental_income: 50000  # Net after depreciation, expenses
+      interest_income: 10000
+      adjusted_gross_income: 285000
+    expected:
+      net_investment_income: 60000
+      excess_magi: 35000
+      niit: 1330
+
+  - name: "Mixed investment income types"
+    description: "Various investment income sources"
+    inputs:
+      filing_status: SINGLE
+      wages: 150000
+      interest_income: 15000
+      dividend_income: 25000
+      capital_gains: 30000
+      rental_income: 20000
+      royalty_income: 10000
+      adjusted_gross_income: 250000
+    expected:
+      net_investment_income: 100000
+      excess_magi: 50000
+      taxable_niit_amount: 50000
+      niit: 1900
+
+  # ==========================================================================
+  # EXCLUDED INCOME
+  # ==========================================================================
+
+  - name: "Wages only - no NII, no NIIT"
+    description: "Wages are not investment income"
+    inputs:
+      filing_status: SINGLE
+      wages: 500000
+      interest_income: 0
+      dividend_income: 0
+      capital_gains: 0
+      adjusted_gross_income: 500000
+    expected:
+      net_investment_income: 0
+      niit: 0
+    notes: "High earner with no investment income pays no NIIT"
+    citations:
+      - "26 USC 1411(c)(1)(A): wages excluded from NII"
+
+  - name: "Self-employment income excluded"
+    description: "SE income is not investment income"
+    inputs:
+      filing_status: SINGLE
+      self_employment_income: 300000
+      interest_income: 10000
+      adjusted_gross_income: 310000
+    expected:
+      net_investment_income: 10000  # Only the interest
+      excess_magi: 110000
+      taxable_niit_amount: 10000
+      niit: 380
+    citations:
+      - "26 USC 1411(c)(6): SE income exclusion"
+
+  - name: "Tax-exempt interest excluded"
+    description: "Municipal bond interest not included in NII"
+    inputs:
+      filing_status: SINGLE
+      wages: 180000
+      tax_exempt_interest: 50000  # Muni bonds
+      taxable_interest: 10000
+      adjusted_gross_income: 240000  # AGI includes taxable only
+    expected:
+      net_investment_income: 10000  # Only taxable interest
+      magi: 240000
+      excess_magi: 40000
+      taxable_niit_amount: 10000
+      niit: 380
+    notes: "Muni bond strategy reduces NIIT"
+    citations:
+      - "26 USC 103: tax-exempt interest"
+
+  - name: "Social Security excluded"
+    description: "SS benefits not included in NII"
+    inputs:
+      filing_status: SINGLE
+      social_security_benefits: 30000
+      wages: 150000
+      dividend_income: 40000
+      adjusted_gross_income: 205000  # Includes 85% of SS
+    expected:
+      net_investment_income: 40000  # Only dividends
+      excess_magi: 5000
+      niit: 190
+
+  # ==========================================================================
+  # MAGI ADJUSTMENTS - FOREIGN EARNED INCOME
+  # ==========================================================================
+
+  - name: "Foreign earned income exclusion adds to MAGI"
+    description: "FEIE excluded from AGI but added back for NIIT MAGI"
+    inputs:
+      filing_status: SINGLE
+      wages: 100000  # US wages
+      foreign_earned_income_exclusion: 100000  # Excluded under Section 911
+      dividend_income: 50000
+      adjusted_gross_income: 150000  # AGI after FEIE
+    expected:
+      net_investment_income: 50000
+      magi: 250000  # 150000 AGI + 100000 FEIE
+      excess_magi: 50000
+      taxable_niit_amount: 50000
+      niit: 1900
+    citations:
+      - "26 USC 1411(d): MAGI includes Section 911 exclusion"
+
+  - name: "No FEIE - MAGI equals AGI"
+    description: "Without FEIE, MAGI is same as AGI"
+    inputs:
+      filing_status: SINGLE
+      wages: 200000
+      dividend_income: 20000
+      foreign_earned_income_exclusion: 0
+      adjusted_gross_income: 220000
+    expected:
+      magi: 220000  # Same as AGI
+      excess_magi: 20000
+      niit: 760
+
+  # ==========================================================================
+  # EDGE CASES
+  # ==========================================================================
+
+  - name: "Zero income"
+    description: "No income means no NIIT"
+    inputs:
+      filing_status: SINGLE
+      wages: 0
+      interest_income: 0
+      adjusted_gross_income: 0
+    expected:
+      net_investment_income: 0
+      magi: 0
+      niit: 0
+
+  - name: "Capital loss - net loss offset"
+    description: "Net capital losses reduce NII (subject to $3k limit)"
+    inputs:
+      filing_status: SINGLE
+      wages: 250000
+      dividend_income: 20000
+      net_capital_gains: -3000  # Loss-limited per Section 1211
+      adjusted_gross_income: 267000
+    expected:
+      net_investment_income: 17000  # 20000 dividends - 3000 loss
+      excess_magi: 67000
+      taxable_niit_amount: 17000
+      niit: 646
+
+  - name: "Very high income - all NII taxable"
+    description: "When excess MAGI >> NII, all NII is taxable"
+    inputs:
+      filing_status: JOINT
+      wages: 1000000
+      interest_income: 10000
+      dividend_income: 5000
+      adjusted_gross_income: 1015000
+    expected:
+      net_investment_income: 15000
+      excess_magi: 765000  # 1015000 - 250000
+      taxable_niit_amount: 15000  # min(15000 NII, 765000 excess)
+      niit: 570
+
+  - name: "All investment income - millionaire investor"
+    description: "No wages, all investment income"
+    inputs:
+      filing_status: SINGLE
+      wages: 0
+      interest_income: 100000
+      dividend_income: 200000
+      capital_gains: 500000
+      rental_income: 200000
+      adjusted_gross_income: 1000000
+    expected:
+      net_investment_income: 1000000
+      magi: 1000000
+      excess_magi: 800000  # 1000000 - 200000
+      taxable_niit_amount: 800000
+      niit: 30400  # 800000 * 0.038
+
+  - name: "Threshold boundary - $1 over"
+    description: "Just over threshold triggers NIIT on $1"
+    inputs:
+      filing_status: SINGLE
+      wages: 180000
+      dividend_income: 20001
+      adjusted_gross_income: 200001
+    expected:
+      net_investment_income: 20001
+      magi: 200001
+      excess_magi: 1
+      taxable_niit_amount: 1
+      niit: 0  # Rounds to $0 (less than $0.04)
+    notes: "Minimal excess results in negligible NIIT"

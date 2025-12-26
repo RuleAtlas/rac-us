@@ -1,4 +1,4 @@
-# 7 USC § 2014(g) - Allowable Financial Resources
+# 7 USC Section 2014(g) - Allowable Financial Resources
 #
 # "(1) The Secretary shall prescribe the types and allowable amounts of financial
 #  resources (liquid and nonliquid assets) an eligible household may own..."
@@ -7,39 +7,73 @@
 # Countable resources include: cash, bank accounts, stocks, bonds.
 # Excludes: home, household goods, one vehicle (up to fair market value limit),
 # retirement accounts, and certain income-producing property.
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014
 
-imports:
+module statute.7.2014.g
+version "2025.1"
+jurisdiction us
+
+references {
+  # Resource limit parameters
   resource_limit: statute/7/2014/g/resource_limit
   resource_limit_elderly_disabled: statute/7/2014/g/resource_limit_elderly_disabled
+  vehicle_fair_market_value_exclusion: statute/7/2014/g/vehicle_fair_market_value_exclusion
+}
 
-entity Household
-period Month
-dtype Boolean
+# Countable resources after exclusions
+variable snap_countable_resources {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Countable Resources"
+  description "Total countable resources for SNAP after applying exclusions"
+  reference (
+    "7 USC 2014(g)(1)",
+    "7 USC 2014(g)(2)"
+  )
 
-formula:
-  # § 2014(g)(1)(B): Higher limit for elderly/disabled households
-  limit = has_elderly_disabled
-  ? resource_limit_elderly_disabled
-  : resource_limit
+  formula {
+    # Start with liquid assets
+    let liquid = bank_accounts + cash_on_hand
 
-  return countable_resources <= limit
+    # Add non-exempt financial assets
+    let financial = stocks + bonds + other_financial_assets
 
-# Helper variable to calculate countable resources
-# Excludes: home, household goods, one vehicle (up to FMV limit),
-# retirement accounts, and certain other exempt resources
-entity Household
-period Month
-dtype Money
+    # Section 2014(g)(2)(B): One vehicle excluded up to fair market value limit
+    let vehicle_exclusion = parameter(gov.usda.fns.snap.resources.vehicle_exclusion)
+    let vehicle_excess = max(0, vehicle_fair_market_value - vehicle_exclusion)
 
-formula:
-  # Start with total liquid assets
-  liquid = bank_accounts + cash_on_hand
+    return liquid + financial + vehicle_excess
+  }
 
-  # Add non-exempt financial assets
-  financial = stocks + bonds + other_financial_assets
+  default 0
+}
 
-  # Vehicle equity above exclusion (if applicable)
-  # Per § 2014(g)(2)(B), one vehicle is excluded up to fair market value limit
-  vehicle_excess = max(0, vehicle_fair_market_value - vehicle_fair_market_value_exclusion)
+# Resource eligibility test
+variable snap_resource_eligible {
+  entity Household
+  period Month
+  dtype Bool
+  label "SNAP Resource Eligible"
+  description "Whether household's countable resources are within SNAP limits"
+  reference (
+    "7 USC 2014(g)(1)",
+    "7 USC 2014(g)(1)(B)"
+  )
 
-  return liquid + financial + vehicle_excess
+  formula {
+    let base_limit = parameter(gov.usda.fns.snap.resources.limit)
+    let elderly_disabled_limit = parameter(gov.usda.fns.snap.resources.elderly_disabled_limit)
+
+    # Section 2014(g)(1)(B): Higher limit for elderly/disabled households
+    let limit = has_elderly_disabled
+      ? elderly_disabled_limit
+      : base_limit
+
+    return snap_countable_resources <= limit
+  }
+
+  default false
+}

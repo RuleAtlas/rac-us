@@ -1,0 +1,30 @@
+# 26 USC Section 86 - Tax Unit Social Security Benefits
+#
+# Total Social Security benefits received by all members of the tax unit
+# during the taxable year. This is the basis for determining the taxable
+# portion under Section 86.
+#
+# Reported on:
+# - Form SSA-1099 (Social Security Benefit Statement)
+# - Form RRB-1099 (Railroad Retirement Benefits)
+#
+# Includes:
+# - Old-Age and Survivors Insurance (OASI) benefits
+# - Disability Insurance (DI) benefits
+# - Tier 1 railroad retirement benefits (treated as Social Security)
+#
+# References:
+# - 26 USC Section 86(d) - "social security benefit" definition
+# - IRS Publication 915
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Social Security Benefits Received"
+description "Sum of Social Security and tier 1 railroad retirement benefits received by tax unit members per 26 USC Section 86(d)"
+
+# Input: Aggregate of Form SSA-1099 Box 5 and Form RRB-1099 Box 5
+# for all tax unit members
+
+default 0

@@ -1,4 +1,4 @@
-# 7 USC § 2014(e)(3) - Dependent Care Deduction
+# 7 USC Section 2014(e)(3) - Dependent Care Deduction
 #
 # "(3) payments necessary for the care of a dependent, including child care
 #  payments for dependents, when necessary for a household member to accept
@@ -7,12 +7,29 @@
 #
 # This is an actual cost deduction with no federal cap
 # (though some states may impose caps)
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014
 
-entity Household
-period Month
-dtype Money
+module statute.7.2014.e.3
+version "2025.1"
+jurisdiction us
 
-formula:
-  # § 2014(e)(3): Actual dependent care costs necessary for work/training
-  # Includes child care, care for elderly/disabled dependents
-  return dependent_care_expenses
+# Dependent care deduction
+variable snap_dependent_care_deduction {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Dependent Care Deduction"
+  description "Deduction for dependent care expenses necessary for work or training"
+  reference "7 USC 2014(e)(3)"
+
+  formula {
+    # Section 2014(e)(3): Actual dependent care costs necessary for work/training
+    # Includes child care, care for elderly/disabled dependents
+    # No federal cap on this deduction
+    return dependent_care_expenses
+  }
+
+  default 0
+}

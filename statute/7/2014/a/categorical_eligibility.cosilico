@@ -1,11 +1,11 @@
-# 7 USC § 2014(a) - Eligible Households
+# 7 USC Section 2014(a) - Eligible Households
 #
 # "(a) Eligible households shall meet the income and other eligibility
 #  requirements of this section."
 #
 # Categorical eligibility arises from:
-# 1. Receipt of TANF benefits (§ 2014(a))
-# 2. Receipt of SSI (§ 2014(j))
+# 1. Receipt of TANF benefits - Section 2014(a)
+# 2. Receipt of SSI - Section 2014(j)
 # 3. Receipt of state General Assistance in some states
 #
 # Categorically eligible households are exempt from:
@@ -16,32 +16,62 @@
 # States may extend categorical eligibility to households receiving
 # any TANF-funded benefit, even non-cash benefits like informational
 # brochures. This is handled at state level.
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014
 
-imports:
+module statute.7.2014.a
+version "2025.1"
+jurisdiction us
+
+references {
+  # Eligibility components
   snap_gross_income_eligible: statute/7/2014/c/snap_gross_income_eligible
-  snap_net_income_eligible: statute/7/2014/e/snap_net_income_eligible
+  snap_net_income_eligible: statute/7/2014/c/snap_net_income_eligible
   snap_resource_eligible: statute/7/2014/g/snap_resource_eligible
+}
 
 # Pure categorical eligibility (federal program receipt)
-entity Household
-period Month
-dtype Boolean
+variable snap_categorically_eligible {
+  entity Household
+  period Month
+  dtype Bool
+  label "SNAP Categorically Eligible"
+  description "Whether household is categorically eligible through receipt of TANF, SSI, or GA"
+  reference (
+    "7 USC 2014(a)",
+    "7 USC 2014(j)"
+  )
 
-formula:
-  # § 2014(a) + § 2014(j): SSI and TANF recipients
-  return receives_ssi or receives_tanf or receives_general_assistance
+  formula {
+    # Section 2014(a) + Section 2014(j): SSI and TANF recipients
+    return receives_ssi or receives_tanf or receives_general_assistance
+  }
 
-# Main eligibility determination
-entity Household
-period Month
-dtype Boolean
+  default false
+}
 
-formula:
-  # § 2014(a): Categorically eligible households bypass certain tests
-  if snap_categorically_eligible then
-  # Still must pass net income test in most states
-  # (Some states with BBCE waive this too, but federal baseline requires it)
-  return snap_net_income_eligible
+# Main SNAP eligibility determination
+variable snap_eligible {
+  entity Household
+  period Month
+  dtype Bool
+  label "SNAP Eligible"
+  description "Whether household meets all SNAP eligibility requirements"
+  reference (
+    "7 USC 2014",
+    "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014"
+  )
 
-  # Regular eligibility: must pass all three tests
-  return snap_gross_income_eligible and snap_net_income_eligible and snap_resource_eligible
+  formula {
+    # Section 2014(a): Categorically eligible households bypass certain tests
+    if snap_categorically_eligible then
+      # Still must pass net income test in most states
+      # (Some states with BBCE waive this too, but federal baseline requires it)
+      return snap_net_income_eligible
+
+    # Regular eligibility: must pass all three tests
+    return snap_gross_income_eligible and snap_net_income_eligible and snap_resource_eligible
+  }
+
+  default false
+}

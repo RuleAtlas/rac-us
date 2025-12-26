@@ -1,0 +1,292 @@
+# 26 USC Sections 71 and 215 - Alimony Tests
+#
+# Comprehensive test suite for alimony income inclusion (Section 71) and
+# alimony deduction (Section 215).
+#
+# Key rules:
+#   - Pre-2019 instruments: Alimony included in recipient's gross income,
+#     deductible by payer (above-the-line per 62(a)(10))
+#   - Post-2018 instruments: No tax consequences for either party
+#   - The DATE OF THE INSTRUMENT controls, not the tax year
+#
+# References:
+#   - 26 USC 71 (repealed for post-2018 instruments)
+#   - 26 USC 215 (repealed for post-2018 instruments)
+#   - 26 USC 62(a)(10) (above-the-line deduction)
+#   - P.L. 115-97 Section 11051 (TCJA repeal)
+
+reference: "26 USC Sections 71, 215, 62(a)(10); P.L. 115-97 Section 11051"
+
+tests:
+  # ==========================================================================
+  # PRE-2019 DIVORCE INSTRUMENTS (OLD RULES)
+  # ==========================================================================
+
+  - name: "Pre-2019 instrument - recipient includes alimony in income"
+    description: "Alimony received under pre-2019 divorce agreement is gross income"
+    tax_year: 2024
+    inputs:
+      person.alimony_received: 24000
+      person.is_pre_2019_divorce_agreement: true
+      person.filing_status: SINGLE
+    expected:
+      person.taxable_alimony_income: 24000
+    notes: "Pre-2019 agreement: $24,000 alimony fully includible in gross income"
+    citations:
+      - "26 USC 71(a): Gross income includes amounts received as alimony"
+      - "P.L. 115-97 Section 11051(c): Applies to instruments executed after 2018"
+
+  - name: "Pre-2019 instrument - payer deducts alimony"
+    description: "Alimony paid under pre-2019 divorce agreement is deductible"
+    tax_year: 2024
+    inputs:
+      person.alimony_paid: 24000
+      person.is_pre_2019_divorce_agreement_payer: true
+      person.filing_status: SINGLE
+    expected:
+      person.alimony_deduction_person: 24000
+    notes: "Pre-2019 agreement: $24,000 alimony fully deductible (above-the-line)"
+    citations:
+      - "26 USC 215(a): Deduction allowed equal to alimony payments"
+      - "26 USC 62(a)(10): Alimony deduction is above-the-line"
+
+  - name: "Pre-2019 instrument - MFJ tax unit with recipient"
+    description: "Tax unit aggregation of alimony income"
+    tax_year: 2024
+    inputs:
+      # Spouse 1 receives alimony from prior marriage
+      tax_unit.members:
+        - alimony_received: 18000
+          is_pre_2019_divorce_agreement: true
+        - alimony_received: 0
+          is_pre_2019_divorce_agreement: false
+      tax_unit.filing_status: MARRIED_FILING_JOINTLY
+    expected:
+      tax_unit.tax_unit_taxable_alimony_income: 18000
+    notes: "Tax unit includes $18,000 alimony from spouse with pre-2019 agreement"
+
+  - name: "Pre-2019 instrument - tax unit with payer"
+    description: "Tax unit aggregation of alimony deduction"
+    tax_year: 2024
+    inputs:
+      tax_unit.members:
+        - alimony_paid: 15000
+          is_pre_2019_divorce_agreement_payer: true
+        - alimony_paid: 0
+          is_pre_2019_divorce_agreement_payer: false
+      tax_unit.filing_status: MARRIED_FILING_JOINTLY
+    expected:
+      tax_unit.alimony_deduction: 15000
+    notes: "Tax unit can deduct $15,000 alimony from spouse with pre-2019 agreement"
+
+  # ==========================================================================
+  # POST-2018 DIVORCE INSTRUMENTS (TCJA REPEAL)
+  # ==========================================================================
+
+  - name: "Post-2018 instrument - recipient does NOT include alimony in income"
+    description: "Alimony received under post-2018 divorce agreement is NOT gross income"
+    tax_year: 2024
+    inputs:
+      person.alimony_received: 24000
+      person.is_pre_2019_divorce_agreement: false
+      person.filing_status: SINGLE
+    expected:
+      person.taxable_alimony_income: 0
+    notes: "Post-2018 agreement: No tax consequences for recipient"
+    citations:
+      - "P.L. 115-97 Section 11051: Sections 71 and 215 repealed for post-2018 instruments"
+
+  - name: "Post-2018 instrument - payer does NOT deduct alimony"
+    description: "Alimony paid under post-2018 divorce agreement is NOT deductible"
+    tax_year: 2024
+    inputs:
+      person.alimony_paid: 24000
+      person.is_pre_2019_divorce_agreement_payer: false
+      person.filing_status: SINGLE
+    expected:
+      person.alimony_deduction_person: 0
+    notes: "Post-2018 agreement: No deduction for payer"
+    citations:
+      - "P.L. 115-97 Section 11051: Sections 71 and 215 repealed for post-2018 instruments"
+
+  - name: "Post-2018 instrument - high alimony still not deductible"
+    description: "Even large alimony payments under post-2018 instrument are not deductible"
+    tax_year: 2024
+    inputs:
+      person.alimony_paid: 120000
+      person.is_pre_2019_divorce_agreement_payer: false
+      person.filing_status: SINGLE
+    expected:
+      person.alimony_deduction_person: 0
+    notes: "$120,000 in alimony - still no deduction for 2019+ instruments"
+
+  - name: "Post-2018 instrument - high alimony still not income"
+    description: "Even large alimony payments under post-2018 instrument are not income"
+    tax_year: 2024
+    inputs:
+      person.alimony_received: 120000
+      person.is_pre_2019_divorce_agreement: false
+      person.filing_status: SINGLE
+    expected:
+      person.taxable_alimony_income: 0
+    notes: "$120,000 in alimony - still not gross income for 2019+ instruments"
+
+  # ==========================================================================
+  # MIXED SCENARIOS
+  # ==========================================================================
+
+  - name: "Tax unit with both old and new divorce instruments"
+    description: "One spouse with pre-2019 agreement, one with post-2018 agreement"
+    tax_year: 2024
+    inputs:
+      tax_unit.members:
+        # Spouse 1: Old divorce, pays alimony
+        - alimony_paid: 12000
+          is_pre_2019_divorce_agreement_payer: true
+          alimony_received: 0
+          is_pre_2019_divorce_agreement: false
+        # Spouse 2: New divorce, pays alimony
+        - alimony_paid: 18000
+          is_pre_2019_divorce_agreement_payer: false
+          alimony_received: 0
+          is_pre_2019_divorce_agreement: false
+      tax_unit.filing_status: MARRIED_FILING_JOINTLY
+    expected:
+      # Only the pre-2019 instrument alimony is deductible
+      tax_unit.alimony_deduction: 12000
+    notes: "Only $12,000 from pre-2019 agreement is deductible; $18,000 from post-2018 is not"
+
+  - name: "Person receives alimony from multiple ex-spouses"
+    description: "Alimony from two divorce instruments with different dates"
+    tax_year: 2024
+    inputs:
+      # Person receives alimony: $15,000 from 2015 divorce, $10,000 from 2020 divorce
+      # Model this as total received with the controlling date being pre-2019
+      # NOTE: In a more sophisticated model, we'd track each payment separately
+      person.alimony_received: 15000  # Only pre-2019 portion
+      person.is_pre_2019_divorce_agreement: true
+      person.filing_status: SINGLE
+    expected:
+      person.taxable_alimony_income: 15000
+    notes: |
+      This tests the pre-2019 portion only. In practice, a taxpayer would need
+      to track alimony from each ex-spouse separately if divorce dates differ.
+
+  # ==========================================================================
+  # EDGE CASES
+  # ==========================================================================
+
+  - name: "Zero alimony received - pre-2019"
+    description: "No alimony received even with pre-2019 agreement"
+    tax_year: 2024
+    inputs:
+      person.alimony_received: 0
+      person.is_pre_2019_divorce_agreement: true
+      person.filing_status: SINGLE
+    expected:
+      person.taxable_alimony_income: 0
+    notes: "No alimony received, no income to report"
+
+  - name: "Zero alimony paid - pre-2019"
+    description: "No alimony paid even with pre-2019 agreement"
+    tax_year: 2024
+    inputs:
+      person.alimony_paid: 0
+      person.is_pre_2019_divorce_agreement_payer: true
+      person.filing_status: SINGLE
+    expected:
+      person.alimony_deduction_person: 0
+    notes: "No alimony paid, no deduction"
+
+  - name: "Small alimony amount - pre-2019"
+    description: "Small alimony payment under pre-2019 agreement"
+    tax_year: 2024
+    inputs:
+      person.alimony_paid: 100
+      person.is_pre_2019_divorce_agreement_payer: true
+      person.filing_status: SINGLE
+    expected:
+      person.alimony_deduction_person: 100
+    notes: "Even small amounts are fully deductible under pre-2019 rules"
+
+  - name: "Large alimony amount - pre-2019"
+    description: "Large alimony payment under pre-2019 agreement"
+    tax_year: 2024
+    inputs:
+      person.alimony_paid: 500000
+      person.is_pre_2019_divorce_agreement_payer: true
+      person.filing_status: SINGLE
+    expected:
+      person.alimony_deduction_person: 500000
+    notes: "No cap on alimony deduction amount (unlike many other deductions)"
+    citations:
+      - "26 USC 215(a): No dollar limit on alimony deduction"
+
+  # ==========================================================================
+  # HISTORICAL TAX YEARS
+  # ==========================================================================
+
+  - name: "2018 tax year - all divorces use old rules"
+    description: "Before TCJA effective date, all alimony follows pre-2019 rules"
+    tax_year: 2018
+    inputs:
+      person.alimony_received: 30000
+      person.is_pre_2019_divorce_agreement: true
+      person.filing_status: SINGLE
+    expected:
+      person.taxable_alimony_income: 30000
+    notes: "In 2018, TCJA not yet effective - all alimony is gross income"
+
+  - name: "2019 tax year - old instrument still uses old rules"
+    description: "First year of TCJA, but pre-2019 instrument still taxable"
+    tax_year: 2019
+    inputs:
+      person.alimony_received: 30000
+      person.is_pre_2019_divorce_agreement: true  # Divorced before 2019
+      person.filing_status: SINGLE
+    expected:
+      person.taxable_alimony_income: 30000
+    notes: "Pre-2019 divorce - alimony remains gross income even in 2019+"
+    citations:
+      - "P.L. 115-97 Section 11051(c): Grandfathers pre-2019 instruments"
+
+  - name: "2019 tax year - new instrument uses new rules"
+    description: "First year of TCJA, new instrument not taxable"
+    tax_year: 2019
+    inputs:
+      person.alimony_received: 30000
+      person.is_pre_2019_divorce_agreement: false  # Divorced in 2019
+      person.filing_status: SINGLE
+    expected:
+      person.taxable_alimony_income: 0
+    notes: "Post-2018 divorce - alimony is not gross income"
+    citations:
+      - "P.L. 115-97 Section 11051(a): Repeal effective for instruments executed after 2018"
+
+  # ==========================================================================
+  # FILING STATUS SCENARIOS
+  # ==========================================================================
+
+  - name: "Head of Household - pre-2019 alimony income"
+    description: "HoH filer receiving alimony under pre-2019 instrument"
+    tax_year: 2024
+    inputs:
+      person.alimony_received: 20000
+      person.is_pre_2019_divorce_agreement: true
+      person.filing_status: HEAD_OF_HOUSEHOLD
+    expected:
+      person.taxable_alimony_income: 20000
+    notes: "Filing status doesn't affect alimony income treatment"
+
+  - name: "Married Filing Separately - pre-2019 alimony deduction"
+    description: "MFS filer paying alimony under pre-2019 instrument"
+    tax_year: 2024
+    inputs:
+      person.alimony_paid: 25000
+      person.is_pre_2019_divorce_agreement_payer: true
+      person.filing_status: MARRIED_FILING_SEPARATELY
+    expected:
+      person.alimony_deduction_person: 25000
+    notes: "MFS can still deduct alimony (unlike some other deductions)"
+    citations:
+      - "26 USC 215: No MFS restriction on alimony deduction"

@@ -1,0 +1,27 @@
+# 26 USC Section 86(c)(1)(C) - Base Amount for MFS (Living Together)
+#
+# "(c) Base amount and adjusted base amount defined
+#  For purposes of this section-
+#  (1) Base amount - The term "base amount" means-
+#   ...
+#   (C) zero, in the case of a taxpayer who-
+#    (i) is married as of the close of the taxable year...
+#    (ii) does not file a joint return for such year, and
+#    (iii) does not live apart from his spouse at all times during the taxable year."
+#
+# This creates maximum taxability for married couples filing separately who
+# lived together at any point during the year.
+
+description: "Married filing separately taxpayers who lived with their spouse have a base amount of zero, meaning all benefits are potentially taxable."
+
+values:
+  1984-01-01: 0
+
+metadata:
+  unit: currency-USD
+  period: year
+  label: "Social Security taxability base threshold (MFS living together)"
+  reference:
+    - title: "26 U.S. Code Section 86(c)(1)(C)"
+      href: "https://www.law.cornell.edu/uscode/text/26/86#c_1_C"
+  notes: "Zero base means 85% of benefits taxable from first dollar"

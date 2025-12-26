@@ -1,34 +1,168 @@
-# 7 USC § 2017(a) - Value of Allotment
+# 7 USC Section 2017(a) - Value of Allotment
 #
 # "The value of the allotment... shall be equal to the cost of the
 # thrifty food plan... reduced by an amount equal to 30 per centum
 # of the household's income"
+#
+# The Thrifty Food Plan (TFP) is updated annually by USDA based on the
+# cost of a nutritious, minimal-cost diet. Maximum allotments are published
+# in the annual FNS COLA memo.
+#
+# Minimum benefit: 1-2 person households receive at least 8% of the
+# maximum allotment for a 1-person household.
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2017
 
-imports:
+module statute.7.2017.a
+version "2025.1"
+jurisdiction us
+
+references {
+  # Allotment parameters
   max_allotment: statute/7/2017/a/max_allotment
   expected_contribution_rate: statute/7/2017/a/expected_contribution_rate
   minimum_benefit: statute/7/2017/a/minimum_benefit
+
+  # Net income and eligibility
   snap_net_income: statute/7/2014/e/snap_net_income
-  snap_eligible: statute/7/2014/c/snap_eligible
+  snap_eligible: statute/7/2014/a/snap_eligible
+}
 
-entity Household
-period Month
-dtype Money
+# Maximum allotment based on household size
+variable snap_max_allotment {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Maximum Allotment"
+  description "Maximum monthly SNAP benefit based on Thrifty Food Plan for household size"
+  reference (
+    "7 USC 2017(a)",
+    "https://www.fns.usda.gov/snap/allotment/main"
+  )
 
-formula:
-  # Check eligibility first
-  if not snap_eligible then
-  return 0
+  formula {
+    # Maximum allotments by household size (48 states + DC)
+    # Sizes 1-8 have specific amounts; beyond 8, add per-person increment
+    let max_1 = parameter(gov.usda.fns.snap.allotment.max.size_1)
+    let max_2 = parameter(gov.usda.fns.snap.allotment.max.size_2)
+    let max_3 = parameter(gov.usda.fns.snap.allotment.max.size_3)
+    let max_4 = parameter(gov.usda.fns.snap.allotment.max.size_4)
+    let max_5 = parameter(gov.usda.fns.snap.allotment.max.size_5)
+    let max_6 = parameter(gov.usda.fns.snap.allotment.max.size_6)
+    let max_7 = parameter(gov.usda.fns.snap.allotment.max.size_7)
+    let max_8 = parameter(gov.usda.fns.snap.allotment.max.size_8)
+    let additional = parameter(gov.usda.fns.snap.allotment.max.additional_per_person)
 
-  # Get maximum allotment for household size
-  max_benefit = max_allotment
+    if household_size == 1 then
+      return max_1
+    else if household_size == 2 then
+      return max_2
+    else if household_size == 3 then
+      return max_3
+    else if household_size == 4 then
+      return max_4
+    else if household_size == 5 then
+      return max_5
+    else if household_size == 6 then
+      return max_6
+    else if household_size == 7 then
+      return max_7
+    else if household_size == 8 then
+      return max_8
+    else
+      # Beyond 8: add per-person increment
+      let extra_members = household_size - 8
+      return max_8 + (additional * extra_members)
+  }
 
-  # § 2017(a): allotment = max - 30% of net income
-  contribution = round(snap_net_income * expected_contribution_rate)
-  calculated = max_benefit - contribution
+  default 0
+}
 
-  # Apply minimum benefit for 1-2 person households
-  minimum = if household_size <= 2 then minimum_benefit else 0
-  benefit = max(calculated, minimum)
+# Expected household contribution (30% of net income)
+variable snap_expected_contribution {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Expected Contribution"
+  description "Expected household contribution toward food costs (30% of net income)"
+  reference "7 USC 2017(a)"
 
-  return max(0, min(benefit, max_benefit))
+  formula {
+    let rate = parameter(gov.usda.fns.snap.allotment.contribution_rate)
+    return round(snap_net_income * rate)
+  }
+
+  default 0
+}
+
+# Calculated SNAP benefit before minimum/maximum bounds
+variable snap_calculated_benefit {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Calculated Benefit"
+  description "SNAP benefit calculated as maximum allotment minus expected contribution"
+  reference "7 USC 2017(a)"
+
+  formula {
+    return snap_max_allotment - snap_expected_contribution
+  }
+
+  default 0
+}
+
+# Minimum benefit for small households
+variable snap_minimum_benefit {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Minimum Benefit"
+  description "Minimum monthly SNAP benefit for 1-2 person households"
+  reference "7 USC 2017(a)"
+
+  formula {
+    # Minimum benefit only applies to 1-2 person households
+    if household_size <= 2 then
+      return parameter(gov.usda.fns.snap.allotment.minimum)
+    else
+      return 0
+  }
+
+  default 0
+}
+
+# Final SNAP allotment (benefit amount)
+variable snap_allotment {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Allotment"
+  description "Final monthly SNAP benefit amount"
+  reference (
+    "7 USC 2017(a)",
+    "https://www.fns.usda.gov/snap/allotment/main"
+  )
+
+  formula {
+    # Must be eligible to receive benefits
+    if not snap_eligible then
+      return 0
+
+    let calculated = snap_calculated_benefit
+    let minimum = snap_minimum_benefit
+    let maximum = snap_max_allotment
+
+    # Apply minimum benefit floor for 1-2 person households
+    let benefit = max(calculated, minimum)
+
+    # Cannot exceed maximum allotment
+    return max(0, min(benefit, maximum))
+  }
+
+  default 0
+}

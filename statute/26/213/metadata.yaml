@@ -2,15 +2,24 @@
 
 encoding:
   created: 2024-12-25
-  updated: 2024-12-25
-  status: initial
+  updated: 2024-12-26
+  status: complete
   encoded_by: claude-opus-4.5
 
-variable:
-  name: medical_expense_deduction
-  entity: TaxUnit
-  period: Year
-  dtype: Money
+variables:
+  - name: qualifying_medical_expenses
+    path: statute/26/213/d/qualified_medical_expenses.cosilico
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    description: "Medical expenses net of insurance reimbursement per 213(d)"
+
+  - name: medical_expense_deduction
+    path: statute/26/213/a/medical_expense_deduction.cosilico
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    description: "Itemized deduction after 7.5% AGI floor per 213(a)"
 
 coverage:
   tax_years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]

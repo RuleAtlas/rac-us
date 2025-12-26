@@ -1,0 +1,204 @@
+# 26 USC Section 86 - Social Security Benefits Taxation Parameters
+#
+# This section determines what portion of Social Security and tier 1 railroad
+# retirement benefits are included in gross income.
+#
+# Key features:
+# - Two-tier system: 50% tier and 85% tier
+# - Based on "combined income" = Modified AGI + 50% of benefits
+# - Thresholds NOT indexed for inflation (frozen since 1984)
+# - Special rules for married filing separately
+#
+# References:
+# - 26 USC Section 86
+# - IRS Publication 915 (Social Security and Equivalent Railroad Retirement Benefits)
+# - www.ssa.gov/benefits/retirement/planner/taxes.html
+
+reference: "26 USC Section 86"
+
+# ==========================================================================
+# Section 86(a)(1) - Tier 1 Rates (50% tier)
+# ==========================================================================
+
+tier_1:
+  # 86(a)(1)(A) - Maximum rate of benefits taxable in tier 1
+  benefit_cap_rate:
+    description: "Social Security benefits are taxable at this maximum rate for taxpayers in tier 1 (combined income between base and adjusted base thresholds)."
+    values:
+      1984-01-01: 0.50
+    metadata:
+      unit: /1
+      period: year
+      label: "Tier 1 benefit cap rate (50%)"
+      reference:
+        - title: "26 U.S. Code Section 86(a)(1)(A)"
+          href: "https://www.law.cornell.edu/uscode/text/26/86#a_1_A"
+
+  # 86(a)(1)(B) - Rate applied to excess over base amount
+  excess_rate:
+    description: "The IRS taxes Social Security at this rate applied to the excess of combined income over the base threshold for taxpayers in tier 1."
+    values:
+      1984-01-01: 0.50
+    metadata:
+      unit: /1
+      period: year
+      label: "Tier 1 excess rate (50%)"
+      reference:
+        - title: "26 U.S. Code Section 86(a)(1)(B)"
+          href: "https://www.law.cornell.edu/uscode/text/26/86#a_1_B"
+
+# ==========================================================================
+# Section 86(a)(2) - Tier 2 Rates (85% tier)
+# ==========================================================================
+
+tier_2:
+  # 86(a)(2)(B) - Maximum rate of benefits taxable overall
+  benefit_cap_rate:
+    description: "Social Security benefits are taxable at this maximum rate (85%) for taxpayers with combined income above the adjusted base threshold."
+    values:
+      1993-01-01: 0.85
+    metadata:
+      unit: /1
+      period: year
+      label: "Tier 2 benefit cap rate (85%)"
+      reference:
+        - title: "26 U.S. Code Section 86(a)(2)(B)"
+          href: "https://www.law.cornell.edu/uscode/text/26/86#a_2_B"
+      notes: "Added by OBRA 1993, effective for tax years after 1993"
+
+  # 86(a)(2)(A)(i) - Rate applied to excess over adjusted base
+  excess_rate:
+    description: "The IRS taxes Social Security at this rate (85%) applied to the excess of combined income over the adjusted base threshold for taxpayers in tier 2."
+    values:
+      1993-01-01: 0.85
+    metadata:
+      unit: /1
+      period: year
+      label: "Tier 2 excess rate (85%)"
+      reference:
+        - title: "26 U.S. Code Section 86(a)(2)(A)(i)"
+          href: "https://www.law.cornell.edu/uscode/text/26/86#a_2_A_i"
+
+  # 86(a)(2)(A)(ii)(II) - Bracket amount rate
+  bracket_rate:
+    description: "The IRC applies this fraction (50%) to calculate the bracket amount for tier 2 taxation - the carryover from tier 1."
+    values:
+      1993-01-01: 0.50
+    metadata:
+      unit: /1
+      period: year
+      label: "Tier 2 bracket rate (50%)"
+      reference:
+        - title: "26 U.S. Code Section 86(a)(2)(A)(ii)(II)"
+          href: "https://www.law.cornell.edu/uscode/text/26/86#a_2_A_ii_II"
+
+# ==========================================================================
+# Section 86(b) - Combined Income Definition
+# ==========================================================================
+
+combined_income:
+  # 86(b)(2) - Fraction of SS benefits included in combined income
+  ss_fraction:
+    description: "The IRC includes this fraction of Social Security benefits when calculating combined income for taxability determination."
+    values:
+      1984-01-01: 0.50
+    metadata:
+      unit: /1
+      period: year
+      label: "Social Security fraction for combined income"
+      reference:
+        - title: "26 U.S. Code Section 86(b)(2)"
+          href: "https://www.law.cornell.edu/uscode/text/26/86#b_2"
+
+# ==========================================================================
+# Section 86(c)(1) - Base Amounts (50% tier threshold)
+# ==========================================================================
+
+base_amount:
+  # 86(c)(1)(A) - Default base amount
+  single:
+    description: "The IRS taxes Social Security benefits for single filers with combined income above this threshold."
+    values:
+      1984-01-01: 25000
+    metadata:
+      unit: currency-USD
+      period: year
+      label: "Social Security taxability base threshold (single)"
+      reference:
+        - title: "26 U.S. Code Section 86(c)(1)(A)"
+          href: "https://www.law.cornell.edu/uscode/text/26/86#c_1_A"
+      notes: "Not indexed for inflation - frozen since 1984"
+
+  # 86(c)(1)(B) - Joint return base amount
+  joint:
+    description: "The IRS taxes Social Security benefits for joint filers with combined income above this threshold."
+    values:
+      1984-01-01: 32000
+    metadata:
+      unit: currency-USD
+      period: year
+      label: "Social Security taxability base threshold (joint)"
+      reference:
+        - title: "26 U.S. Code Section 86(c)(1)(B)"
+          href: "https://www.law.cornell.edu/uscode/text/26/86#c_1_B"
+      notes: "Not indexed for inflation - frozen since 1984"
+
+  # 86(c)(1)(C) - MFS living together (zero base)
+  mfs_cohabitating:
+    description: "Married filing separately taxpayers who lived with their spouse have a base amount of zero, meaning all benefits are potentially taxable."
+    values:
+      1984-01-01: 0
+    metadata:
+      unit: currency-USD
+      period: year
+      label: "Social Security taxability base threshold (MFS living together)"
+      reference:
+        - title: "26 U.S. Code Section 86(c)(1)(C)"
+          href: "https://www.law.cornell.edu/uscode/text/26/86#c_1_C"
+      notes: "Zero base means 85% of benefits taxable from first dollar"
+
+# ==========================================================================
+# Section 86(c)(2) - Adjusted Base Amounts (85% tier threshold)
+# ==========================================================================
+
+adjusted_base_amount:
+  # 86(c)(2)(A) - Default adjusted base amount
+  single:
+    description: "The IRS taxes Social Security benefits at the higher 85% rate for single filers with combined income above this threshold."
+    values:
+      1984-01-01: 34000
+    metadata:
+      unit: currency-USD
+      period: year
+      label: "Social Security taxability adjusted base threshold (single)"
+      reference:
+        - title: "26 U.S. Code Section 86(c)(2)(A)"
+          href: "https://www.law.cornell.edu/uscode/text/26/86#c_2_A"
+      notes: "Not indexed for inflation - frozen since 1984"
+
+  # 86(c)(2)(B) - Joint return adjusted base amount
+  joint:
+    description: "The IRS taxes Social Security benefits at the higher 85% rate for joint filers with combined income above this threshold."
+    values:
+      1984-01-01: 44000
+    metadata:
+      unit: currency-USD
+      period: year
+      label: "Social Security taxability adjusted base threshold (joint)"
+      reference:
+        - title: "26 U.S. Code Section 86(c)(2)(B)"
+          href: "https://www.law.cornell.edu/uscode/text/26/86#c_2_B"
+      notes: "Not indexed for inflation - frozen since 1984"
+
+  # 86(c)(2)(C) - MFS living together (zero adjusted base)
+  mfs_cohabitating:
+    description: "Married filing separately taxpayers who lived with their spouse have an adjusted base amount of zero."
+    values:
+      1984-01-01: 0
+    metadata:
+      unit: currency-USD
+      period: year
+      label: "Social Security taxability adjusted base threshold (MFS living together)"
+      reference:
+        - title: "26 U.S. Code Section 86(c)(2)(C)"
+          href: "https://www.law.cornell.edu/uscode/text/26/86#c_2_C"

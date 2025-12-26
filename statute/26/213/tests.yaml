@@ -1,4 +1,8 @@
 # Tests for 26 USC Section 213 - Medical Expense Deduction
+#
+# Variables tested:
+#   - qualifying_medical_expenses (213(d)): Net unreimbursed expenses + LTC premiums
+#   - medical_expense_deduction (213(a)): Qualifying expenses - (AGI * 7.5%)
 
 variable: medical_expense_deduction
 tax_year: 2024
@@ -247,3 +251,77 @@ test_cases:
       medical_expense_deduction: 1000
     citations:
       - "ACA Section 9013: 10% floor (pre-TCJA)"
+
+  # ==========================================================================
+  # Qualifying Medical Expenses (213(d)) - Additional Tests
+  # ==========================================================================
+
+  - name: "Reimbursement exceeds expenses"
+    description: "Cannot have negative qualifying expenses"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 50000
+      medical_expenses: 5000
+      medical_insurance_reimbursement: 7000
+    expected:
+      # max(0, $5,000 - $7,000) = $0, not negative
+      qualifying_medical_expenses: 0
+      medical_expense_deduction: 0
+    citations:
+      - "26 USC 213(d): expenses net of reimbursement"
+
+  - name: "LTC premiums only, no other medical"
+    description: "Long-term care premiums alone can qualify"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 30000
+      medical_expenses: 0
+      long_term_care_premiums: 3000
+    expected:
+      # Qualifying = $0 + $3,000 = $3,000
+      # Floor = $30,000 * 7.5% = $2,250
+      # Deduction = $3,000 - $2,250 = $750
+      qualifying_medical_expenses: 3000
+      medical_expense_deduction: 750
+    citations:
+      - "26 USC 213(d)(1)(D): LTC insurance as medical care"
+
+  - name: "Combined medical, reimbursement, and LTC"
+    description: "All components together"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 80000
+      medical_expenses: 15000
+      medical_insurance_reimbursement: 6000
+      long_term_care_premiums: 4000
+    expected:
+      # Unreimbursed = $15,000 - $6,000 = $9,000
+      # Qualifying = $9,000 + $4,000 = $13,000
+      # Floor = $80,000 * 7.5% = $6,000
+      # Deduction = $13,000 - $6,000 = $7,000
+      qualifying_medical_expenses: 13000
+      medical_expense_deduction: 7000
+    citations:
+      - "26 USC 213(a)"
+      - "26 USC 213(d)(1)(D)"
+
+  # ==========================================================================
+  # Schedule A Itemization Context
+  # ==========================================================================
+
+  - name: "Medical deduction for itemizers"
+    description: "Medical expense deduction is part of Schedule A itemized deductions"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 150000
+      medical_expenses: 20000
+    expected:
+      # Floor = $150,000 * 7.5% = $11,250
+      # Deduction = $20,000 - $11,250 = $8,750
+      medical_expense_deduction: 8750
+    citations:
+      - "26 USC 213(a)"
+      - "Schedule A Line 4"
+    notes: |
+      Taxpayer must itemize (Schedule A) to claim medical expense deduction.
+      Total itemized deductions must exceed standard deduction to benefit.

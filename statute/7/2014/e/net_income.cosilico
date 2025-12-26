@@ -1,4 +1,4 @@
-# 7 USC § 2014(e) - Deductions from Income
+# 7 USC Section 2014(e) - Deductions from Income
 #
 # Net income = Gross income - deductions
 # Deductions in order of application:
@@ -7,68 +7,182 @@
 #   (4) Child support payments (legally obligated and paid)
 #   (5) Medical expenses over $35 (elderly/disabled only)
 #   (6) Excess shelter (shelter costs - 50% adjusted income)
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014
 
-imports:
+module statute.7.2014.e
+version "2025.1"
+jurisdiction us
+
+references {
+  # Deduction parameters
   earned_income_deduction_rate: statute/7/2014/e/1/earned_income_deduction_rate
   standard_deduction: statute/7/2014/e/1/standard_deduction
   shelter_deduction_cap: statute/7/2014/e/6/shelter_deduction_cap
+
+  # Component deductions
   snap_dependent_care_deduction: statute/7/2014/e/3/snap_dependent_care_deduction
   snap_child_support_deduction: statute/7/2014/e/4/snap_child_support_deduction
   snap_medical_expense_deduction: statute/7/2014/e/5/snap_medical_expense_deduction
+}
 
-entity Household
-period Month
-dtype Money
+# Section 2014(e)(1): Standard deduction by household size
+variable snap_standard_deduction {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Standard Deduction"
+  description "Monthly standard deduction based on household size"
+  reference "7 USC 2014(e)(1)"
 
-formula:
-  # Step 1: § 2014(e)(1) - Earned income deduction (20%)
-  earned_deduction = earned_income * earned_income_deduction_rate
+  formula {
+    # Standard deduction varies by household size
+    # Sizes 1-3 get same amount, 4 gets more, 5 gets more, 6+ gets maximum
+    let std_1_3 = parameter(gov.usda.fns.snap.deductions.standard.size_1_3)
+    let std_4 = parameter(gov.usda.fns.snap.deductions.standard.size_4)
+    let std_5 = parameter(gov.usda.fns.snap.deductions.standard.size_5)
+    let std_6_plus = parameter(gov.usda.fns.snap.deductions.standard.size_6_plus)
 
-  # Step 2: § 2014(e)(1) - Standard deduction (by household size)
-  std_deduction = standard_deduction[household_size]
+    if household_size <= 3 then
+      return std_1_3
+    else if household_size == 4 then
+      return std_4
+    else if household_size == 5 then
+      return std_5
+    else
+      return std_6_plus
+  }
 
-  # Step 3: § 2014(e)(3) - Dependent care deduction
-  care_deduction = snap_dependent_care_deduction
+  default 0
+}
 
-  # Step 4: § 2014(e)(4) - Child support payments
-  support_deduction = snap_child_support_deduction
+# Section 2014(e)(1): Earned income deduction - 20%
+variable snap_earned_income_deduction {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Earned Income Deduction"
+  description "20% of gross earned income deducted before other calculations"
+  reference "7 USC 2014(e)(1)"
 
-  # Step 5: § 2014(e)(5) - Medical expenses (elderly/disabled only)
-  medical_deduction = snap_medical_expense_deduction
+  formula {
+    let rate = parameter(gov.usda.fns.snap.deductions.earned_income_rate)
+    return earned_income * rate
+  }
 
-  # Adjusted income before shelter
-  pre_shelter_deductions = earned_deduction + std_deduction + care_deduction + support_deduction + medical_deduction
-  adjusted_income = max(0, gross_income - pre_shelter_deductions)
+  default 0
+}
 
-  # Step 6: § 2014(e)(6) - Excess shelter deduction
-  shelter_deduction = snap_shelter_deduction
+# Total deductions before shelter calculation
+variable snap_pre_shelter_deductions {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Pre-Shelter Deductions"
+  description "Sum of all deductions before excess shelter calculation"
+  reference "7 USC 2014(e)"
 
-  return max(0, adjusted_income - shelter_deduction)
+  formula {
+    # Sum all deductions that apply before shelter
+    let earned_ded = snap_earned_income_deduction
+    let std_ded = snap_standard_deduction
+    let care_ded = snap_dependent_care_deduction
+    let support_ded = snap_child_support_deduction
+    let medical_ded = snap_medical_expense_deduction
 
-entity Household
-period Month
-dtype Money
+    return earned_ded + std_ded + care_ded + support_ded + medical_ded
+  }
 
-formula:
-  # Calculate income after all deductions except shelter
-  earned_deduction = earned_income * earned_income_deduction_rate
-  std_deduction = standard_deduction[household_size]
-  pre_shelter_deductions = earned_deduction + std_deduction
-  + snap_dependent_care_deduction
-  + snap_child_support_deduction
-  + snap_medical_expense_deduction
+  default 0
+}
 
-  adjusted = max(0, gross_income - pre_shelter_deductions)
+# Adjusted income after pre-shelter deductions
+variable snap_adjusted_income {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Adjusted Income"
+  description "Gross income minus pre-shelter deductions, used for shelter calculation"
+  reference "7 USC 2014(e)(6)"
 
-  # § 2014(e)(6)(A): Excess shelter = shelter costs - 50% adjusted income
-  excess = shelter_costs - (adjusted * 0.5)
+  formula {
+    return max(0, gross_income - snap_pre_shelter_deductions)
+  }
 
-  if excess <= 0 then
-  return 0
+  default 0
+}
 
-  # § 2014(e)(6)(B): Cap for non-elderly/disabled households
-  # § 2014(e)(6)(C): No cap for elderly/disabled households
-  if has_elderly_disabled then
-  return excess
+# Section 2014(e)(6): Excess shelter expense deduction
+variable snap_shelter_deduction {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Shelter Deduction"
+  description "Deduction for shelter costs exceeding 50% of adjusted income"
+  reference (
+    "7 USC 2014(e)(6)(A)",
+    "7 USC 2014(e)(6)(B)",
+    "7 USC 2014(e)(6)(C)"
+  )
 
-  return min(excess, shelter_deduction_cap)
+  formula {
+    # Section 2014(e)(6)(A): Excess = shelter costs - 50% of adjusted income
+    let adjusted = snap_adjusted_income
+    let excess = shelter_costs - (adjusted * 0.5)
+
+    if excess <= 0 then
+      return 0
+
+    # Section 2014(e)(6)(C): No cap for elderly/disabled households
+    if has_elderly_disabled then
+      return excess
+
+    # Section 2014(e)(6)(B): Cap for non-elderly/disabled households
+    let cap = parameter(gov.usda.fns.snap.deductions.shelter.cap)
+    return min(excess, cap)
+  }
+
+  default 0
+}
+
+# Net monthly income after all deductions
+variable snap_net_income {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Net Income"
+  description "Monthly income after all SNAP deductions, used for benefit calculation"
+  reference "7 USC 2014(e)"
+
+  formula {
+    let adjusted = snap_adjusted_income
+    let shelter_ded = snap_shelter_deduction
+
+    return max(0, adjusted - shelter_ded)
+  }
+
+  default 0
+}
+
+# Total SNAP deductions (for reporting/transparency)
+variable snap_total_deductions {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Total Deductions"
+  description "Sum of all SNAP income deductions"
+  reference "7 USC 2014(e)"
+
+  formula {
+    return snap_pre_shelter_deductions + snap_shelter_deduction
+  }
+
+  default 0
+}

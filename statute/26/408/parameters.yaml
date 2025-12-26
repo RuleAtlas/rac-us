@@ -1,0 +1,240 @@
+# 26 USC Section 408 - Individual Retirement Accounts
+#
+# Parameters for IRA contribution limits, distribution rules, and penalties
+# Reference: 26 USC 408, 408A, 219, 72(t)
+# Annual updates from IRS Rev. Proc. and Notices
+
+# ============================================================================
+# IRA Contribution Limits - 219(b)
+# ============================================================================
+
+ira_contribution_limit:
+  description: "Maximum annual IRA contribution (traditional or Roth)"
+  unit: currency-USD
+  values:
+    2019-01-01: 6000
+    2020-01-01: 6000
+    2021-01-01: 6000
+    2022-01-01: 6000
+    2023-01-01: 6500
+    2024-01-01: 7000
+    2025-01-01: 7000
+  citations:
+    - "26 USC 219(b)(1)(A): deductible amount"
+    - "IRS Notice 2023-75: 2024 limit $7,000"
+    - "IRS Notice 2024-80: 2025 limit $7,000"
+
+ira_catchup_contribution:
+  description: "Additional catch-up contribution for individuals age 50+"
+  unit: currency-USD
+  values:
+    2019-01-01: 1000
+    2020-01-01: 1000
+    2021-01-01: 1000
+    2022-01-01: 1000
+    2023-01-01: 1000
+    2024-01-01: 1000
+    2025-01-01: 1000
+  citations:
+    - "26 USC 219(b)(5)(B): additional amount for individuals 50 or older"
+    - "Note: catch-up amount is NOT indexed for inflation"
+
+ira_catchup_age:
+  description: "Age at which catch-up contributions are permitted"
+  unit: year
+  values:
+    2002-01-01: 50
+  citations:
+    - "26 USC 219(b)(5)(B)(i): individual who has attained age 50"
+
+# ============================================================================
+# Roth IRA Income Phase-Out - 408A(c)(3)
+# ============================================================================
+
+roth_ira_phaseout_single:
+  description: "Roth IRA contribution phase-out range for single/HoH filers"
+  unit: currency-USD
+  values:
+    2023-01-01:
+      start: 138000
+      end: 153000
+    2024-01-01:
+      start: 146000
+      end: 161000
+    2025-01-01:
+      start: 150000
+      end: 165000
+  citations:
+    - "26 USC 408A(c)(3)(C)(ii): applicable dollar amount"
+    - "IRS Notice 2023-75: 2024 thresholds"
+    - "IRS Notice 2024-80: 2025 thresholds"
+
+roth_ira_phaseout_joint:
+  description: "Roth IRA contribution phase-out range for married filing jointly"
+  unit: currency-USD
+  values:
+    2023-01-01:
+      start: 218000
+      end: 228000
+    2024-01-01:
+      start: 230000
+      end: 240000
+    2025-01-01:
+      start: 236000
+      end: 246000
+  citations:
+    - "26 USC 408A(c)(3)(C)(ii)(I): joint return"
+    - "IRS Notice 2023-75: 2024 thresholds"
+    - "IRS Notice 2024-80: 2025 thresholds"
+
+roth_ira_phaseout_separate:
+  description: "Roth IRA contribution phase-out range for married filing separately"
+  unit: currency-USD
+  values:
+    2024-01-01:
+      start: 0
+      end: 10000
+  citations:
+    - "26 USC 408A(c)(3)(B): no Roth contribution if MFS and lived with spouse"
+    - "Note: $0-$10,000 phase-out if did not live with spouse"
+
+# ============================================================================
+# Traditional IRA Deduction Phase-Out - 219(g)
+# ============================================================================
+
+traditional_ira_phaseout_single_covered:
+  description: "Traditional IRA deduction phase-out for single filers covered by workplace plan"
+  unit: currency-USD
+  values:
+    2023-01-01:
+      start: 73000
+      end: 83000
+    2024-01-01:
+      start: 77000
+      end: 87000
+    2025-01-01:
+      start: 79000
+      end: 89000
+  citations:
+    - "26 USC 219(g)(3)(B)(i): active participant phase-out"
+    - "IRS Notice 2023-75"
+    - "IRS Notice 2024-80"
+
+traditional_ira_phaseout_joint_covered:
+  description: "Traditional IRA deduction phase-out for MFJ where contributor is covered"
+  unit: currency-USD
+  values:
+    2023-01-01:
+      start: 116000
+      end: 136000
+    2024-01-01:
+      start: 123000
+      end: 143000
+    2025-01-01:
+      start: 126000
+      end: 146000
+  citations:
+    - "26 USC 219(g)(3)(B)(i): active participant, joint return"
+    - "IRS Notice 2023-75"
+    - "IRS Notice 2024-80"
+
+traditional_ira_phaseout_spouse_covered:
+  description: "Traditional IRA deduction phase-out for MFJ where only spouse is covered"
+  unit: currency-USD
+  values:
+    2023-01-01:
+      start: 218000
+      end: 228000
+    2024-01-01:
+      start: 230000
+      end: 240000
+    2025-01-01:
+      start: 236000
+      end: 246000
+  citations:
+    - "26 USC 219(g)(7): spouse is active participant"
+    - "IRS Notice 2023-75"
+    - "IRS Notice 2024-80"
+
+# ============================================================================
+# IRA Early Withdrawal Penalty Exceptions
+# ============================================================================
+
+ira_first_home_exception_limit:
+  description: "Lifetime limit for first-time homebuyer IRA penalty exception"
+  unit: currency-USD
+  values:
+    1997-01-01: 10000
+  citations:
+    - "26 USC 72(t)(2)(F): $10,000 lifetime limit"
+    - "Note: This limit is NOT indexed for inflation"
+
+ira_first_home_acquisition_period:
+  description: "Days to use funds after IRA distribution for first home"
+  unit: day
+  values:
+    1997-01-01: 120
+  citations:
+    - "26 USC 72(t)(8)(D)(i): 120-day acquisition period"
+
+# ============================================================================
+# Required Minimum Distributions - 408(a)(6)
+# ============================================================================
+
+ira_rmd_applicable_age:
+  description: "Age at which IRA RMDs must begin"
+  unit: year
+  values:
+    1997-01-01: 70.5
+    2020-01-01: 72
+    2023-01-01: 73
+    2033-01-01: 75
+  citations:
+    - "26 USC 401(a)(9)(C): required beginning date"
+    - "SECURE Act Section 114: age 72"
+    - "SECURE 2.0 Act Section 107: age 73 (2023), age 75 (2033)"
+
+# ============================================================================
+# 5-Year Holding Period - 408A(d)(2)(B)
+# ============================================================================
+
+roth_5_year_holding_period:
+  description: "Required holding period for qualified Roth distributions"
+  unit: year
+  values:
+    1998-01-01: 5
+  citations:
+    - "26 USC 408A(d)(2)(B): 5-taxable-year period"
+
+# ============================================================================
+# Excess Contribution Penalty - 4973
+# ============================================================================
+
+excess_contribution_penalty_rate:
+  description: "Excise tax rate on excess IRA contributions"
+  unit: rate
+  values:
+    1974-01-01: 0.06
+  citations:
+    - "26 USC 4973(a): tax equal to 6 percent"
+
+# ============================================================================
+# Rollover Rules - 408(d)(3)
+# ============================================================================
+
+ira_rollover_period_days:
+  description: "Number of days to complete 60-day rollover"
+  unit: day
+  values:
+    1974-01-01: 60
+  citations:
+    - "26 USC 408(d)(3)(A)(i): not later than the 60th day"
+
+ira_rollover_frequency:
+  description: "Waiting period between IRA-to-IRA rollovers"
+  unit: month
+  values:
+    2015-01-01: 12
+  citations:
+    - "26 USC 408(d)(3)(B): one-rollover-per-year rule"
+    - "Note: Applies to 60-day rollovers, not trustee-to-trustee transfers"

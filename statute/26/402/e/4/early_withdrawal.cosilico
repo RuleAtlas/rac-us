@@ -1,0 +1,234 @@
+# 26 USC Section 72(t) / 402(e)(4) - Additional Tax on Early Distributions
+#
+# "(t) 10-percent additional tax on early distributions from qualified
+#     retirement plans.--
+#     (1) Imposition of additional tax.--If any taxpayer receives any amount
+#         from a qualified retirement plan (as defined in section 4974(c)),
+#         the taxpayer's tax under this chapter for the taxable year in which
+#         such amount is received shall be increased by an amount equal to
+#         10 percent of the portion of such amount which is includible in
+#         gross income."
+#
+# Exceptions under 72(t)(2):
+# - (A)(i) After age 59-1/2
+# - (A)(ii) Made to beneficiary after death of employee
+# - (A)(iii) Attributable to disability
+# - (A)(iv) Substantially equal periodic payments (SEPP/72(t) payments)
+# - (A)(v) Medical expenses exceeding 7.5% of AGI
+# - (A)(vi) Qualified domestic relations order (QDRO)
+# - (A)(vii) Separation from service at age 55+ (401k only)
+# - (B) Dividends from ESOP
+# - (C) IRS levy
+# - (D) Qualified reservist distributions
+# - (E) First-time homebuyer ($10,000 lifetime limit - IRA only)
+# - (F) Higher education expenses (IRA only)
+# - (G) Health insurance premiums during unemployment (IRA only)
+# - (H) Birth or adoption expenses ($5,000 per child - added by SECURE Act)
+# - (I) Qualified disaster distributions
+# - (J) Terminal illness
+
+imports:
+  taxable_401k_distribution: statute/26/402/a/distributions
+  age: statute/26/person/age
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+
+# Input: Age at time of distribution
+entity Person
+period Year
+dtype Integer
+label "Age at Distribution"
+description "Taxpayer's age at time of retirement plan distribution"
+
+---
+
+# Input: Is distribution due to death of plan participant?
+entity Person
+period Year
+dtype Boolean
+label "Death Distribution"
+description "Distribution to beneficiary after death of plan participant"
+default false
+
+---
+
+# Input: Is taxpayer disabled per 72(m)(7)?
+entity Person
+period Year
+dtype Boolean
+label "Is Disabled"
+description "Whether taxpayer is disabled per 26 USC 72(m)(7)"
+default false
+
+---
+
+# Input: Is distribution a QDRO distribution?
+entity Person
+period Year
+dtype Boolean
+label "QDRO Distribution"
+description "Distribution pursuant to qualified domestic relations order"
+default false
+
+---
+
+# Input: Is distribution due to separation from service at age 55+?
+entity Person
+period Year
+dtype Boolean
+label "Age 55 Separation Distribution"
+description "Distribution due to separation from service in year of age 55+"
+default false
+
+---
+
+# Input: Is distribution for medical expenses?
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Medical Expense Distribution"
+description "Distribution used for unreimbursed medical expenses"
+default 0
+
+---
+
+# Input: Is distribution a SEPP (substantially equal periodic payments)?
+entity Person
+period Year
+dtype Boolean
+label "SEPP Distribution"
+description "Distribution is part of a series of substantially equal periodic payments"
+default false
+
+---
+
+# Input: Is distribution for birth/adoption expenses (SECURE Act)?
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Birth/Adoption Distribution"
+description "Distribution for qualified birth or adoption expenses (max $5,000 per event)"
+default 0
+
+---
+
+# Input: Is distribution due to terminal illness?
+entity Person
+period Year
+dtype Boolean
+label "Terminal Illness Distribution"
+description "Distribution due to terminal illness diagnosis"
+default false
+
+---
+
+# 72(t)(1): Whether 10% early withdrawal penalty applies
+entity Person
+period Year
+dtype Boolean
+label "Subject to Early Withdrawal Penalty"
+description "Whether distribution is subject to 10% early withdrawal penalty"
+
+formula:
+  # No penalty if no taxable distribution
+  if taxable_401k_distribution <= 0:
+    return false
+
+  # Exception (A)(i): Age 59-1/2 or older
+  if age >= 60:  # Simplified to 60 for modeling
+    return false
+
+  # Exception (A)(ii): Death
+  if is_death_distribution:
+    return false
+
+  # Exception (A)(iii): Disability
+  if is_disabled:
+    return false
+
+  # Exception (A)(iv): SEPP/72(t) payments
+  if is_sepp_distribution:
+    return false
+
+  # Exception (A)(vi): QDRO
+  if is_qdro_distribution:
+    return false
+
+  # Exception (A)(vii): Separation at 55+ (401k only)
+  if is_age_55_separation_distribution:
+    return false
+
+  # Exception (J): Terminal illness
+  if is_terminal_illness_distribution:
+    return false
+
+  # If none of the exceptions apply, penalty applies
+  return true
+
+---
+
+# Derived: Amount exempt from penalty due to medical expenses
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Medical Expense Exemption"
+description "Amount of distribution exempt from penalty for medical expenses"
+
+formula:
+  # Medical expenses exceeding 7.5% of AGI are exempt
+  medical_threshold = adjusted_gross_income * 0.075
+  excess_medical = max(0, medical_expense_distribution - medical_threshold)
+  return min(excess_medical, taxable_401k_distribution)
+
+---
+
+# Derived: Amount exempt from penalty for birth/adoption
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Birth/Adoption Exemption"
+description "Amount exempt from penalty for birth/adoption (max $5,000)"
+
+formula:
+  # SECURE Act added $5,000 per birth/adoption exemption
+  return min(birth_adoption_distribution, 5000)
+
+---
+
+# Derived: Total amount subject to 10% penalty
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Amount Subject to Penalty"
+description "Distribution amount subject to 10% early withdrawal penalty"
+
+formula:
+  if not is_subject_to_early_withdrawal_penalty:
+    return 0
+
+  # Start with full taxable amount
+  subject_amount = taxable_401k_distribution
+
+  # Subtract partial exemptions
+  subject_amount = subject_amount - medical_expense_exemption
+  subject_amount = subject_amount - birth_adoption_exemption
+
+  return max(0, subject_amount)
+
+---
+
+# 72(t)(1): 10% additional tax on early distributions
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Early Withdrawal Penalty"
+description "10% additional tax on early distributions from retirement plans per 72(t)"
+
+formula:
+  # 10% of the amount subject to penalty
+  return amount_subject_to_penalty * 0.10

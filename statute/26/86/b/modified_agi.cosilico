@@ -1,0 +1,36 @@
+# 26 USC Section 86(b)(1)(A) - Modified Adjusted Gross Income
+#
+# "(b) Combined income
+#  For purposes of this section, the term "combined income" means the sum of-
+#  (1) the modified adjusted gross income of the taxpayer for such taxable year..."
+#
+# Modified AGI for Social Security taxability is defined as:
+#   AGI + Tax-exempt interest (from Section 103)
+#
+# This differs from other MAGI definitions (e.g., for ACA, IRA contributions)
+# because it specifically adds back tax-exempt interest which is excluded from
+# regular AGI but affects Social Security benefit taxability.
+#
+# References:
+# - IRS Publication 915: "Modified adjusted gross income (MAGI) is your
+#   adjusted gross income (AGI) plus: Tax-exempt interest from Form 1040"
+# - www.ssa.gov/benefits/retirement/planner/taxes.html
+
+imports:
+# Regular AGI from Section 62
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+
+# Tax-exempt interest from Section 103 (state/local bond interest)
+  tax_exempt_interest: statute/26/103/tax_exempt_interest
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Modified Adjusted Gross Income for Social Security Taxability"
+description "AGI plus tax-exempt interest for determining taxable portion of Social Security benefits per 26 USC Section 86(b)(1)"
+
+formula:
+  # Per Section 86(b)(1)(A) and IRS Publication 915:
+  # MAGI = AGI + tax-exempt interest
+  return adjusted_gross_income + tax_exempt_interest

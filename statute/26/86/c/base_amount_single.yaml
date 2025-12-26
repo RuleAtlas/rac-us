@@ -1,0 +1,22 @@
+# 26 USC Section 86(c)(1)(A) - Base Amount for Single Filers
+#
+# "(c) Base amount and adjusted base amount defined
+#  For purposes of this section-
+#  (1) Base amount - The term "base amount" means-
+#   (A) except as otherwise provided in this paragraph, $25,000..."
+#
+# Applies to: Single, Head of Household, Married Filing Separately (living apart)
+
+description: "The IRS taxes Social Security benefits for single filers with combined income above this threshold."
+
+values:
+  1984-01-01: 25000
+
+metadata:
+  unit: currency-USD
+  period: year
+  label: "Social Security taxability base threshold (single)"
+  reference:
+    - title: "26 U.S. Code Section 86(c)(1)(A)"
+      href: "https://www.law.cornell.edu/uscode/text/26/86#c_1_A"
+  notes: "Not indexed for inflation - frozen since 1984"

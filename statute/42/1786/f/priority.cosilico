@@ -1,0 +1,145 @@
+# 42 USC 1786(f)(1)(C) - WIC Priority System
+#
+# "The Secretary shall establish a priority system for the selection of
+# individuals to be served by the program, taking into account (i) the
+# greatest nutritional need, and (ii) to the extent such persons are
+# not participants, an identification of the special nutritional needs
+# of pregnant women, breastfeeding women, and infants."
+#
+# 7 CFR 246.7 establishes the nationwide WIC priority system:
+#
+# Priority I - Pregnant women, breastfeeding women, and infants at
+#              nutritional risk by biochemical assessment, anthropometric
+#              measures, or documented nutrition-related medical conditions
+#
+# Priority II - Infants up to 6 months of age whose mother participated
+#               in WIC or programs such as Medicaid during pregnancy
+#
+# Priority III - Children at nutritional risk by biochemical assessment,
+#                anthropometric measures, or documented nutrition-related
+#                medical conditions
+#
+# Priority IV - Pregnant women, breastfeeding women, and infants at
+#               nutritional risk by dietary deficiency alone
+#
+# Priority V - Children at nutritional risk by dietary deficiency alone
+#
+# Priority VI - Postpartum women at nutritional risk (non-breastfeeding
+#               or breastfeeding but no longer meeting other criteria)
+#
+# Priority VII - Individuals certified at nutritional risk solely due to
+#                homelessness or migrancy
+#
+# Note: Actual priority assignment requires nutritional risk assessment
+# by a competent professional authority. This module provides a simplified
+# priority based on category and assumed risk factors.
+#
+# Reference: 7 CFR 246.7 - Certification of participants
+
+imports:
+  wic_category: statute/42/1786/d/1/wic_category
+  is_wic_eligible: statute/42/1786/d/is_wic_eligible
+
+# =============================================================================
+# PRIORITY LEVEL ASSIGNMENT
+# 7 CFR 246.7(e) - Nationwide priority system
+# =============================================================================
+
+# Simplified priority assignment based on category
+# Note: Actual priority requires clinical nutritional risk assessment
+entity Person
+period Month
+dtype Integer  # 1-7, or 0 if not eligible
+
+formula:
+  if not is_wic_eligible then
+    return 0
+
+  category = wic_category
+
+  # Priority I: Pregnant/breastfeeding women and infants with documented
+  # medical nutrition risk (anemia, underweight, failure to thrive, etc.)
+  #
+  # Priority II: Infants under 6 months of mothers on WIC/Medicaid pregnancy
+  #
+  # Priority III: Children with documented medical nutrition risk
+  #
+  # For modeling, we assume standard dietary risk (Priority IV/V/VI) since
+  # clinical assessments cannot be simulated.
+
+  # Priority IV - Pregnant/breastfeeding women, infants (dietary risk assumed)
+  if category == "pregnant_woman" or category == "breastfeeding_woman" then
+    return 4
+
+  if category == "infant" then
+    return 4
+
+  # Priority V - Children (dietary risk assumed)
+  if category == "child" then
+    return 5
+
+  # Priority VI - Postpartum non-breastfeeding women
+  if category == "postpartum_woman" then
+    return 6
+
+  return 0
+
+# =============================================================================
+# PRIORITY DESCRIPTIONS
+# =============================================================================
+
+entity Person
+period Month
+dtype String
+
+formula:
+  priority = wic_priority_level
+
+  if priority == 1 then
+    return "Priority I - High-risk pregnant/breastfeeding women and infants"
+  else if priority == 2 then
+    return "Priority II - Infants of WIC/Medicaid mothers"
+  else if priority == 3 then
+    return "Priority III - High-risk children"
+  else if priority == 4 then
+    return "Priority IV - Pregnant/breastfeeding women and infants"
+  else if priority == 5 then
+    return "Priority V - Children at dietary risk"
+  else if priority == 6 then
+    return "Priority VI - Postpartum non-breastfeeding women"
+  else if priority == 7 then
+    return "Priority VII - Homeless/migrant certification"
+  else
+    return "Not eligible for WIC"
+
+# =============================================================================
+# PRIORITY CATEGORY FLAGS
+# For filtering and analysis
+# =============================================================================
+
+# High priority (I-III)
+entity Person
+period Month
+dtype Boolean
+
+formula:
+  priority = wic_priority_level
+  return priority >= 1 and priority <= 3
+
+# Standard priority (IV-V)
+entity Person
+period Month
+dtype Boolean
+
+formula:
+  priority = wic_priority_level
+  return priority >= 4 and priority <= 5
+
+# Lower priority (VI-VII)
+entity Person
+period Month
+dtype Boolean
+
+formula:
+  priority = wic_priority_level
+  return priority >= 6 and priority <= 7

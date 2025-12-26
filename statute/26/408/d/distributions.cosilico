@@ -1,0 +1,228 @@
+# 26 USC Section 408(d) - Tax Treatment of Distributions
+#
+# "(d) Tax treatment of distributions.--
+#     (1) In general.--Except as otherwise provided in this subsection, any
+#         amount paid or distributed out of an individual retirement plan
+#         shall be included in gross income by the payee or distributee, as
+#         the case may be, in the manner provided under section 72."
+#
+# Key rules for Traditional IRA distributions:
+# - Deductible contributions + earnings: fully taxable
+# - Nondeductible contributions: recovered tax-free (basis recovery)
+# - Pro-rata rule applies when both deductible and nondeductible
+#
+# Early withdrawal penalty (under age 59.5) applies per 72(t), but
+# IRAs have additional exceptions not available to 401(k)s:
+# - First-time homebuyer ($10,000 lifetime)
+# - Higher education expenses
+# - Health insurance during unemployment
+
+imports:
+  age: statute/26/person/age
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  early_withdrawal_penalty_rate: statute/26/402/parameters/early_withdrawal_penalty_rate
+
+# Input: Traditional IRA distribution amount
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Traditional IRA Distribution"
+description "Amounts distributed from traditional IRA during the year"
+default 0
+
+---
+
+# Input: Basis in traditional IRA (nondeductible contributions)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Traditional IRA Basis"
+description "Aggregate nondeductible contributions to traditional IRAs (Form 8606)"
+default 0
+
+---
+
+# Input: Total value of all traditional IRAs at end of year
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Traditional IRA Total Value"
+description "Sum of all traditional IRA account values for pro-rata calculation"
+default 0
+
+---
+
+# 408(d)(1): Taxable portion of traditional IRA distribution
+# Uses pro-rata rule when there is basis (nondeductible contributions)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Taxable IRA Distribution"
+description "Portion of traditional IRA distribution includible in gross income"
+
+formula:
+  if traditional_ira_distribution <= 0:
+    return 0
+
+  # If no basis, entire distribution is taxable
+  if traditional_ira_basis <= 0:
+    return traditional_ira_distribution
+
+  # Pro-rata rule: basis recovery based on ratio of basis to total value
+  # Total value = year-end value + current year distributions
+  total_value = traditional_ira_total_value + traditional_ira_distribution
+
+  if total_value <= 0:
+    return traditional_ira_distribution
+
+  # Non-taxable ratio = basis / total value
+  nontaxable_ratio = min(1.0, traditional_ira_basis / total_value)
+  nontaxable_amount = traditional_ira_distribution * nontaxable_ratio
+
+  return traditional_ira_distribution - nontaxable_amount
+
+---
+
+# Derived: Nontaxable portion (basis recovery)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Basis Recovery"
+description "Portion of distribution representing return of nondeductible contributions"
+
+formula:
+  return traditional_ira_distribution - taxable_ira_distribution
+
+---
+
+# ============================================================================
+# IRA-Specific Early Withdrawal Exceptions (in addition to 72(t) exceptions)
+# ============================================================================
+
+# Input: First-time homebuyer distribution
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "First Home Distribution"
+description "IRA distribution for first-time homebuyer expenses"
+default 0
+
+---
+
+# Input: Higher education expense distribution
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Education Distribution"
+description "IRA distribution for qualified higher education expenses"
+default 0
+
+---
+
+# Input: Health insurance during unemployment
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Health Insurance Distribution"
+description "IRA distribution for health insurance premiums during unemployment"
+default 0
+
+---
+
+# Derived: First-time homebuyer exemption (limited to $10,000 lifetime)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "First Home Exemption"
+description "Amount exempt from penalty for first-time homebuyer ($10,000 lifetime limit)"
+
+formula:
+  # $10,000 lifetime limit per 72(t)(2)(F)
+  return min(first_home_distribution, 10000)
+
+---
+
+# Whether early withdrawal penalty applies to IRA distribution
+entity Person
+period Year
+dtype Boolean
+label "IRA Early Withdrawal Penalty Applies"
+description "Whether IRA distribution is subject to 10% early withdrawal penalty"
+
+formula:
+  # No penalty if no taxable distribution
+  if taxable_ira_distribution <= 0:
+    return false
+
+  # Age 59.5+ exception (simplified to 60)
+  if age >= 60:
+    return false
+
+  # Other standard exceptions checked in 72(t) module
+  return true
+
+---
+
+# Input: Is distribution due to death?
+entity Person
+period Year
+dtype Boolean
+label "IRA Death Distribution"
+description "Distribution to beneficiary after death of IRA owner"
+default false
+
+---
+
+# Input: Is IRA owner disabled?
+entity Person
+period Year
+dtype Boolean
+label "IRA Owner Disabled"
+description "Whether IRA owner is disabled per 72(m)(7)"
+default false
+
+---
+
+# Derived: Amount subject to IRA early withdrawal penalty
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Amount Subject to Penalty"
+description "IRA distribution amount subject to 10% early withdrawal penalty"
+
+formula:
+  if not is_ira_early_withdrawal_penalty_applies:
+    return 0
+
+  # Start with taxable portion
+  subject_amount = taxable_ira_distribution
+
+  # Subtract IRA-specific exemptions
+  subject_amount = subject_amount - first_home_exemption
+  subject_amount = subject_amount - education_distribution
+  subject_amount = subject_amount - health_insurance_distribution
+
+  return max(0, subject_amount)
+
+---
+
+# Derived: IRA early withdrawal penalty
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Early Withdrawal Penalty"
+description "10% additional tax on early IRA distributions per 72(t)"
+
+formula:
+  return ira_amount_subject_to_penalty * 0.10

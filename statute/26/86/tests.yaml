@@ -289,3 +289,112 @@ tests:
       tier1_taxable_social_security: 4000
       social_security_taxable_fraction: 0.25
     notes: "Just under 85% threshold"
+
+  # ==========================================================================
+  # TAX-EXEMPT INTEREST TESTS
+  # ==========================================================================
+  # These tests verify that tax-exempt interest is correctly added to AGI
+  # to form Modified AGI per Section 86(b)(1)(A)
+
+  # Test 16: Tax-exempt interest pushes filer above base amount
+  - name: "Tax-exempt interest triggers taxability"
+    inputs:
+      filing_status: SINGLE
+      adjusted_gross_income: 10000
+      tax_exempt_interest: 6000
+      social_security_benefits: 18000
+      # Modified AGI = 10000 + 6000 = 16000
+      # Combined income = 16000 + 9000 = 25000 = base (no excess yet)
+    expected:
+      modified_agi: 16000
+      combined_income: 25000
+      taxable_social_security: 0
+    notes: "Tax-exempt interest included in MAGI, at base threshold"
+
+  # Test 17: Tax-exempt interest pushes into 50% tier
+  - name: "Tax-exempt interest causes 50% tier taxation"
+    inputs:
+      filing_status: SINGLE
+      adjusted_gross_income: 12000
+      tax_exempt_interest: 8000
+      social_security_benefits: 20000
+      # Modified AGI = 12000 + 8000 = 20000
+      # Combined income = 20000 + 10000 = 30000
+      # Excess over base ($25k) = 5000
+      # Tier 1: min(2500, 10000) = 2500
+    expected:
+      modified_agi: 20000
+      combined_income: 30000
+      tier1_taxable_social_security: 2500
+      taxable_social_security: 2500
+    notes: "Municipal bond interest pushes taxpayer into taxable range"
+
+  # Test 18: High tax-exempt interest with joint filing
+  - name: "Joint filers with significant muni bond income"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      adjusted_gross_income: 25000
+      tax_exempt_interest: 15000
+      social_security_benefits: 30000
+      # Modified AGI = 25000 + 15000 = 40000
+      # Combined income = 40000 + 15000 = 55000
+      # Excess over base ($32k) = 23000
+      # Excess over adjusted ($44k) = 11000
+      # Tier 1: min(11500, 15000) = 11500
+      # Tier 2: 35% of 11000 = 3850
+    expected:
+      modified_agi: 40000
+      combined_income: 55000
+      tier1_taxable_social_security: 11500
+      tier2_additional_taxable_social_security: 3850
+      taxable_social_security: 15350
+    notes: "Retirees with muni bond income face SS taxation"
+
+  # Test 19: Zero tax-exempt interest (AGI = MAGI)
+  - name: "No tax-exempt interest - AGI equals MAGI"
+    inputs:
+      filing_status: SINGLE
+      adjusted_gross_income: 22000
+      tax_exempt_interest: 0
+      social_security_benefits: 20000
+      # Modified AGI = 22000 + 0 = 22000
+      # Same as Test 3 with modified_agi directly
+    expected:
+      modified_agi: 22000
+      combined_income: 32000
+      tier1_taxable_social_security: 3500
+      taxable_social_security: 3500
+    notes: "When no tax-exempt interest, MAGI = AGI"
+
+  # ==========================================================================
+  # RAILROAD RETIREMENT TIER 1 TESTS
+  # ==========================================================================
+
+  # Test 20: Tier 1 railroad retirement treated as SS
+  - name: "Railroad retirement tier 1 benefits"
+    inputs:
+      filing_status: SINGLE
+      modified_agi: 30000
+      social_security_benefits: 0
+      railroad_tier_1_benefits: 24000  # Treated same as SS
+      # Combined income = 30000 + 12000 = 42000
+      # Same calculation as SS benefits
+    expected:
+      combined_income: 42000
+      taxable_social_security: 11300
+    notes: "Tier 1 RRB benefits taxed same as SS per 86(d)(1)(B)"
+
+  # Test 21: Mixed SS and railroad tier 1
+  - name: "Combined SS and railroad tier 1 benefits"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      modified_agi: 40000
+      social_security_benefits: 20000
+      railroad_tier_1_benefits: 10000
+      # Total SS/tier 1 benefits = 30000
+      # Combined income = 40000 + 15000 = 55000
+      # Uses joint thresholds
+    expected:
+      combined_income: 55000
+      taxable_social_security: 15350
+    notes: "Both benefit types combined for taxability calculation"

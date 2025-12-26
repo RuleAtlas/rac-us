@@ -1,0 +1,136 @@
+# 26 USC Section 408(d)(3) - Rollover Contributions
+#
+# "(3) Rollover contribution.--An amount is described in this paragraph as
+#     a rollover contribution if it meets the requirements of subparagraphs
+#     (A) and (B).
+#
+#     (A) In general.--Paragraph (1) does not apply to any amount paid or
+#         distributed out of an individual retirement account or individual
+#         retirement annuity to the individual for whose benefit the account
+#         or annuity is maintained if--
+#         (i) the entire amount received (including money and any other property)
+#             is paid into an individual retirement account or individual
+#             retirement annuity (other than an endowment contract) for the
+#             benefit of such individual not later than the 60th day after the
+#             day on which he receives the payment or distribution..."
+#
+# Key rules:
+# - 60-day rollover window
+# - Once-per-year IRA-to-IRA rollover limitation
+# - Trustee-to-trustee transfers not subject to limitations
+# - Rollover to qualified plan allowed (reverse rollover)
+
+imports:
+  traditional_ira_distribution: statute/26/408/d/distributions
+
+# Input: Is this a trustee-to-trustee (direct) transfer?
+entity Person
+period Year
+dtype Boolean
+label "IRA Direct Transfer"
+description "Whether distribution is a trustee-to-trustee transfer"
+default false
+
+---
+
+# Input: Amount rolled over within 60 days
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Rollover Amount"
+description "Amount of IRA distribution completed as rollover within 60 days"
+default 0
+
+---
+
+# Input: Did individual complete another IRA-to-IRA rollover in last 12 months?
+entity Person
+period Year
+dtype Boolean
+label "Prior 12-Month Rollover"
+description "Whether individual completed IRA-to-IRA rollover in previous 12 months"
+default false
+
+---
+
+# 408(d)(3)(B): One-rollover-per-year rule
+# Only applies to 60-day rollovers, not trustee-to-trustee transfers
+entity Person
+period Year
+dtype Boolean
+label "Rollover Permitted"
+description "Whether IRA-to-IRA 60-day rollover is permitted this year"
+
+formula:
+  # Direct transfers always permitted
+  if is_ira_direct_transfer:
+    return true
+
+  # 60-day rollover limited to once per 12 months
+  if has_prior_12_month_rollover:
+    return false
+
+  return true
+
+---
+
+# Derived: Valid rollover amount (considering one-per-year rule)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Valid IRA Rollover"
+description "Amount of IRA rollover that meets requirements"
+
+formula:
+  # Direct transfers always valid
+  if is_ira_direct_transfer:
+    return ira_rollover_amount
+
+  # If one-per-year rule violated, rollover is invalid
+  if not is_rollover_permitted:
+    return 0
+
+  # Valid rollover cannot exceed distribution
+  return min(ira_rollover_amount, traditional_ira_distribution)
+
+---
+
+# Derived: Failed rollover amount (taxable + possibly penalized)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Failed IRA Rollover"
+description "Amount that failed to qualify as valid rollover"
+
+formula:
+  attempted_rollover = ira_rollover_amount
+
+  if is_ira_direct_transfer:
+    return 0
+
+  # If one-per-year rule violated, entire rollover fails
+  if not is_rollover_permitted and attempted_rollover > 0:
+    return attempted_rollover
+
+  return 0
+
+---
+
+# Derived: Net taxable IRA distribution after rollovers
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Net IRA Distribution After Rollover"
+description "IRA distribution amount remaining taxable after valid rollover"
+
+formula:
+  # Direct transfer = no taxable event
+  if is_ira_direct_transfer:
+    return 0
+
+  # Reduce taxable amount by valid rollover
+  return max(0, traditional_ira_distribution - valid_ira_rollover)

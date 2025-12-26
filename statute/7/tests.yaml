@@ -1,0 +1,485 @@
+# SNAP Program Tests
+#
+# Comprehensive test cases for the Supplemental Nutrition Assistance Program
+# covering eligibility determination and benefit calculation.
+#
+# Test values based on FY2024 (Oct 2023 - Sep 2024) parameters:
+# - 130% FPL gross income limit
+# - 100% FPL net income limit
+# - $2,750 resource limit ($4,250 elderly/disabled)
+# - Maximum allotments by household size
+# - 20% earned income deduction
+# - Standard deduction by household size
+# - Excess shelter deduction
+#
+# References:
+# - 7 USC 2014: Eligibility
+# - 7 USC 2017: Allotment calculation
+# - FNS SNAP COLA FY2024
+
+variable: snap
+fiscal_year: 2024
+
+test_cases:
+  # ===========================================================================
+  # SECTION 1: BASIC ELIGIBILITY - ZERO INCOME
+  # ===========================================================================
+
+  - name: "Zero income, 1-person household"
+    description: "Single person with no income receives maximum allotment"
+    inputs:
+      household_size: 1
+      gross_income: 0
+      earned_income: 0
+      unearned_income: 0
+      countable_resources: 0
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap_eligible: true
+      snap_gross_income_eligible: true
+      snap_net_income_eligible: true
+      snap_resource_eligible: true
+      snap_net_income: 0
+      snap_max_allotment: 291
+      snap: 291
+    citations:
+      - "7 USC 2017(a): maximum allotment with zero income"
+      - "FNS FY2024: $291 max for 1 person"
+
+  - name: "Zero income, 4-person household"
+    description: "Family of 4 with no income receives maximum allotment"
+    inputs:
+      household_size: 4
+      gross_income: 0
+      earned_income: 0
+      unearned_income: 0
+      countable_resources: 0
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap_eligible: true
+      snap_max_allotment: 973
+      snap: 973
+    citations:
+      - "FNS FY2024: $973 max for 4 persons"
+
+  # ===========================================================================
+  # SECTION 2: GROSS INCOME TEST (130% FPL)
+  # ===========================================================================
+
+  - name: "At gross income limit - eligible"
+    description: "1-person at exactly 130% FPL ($1,632/mo in FY2024)"
+    inputs:
+      household_size: 1
+      gross_income: 1632
+      earned_income: 0
+      unearned_income: 1632
+      countable_resources: 0
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap_gross_income_eligible: true
+    citations:
+      - "7 USC 2014(c)(2): income at or below 130% FPL"
+
+  - name: "Over gross income limit - ineligible"
+    description: "1-person over 130% FPL fails gross income test"
+    inputs:
+      household_size: 1
+      gross_income: 1700
+      earned_income: 0
+      unearned_income: 1700
+      countable_resources: 0
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap_eligible: false
+      snap_gross_income_eligible: false
+    citations:
+      - "7 USC 2014(c)(2): gross income exceeds 130% FPL"
+
+  - name: "Elderly over gross limit - exempt"
+    description: "Elderly/disabled exempt from gross income test"
+    inputs:
+      household_size: 1
+      gross_income: 1700
+      earned_income: 1700
+      unearned_income: 0
+      countable_resources: 0
+      has_elderly_disabled: true
+      shelter_costs: 800
+    expected:
+      snap_gross_income_eligible: true
+    citations:
+      - "7 USC 2014(c)(2): elderly/disabled exempt from gross income test"
+
+  # ===========================================================================
+  # SECTION 3: NET INCOME TEST (100% FPL)
+  # ===========================================================================
+
+  - name: "Earned income with deductions - eligible"
+    description: "Net income after 20% + standard deduction below 100% FPL"
+    inputs:
+      household_size: 4
+      gross_income: 2500
+      earned_income: 2500
+      unearned_income: 0
+      countable_resources: 0
+      has_elderly_disabled: false
+      shelter_costs: 1000
+    expected:
+      snap_eligible: true
+      snap_net_income_eligible: true
+    citations:
+      - "7 USC 2014(e)(1): 20% earned income deduction"
+      - "7 USC 2014(e)(1): standard deduction by HH size"
+
+  - name: "Net income calculation with all deductions"
+    description: "Test complete deduction calculation chain"
+    inputs:
+      household_size: 3
+      gross_income: 2000
+      earned_income: 1800
+      unearned_income: 200
+      dependent_care_expenses: 300
+      child_support_paid: 150
+      medical_expenses: 0
+      countable_resources: 500
+      has_elderly_disabled: false
+      shelter_costs: 900
+    expected:
+      snap_earned_income_deduction: 360  # 1800 * 0.20
+      snap_standard_deduction: 198  # FY2024 for 1-3 persons
+      snap_dependent_care_deduction: 300
+      snap_child_support_deduction: 150
+      snap_eligible: true
+    citations:
+      - "7 USC 2014(e): deduction ordering"
+
+  # ===========================================================================
+  # SECTION 4: RESOURCE TEST
+  # ===========================================================================
+
+  - name: "Under resource limit - eligible"
+    description: "Resources below $2,750 limit"
+    inputs:
+      household_size: 1
+      gross_income: 0
+      earned_income: 0
+      unearned_income: 0
+      countable_resources: 2000
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap_eligible: true
+      snap_resource_eligible: true
+    citations:
+      - "7 USC 2014(g)(1): $2,750 resource limit"
+
+  - name: "At resource limit - eligible"
+    description: "Resources exactly at $2,750 limit"
+    inputs:
+      household_size: 1
+      gross_income: 0
+      earned_income: 0
+      unearned_income: 0
+      countable_resources: 2750
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap_eligible: true
+      snap_resource_eligible: true
+    citations:
+      - "7 USC 2014(g)(1): at or below $2,750"
+
+  - name: "Over resource limit - ineligible"
+    description: "Resources above $2,750 limit"
+    inputs:
+      household_size: 1
+      gross_income: 0
+      earned_income: 0
+      unearned_income: 0
+      countable_resources: 3000
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap_eligible: false
+      snap_resource_eligible: false
+    citations:
+      - "7 USC 2014(g)(1): exceeds $2,750 resource limit"
+
+  - name: "Elderly - higher resource limit - eligible"
+    description: "Elderly/disabled have $4,250 limit"
+    inputs:
+      household_size: 1
+      gross_income: 0
+      earned_income: 0
+      unearned_income: 0
+      countable_resources: 4000
+      has_elderly_disabled: true
+      shelter_costs: 0
+    expected:
+      snap_eligible: true
+      snap_resource_eligible: true
+    citations:
+      - "7 USC 2014(g)(1)(B): $4,250 for elderly/disabled"
+
+  - name: "Elderly - over higher limit - ineligible"
+    description: "Elderly/disabled over $4,250 limit"
+    inputs:
+      household_size: 1
+      gross_income: 0
+      earned_income: 0
+      unearned_income: 0
+      countable_resources: 5000
+      has_elderly_disabled: true
+      shelter_costs: 0
+    expected:
+      snap_eligible: false
+      snap_resource_eligible: false
+    citations:
+      - "7 USC 2014(g)(1)(B): exceeds $4,250 limit"
+
+  # ===========================================================================
+  # SECTION 5: CATEGORICAL ELIGIBILITY
+  # ===========================================================================
+
+  - name: "SSI recipient - categorically eligible"
+    description: "SSI recipients are categorically eligible for SNAP"
+    inputs:
+      household_size: 1
+      gross_income: 1800
+      earned_income: 0
+      unearned_income: 1800
+      countable_resources: 3500
+      has_elderly_disabled: true
+      receives_ssi: true
+      shelter_costs: 0
+    expected:
+      snap_eligible: true
+      snap_categorically_eligible: true
+    citations:
+      - "7 USC 2014(a): SSI recipients categorically eligible"
+
+  - name: "TANF recipient - categorically eligible"
+    description: "TANF recipients are categorically eligible for SNAP"
+    inputs:
+      household_size: 3
+      gross_income: 2500
+      earned_income: 2500
+      unearned_income: 0
+      countable_resources: 3000
+      has_elderly_disabled: false
+      receives_tanf: true
+      shelter_costs: 0
+    expected:
+      snap_eligible: true
+      snap_categorically_eligible: true
+    citations:
+      - "7 USC 2014(a): TANF recipients categorically eligible"
+
+  # ===========================================================================
+  # SECTION 6: BENEFIT CALCULATION
+  # ===========================================================================
+
+  - name: "Benefit with income - basic calculation"
+    description: "Net = $1000 - $200 (20%) - $198 (std) = $602; benefit = $291 - $181 = $110"
+    inputs:
+      household_size: 1
+      gross_income: 1000
+      earned_income: 1000
+      unearned_income: 0
+      countable_resources: 0
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap_net_income: 602  # 1000 - 200 - 198 = 602
+      snap_expected_contribution: 181  # round(602 * 0.30)
+      snap: 110  # 291 - 181 = 110
+    citations:
+      - "7 USC 2017(a): max - 30% net income"
+
+  - name: "Minimum benefit applies"
+    description: "1-2 person households get minimum $23 benefit"
+    inputs:
+      household_size: 1
+      gross_income: 1100
+      earned_income: 1100
+      unearned_income: 0
+      countable_resources: 0
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap: 23
+    citations:
+      - "7 USC 2017(a): minimum benefit for 1-2 person"
+
+  - name: "3+ person household - no minimum"
+    description: "3+ person households don't get minimum benefit floor"
+    inputs:
+      household_size: 3
+      gross_income: 2400
+      earned_income: 2400
+      unearned_income: 0
+      countable_resources: 0
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap_minimum_benefit: 0
+    citations:
+      - "7 USC 2017(a): minimum only for 1-2 person"
+
+  - name: "Large household (10 persons)"
+    description: "Households beyond 8 get additional per-person amount"
+    inputs:
+      household_size: 10
+      gross_income: 0
+      earned_income: 0
+      unearned_income: 0
+      countable_resources: 0
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap_max_allotment: 2189  # $1,751 + 2 * $219
+      snap: 2189
+    citations:
+      - "FNS: each person beyond 8 adds $219"
+
+  # ===========================================================================
+  # SECTION 7: SHELTER DEDUCTION
+  # ===========================================================================
+
+  - name: "Excess shelter deduction - under cap"
+    description: "Shelter deduction when excess is below cap"
+    inputs:
+      household_size: 1
+      gross_income: 1000
+      earned_income: 1000
+      unearned_income: 0
+      countable_resources: 0
+      has_elderly_disabled: false
+      shelter_costs: 800
+    expected:
+      snap_eligible: true
+    citations:
+      - "7 USC 2014(e)(6)(A): shelter excess calculation"
+
+  - name: "Excess shelter deduction - capped"
+    description: "Non-elderly shelter deduction capped at $672"
+    inputs:
+      household_size: 1
+      gross_income: 500
+      earned_income: 500
+      unearned_income: 0
+      countable_resources: 0
+      has_elderly_disabled: false
+      shelter_costs: 1500
+    expected:
+      snap_shelter_deduction: 672  # Capped at FY2024 limit
+    citations:
+      - "7 USC 2014(e)(6)(B): shelter deduction cap"
+
+  - name: "Elderly - uncapped shelter deduction"
+    description: "Elderly/disabled get full excess shelter deduction"
+    inputs:
+      household_size: 1
+      gross_income: 500
+      earned_income: 500
+      unearned_income: 0
+      countable_resources: 0
+      has_elderly_disabled: true
+      shelter_costs: 1500
+    expected:
+      snap_gross_income_eligible: true  # Exempt from gross test
+    citations:
+      - "7 USC 2014(e)(6)(C): no cap for elderly/disabled"
+
+  # ===========================================================================
+  # SECTION 8: MEDICAL EXPENSE DEDUCTION
+  # ===========================================================================
+
+  - name: "Medical deduction - elderly with expenses"
+    description: "Elderly household deducts medical expenses over $35"
+    inputs:
+      household_size: 1
+      gross_income: 800
+      earned_income: 0
+      unearned_income: 800
+      medical_expenses: 200
+      countable_resources: 0
+      has_elderly_disabled: true
+      shelter_costs: 0
+    expected:
+      snap_medical_expense_deduction: 165  # 200 - 35
+    citations:
+      - "7 USC 2014(e)(5): medical expenses over $35"
+
+  - name: "Medical deduction - non-elderly ineligible"
+    description: "Non-elderly cannot deduct medical expenses"
+    inputs:
+      household_size: 1
+      gross_income: 800
+      earned_income: 800
+      unearned_income: 0
+      medical_expenses: 200
+      countable_resources: 0
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap_medical_expense_deduction: 0
+    citations:
+      - "7 USC 2014(e)(5): only elderly/disabled"
+
+  # ===========================================================================
+  # SECTION 9: COMBINED SCENARIOS
+  # ===========================================================================
+
+  - name: "Working family with shelter costs"
+    description: "4-person working family with moderate income"
+    inputs:
+      household_size: 4
+      gross_income: 3000
+      earned_income: 3000
+      unearned_income: 0
+      countable_resources: 1000
+      has_elderly_disabled: false
+      shelter_costs: 1200
+      dependent_care_expenses: 400
+    expected:
+      snap_eligible: true
+    citations:
+      - "7 USC 2014: combined eligibility tests"
+
+  - name: "Ineligible - all tests fail"
+    description: "Household failing gross income, net income, and resource tests"
+    inputs:
+      household_size: 1
+      gross_income: 5000
+      earned_income: 5000
+      unearned_income: 0
+      countable_resources: 5000
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap_eligible: false
+      snap_gross_income_eligible: false
+      snap_resource_eligible: false
+      snap: 0
+    citations:
+      - "7 USC 2014: fails all eligibility tests"
+
+  - name: "Edge case - exactly at net income limit"
+    description: "Household at exactly 100% FPL net income"
+    inputs:
+      household_size: 1
+      gross_income: 1453  # With deductions, net = ~$1,255 (FPL)
+      earned_income: 1453
+      unearned_income: 0
+      countable_resources: 0
+      has_elderly_disabled: false
+      shelter_costs: 0
+    expected:
+      snap_net_income_eligible: true
+    citations:
+      - "7 USC 2014(c)(1): at or below 100% FPL"

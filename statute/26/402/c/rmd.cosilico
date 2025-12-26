@@ -1,0 +1,207 @@
+# 26 USC Section 401(a)(9) - Required Minimum Distributions (RMD)
+#
+# "(9) Required distributions.--
+#     (A) In general.--A trust shall not constitute a qualified trust under
+#         this subsection unless the plan provides that the entire interest
+#         of each employee--
+#         (i) will be distributed to such employee not later than the required
+#             beginning date, or
+#         (ii) will be distributed, beginning not later than the required
+#              beginning date..."
+#
+# Required Beginning Date (RBD):
+# - Pre-SECURE: April 1 following year taxpayer turns 70-1/2
+# - SECURE Act (2020): April 1 following year taxpayer turns 72
+# - SECURE 2.0 (2023): April 1 following year taxpayer turns 73
+# - SECURE 2.0 (2033): April 1 following year taxpayer turns 75
+#
+# Still-working exception: For non-5% owners, RMD can be delayed
+# until retirement from the plan sponsor.
+
+imports:
+  age: statute/26/person/age
+
+# Input: Year of birth (for determining RMD age)
+entity Person
+period Year
+dtype Integer
+label "Birth Year"
+description "Year of birth for RMD age determination"
+
+---
+
+# Input: Account balance at end of prior year
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "401(k) Prior Year Balance"
+description "Account balance as of December 31 of prior year for RMD calculation"
+default 0
+
+---
+
+# Input: Is still employed by plan sponsor?
+entity Person
+period Year
+dtype Boolean
+label "Still Working for Plan Sponsor"
+description "Whether employee is still working for the 401(k) plan sponsor"
+default false
+
+---
+
+# Input: Is 5% or greater owner?
+entity Person
+period Year
+dtype Boolean
+label "Is 5% Owner"
+description "Whether employee owns 5% or more of the business"
+default false
+
+---
+
+# Derived: RMD applicable age based on birth year
+# Per SECURE 2.0 Act:
+# - Born 1950 or earlier: 72
+# - Born 1951-1958: 73
+# - Born 1959: 73 (waiting for Treasury guidance on 1959 ambiguity)
+# - Born 1960+: 75
+entity Person
+period Year
+dtype Integer
+label "RMD Applicable Age"
+description "Age at which required minimum distributions must begin"
+
+formula:
+  if birth_year <= 1950:
+    return 72
+  elif birth_year <= 1959:
+    return 73
+  else:
+    return 75
+
+---
+
+# Derived: Has reached RMD age?
+entity Person
+period Year
+dtype Boolean
+label "Reached RMD Age"
+description "Whether individual has reached required minimum distribution age"
+
+formula:
+  return age >= rmd_applicable_age
+
+---
+
+# Derived: Is RMD required this year?
+entity Person
+period Year
+dtype Boolean
+label "RMD Required"
+description "Whether a required minimum distribution must be taken this year"
+
+formula:
+  # Must have reached RMD age
+  if not has_reached_rmd_age:
+    return false
+
+  # Still-working exception for non-5% owners
+  if is_still_working_for_plan_sponsor and not is_5_percent_owner:
+    return false
+
+  # Must have account balance
+  if prior_year_401k_balance <= 0:
+    return false
+
+  return true
+
+---
+
+# Derived: Uniform Lifetime Table divisor
+# Simplified version - actual IRS tables have specific values for each age
+# Table III (Uniform Lifetime Table) divisors:
+entity Person
+period Year
+dtype Decimal
+label "RMD Divisor"
+description "Life expectancy divisor from IRS Uniform Lifetime Table"
+
+formula:
+  # Simplified divisor calculation
+  # Actual table: 73=26.5, 74=25.5, 75=24.6, 76=23.7, 77=22.9, 78=22.0...
+  if age < 73:
+    return 27.4
+  elif age == 73:
+    return 26.5
+  elif age == 74:
+    return 25.5
+  elif age == 75:
+    return 24.6
+  elif age == 76:
+    return 23.7
+  elif age == 77:
+    return 22.9
+  elif age == 78:
+    return 22.0
+  elif age == 79:
+    return 21.1
+  elif age == 80:
+    return 20.2
+  elif age == 81:
+    return 19.4
+  elif age == 82:
+    return 18.5
+  elif age == 83:
+    return 17.7
+  elif age == 84:
+    return 16.8
+  elif age == 85:
+    return 16.0
+  elif age == 86:
+    return 15.2
+  elif age == 87:
+    return 14.4
+  elif age == 88:
+    return 13.7
+  elif age == 89:
+    return 12.9
+  elif age == 90:
+    return 12.2
+  else:
+    # Ages 91+: continues declining
+    return max(3.0, 12.2 - (age - 90) * 0.7)
+
+---
+
+# Derived: Required Minimum Distribution amount
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Required Minimum Distribution"
+description "Minimum amount that must be withdrawn from retirement account"
+
+formula:
+  if not is_rmd_required:
+    return 0
+
+  # RMD = Prior year balance / Life expectancy divisor
+  return prior_year_401k_balance / rmd_divisor
+
+---
+
+# Derived: Penalty for failure to take RMD
+# SECURE 2.0 reduced penalty from 50% to 25% (10% if corrected timely)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "RMD Shortfall Penalty"
+description "Excise tax on failure to take required minimum distribution"
+
+formula:
+  # Input: Actual distribution taken
+  # For now, assume full compliance
+  return 0

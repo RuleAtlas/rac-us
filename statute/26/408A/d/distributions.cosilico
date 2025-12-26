@@ -1,0 +1,250 @@
+# 26 USC Section 408A(d) - Distribution Rules for Roth IRAs
+#
+# "(d) Distribution rules.--For purposes of this title--
+#     (1) Exclusion.--Any qualified distribution from a Roth IRA shall not be
+#         includible in gross income.
+#
+#     (2) Qualified distribution.--For purposes of this subsection--
+#         (A) In general.--The term 'qualified distribution' means any payment
+#             or distribution--
+#             (i) made on or after the date on which the individual attains
+#                 age 59-1/2,
+#             (ii) made to a beneficiary (or to the estate of the individual)
+#                  on or after the death of the individual,
+#             (iii) attributable to the individual's being disabled, or
+#             (iv) which is a qualified special purpose distribution.
+#
+#         (B) Distributions within nonexclusion period.--A payment or distribution
+#             from a Roth IRA shall not be treated as a qualified distribution...
+#             if such payment or distribution is made within the 5-taxable year
+#             period beginning with the first taxable year for which the
+#             individual made a contribution to a Roth IRA..."
+#
+# Ordering rules for non-qualified Roth distributions:
+# 1. Regular contributions (tax-free, no penalty)
+# 2. Conversion contributions (tax-free, 5-year rule for penalty)
+# 3. Earnings (taxable and possibly penalized if not qualified)
+
+imports:
+  age: statute/26/person/age
+
+# Input: Total Roth IRA distributions
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Roth IRA Distribution"
+description "Amounts distributed from Roth IRA during the year"
+default 0
+
+---
+
+# Input: Roth IRA contribution basis (total contributions made)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Roth IRA Contribution Basis"
+description "Aggregate Roth IRA contributions (not including conversions)"
+default 0
+
+---
+
+# Input: Roth IRA conversion basis
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Roth IRA Conversion Basis"
+description "Aggregate amounts converted from traditional IRA to Roth"
+default 0
+
+---
+
+# Input: Whether 5-year holding period is satisfied
+entity Person
+period Year
+dtype Boolean
+label "Roth IRA 5-Year Satisfied"
+description "Whether Roth IRA has satisfied the 5-taxable-year holding period"
+default false
+
+---
+
+# Input: Is distribution due to death?
+entity Person
+period Year
+dtype Boolean
+label "Roth Death Distribution"
+description "Distribution to beneficiary after death of Roth IRA owner"
+default false
+
+---
+
+# Input: Is Roth IRA owner disabled?
+entity Person
+period Year
+dtype Boolean
+label "Roth Owner Disabled"
+description "Whether Roth IRA owner is disabled per 72(m)(7)"
+default false
+
+---
+
+# Input: Is first-time homebuyer distribution? (qualified special purpose)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Roth First Home Distribution"
+description "Roth IRA distribution for first-time homebuyer expenses"
+default 0
+
+---
+
+# 408A(d)(2): Whether distribution is qualified
+entity Person
+period Year
+dtype Boolean
+label "Roth Qualified Distribution"
+description "Whether Roth IRA distribution is a qualified distribution"
+
+formula:
+  # Must satisfy 5-year holding period
+  if not is_roth_ira_5_year_satisfied:
+    return false
+
+  # Must meet one of these conditions:
+  # (i) Age 59.5+
+  if age >= 60:  # Simplified from 59.5
+    return true
+
+  # (ii) Death
+  if is_roth_death_distribution:
+    return true
+
+  # (iii) Disability
+  if is_roth_owner_disabled:
+    return true
+
+  # (iv) First-time homebuyer (up to $10,000 lifetime)
+  if roth_first_home_distribution > 0:
+    return true
+
+  return false
+
+---
+
+# 408A(d)(1): Taxable portion of Roth distribution
+# Qualified distributions are entirely tax-free
+# Non-qualified: contributions come out first (tax-free), then earnings (taxable)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Taxable Roth Distribution"
+description "Portion of Roth IRA distribution includible in gross income"
+
+formula:
+  # Qualified distributions are entirely tax-free
+  if is_roth_qualified_distribution:
+    return 0
+
+  # Non-qualified: apply ordering rules
+  total_basis = roth_ira_contribution_basis + roth_ira_conversion_basis
+  distribution = roth_ira_distribution
+
+  # Contributions and conversions come out first (tax-free)
+  if distribution <= total_basis:
+    return 0
+
+  # Excess over basis = earnings (taxable)
+  return distribution - total_basis
+
+---
+
+# Derived: Roth IRA earnings portion of distribution
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Roth IRA Earnings Distributed"
+description "Earnings portion of Roth IRA distribution"
+
+formula:
+  total_basis = roth_ira_contribution_basis + roth_ira_conversion_basis
+  return max(0, roth_ira_distribution - total_basis)
+
+---
+
+# Derived: Whether early withdrawal penalty applies to Roth
+entity Person
+period Year
+dtype Boolean
+label "Roth Early Penalty Applies"
+description "Whether Roth IRA distribution is subject to 10% early withdrawal penalty"
+
+formula:
+  # No penalty on qualified distributions
+  if is_roth_qualified_distribution:
+    return false
+
+  # No penalty if distribution is within contribution basis
+  if roth_ira_distribution <= roth_ira_contribution_basis:
+    return false
+
+  # Age 59.5+ exception
+  if age >= 60:
+    return false
+
+  # Death exception
+  if is_roth_death_distribution:
+    return false
+
+  # Disability exception
+  if is_roth_owner_disabled:
+    return false
+
+  # First-home exception ($10,000 limit)
+  if roth_first_home_distribution > 0:
+    return false
+
+  # Penalty applies if earnings being distributed before 59.5
+  return taxable_roth_distribution > 0
+
+---
+
+# Derived: Roth IRA early withdrawal penalty
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Roth Early Withdrawal Penalty"
+description "10% additional tax on non-qualified Roth IRA earnings distributions"
+
+formula:
+  if not is_roth_early_penalty_applies:
+    return 0
+
+  # Penalty applies to taxable (earnings) portion only
+  # Contributions always come out tax-free and penalty-free
+  return taxable_roth_distribution * 0.10
+
+---
+
+# Combined IRA taxable income
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Total IRA Taxable Income"
+description "Combined taxable income from all IRA distributions"
+
+formula:
+  # Import traditional IRA taxable amount
+  traditional_taxable = taxable_ira_distribution  # From 408/d/distributions
+
+  # Add Roth taxable amount (earnings before qualified)
+  roth_taxable = taxable_roth_distribution
+
+  return traditional_taxable + roth_taxable

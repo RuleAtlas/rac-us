@@ -1,0 +1,23 @@
+# 26 USC Section 86(c)(1)(B) - Base Amount for Joint Filers
+#
+# "(c) Base amount and adjusted base amount defined
+#  For purposes of this section-
+#  (1) Base amount - The term "base amount" means-
+#   ...
+#   (B) $32,000, in the case of a joint return..."
+#
+# Applies to: Married Filing Jointly, Qualifying Widow(er)
+
+description: "The IRS taxes Social Security benefits for joint filers with combined income above this threshold."
+
+values:
+  1984-01-01: 32000
+
+metadata:
+  unit: currency-USD
+  period: year
+  label: "Social Security taxability base threshold (joint)"
+  reference:
+    - title: "26 U.S. Code Section 86(c)(1)(B)"
+      href: "https://www.law.cornell.edu/uscode/text/26/86#c_1_B"
+  notes: "Not indexed for inflation - frozen since 1984"

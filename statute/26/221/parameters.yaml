@@ -1,0 +1,125 @@
+# 26 USC Section 221 - Interest on Education Loans
+#
+# Parameters for the student loan interest deduction.
+#
+# 221(b)(1): Maximum deduction amount ($2,500, not indexed)
+# 221(b)(2)(B): Phase-out thresholds (indexed annually)
+#
+# Note: Unlike most tax parameters, the $2,500 maximum is NOT indexed
+# for inflation. The phase-out thresholds ARE indexed per Rev. Proc.
+
+# ==============================================================================
+# MAXIMUM DEDUCTION - 26 USC 221(b)(1)
+# ==============================================================================
+
+max_deduction:
+  description: "Maximum student loan interest deduction allowed per tax year"
+  unit: currency-USD
+  values:
+    # 221(b)(1): Fixed at $2,500 since 2001, NOT indexed for inflation
+    2001-01-01: 2500
+  citations:
+    - "26 USC 221(b)(1): The deduction allowed... shall not exceed $2,500"
+    - "Note: This amount is NOT subject to inflation adjustment"
+
+# ==============================================================================
+# PHASE-OUT THRESHOLDS - 26 USC 221(b)(2)(B)
+# ==============================================================================
+
+# Phase-out for Single and Head of Household filers
+phaseout_single_start:
+  description: "MAGI threshold where student loan interest deduction phase-out begins for single/HOH filers"
+  unit: currency-USD
+  indexing:
+    method: cpi-u
+    round_to: 5000
+  values:
+    2002-01-01: 50000
+    2010-01-01: 60000
+    2016-01-01: 65000
+    2017-01-01: 65000
+    2018-01-01: 65000
+    2019-01-01: 70000
+    2020-01-01: 70000
+    2021-01-01: 70000
+    2022-01-01: 70000
+    2023-01-01: 75000
+    2024-01-01: 75000
+    2025-01-01: 80000
+  citations:
+    - "26 USC 221(b)(2)(B): phase-out threshold for unmarried individuals"
+    - "Rev. Proc. 2023-34 Section 3.19: $75,000-$90,000 for 2024"
+    - "Rev. Proc. 2024-40 Section 3.19: $80,000-$95,000 for 2025"
+
+phaseout_single_end:
+  description: "MAGI threshold where student loan interest deduction is fully phased out for single/HOH filers"
+  unit: currency-USD
+  indexing:
+    method: cpi-u
+    round_to: 5000
+  values:
+    2002-01-01: 65000
+    2010-01-01: 75000
+    2016-01-01: 80000
+    2017-01-01: 80000
+    2018-01-01: 80000
+    2019-01-01: 85000
+    2020-01-01: 85000
+    2021-01-01: 85000
+    2022-01-01: 85000
+    2023-01-01: 90000
+    2024-01-01: 90000
+    2025-01-01: 95000
+  citations:
+    - "26 USC 221(b)(2)(B): phase-out ends $15,000 above start for single"
+    - "Rev. Proc. 2023-34 Section 3.19: $75,000-$90,000 for 2024"
+    - "Rev. Proc. 2024-40 Section 3.19: $80,000-$95,000 for 2025"
+
+# Phase-out for Married Filing Jointly filers
+phaseout_joint_start:
+  description: "MAGI threshold where student loan interest deduction phase-out begins for MFJ filers"
+  unit: currency-USD
+  indexing:
+    method: cpi-u
+    round_to: 5000
+  values:
+    2002-01-01: 100000
+    2010-01-01: 120000
+    2016-01-01: 130000
+    2017-01-01: 135000
+    2018-01-01: 135000
+    2019-01-01: 140000
+    2020-01-01: 140000
+    2021-01-01: 140000
+    2022-01-01: 145000
+    2023-01-01: 155000
+    2024-01-01: 155000
+    2025-01-01: 165000
+  citations:
+    - "26 USC 221(b)(2)(B): phase-out threshold for married filing jointly"
+    - "Rev. Proc. 2023-34 Section 3.19: $155,000-$185,000 for 2024"
+    - "Rev. Proc. 2024-40 Section 3.19: $165,000-$195,000 for 2025"
+
+phaseout_joint_end:
+  description: "MAGI threshold where student loan interest deduction is fully phased out for MFJ filers"
+  unit: currency-USD
+  indexing:
+    method: cpi-u
+    round_to: 5000
+  values:
+    2002-01-01: 130000
+    2010-01-01: 150000
+    2016-01-01: 160000
+    2017-01-01: 165000
+    2018-01-01: 165000
+    2019-01-01: 170000
+    2020-01-01: 170000
+    2021-01-01: 170000
+    2022-01-01: 175000
+    2023-01-01: 185000
+    2024-01-01: 185000
+    2025-01-01: 195000
+  citations:
+    - "26 USC 221(b)(2)(B): phase-out ends $30,000 above start for MFJ"
+    - "Rev. Proc. 2023-34 Section 3.19: $155,000-$185,000 for 2024"
+    - "Rev. Proc. 2024-40 Section 3.19: $165,000-$195,000 for 2025"

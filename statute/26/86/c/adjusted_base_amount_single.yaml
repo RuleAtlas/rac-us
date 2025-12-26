@@ -1,0 +1,24 @@
+# 26 USC Section 86(c)(2)(A) - Adjusted Base Amount for Single Filers
+#
+# "(c) Base amount and adjusted base amount defined
+#  For purposes of this section-
+#  ...
+#  (2) Adjusted base amount - The term "adjusted base amount" means-
+#   (A) except as otherwise provided in this paragraph, $34,000..."
+#
+# When combined income exceeds this amount, up to 85% of benefits become taxable.
+# Applies to: Single, Head of Household, Married Filing Separately (living apart)
+
+description: "The IRS taxes Social Security benefits at the higher 85% rate for single filers with combined income above this threshold."
+
+values:
+  1984-01-01: 34000
+
+metadata:
+  unit: currency-USD
+  period: year
+  label: "Social Security taxability adjusted base threshold (single)"
+  reference:
+    - title: "26 U.S. Code Section 86(c)(2)(A)"
+      href: "https://www.law.cornell.edu/uscode/text/26/86#c_2_A"
+  notes: "Not indexed for inflation - frozen since 1984"

@@ -1,0 +1,166 @@
+# 26 USC Section 402(a) - Taxability of Beneficiary of Employees' Trust
+#
+# "(a) Taxability of beneficiary of exempt trust.--
+#     (1) In general.--Except as otherwise provided in this section, any
+#         amount actually distributed to any distributee by any employees'
+#         trust described in section 401(a) which is exempt from tax under
+#         section 501(a) shall be taxable to the distributee, in the taxable
+#         year of the distributee in which distributed, under section 72
+#         (relating to annuities)."
+#
+# This section governs taxation of distributions from qualified employer
+# retirement plans including 401(k), 403(b), and pension plans.
+#
+# Key rules:
+# - Traditional 401(k) distributions: fully taxable as ordinary income
+# - Roth 401(k) qualified distributions: tax-free (after 5 years, age 59.5+)
+# - After-tax contributions: recovered tax-free (basis recovery)
+# - Employer matching: always taxable when distributed
+
+imports:
+  filing_status: statute/26/1/filing_status
+  age: statute/26/person/age
+  early_withdrawal_penalty_401k: statute/26/402/e/4/early_withdrawal
+
+# Input: Total distributions from employer retirement plans
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "401(k) Distribution"
+description "Total distributions from 401(k), 403(b), and other employer retirement plans"
+default 0
+
+---
+
+# Input: Distributions from traditional (pre-tax) 401(k)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Traditional 401(k) Distribution"
+description "Distributions from traditional pre-tax 401(k) accounts"
+default 0
+
+---
+
+# Input: Distributions from Roth 401(k)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Roth 401(k) Distribution"
+description "Distributions from Roth (post-tax) 401(k) accounts"
+default 0
+
+---
+
+# Input: After-tax contributions basis in 401(k)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "401(k) After-Tax Basis"
+description "Unrecovered after-tax contributions in employer plan"
+default 0
+
+---
+
+# Input: Whether Roth 401(k) meets 5-year requirement
+entity Person
+period Year
+dtype Boolean
+label "Roth 401(k) 5-Year Satisfied"
+description "Whether 5-year holding period for Roth 401(k) is satisfied"
+default false
+
+---
+
+# 402(a)(1): Taxable portion of traditional 401(k) distributions
+# Traditional 401(k) distributions are fully taxable as ordinary income
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Taxable 401(k) Distribution"
+description "Portion of 401(k) distribution includible in gross income per 26 USC 402(a)"
+
+formula:
+  # Traditional distributions are fully taxable
+  traditional_taxable = traditional_401k_distribution
+
+  # Roth distributions are tax-free if qualified
+  # Qualified: 5-year holding period AND (age 59.5+ OR death/disability)
+  is_qualified_roth = roth_401k_5_year_satisfied and age >= 59.5
+
+  if is_qualified_roth:
+    roth_taxable = 0
+  else:
+    # Non-qualified Roth: earnings portion is taxable
+    # Simplified: assume contributions recovered first (FIFO)
+    roth_taxable = max(0, roth_401k_distribution - roth_401k_contribution_basis)
+
+  return traditional_taxable + roth_taxable
+
+---
+
+# Input: Roth 401(k) contribution basis (for non-qualified distributions)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Roth 401(k) Contribution Basis"
+description "Total Roth 401(k) contributions made (not including earnings)"
+default 0
+
+---
+
+# Derived: Total taxable retirement plan income
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Total Taxable Retirement Distribution"
+description "Combined taxable income from all qualified retirement plans"
+
+formula:
+  return taxable_401k_distribution
+
+---
+
+# Input: Is distribution a direct rollover?
+entity Person
+period Year
+dtype Boolean
+label "Is Direct Rollover"
+description "Whether distribution was directly rolled over to another plan or IRA"
+default false
+
+---
+
+# 402(c): Rollover treatment - distributions rolled over are not taxable
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Rollover Amount"
+description "Amount of distribution rolled over within 60 days"
+default 0
+
+---
+
+# Derived: Net taxable distribution after rollovers
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Net Taxable Distribution"
+description "Taxable distribution after excluding rollover amounts"
+
+formula:
+  # Direct rollovers and 60-day rollovers are not taxable
+  if is_direct_rollover:
+    return 0
+
+  taxable = taxable_401k_distribution
+  return max(0, taxable - rollover_amount)

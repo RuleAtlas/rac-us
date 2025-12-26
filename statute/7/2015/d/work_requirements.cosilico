@@ -1,8 +1,8 @@
-# 7 USC § 2015(d) & (o) - Work Requirements
+# 7 USC Section 2015(d) & (o) - Work Requirements
 #
 # Two types of work requirements apply to SNAP:
-# 1. General work registration (§ 2015(d)) - must register for work
-# 2. ABAWD requirements (§ 2015(o)) - time-limited benefits for able-bodied
+# 1. General work registration (Section 2015(d)) - must register for work
+# 2. ABAWD requirements (Section 2015(o)) - time-limited benefits for able-bodied
 #    adults without dependents who don't work 80+ hours/month
 #
 # LIMITATIONS OF STATIC MICROSIMULATION:
@@ -11,53 +11,83 @@
 # - Determination of ABAWD status (subject to time limit)
 # - Exemption categories
 # But does NOT track actual time limit exhaustion.
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2015
 
-imports:
+module statute.7.2015.d
+version "2025.1"
+jurisdiction us
+
+references {
   abawd_min_age: statute/7/2015/d/abawd_min_age
   abawd_max_age: statute/7/2015/d/abawd_max_age
   abawd_work_hours: statute/7/2015/d/abawd_work_hours
+}
 
 # Determine if individual is subject to ABAWD requirements
-entity Person
-period Month
-dtype Boolean
+variable is_snap_abawd {
+  entity Person
+  period Month
+  dtype Bool
+  label "Subject to SNAP ABAWD Requirements"
+  description "Whether individual is an Able-Bodied Adult Without Dependents subject to work requirements"
+  reference (
+    "7 USC 2015(o)(2)",
+    "2023 Fiscal Responsibility Act"
+  )
 
-formula:
-  # § 2015(o)(2): Definition of ABAWD
-  # - Aged 18-54 (as of 2025 phase-in)
-  # - Not disabled
-  # - Not responsible for dependent child
-  # - Not pregnant
-  # - Not exempt from work registration
+  formula {
+    # Section 2015(o)(2): Definition of ABAWD
+    # - Aged 18-54 (as of 2025 phase-in per Fiscal Responsibility Act)
+    # - Not disabled
+    # - Not responsible for dependent child
+    # - Not pregnant
+    # - Not exempt from work registration
 
-  in_age_range = age >= abawd_min_age and age <= abawd_max_age
-  has_dependent = has_dependent_child
-  is_exempt = is_disabled or is_pregnant or has_dependent
+    let min_age = parameter(gov.usda.fns.snap.abawd.min_age)
+    let max_age = parameter(gov.usda.fns.snap.abawd.max_age)
 
-  return in_age_range and not is_exempt
+    let in_age_range = age >= min_age and age <= max_age
+    let is_exempt = is_disabled or is_pregnant or has_dependent_child
+
+    return in_age_range and not is_exempt
+  }
+
+  default false
+}
 
 # Check if ABAWD meets work requirement
-entity Person
-period Month
-dtype Boolean
+variable snap_abawd_work_requirement_met {
+  entity Person
+  period Month
+  dtype Bool
+  label "SNAP ABAWD Work Requirement Met"
+  description "Whether ABAWD individual meets 80 hour/month work requirement"
+  reference "7 USC 2015(o)(2)"
 
-formula:
-  # Not subject to ABAWD rules = automatically meets requirement
-  if not is_snap_abawd then
-  return true
+  formula {
+    # Not subject to ABAWD rules = automatically meets requirement
+    if not is_snap_abawd then
+      return true
 
-  # § 2015(o)(2): Must work 80+ hours/month
-  # or participate in qualifying work program
-  working = work_hours_monthly >= abawd_work_hours
-  in_program = in_snap_employment_training
+    # Section 2015(o)(2): Must work 80+ hours/month
+    # or participate in qualifying work program
+    let hours_required = parameter(gov.usda.fns.snap.abawd.work_hours)
+    let working = work_hours_monthly >= hours_required
+    let in_program = in_snap_employment_training
 
-  return working or in_program
+    return working or in_program
+  }
+
+  default true
+}
 
 # NOTE: The following aspects CANNOT be implemented in static microsimulation:
 # - 3-month time limit tracking within 36-month period
-# - State-level ABAWD waivers
+# - State-level ABAWD waivers (geographic, economic conditions)
 # - Individual exemption tracking
 # - Work program slot availability
+# - Discretionary exemptions (15% state exemptions)
 #
 # For actual eligibility determination, integration with state eligibility
 # systems would be required.

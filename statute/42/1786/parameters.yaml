@@ -135,3 +135,86 @@ fpl_monthly:
       7: 4054    # 48650 / 12
       8: 4513    # 54150 / 12
     additional_per_person: 458  # 5500 / 12
+
+# ==============================================================================
+# Food Package Assignment
+# 7 CFR 246.10 - Supplemental foods
+# ==============================================================================
+
+food_package:
+  description: "WIC food package definitions per 7 CFR 246.10"
+
+  # Food package codes by category
+  # Note: Actual food package contents are defined in 7 CFR 246.10
+  # and vary by participant category. States have flexibility in
+  # offering state-specific food lists within federal guidelines.
+
+  packages:
+    description: "Food package categories per 7 CFR 246.10(c)"
+    I:
+      description: "Fully breastfed infants (no formula)"
+      participant_type: "infant"
+      reference: "7 CFR 246.10(c)(1)"
+    II:
+      description: "Formula-fed or partially breastfed infants"
+      participant_type: "infant"
+      reference: "7 CFR 246.10(c)(2)"
+    III:
+      description: "Children ages 1-4"
+      participant_type: "child"
+      reference: "7 CFR 246.10(c)(3)"
+    IV:
+      description: "Pregnant women and partially breastfeeding women"
+      participant_type: "woman"
+      reference: "7 CFR 246.10(c)(4)"
+    V:
+      description: "Non-breastfeeding postpartum women"
+      participant_type: "woman"
+      reference: "7 CFR 246.10(c)(5)"
+    VI:
+      description: "Fully breastfeeding postpartum women (enhanced)"
+      participant_type: "woman"
+      reference: "7 CFR 246.10(c)(6)"
+    VII:
+      description: "Fully breastfeeding women (up to infant's 1st birthday)"
+      participant_type: "woman"
+      reference: "7 CFR 246.10(c)(7)"
+
+# ==============================================================================
+# Priority System
+# 7 CFR 246.7(e) - Nationwide WIC priority system
+# ==============================================================================
+
+priority:
+  description: "WIC priority system for enrollment per 7 CFR 246.7(e)"
+
+  levels:
+    description: "Priority levels for selection when funding is limited"
+
+    1:
+      description: "Pregnant, breastfeeding women and infants at nutritional risk from documented medical conditions"
+      reference: "7 CFR 246.7(e)(1)(i)"
+
+    2:
+      description: "Infants up to 6 months of age of WIC/Medicaid participating mothers"
+      reference: "7 CFR 246.7(e)(1)(ii)"
+
+    3:
+      description: "Children at nutritional risk from documented medical conditions"
+      reference: "7 CFR 246.7(e)(1)(iii)"
+
+    4:
+      description: "Pregnant, breastfeeding women and infants at nutritional risk from dietary deficiency"
+      reference: "7 CFR 246.7(e)(1)(iv)"
+
+    5:
+      description: "Children at nutritional risk from dietary deficiency"
+      reference: "7 CFR 246.7(e)(1)(v)"
+
+    6:
+      description: "Non-breastfeeding postpartum women at nutritional risk"
+      reference: "7 CFR 246.7(e)(1)(vi)"
+
+    7:
+      description: "Individuals at nutritional risk solely from homelessness or migrancy"
+      reference: "7 CFR 246.7(e)(1)(vii)"

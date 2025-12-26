@@ -1,0 +1,391 @@
+# Tests for 26 USC Section 402 - Employer Retirement Plan Distributions
+#
+# Test categories:
+# 1. Traditional 401(k) distribution taxation
+# 2. Roth 401(k) qualified vs non-qualified distributions
+# 3. Early withdrawal penalty (72(t))
+# 4. Penalty exceptions
+# 5. Required minimum distributions
+
+variable: taxable_401k_distribution
+tax_year: 2024
+
+test_cases:
+  # ============================================================================
+  # Traditional 401(k) Distributions - 402(a)(1)
+  # ============================================================================
+
+  - name: "Traditional 401(k) distribution - fully taxable"
+    description: "All traditional 401(k) distributions are ordinary income"
+    inputs:
+      age: 65
+      traditional_401k_distribution: 50000
+      roth_401k_distribution: 0
+    expected:
+      taxable_401k_distribution: 50000
+      early_withdrawal_penalty: 0
+    citations:
+      - "26 USC 402(a)(1): taxable to the distributee"
+
+  - name: "Traditional 401(k) distribution - under 59.5"
+    description: "Early distribution subject to 10% penalty"
+    inputs:
+      age: 45
+      traditional_401k_distribution: 20000
+      roth_401k_distribution: 0
+      is_death_distribution: false
+      is_disabled: false
+      is_sepp_distribution: false
+    expected:
+      taxable_401k_distribution: 20000
+      is_subject_to_early_withdrawal_penalty: true
+      early_withdrawal_penalty: 2000
+    citations:
+      - "26 USC 72(t)(1): 10 percent additional tax"
+
+  - name: "Traditional 401(k) - large distribution at age 60"
+    description: "No penalty after age 59.5"
+    inputs:
+      age: 60
+      traditional_401k_distribution: 100000
+      roth_401k_distribution: 0
+    expected:
+      taxable_401k_distribution: 100000
+      is_subject_to_early_withdrawal_penalty: false
+      early_withdrawal_penalty: 0
+    citations:
+      - "26 USC 72(t)(2)(A)(i): age 59-1/2 exception"
+
+  # ============================================================================
+  # Roth 401(k) Distributions - 402A
+  # ============================================================================
+
+  - name: "Roth 401(k) qualified distribution - tax-free"
+    description: "Qualified Roth distribution after 5 years and age 59.5"
+    inputs:
+      age: 62
+      traditional_401k_distribution: 0
+      roth_401k_distribution: 30000
+      roth_401k_5_year_satisfied: true
+      roth_401k_contribution_basis: 25000
+    expected:
+      taxable_401k_distribution: 0
+      early_withdrawal_penalty: 0
+    citations:
+      - "26 USC 402A(d)(1): qualified distribution not includible in gross income"
+      - "26 USC 402A(d)(2): 5-year holding period requirement"
+
+  - name: "Roth 401(k) non-qualified - 5 years but under 59.5"
+    description: "Earnings portion taxable if under 59.5"
+    inputs:
+      age: 50
+      traditional_401k_distribution: 0
+      roth_401k_distribution: 30000
+      roth_401k_5_year_satisfied: true
+      roth_401k_contribution_basis: 25000
+    expected:
+      taxable_401k_distribution: 5000  # Only earnings taxable
+      early_withdrawal_penalty: 500     # 10% of taxable portion
+    citations:
+      - "26 USC 402A(d)(4)(A): distribution allocated between contributions and earnings"
+
+  - name: "Roth 401(k) - contributions only, no earnings"
+    description: "Distribution within contribution basis is tax-free"
+    inputs:
+      age: 40
+      traditional_401k_distribution: 0
+      roth_401k_distribution: 15000
+      roth_401k_5_year_satisfied: false
+      roth_401k_contribution_basis: 20000
+    expected:
+      taxable_401k_distribution: 0  # All within basis
+      early_withdrawal_penalty: 0
+    citations:
+      - "26 USC 402A(d)(4): ordering rules for Roth distributions"
+
+  # ============================================================================
+  # Early Withdrawal Penalty Exceptions - 72(t)(2)
+  # ============================================================================
+
+  - name: "Death distribution - no penalty"
+    description: "Beneficiary distributions exempt from early withdrawal penalty"
+    inputs:
+      age: 45
+      traditional_401k_distribution: 50000
+      is_death_distribution: true
+    expected:
+      taxable_401k_distribution: 50000
+      is_subject_to_early_withdrawal_penalty: false
+      early_withdrawal_penalty: 0
+    citations:
+      - "26 USC 72(t)(2)(A)(ii): made to a beneficiary after the death"
+
+  - name: "Disability distribution - no penalty"
+    description: "Disabled individual exempt from penalty"
+    inputs:
+      age: 40
+      traditional_401k_distribution: 30000
+      is_disabled: true
+    expected:
+      taxable_401k_distribution: 30000
+      is_subject_to_early_withdrawal_penalty: false
+      early_withdrawal_penalty: 0
+    citations:
+      - "26 USC 72(t)(2)(A)(iii): attributable to employee being disabled"
+
+  - name: "SEPP distribution - no penalty"
+    description: "Substantially equal periodic payments exempt"
+    inputs:
+      age: 52
+      traditional_401k_distribution: 25000
+      is_sepp_distribution: true
+    expected:
+      taxable_401k_distribution: 25000
+      is_subject_to_early_withdrawal_penalty: false
+      early_withdrawal_penalty: 0
+    citations:
+      - "26 USC 72(t)(2)(A)(iv): substantially equal periodic payments"
+
+  - name: "Age 55 separation from service - no penalty"
+    description: "401(k) exception for separation at 55+"
+    inputs:
+      age: 56
+      traditional_401k_distribution: 40000
+      is_age_55_separation_distribution: true
+    expected:
+      taxable_401k_distribution: 40000
+      is_subject_to_early_withdrawal_penalty: false
+      early_withdrawal_penalty: 0
+    citations:
+      - "26 USC 72(t)(2)(A)(v): separation from service after age 55"
+
+  - name: "QDRO distribution - no penalty"
+    description: "Qualified domestic relations order distribution exempt"
+    inputs:
+      age: 42
+      traditional_401k_distribution: 75000
+      is_qdro_distribution: true
+    expected:
+      taxable_401k_distribution: 75000
+      is_subject_to_early_withdrawal_penalty: false
+      early_withdrawal_penalty: 0
+    citations:
+      - "26 USC 72(t)(2)(C): pursuant to qualified domestic relations order"
+
+  - name: "Terminal illness - no penalty"
+    description: "Terminal illness exception added by SECURE Act"
+    inputs:
+      age: 48
+      traditional_401k_distribution: 100000
+      is_terminal_illness_distribution: true
+    expected:
+      taxable_401k_distribution: 100000
+      is_subject_to_early_withdrawal_penalty: false
+      early_withdrawal_penalty: 0
+    citations:
+      - "26 USC 72(t)(2)(L): terminally ill individual"
+      - "SECURE 2.0 Act Section 326"
+
+  - name: "Birth/adoption distribution - partial exemption"
+    description: "Up to $5,000 exempt from penalty for birth/adoption"
+    inputs:
+      age: 35
+      traditional_401k_distribution: 10000
+      birth_adoption_distribution: 5000
+    expected:
+      taxable_401k_distribution: 10000
+      birth_adoption_exemption: 5000
+      amount_subject_to_penalty: 5000
+      early_withdrawal_penalty: 500
+    citations:
+      - "26 USC 72(t)(2)(H): qualified birth or adoption distribution"
+      - "SECURE Act Section 113"
+
+  - name: "Medical expenses - partial exemption"
+    description: "Medical expenses exceeding 7.5% of AGI exempt from penalty"
+    inputs:
+      age: 50
+      traditional_401k_distribution: 30000
+      adjusted_gross_income: 100000
+      medical_expense_distribution: 15000
+    expected:
+      taxable_401k_distribution: 30000
+      # Exempt: $15,000 - ($100,000 * 7.5%) = $15,000 - $7,500 = $7,500
+      medical_expense_exemption: 7500
+      amount_subject_to_penalty: 22500
+      early_withdrawal_penalty: 2250
+    citations:
+      - "26 USC 72(t)(2)(B): medical care expenses exceeding 7.5%"
+
+  # ============================================================================
+  # Rollovers - 402(c)
+  # ============================================================================
+
+  - name: "Direct rollover - not taxable"
+    description: "Direct trustee-to-trustee transfer not taxable"
+    inputs:
+      age: 45
+      traditional_401k_distribution: 200000
+      is_direct_rollover: true
+    expected:
+      net_taxable_distribution: 0
+      early_withdrawal_penalty: 0
+    citations:
+      - "26 USC 402(c)(1): if transferred to an eligible retirement plan"
+
+  - name: "60-day rollover - not taxable"
+    description: "Amount rolled over within 60 days not taxable"
+    inputs:
+      age: 55
+      traditional_401k_distribution: 100000
+      rollover_amount: 100000
+      is_direct_rollover: false
+    expected:
+      net_taxable_distribution: 0
+    citations:
+      - "26 USC 402(c)(3): 60-day rollover period"
+
+  - name: "Partial rollover"
+    description: "Only portion rolled over is tax-free"
+    inputs:
+      age: 55
+      traditional_401k_distribution: 100000
+      rollover_amount: 70000
+      is_direct_rollover: false
+    expected:
+      net_taxable_distribution: 30000
+    citations:
+      - "26 USC 402(c)(2): any portion of an eligible rollover distribution"
+
+  # ============================================================================
+  # Required Minimum Distributions - 401(a)(9)
+  # ============================================================================
+
+  - name: "Age 73 - RMD required (born 1951)"
+    description: "SECURE 2.0 RMD age for those born 1951-1959"
+    inputs:
+      age: 73
+      birth_year: 1951
+      prior_year_401k_balance: 500000
+      is_still_working_for_plan_sponsor: false
+      is_5_percent_owner: false
+    expected:
+      rmd_applicable_age: 73
+      has_reached_rmd_age: true
+      is_rmd_required: true
+      rmd_divisor: 26.5
+      required_minimum_distribution: 18868  # 500000 / 26.5
+    citations:
+      - "SECURE 2.0 Act Section 107: age 73 for birth years 1951-1959"
+
+  - name: "Age 72 - RMD required (born 1950)"
+    description: "RMD age 72 for those born 1950 or earlier"
+    inputs:
+      age: 74
+      birth_year: 1950
+      prior_year_401k_balance: 400000
+      is_still_working_for_plan_sponsor: false
+      is_5_percent_owner: false
+    expected:
+      rmd_applicable_age: 72
+      has_reached_rmd_age: true
+      is_rmd_required: true
+      rmd_divisor: 25.5
+      required_minimum_distribution: 15686  # 400000 / 25.5
+    citations:
+      - "SECURE Act: age 72 for those born 1950 or earlier"
+
+  - name: "Age 74 - still working exception"
+    description: "RMD delayed if still working (non-5% owner)"
+    inputs:
+      age: 74
+      birth_year: 1950
+      prior_year_401k_balance: 600000
+      is_still_working_for_plan_sponsor: true
+      is_5_percent_owner: false
+    expected:
+      has_reached_rmd_age: true
+      is_rmd_required: false
+      required_minimum_distribution: 0
+    citations:
+      - "26 USC 401(a)(9)(C)(i)(II): later of retirement or required beginning date"
+
+  - name: "Age 74 - 5% owner must take RMD"
+    description: "Still-working exception doesn't apply to 5%+ owners"
+    inputs:
+      age: 74
+      birth_year: 1950
+      prior_year_401k_balance: 800000
+      is_still_working_for_plan_sponsor: true
+      is_5_percent_owner: true
+    expected:
+      has_reached_rmd_age: true
+      is_rmd_required: true
+      rmd_divisor: 25.5
+      required_minimum_distribution: 31373  # 800000 / 25.5
+    citations:
+      - "26 USC 401(a)(9)(C)(ii): 5-percent owner exception"
+
+  - name: "Age 64 (born 1960) - RMD not required"
+    description: "Future RMD age 75 for those born 1960+"
+    inputs:
+      age: 64
+      birth_year: 1960
+      prior_year_401k_balance: 200000
+    expected:
+      rmd_applicable_age: 75
+      has_reached_rmd_age: false
+      is_rmd_required: false
+      required_minimum_distribution: 0
+    citations:
+      - "SECURE 2.0 Act Section 107: age 75 for birth years 1960+"
+
+  - name: "Age 80 - larger RMD due to shorter life expectancy"
+    description: "RMD increases as life expectancy divisor decreases"
+    inputs:
+      age: 80
+      birth_year: 1944
+      prior_year_401k_balance: 300000
+      is_still_working_for_plan_sponsor: false
+    expected:
+      rmd_divisor: 20.2
+      required_minimum_distribution: 14851  # 300000 / 20.2
+    citations:
+      - "IRS Publication 590-B: Uniform Lifetime Table"
+
+  # ============================================================================
+  # Combined Scenarios
+  # ============================================================================
+
+  - name: "Mixed distribution - traditional and Roth at 62"
+    description: "Both traditional and qualified Roth in same year"
+    inputs:
+      age: 62
+      traditional_401k_distribution: 40000
+      roth_401k_distribution: 20000
+      roth_401k_5_year_satisfied: true
+      roth_401k_contribution_basis: 15000
+    expected:
+      taxable_401k_distribution: 40000  # Only traditional is taxable
+      early_withdrawal_penalty: 0
+    citations:
+      - "26 USC 402A(d)(1): qualified Roth distributions tax-free"
+
+  - name: "Early distribution with multiple exceptions"
+    description: "Some portion exempt, some subject to penalty"
+    inputs:
+      age: 45
+      traditional_401k_distribution: 50000
+      medical_expense_distribution: 20000
+      adjusted_gross_income: 100000
+      birth_adoption_distribution: 5000
+    expected:
+      taxable_401k_distribution: 50000
+      # Medical exemption: 20000 - (100000 * 0.075) = 20000 - 7500 = 12500
+      medical_expense_exemption: 12500
+      birth_adoption_exemption: 5000
+      # Subject to penalty: 50000 - 12500 - 5000 = 32500
+      amount_subject_to_penalty: 32500
+      early_withdrawal_penalty: 3250
+    citations:
+      - "26 USC 72(t)(2): multiple exceptions can apply"

@@ -1,24 +1,46 @@
-# 7 USC § 2014(e)(5) - Medical Expense Deduction
+# 7 USC Section 2014(e)(5) - Medical Expense Deduction
 #
 # "(5) that portion of actual costs of medical expenses in excess of $35 per month,
 #  for any elderly or disabled member, including transportation costs necessary
 #  to secure medical treatment or services"
 #
 # Only available to households with elderly (60+) or disabled members.
+# The $35 threshold was increased from $25 by the 2014 Farm Bill.
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014
 
-imports:
+module statute.7.2014.e.5
+version "2025.1"
+jurisdiction us
+
+references {
   medical_expense_threshold: statute/7/2014/e/5/medical_expense_threshold
+}
 
-entity Household
-period Month
-dtype Money
+# Medical expense deduction for elderly/disabled households
+variable snap_medical_expense_deduction {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Medical Expense Deduction"
+  description "Deduction for medical expenses over $35/month for elderly/disabled members"
+  reference (
+    "7 USC 2014(e)(5)",
+    "2014 Farm Bill (P.L. 113-79)"
+  )
 
-formula:
-  # Only available for elderly/disabled households
-  if not has_elderly_disabled then
-  return 0
+  formula {
+    # Only available for elderly/disabled households
+    if not has_elderly_disabled then
+      return 0
 
-  # § 2014(e)(5): Deduct expenses in excess of $35
-  excess = medical_expenses - medical_expense_threshold
+    # Section 2014(e)(5): Deduct expenses in excess of threshold
+    let threshold = parameter(gov.usda.fns.snap.deductions.medical.threshold)
+    let excess = medical_expenses - threshold
 
-  return max(0, excess)
+    return max(0, excess)
+  }
+
+  default 0
+}

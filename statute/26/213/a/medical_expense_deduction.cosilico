@@ -15,56 +15,30 @@
 # - CAA 2021: Permanently 7.5%
 
 imports:
+# AGI from Section 62
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
 
-# Input amounts
-  medical_expenses_paid: inputs/medical_expenses
-  insurance_reimbursements: inputs/medical_insurance_reimbursement
-  long_term_care_premiums: inputs/long_term_care_premiums
+# Qualifying expenses from 213(d)
+  qualifying_medical_expenses: statute/26/213/d/qualified_medical_expenses
 
 parameters:
   p: statute/26/213/parameters/agi_floor
-  ltc: statute/26/213/parameters/long_term_care
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Qualifying Medical Expenses"
-description "Medical expenses eligible for deduction per 26 USC 213(d)"
-"IRS Publication 502"
-
-formula:
-  # Start with gross medical expenses
-  gross_medical = medical_expenses_paid
-
-  # Subtract insurance reimbursements
-  unreimbursed = gross_medical - insurance_reimbursements
-
-  # Add long-term care premiums (subject to age limits)
-  # Note: Full LTC limit calculation would require age-based lookup
-  total = unreimbursed + long_term_care_premiums
-
-  return max(0, total)
-
-default 0
 
 entity TaxUnit
 period Year
 dtype Money
 unit "USD"
 label "Medical Expense Deduction"
-description "Deductible medical expenses after AGI floor per 26 USC 213(a)"
-"TCJA Section 11027",
-"CAA 2021 Section 9041",
-"IRS Publication 502"
+description "Itemized deduction for medical expenses exceeding 7.5% of AGI per 26 USC 213(a)"
+reference "26 USC 213(a)", "TCJA Section 11027", "CAA 2021 Section 9041", "IRS Publication 502"
 
 formula:
   agi = adjusted_gross_income
   expenses = qualifying_medical_expenses
 
-  # Calculate floor (7.5% of AGI permanently after CAA 2021)
-  floor = agi * p.rate
+  # Calculate floor: 7.5% of AGI (permanent after CAA 2021)
+  # Negative AGI treated as $0 floor
+  floor = max(0, agi) * p.rate
 
   # Deduction is expenses exceeding the floor
   return max(0, expenses - floor)

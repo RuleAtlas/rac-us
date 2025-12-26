@@ -1,50 +1,95 @@
-# 7 USC § 2014(c) - Income Eligibility Standards
+# 7 USC Section 2014(c) - Income Eligibility Standards
 #
 # "(2) households... shall have... gross income that does not exceed
 # 130 percent of the poverty line... and net income that does not
 # exceed 100 percent of the poverty line"
 #
 # "(2) Elderly and disabled exemption from gross income test"
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014
 
-imports:
+module statute.7.2014.c
+version "2025.1"
+jurisdiction us
+
+references {
+  # Parameters from YAML
   gross_income_limit_pct: statute/7/2014/c/gross_income_limit_pct
   net_income_limit_pct: statute/7/2014/c/net_income_limit_pct
   fpl_by_household_size: statute/7/2014/c/fpl_by_household_size
+
+  # Net income from deductions module
   snap_net_income: statute/7/2014/e/snap_net_income
+}
 
-# Calculate Federal Poverty Level for household
-entity Household
-period Month
-dtype Money
+# Calculate Federal Poverty Level for SNAP household
+variable snap_fpl_monthly {
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Monthly FPL"
+  description "Monthly Federal Poverty Level for household, scaled by size"
+  reference "HHS Poverty Guidelines"
 
-formula:
-  # FPL = base for 1 person + additional per person beyond 1
-  base = fpl_by_household_size[1]
-  additional = fpl_by_household_size["additional_per_person"]
-  extra_members = max(0, household_size - 1)
+  formula {
+    # FPL = base for 1 person + additional per person beyond 1
+    let base = parameter(gov.hhs.fpl.base)
+    let additional = parameter(gov.hhs.fpl.additional_per_person)
+    let extra_members = max(0, household_size - 1)
 
-  return base + (additional * extra_members)
+    return base + (additional * extra_members)
+  }
 
-# § 2014(c)(2): Gross income test - 130% FPL
+  default 0
+}
+
+# Section 2014(c)(2): Gross income test - 130% FPL
 # Elderly/disabled households are EXEMPT from this test
-entity Household
-period Month
-dtype Boolean
+variable snap_gross_income_eligible {
+  entity Household
+  period Month
+  dtype Bool
+  label "SNAP Gross Income Eligible"
+  description "Whether household passes 130% FPL gross income test (elderly/disabled exempt)"
+  reference (
+    "7 USC 2014(c)(2)",
+    "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014"
+  )
 
-formula:
-  # § 2014(c)(2): Elderly/disabled exempt from gross income test
-  if has_elderly_disabled then
-  return true
+  formula {
+    let limit_pct = parameter(gov.usda.fns.snap.income.gross_income_limit_pct)
 
-  gross_limit = snap_fpl_monthly * gross_income_limit_pct
-  return gross_income <= gross_limit
+    # Section 2014(c)(2): Elderly/disabled exempt from gross income test
+    if has_elderly_disabled then
+      return true
 
-# § 2014(c)(1): Net income test - 100% FPL
+    let gross_limit = snap_fpl_monthly * limit_pct
+    return gross_income <= gross_limit
+  }
+
+  default false
+}
+
+# Section 2014(c)(1): Net income test - 100% FPL
 # Applies to all households (including elderly/disabled)
-entity Household
-period Month
-dtype Boolean
+variable snap_net_income_eligible {
+  entity Household
+  period Month
+  dtype Bool
+  label "SNAP Net Income Eligible"
+  description "Whether household passes 100% FPL net income test after deductions"
+  reference (
+    "7 USC 2014(c)(1)",
+    "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014"
+  )
 
-formula:
-  net_limit = snap_fpl_monthly * net_income_limit_pct
-  return snap_net_income <= net_limit
+  formula {
+    let limit_pct = parameter(gov.usda.fns.snap.income.net_income_limit_pct)
+    let net_limit = snap_fpl_monthly * limit_pct
+
+    return snap_net_income <= net_limit
+  }
+
+  default false
+}

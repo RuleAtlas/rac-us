@@ -1,0 +1,48 @@
+# 26 USC Section 71 - Alimony Income Parameters
+#
+# Section 71 was REPEALED by the Tax Cuts and Jobs Act (TCJA) of 2017
+# (P.L. 115-97, Section 11051) for divorce or separation instruments:
+#   - Executed after December 31, 2018, OR
+#   - Modified after December 31, 2018, if the modification expressly
+#     provides that the TCJA amendments apply to such modification
+#
+# For pre-2019 instruments: Alimony is included in gross income of the recipient
+# For post-2018 instruments: Alimony has no tax consequences for the recipient
+#
+# IMPORTANT: The controlling factor is the DATE OF THE DIVORCE INSTRUMENT,
+# not the tax year. A taxpayer in 2024 with a 2015 divorce still includes
+# alimony in gross income.
+
+reference: "26 USC Section 71; P.L. 115-97 Section 11051"
+
+description: "Parameters for alimony income inclusion under IRC Section 71"
+
+# =============================================================================
+# ALIMONY INCOME INCLUSION RATE
+# =============================================================================
+# This parameter indicates the rate at which alimony is included in gross income
+# for agreements governed by pre-2019 rules.
+#
+# The rate is 1.0 (100%) for pre-2019 agreements and 0 for post-2018 agreements.
+# However, since the agreement date (not tax year) controls, this parameter
+# serves primarily as documentation. The actual logic uses is_pre_2019_divorce_agreement.
+
+alimony_income_inclusion_rate:
+  description: "Rate at which alimony payments are included in recipient's gross income"
+  unit: rate
+  values:
+    # Pre-TCJA: Full inclusion in gross income
+    - date: 1942-01-01
+      value: 1.0
+      reference: "Revenue Act of 1942; 26 USC 71(a)"
+    # Post-TCJA: The statute is repealed for new instruments
+    # Note: This rate applies to NEW instruments only, not existing ones
+    # For existing pre-2019 instruments, alimony remains includible
+    - date: 2019-01-01
+      value: 0.0
+      reference: "P.L. 115-97 Section 11051 (TCJA); effective for instruments executed after Dec 31, 2018"
+  notes: |
+    CRITICAL: This parameter documents the statutory change but the actual
+    tax treatment depends on the date of the divorce/separation instrument,
+    NOT the tax year. Pre-2019 instruments continue to have alimony included
+    in the recipient's gross income regardless of what tax year we're in.

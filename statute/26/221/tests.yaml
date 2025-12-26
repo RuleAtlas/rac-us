@@ -3,14 +3,21 @@
 # Comprehensive test suite for the student loan interest deduction.
 #
 # Key rules:
-#   - Maximum deduction: $2,500
+#   - Maximum deduction: $2,500 (not indexed)
 #   - Phase-out thresholds (2024):
 #     - Single/HoH: $75,000 - $90,000 MAGI
 #     - MFJ: $155,000 - $185,000 MAGI
+#   - Phase-out thresholds (2025):
+#     - Single/HoH: $80,000 - $95,000 MAGI
+#     - MFJ: $165,000 - $195,000 MAGI
 #   - MFS: Not allowed (disqualified)
 #   - Dependents: Not allowed
 #   - Interest must be on qualified education loan
 #   - Taxpayer must be legally obligated to pay
+#
+# Parameters: statute/26/221/parameters.yaml
+# Deduction formula: statute/26/221/a/student_loan_deduction.cosilico
+# Definitions: statute/26/221/b/qualified_loan.cosilico
 
 reference: "26 USC Section 221"
 tax_year: 2024
@@ -393,3 +400,129 @@ tests:
       student_loan_interest_phaseout_ratio: 0
       student_loan_interest_deduction: 2500
     notes: "Qualifying widow uses single thresholds"
+
+  # ==========================================================================
+  # TAX YEAR 2025 TESTS (Updated Thresholds)
+  # ==========================================================================
+
+  - name: "2025 - Single filer - full deduction"
+    tax_year: 2025
+    inputs:
+      filing_status: SINGLE
+      adjusted_gross_income: 75000
+      student_loan_interest_paid: 2500
+      is_claimed_as_dependent: false
+    expected:
+      student_loan_interest_phaseout_start: 80000
+      student_loan_interest_phaseout_end: 95000
+      student_loan_interest_phaseout_ratio: 0
+      student_loan_interest_deduction: 2500
+    notes: "2025 threshold increased to $80,000"
+    citations:
+      - "Rev. Proc. 2024-40 Section 3.19"
+
+  - name: "2025 - Single filer - partial phase-out"
+    tax_year: 2025
+    inputs:
+      filing_status: SINGLE
+      adjusted_gross_income: 87500  # Midpoint of 80000-95000
+      student_loan_interest_paid: 2500
+      is_claimed_as_dependent: false
+    expected:
+      # Phase-out: (87500 - 80000) / (95000 - 80000) = 7500 / 15000 = 0.5
+      student_loan_interest_phaseout_ratio: 0.5
+      student_loan_interest_deduction: 1250
+    notes: "2025: 50% phase-out at midpoint"
+
+  - name: "2025 - MFJ - full deduction"
+    tax_year: 2025
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      adjusted_gross_income: 160000
+      student_loan_interest_paid: 2500
+      is_claimed_as_dependent: false
+    expected:
+      student_loan_interest_phaseout_start: 165000
+      student_loan_interest_phaseout_end: 195000
+      student_loan_interest_phaseout_ratio: 0
+      student_loan_interest_deduction: 2500
+    notes: "2025: MFJ threshold increased to $165,000"
+
+  - name: "2025 - MFJ - partial phase-out"
+    tax_year: 2025
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      adjusted_gross_income: 180000  # Midpoint of 165000-195000
+      student_loan_interest_paid: 2500
+      is_claimed_as_dependent: false
+    expected:
+      # Phase-out: (180000 - 165000) / (195000 - 165000) = 15000 / 30000 = 0.5
+      student_loan_interest_phaseout_ratio: 0.5
+      student_loan_interest_deduction: 1250
+    notes: "2025: 50% MFJ phase-out"
+
+  # ==========================================================================
+  # ROUNDING AND PRECISION TESTS
+  # ==========================================================================
+
+  - name: "Phase-out results in fractional cents"
+    inputs:
+      filing_status: SINGLE
+      adjusted_gross_income: 76000  # 1/15 into phase-out
+      student_loan_interest_paid: 2500
+      is_claimed_as_dependent: false
+    expected:
+      # Phase-out: (76000 - 75000) / 15000 = 0.0666...
+      # Deduction: 2500 * (1 - 0.0666...) = 2333.33...
+      student_loan_interest_phaseout_ratio: 0.0666666666666667
+      student_loan_interest_deduction: 2333.33
+    notes: "Verify fractional calculation handling"
+
+  - name: "Very small interest amount"
+    inputs:
+      filing_status: SINGLE
+      adjusted_gross_income: 50000
+      student_loan_interest_paid: 1
+      is_claimed_as_dependent: false
+    expected:
+      student_loan_interest_deduction: 1
+    notes: "Even $1 of interest is deductible"
+
+  # ==========================================================================
+  # BOUNDARY VALUE TESTS
+  # ==========================================================================
+
+  - name: "Zero AGI - full deduction"
+    inputs:
+      filing_status: SINGLE
+      adjusted_gross_income: 0
+      student_loan_interest_paid: 2500
+      is_claimed_as_dependent: false
+    expected:
+      student_loan_interest_phaseout_ratio: 0
+      student_loan_interest_deduction: 2500
+    notes: "Zero income still qualifies for full deduction"
+
+  - name: "Negative AGI scenario"
+    description: "Business losses resulting in negative AGI"
+    inputs:
+      filing_status: SINGLE
+      adjusted_gross_income: -10000
+      student_loan_interest_paid: 2500
+      is_claimed_as_dependent: false
+    expected:
+      student_loan_interest_phaseout_ratio: 0
+      student_loan_interest_deduction: 2500
+    notes: "Negative AGI results in no phase-out"
+
+  - name: "MFJ at exact phase-out boundaries"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      adjusted_gross_income: 177500  # 75% into phase-out range
+      student_loan_interest_paid: 2500
+      is_claimed_as_dependent: false
+    expected:
+      # Phase-out: (177500 - 155000) / 30000 = 0.75
+      student_loan_interest_phaseout_ratio: 0.75
+      student_loan_interest_deduction: 625
+    notes: "75% phase-out for MFJ"

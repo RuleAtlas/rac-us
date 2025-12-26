@@ -482,3 +482,288 @@ test_cases:
       is_wic_eligible: true
     citations:
       - "42 USC 1786(b)(3): breastfeeding up to 1 year"
+
+# ==============================================================================
+# 7 CFR 246.10 - Food Package Assignment
+# Food packages are assigned based on participant category and breastfeeding status
+# ==============================================================================
+
+  - name: "Child receives Food Package III"
+    description: "Children ages 1-4 receive Package III"
+    inputs:
+      age: 3
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 2000
+      household_size: 3
+      is_us_resident: true
+    expected:
+      is_wic_eligible: true
+      wic_food_package: "III"
+    citations:
+      - "7 CFR 246.10(c)(3): Food Package III for children"
+
+  - name: "Pregnant woman receives Food Package IV"
+    description: "Pregnant women receive Package IV"
+    inputs:
+      age: 28
+      is_pregnant: true
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 2000
+      household_size: 1
+      is_us_resident: true
+    expected:
+      is_wic_eligible: true
+      wic_food_package: "IV"
+    citations:
+      - "7 CFR 246.10(c)(4): Food Package IV for pregnant women"
+
+  - name: "Fully breastfeeding woman receives Food Package VII"
+    description: "Fully breastfeeding women receive enhanced Package VII"
+    inputs:
+      age: 26
+      is_pregnant: false
+      is_breastfeeding: true
+      is_fully_breastfeeding: true
+      is_postpartum: false
+      months_postpartum: 4
+      household_gross_income: 2000
+      household_size: 2
+      is_us_resident: true
+    expected:
+      is_wic_eligible: true
+      wic_food_package: "VII"
+      is_wic_enhanced_package: true
+    citations:
+      - "7 CFR 246.10(c)(7): Food Package VII for fully breastfeeding"
+
+  - name: "Partially breastfeeding woman receives Food Package IV"
+    description: "Partially breastfeeding women receive Package IV"
+    inputs:
+      age: 26
+      is_pregnant: false
+      is_breastfeeding: true
+      is_fully_breastfeeding: false
+      is_postpartum: false
+      months_postpartum: 4
+      household_gross_income: 2000
+      household_size: 2
+      is_us_resident: true
+    expected:
+      is_wic_eligible: true
+      wic_food_package: "IV"
+    citations:
+      - "7 CFR 246.10(c)(4): Partially breastfeeding women receive Package IV"
+
+  - name: "Non-breastfeeding postpartum woman receives Food Package V"
+    description: "Non-breastfeeding postpartum women receive Package V"
+    inputs:
+      age: 29
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: true
+      months_postpartum: 3
+      household_gross_income: 2000
+      household_size: 2
+      is_us_resident: true
+    expected:
+      is_wic_eligible: true
+      wic_food_package: "V"
+    citations:
+      - "7 CFR 246.10(c)(5): Food Package V for non-breastfeeding postpartum"
+
+  - name: "Fully breastfed infant receives Food Package I"
+    description: "Infants exclusively breastfed receive Package I"
+    inputs:
+      age_months: 6
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      is_fully_breastfed: true
+      household_gross_income: 2000
+      household_size: 3
+      is_us_resident: true
+    expected:
+      is_wic_eligible: true
+      wic_food_package: "I"
+      is_wic_enhanced_package: true
+    citations:
+      - "7 CFR 246.10(c)(1): Food Package I for fully breastfed infants"
+
+  - name: "Formula-fed infant receives Food Package II"
+    description: "Formula-fed infants receive Package II"
+    inputs:
+      age_months: 4
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      is_fully_breastfed: false
+      household_gross_income: 2000
+      household_size: 3
+      is_us_resident: true
+    expected:
+      is_wic_eligible: true
+      wic_food_package: "II"
+    citations:
+      - "7 CFR 246.10(c)(2): Food Package II for formula-fed infants"
+
+  - name: "Ineligible person receives no food package"
+    description: "Ineligible individuals receive no food package"
+    inputs:
+      age: 40
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 1000
+      household_size: 1
+      is_us_resident: true
+    expected:
+      is_wic_eligible: false
+      wic_food_package: "none"
+    citations:
+      - "7 CFR 246.10: Only eligible participants receive food packages"
+
+# ==============================================================================
+# 7 CFR 246.7(e) - Priority System
+# Priority levels for enrollment when funding is limited
+# ==============================================================================
+
+  - name: "Pregnant woman receives Priority IV"
+    description: "Pregnant women with dietary risk receive Priority IV"
+    inputs:
+      age: 25
+      is_pregnant: true
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 2000
+      household_size: 1
+      is_us_resident: true
+    expected:
+      is_wic_eligible: true
+      wic_priority_level: 4
+    citations:
+      - "7 CFR 246.7(e)(1)(iv): Priority IV for pregnant/breastfeeding/infants"
+
+  - name: "Breastfeeding woman receives Priority IV"
+    description: "Breastfeeding women with dietary risk receive Priority IV"
+    inputs:
+      age: 28
+      is_pregnant: false
+      is_breastfeeding: true
+      is_postpartum: false
+      months_postpartum: 5
+      household_gross_income: 2000
+      household_size: 2
+      is_us_resident: true
+    expected:
+      is_wic_eligible: true
+      wic_priority_level: 4
+    citations:
+      - "7 CFR 246.7(e)(1)(iv): Priority IV for breastfeeding women"
+
+  - name: "Infant receives Priority IV"
+    description: "Infants with dietary risk receive Priority IV"
+    inputs:
+      age_months: 8
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 1500
+      household_size: 3
+      is_us_resident: true
+    expected:
+      is_wic_eligible: true
+      wic_priority_level: 4
+    citations:
+      - "7 CFR 246.7(e)(1)(iv): Priority IV for infants"
+
+  - name: "Child receives Priority V"
+    description: "Children with dietary risk receive Priority V"
+    inputs:
+      age: 3
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 2000
+      household_size: 3
+      is_us_resident: true
+    expected:
+      is_wic_eligible: true
+      wic_priority_level: 5
+    citations:
+      - "7 CFR 246.7(e)(1)(v): Priority V for children"
+
+  - name: "Postpartum non-breastfeeding woman receives Priority VI"
+    description: "Non-breastfeeding postpartum women receive Priority VI"
+    inputs:
+      age: 30
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: true
+      months_postpartum: 4
+      household_gross_income: 2000
+      household_size: 2
+      is_us_resident: true
+    expected:
+      is_wic_eligible: true
+      wic_priority_level: 6
+    citations:
+      - "7 CFR 246.7(e)(1)(vi): Priority VI for postpartum non-breastfeeding"
+
+  - name: "Ineligible person receives no priority"
+    description: "Ineligible individuals receive priority 0"
+    inputs:
+      age: 45
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 1000
+      household_size: 1
+      is_us_resident: true
+    expected:
+      is_wic_eligible: false
+      wic_priority_level: 0
+    citations:
+      - "7 CFR 246.7(e): Priority only applies to eligible participants"
+
+# ==============================================================================
+# Household-Level Tests
+# Tests for household WIC participant counts
+# ==============================================================================
+
+  - name: "Household with multiple WIC participants"
+    description: "Household with pregnant woman, infant, and child"
+    household:
+      members:
+        - name: "mother"
+          age: 28
+          is_pregnant: true
+          is_breastfeeding: false
+          is_postpartum: false
+        - name: "infant"
+          age_months: 9
+          is_pregnant: false
+          is_breastfeeding: false
+          is_postpartum: false
+        - name: "toddler"
+          age: 2
+          is_pregnant: false
+          is_breastfeeding: false
+          is_postpartum: false
+        - name: "father"
+          age: 30
+          is_pregnant: false
+          is_breastfeeding: false
+          is_postpartum: false
+      household_gross_income: 3000
+      is_us_resident: true
+    expected:
+      wic_eligible_count: 3
+      has_wic_eligible_member: true
+      wic_children_count: 1
+      wic_infants_count: 1
+      wic_women_count: 1
+    citations:
+      - "42 USC 1786(d): Multiple eligible categories in one household"

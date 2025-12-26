@@ -1,0 +1,162 @@
+# 26 USC Section 402 - Taxability of Employer Retirement Plan Distributions
+#
+# Parameters for 401(k), 403(b), and qualified pension plan taxation
+# Reference: 26 USC 402, 72(t), 401(a)(9)
+
+# ============================================================================
+# Early Withdrawal Penalty - 72(t)(1)
+# ============================================================================
+
+early_withdrawal_penalty_rate:
+  description: "Additional tax rate on early distributions from qualified plans"
+  unit: rate
+  values:
+    1974-01-01: 0.10  # 10% penalty
+  citations:
+    - "26 USC 72(t)(1): 10 percent of the portion includible in gross income"
+
+# Age at which penalty no longer applies
+early_withdrawal_penalty_age:
+  description: "Age after which early withdrawal penalty no longer applies"
+  unit: year
+  values:
+    1974-01-01: 59.5  # 59 and 1/2 years old
+  citations:
+    - "26 USC 72(t)(2)(A)(i): after the employee attains age 59-1/2"
+
+# Age 55 separation from service exception (401k only, not IRAs)
+age_55_separation_exception_age:
+  description: "Minimum age for penalty-free withdrawal upon separation from service"
+  unit: year
+  values:
+    1974-01-01: 55
+  citations:
+    - "26 USC 72(t)(2)(A)(v): separation from service after age 55"
+
+# Birth/adoption distribution limit (SECURE Act)
+birth_adoption_distribution_limit:
+  description: "Maximum penalty-free distribution for qualified birth or adoption"
+  unit: currency-USD
+  values:
+    2020-01-01: 5000
+  citations:
+    - "26 USC 72(t)(2)(H)(ii): aggregate amount not exceeding $5,000"
+    - "SECURE Act Section 113"
+
+# ============================================================================
+# Required Minimum Distributions - 401(a)(9)
+# ============================================================================
+
+# RMD applicable age by birth year
+rmd_applicable_age:
+  description: "Age at which required minimum distributions must begin"
+  unit: year
+  notes: "SECURE 2.0 changed ages based on birth year"
+  values:
+    # Pre-SECURE Act
+    1974-01-01:
+      default: 70.5
+    # SECURE Act (2020)
+    2020-01-01:
+      default: 72
+    # SECURE 2.0 (2023)
+    2023-01-01:
+      born_1950_or_earlier: 72
+      born_1951_to_1959: 73
+      born_1960_or_later: 75
+  citations:
+    - "26 USC 401(a)(9)(C): required beginning date"
+    - "SECURE Act Section 114: age 72"
+    - "SECURE 2.0 Act Section 107: ages 73 and 75"
+
+# RMD shortfall penalty rate (reduced by SECURE 2.0)
+rmd_shortfall_penalty_rate:
+  description: "Excise tax rate on failure to take required minimum distribution"
+  unit: rate
+  values:
+    1974-01-01: 0.50  # 50% penalty
+    2023-01-01: 0.25  # SECURE 2.0 reduced to 25%
+  citations:
+    - "26 USC 4974(a): tax equal to 50 percent"
+    - "SECURE 2.0 Act Section 302: reduced to 25 percent"
+
+# RMD corrected shortfall penalty rate (SECURE 2.0)
+rmd_corrected_shortfall_penalty_rate:
+  description: "Reduced penalty if RMD shortfall corrected during correction window"
+  unit: rate
+  values:
+    2023-01-01: 0.10  # 10% if corrected timely
+  citations:
+    - "SECURE 2.0 Act Section 302(b): reduced to 10 percent if corrected"
+
+# ============================================================================
+# 401(k) Contribution Limits - 402(g)
+# ============================================================================
+
+elective_deferral_limit:
+  description: "Maximum employee elective deferrals to 401(k) plans"
+  unit: currency-USD
+  values:
+    2023-01-01: 22500
+    2024-01-01: 23000
+    2025-01-01: 23500
+  citations:
+    - "26 USC 402(g)(1): limitation on exclusion"
+    - "IRS Notice 2023-75"
+    - "IRS Notice 2024-80"
+
+elective_deferral_catchup:
+  description: "Additional catch-up contribution limit for age 50+"
+  unit: currency-USD
+  values:
+    2023-01-01: 7500
+    2024-01-01: 7500
+    2025-01-01: 7500
+  citations:
+    - "26 USC 414(v)(2)(B)(i): $7,500 for 2024-2025"
+
+# SECURE 2.0: Enhanced catch-up for ages 60-63
+enhanced_catchup_ages:
+  description: "Age range for enhanced catch-up contributions under SECURE 2.0"
+  values:
+    2025-01-01:
+      min_age: 60
+      max_age: 63
+  citations:
+    - "SECURE 2.0 Act Section 109: ages 60-63"
+
+enhanced_catchup_amount:
+  description: "Enhanced catch-up contribution for ages 60-63"
+  unit: currency-USD
+  values:
+    2025-01-01: 11250  # Greater of $10,000 or 150% of regular catch-up
+  citations:
+    - "SECURE 2.0 Act Section 109"
+
+# ============================================================================
+# Total Annual Additions Limit - 415(c)
+# ============================================================================
+
+total_annual_additions_limit:
+  description: "Maximum total contributions (employee + employer) to defined contribution plans"
+  unit: currency-USD
+  values:
+    2023-01-01: 66000
+    2024-01-01: 69000
+    2025-01-01: 70000
+  citations:
+    - "26 USC 415(c)(1)(A): limitation on annual additions"
+    - "IRS Notice 2023-75"
+    - "IRS Notice 2024-80"
+
+# ============================================================================
+# Roth 401(k) - 402A
+# ============================================================================
+
+roth_401k_holding_period_years:
+  description: "Required holding period for qualified Roth 401(k) distributions"
+  unit: year
+  values:
+    2006-01-01: 5
+  citations:
+    - "26 USC 402A(d)(2)(B): 5-taxable-year period of participation"
