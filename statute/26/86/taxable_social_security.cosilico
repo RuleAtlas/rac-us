@@ -43,22 +43,24 @@ imports:
 # Get base amount based on filing status per 86(c)(1)
 
 function get_base_amount(filing_status: FilingStatus) -> Money:
-match filing_status {
-SINGLE => base_amount_single
-HEAD_OF_HOUSEHOLD => base_amount_single
-MARRIED_FILING_JOINTLY => base_amount_joint
-QUALIFYING_WIDOW => base_amount_joint
-MARRIED_FILING_SEPARATELY => base_amount_mfs
+  match filing_status {
+    SINGLE => base_amount_single
+    HEAD_OF_HOUSEHOLD => base_amount_single
+    MARRIED_FILING_JOINTLY => base_amount_joint
+    QUALIFYING_WIDOW => base_amount_joint
+    MARRIED_FILING_SEPARATELY => base_amount_mfs
+  }
 
 # Get adjusted base amount based on filing status per 86(c)(2)
 
 function get_adjusted_base_amount(filing_status: FilingStatus) -> Money:
-match filing_status {
-SINGLE => adjusted_base_amount_single
-HEAD_OF_HOUSEHOLD => adjusted_base_amount_single
-MARRIED_FILING_JOINTLY => adjusted_base_amount_joint
-QUALIFYING_WIDOW => adjusted_base_amount_joint
-MARRIED_FILING_SEPARATELY => 0  # No adjusted base for MFS
+  match filing_status {
+    SINGLE => adjusted_base_amount_single
+    HEAD_OF_HOUSEHOLD => adjusted_base_amount_single
+    MARRIED_FILING_JOINTLY => adjusted_base_amount_joint
+    QUALIFYING_WIDOW => adjusted_base_amount_joint
+    MARRIED_FILING_SEPARATELY => 0  # No adjusted base for MFS
+  }
 
 # Tier 1 taxable amount - up to 50% of benefits
 entity TaxUnit
@@ -142,6 +144,4 @@ label "Taxable Fraction of Social Security"
 description "Portion of Social Security benefits included in taxable income"
 
 formula:
-  if tax_unit_social_security <= 0 then
-  return 0
-  return taxable_social_security / tax_unit_social_security
+  if tax_unit_social_security <= 0 then 0 else taxable_social_security / tax_unit_social_security

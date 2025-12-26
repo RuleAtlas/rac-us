@@ -55,22 +55,24 @@ parameters:
 # Helper function to get 0% rate ceiling based on filing status
 
 function get_zero_pct_threshold(filing_status: FilingStatus) -> Money:
-match filing_status {
-SINGLE => zero_pct_single
-MARRIED_FILING_JOINTLY => zero_pct_joint
-HEAD_OF_HOUSEHOLD => zero_pct_hoh
-MARRIED_FILING_SEPARATELY => zero_pct_separate
-QUALIFYING_WIDOW => zero_pct_surviving
+  match filing_status {
+    SINGLE => zero_pct_single
+    MARRIED_FILING_JOINTLY => zero_pct_joint
+    HEAD_OF_HOUSEHOLD => zero_pct_hoh
+    MARRIED_FILING_SEPARATELY => zero_pct_separate
+    QUALIFYING_WIDOW => zero_pct_surviving
+  }
 
 # Helper function to get 15% rate ceiling based on filing status
 
 function get_fifteen_pct_threshold(filing_status: FilingStatus) -> Money:
-match filing_status {
-SINGLE => fifteen_pct_single
-MARRIED_FILING_JOINTLY => fifteen_pct_joint
-HEAD_OF_HOUSEHOLD => fifteen_pct_hoh
-MARRIED_FILING_SEPARATELY => fifteen_pct_separate
-QUALIFYING_WIDOW => fifteen_pct_surviving
+  match filing_status {
+    SINGLE => fifteen_pct_single
+    MARRIED_FILING_JOINTLY => fifteen_pct_joint
+    HEAD_OF_HOUSEHOLD => fifteen_pct_hoh
+    MARRIED_FILING_SEPARATELY => fifteen_pct_separate
+    QUALIFYING_WIDOW => fifteen_pct_surviving
+  }
 
 # =============================================================================
 # Section 1(h)(11) - Net Capital Gain Including Qualified Dividends
