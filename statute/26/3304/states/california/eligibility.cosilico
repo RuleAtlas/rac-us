@@ -1,0 +1,351 @@
+# California Unemployment Insurance Eligibility
+#
+# California UI is governed by the California Unemployment Insurance Code (CUIC),
+# administered by the Employment Development Department (EDD).
+#
+# Key sections:
+# - CUIC 1275-1279: General eligibility
+# - CUIC 1280-1281: Benefit computation
+# - CUIC 1252-1253: Able/available requirements
+# - CUIC 1256-1260: Disqualifications
+
+module statute.26.3304.states.california
+version "2024.1"
+
+references {
+  # California parameters
+  minimum_base_period_wages: statute/26/3304/states/california/parameters/minimum_base_period_wages
+  high_quarter_multiplier: statute/26/3304/states/california/parameters/high_quarter_multiplier
+  minimum_outside_high_quarter: statute/26/3304/states/california/parameters/minimum_outside_high_quarter
+  minimum_wba: statute/26/3304/states/california/parameters/minimum_wba
+  maximum_wba: statute/26/3304/states/california/parameters/maximum_wba
+  maximum_weeks: statute/26/3304/states/california/parameters/maximum_weeks
+  waiting_period_weeks: statute/26/3304/states/california/parameters/waiting_period_weeks
+  earnings_disregard: statute/26/3304/states/california/parameters/earnings_disregard
+  earnings_offset_rate: statute/26/3304/states/california/parameters/earnings_offset_rate
+  wba_table: statute/26/3304/states/california/parameters/wba_table
+  disqualification_earnings_multiplier: statute/26/3304/states/california/parameters/disqualification_earnings_multiplier
+}
+
+# =============================================================================
+# MONETARY ELIGIBILITY (CUIC 1281)
+# =============================================================================
+
+variable ca_ui_monetarily_eligible {
+  entity Person
+  period Week
+  dtype Boolean
+  label "California UI monetary eligibility"
+  description "Meets California minimum wage requirements per CUIC 1281"
+  reference (
+    "Cal. Unemp. Ins. Code 1281(a)",
+    "Cal. Unemp. Ins. Code 1281(a)(2)"
+  )
+
+  formula {
+    let hq_wages = high_quarter_wages
+    let bp_wages = base_period_wages
+    let outside_hq = outside_high_quarter_wages
+
+    # Primary test: HQ >= $1,300 AND BP >= 1.25 * HQ
+    let meets_primary = (
+      hq_wages >= minimum_base_period_wages and
+      bp_wages >= hq_wages * high_quarter_multiplier
+    )
+
+    # Alternative test: HQ >= $900 AND has wages outside HQ
+    let meets_alternative = (
+      hq_wages >= minimum_outside_high_quarter and
+      outside_hq > 0
+    )
+
+    return meets_primary or meets_alternative
+  }
+
+  default false
+}
+
+# =============================================================================
+# NON-MONETARY ELIGIBILITY (CUIC 1252-1253)
+# =============================================================================
+
+variable ca_ui_nonmonetarily_eligible {
+  entity Person
+  period Week
+  dtype Boolean
+  label "California UI non-monetary eligibility"
+  description "Meets able/available/seeking requirements per CUIC 1252-1253"
+  reference (
+    "Cal. Unemp. Ins. Code 1252",
+    "Cal. Unemp. Ins. Code 1253"
+  )
+
+  formula {
+    return is_able_to_work and is_available_for_work and is_actively_seeking_work
+  }
+
+  default false
+}
+
+# =============================================================================
+# SEPARATION ELIGIBILITY (CUIC 1256)
+# =============================================================================
+
+variable ca_ui_separation_eligible {
+  entity Person
+  period Week
+  dtype Boolean
+  label "California UI separation eligibility"
+  description "Job separation qualifies for UI per CUIC 1256"
+  reference (
+    "Cal. Unemp. Ins. Code 1256",
+    "Cal. Unemp. Ins. Code 1257"
+  )
+
+  formula {
+    let reason = separation_reason
+
+    # Layoff, reduction in force, employer closure = eligible
+    if reason == "layoff" then
+      return true
+    elif reason == "reduction_in_force" then
+      return true
+    elif reason == "employer_closure" then
+      return true
+    # Voluntary quit = check for good cause
+    elif reason == "voluntary_quit" then
+      return voluntary_quit_good_cause
+    # Misconduct = disqualified until requalified
+    elif reason == "misconduct" then
+      return has_requalified
+    elif reason == "gross_misconduct" then
+      return has_requalified
+    else
+      return false
+  }
+
+  default false
+}
+
+# =============================================================================
+# COMBINED ELIGIBILITY
+# =============================================================================
+
+variable ca_ui_eligible {
+  entity Person
+  period Week
+  dtype Boolean
+  label "California UI eligibility"
+  description "Eligible for California unemployment insurance benefits"
+  reference "Cal. Unemp. Ins. Code 1275-1281"
+
+  formula {
+    return (
+      ca_ui_monetarily_eligible and
+      ca_ui_nonmonetarily_eligible and
+      ca_ui_separation_eligible
+    )
+  }
+
+  default false
+}
+
+# =============================================================================
+# WEEKLY BENEFIT AMOUNT (CUIC 1280)
+# California uses a wage table for WBA calculation
+# =============================================================================
+
+variable ca_ui_weekly_benefit_amount {
+  entity Person
+  period Week
+  dtype Money
+  unit "USD"
+  label "California weekly benefit amount"
+  description "Weekly UI benefit based on high quarter wages per CUIC 1280"
+  reference "Cal. Unemp. Ins. Code 1280"
+
+  formula {
+    if not ca_ui_eligible then
+      return 0
+
+    let hq_wages = high_quarter_wages
+
+    # Use wage table lookup
+    # Simplified calculation: approximately 4.34% of HQ wages
+    # (equivalent to 1/23 of HQ, or about 60% of weekly wage)
+    let calculated = round(hq_wages / 23)
+
+    # Apply minimum and maximum
+    let bounded = max(minimum_wba, min(calculated, maximum_wba))
+
+    return bounded
+  }
+
+  default 0
+}
+
+# =============================================================================
+# MAXIMUM BENEFIT AMOUNT (CUIC 1281)
+# =============================================================================
+
+variable ca_ui_maximum_benefit_amount {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "California maximum benefit amount"
+  description "Total UI benefits available in benefit year per CUIC 1281"
+  reference "Cal. Unemp. Ins. Code 1281(a)"
+
+  formula {
+    let wba = ca_ui_weekly_benefit_amount
+    let bp_wages = base_period_wages
+
+    # Lesser of: 26 weeks * WBA or 50% of base period wages
+    let weeks_based = wba * maximum_weeks
+    let wage_based = bp_wages * 0.5
+
+    return min(weeks_based, wage_based)
+  }
+
+  default 0
+}
+
+variable ca_ui_maximum_weeks {
+  entity Person
+  period Year
+  dtype Integer
+  label "California maximum benefit weeks"
+  description "Maximum weeks of regular UI benefits per CUIC 1281"
+  reference "Cal. Unemp. Ins. Code 1281(a)"
+
+  formula {
+    return maximum_weeks  # 26 weeks
+  }
+
+  default 26
+}
+
+# =============================================================================
+# WAITING WEEK (CUIC 1253)
+# =============================================================================
+
+variable ca_ui_waiting_week {
+  entity Person
+  period Week
+  dtype Boolean
+  label "California UI waiting week"
+  description "Currently in unpaid waiting period per CUIC 1253"
+  reference "Cal. Unemp. Ins. Code 1253"
+
+  formula {
+    let week_num = current_week_number
+    return week_num <= waiting_period_weeks
+  }
+
+  default false
+}
+
+# =============================================================================
+# WEEKS REMAINING
+# =============================================================================
+
+variable ca_ui_weeks_remaining {
+  entity Person
+  period Week
+  dtype Integer
+  label "California UI weeks remaining"
+  description "Weeks of benefits still available"
+
+  formula {
+    let max_weeks = ca_ui_maximum_weeks
+    let used_weeks = weeks_claimed
+
+    return max(0, max_weeks - used_weeks)
+  }
+
+  default 26
+}
+
+# =============================================================================
+# CURRENT PAYMENT (CUIC 1279)
+# Earnings offset: 25% of WBA disregarded, rest reduces dollar-for-dollar
+# =============================================================================
+
+variable ca_ui_current_weekly_payment {
+  entity Person
+  period Week
+  dtype Money
+  unit "USD"
+  label "California current week UI payment"
+  description "UI payment for current week after deductions per CUIC 1279"
+  reference "Cal. Unemp. Ins. Code 1279(a)"
+
+  formula {
+    if not ca_ui_eligible then
+      return 0
+
+    # No payment during waiting week
+    if ca_ui_waiting_week then
+      return 0
+
+    # No payment if benefits exhausted
+    if ca_ui_weeks_remaining <= 0 then
+      return 0
+
+    let wba = ca_ui_weekly_benefit_amount
+    let earnings = current_week_earnings
+
+    # Calculate earnings offset
+    # First 25% of WBA is disregarded
+    let disregard_amount = wba * earnings_disregard
+    let excess_earnings = max(0, earnings - disregard_amount)
+
+    # Dollar-for-dollar reduction
+    let reduction = excess_earnings * earnings_offset_rate
+
+    return max(0, wba - reduction)
+  }
+
+  default 0
+}
+
+# =============================================================================
+# REQUALIFICATION (CUIC 1260)
+# After disqualification, must earn 5x WBA to requalify
+# =============================================================================
+
+variable ca_ui_requalification_amount {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "California requalification earnings requirement"
+  description "Earnings required to purge disqualification per CUIC 1260"
+  reference "Cal. Unemp. Ins. Code 1260"
+
+  formula {
+    let wba = ca_ui_weekly_benefit_amount
+    return wba * disqualification_earnings_multiplier
+  }
+
+  default 0
+}
+
+variable has_requalified {
+  entity Person
+  period Week
+  dtype Boolean
+  label "Has requalified after disqualification"
+  description "Earned sufficient wages to purge disqualification per CUIC 1260"
+  reference "Cal. Unemp. Ins. Code 1260"
+
+  formula {
+    let required = ca_ui_requalification_amount
+    let post_separation_earnings = post_separation_wages
+
+    return post_separation_earnings >= required
+  }
+
+  default false
+}

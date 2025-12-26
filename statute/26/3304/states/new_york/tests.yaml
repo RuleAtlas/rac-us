@@ -1,0 +1,434 @@
+# New York Unemployment Insurance Tests
+#
+# Tests for New York-specific UI rules under NY Labor Law Article 18,
+# administered by the NY Department of Labor.
+#
+# Key statutes:
+# - NY Labor Law 590: Benefit rates
+# - NY Labor Law 591: Maximum benefit
+# - NY Labor Law 593: Disqualifications
+# - NY Labor Law 594: Duration
+
+variable: ny_ui_eligible
+year: 2024
+
+test_cases:
+  # =============================================================================
+  # MONETARY ELIGIBILITY (NY Labor Law 527)
+  # New York requires:
+  # - Base period wages >= 1.5x high quarter wages
+  # - Wages in at least 2 quarters
+  # =============================================================================
+
+  - name: "Standard monetary eligibility - meets requirements"
+    description: "Worker with wages in multiple quarters"
+    inputs:
+      high_quarter_wages: 7000
+      base_period_wages: 20000  # 20000 >= 7000 * 1.5 = 10500 CHECK
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ny_ui_monetarily_eligible: true
+      ny_ui_eligible: true
+    citations:
+      - "NY Labor Law 527"
+
+  - name: "Below minimum base period wages - ineligible"
+    description: "Total wages below threshold"
+    inputs:
+      high_quarter_wages: 1500
+      base_period_wages: 3000  # Below $3,300 minimum
+      base_period_quarters_worked: 2
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ny_ui_monetarily_eligible: false
+      ny_ui_eligible: false
+    citations:
+      - "NY Labor Law 527"
+
+  - name: "Fails 1.5x multiplier test"
+    description: "Wages not distributed across quarters"
+    inputs:
+      high_quarter_wages: 5000
+      base_period_wages: 7000  # 7000 < 5000 * 1.5 = 7500
+      base_period_quarters_worked: 2
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ny_ui_monetarily_eligible: false
+    citations:
+      - "NY Labor Law 527"
+
+  - name: "Only one quarter with wages - ineligible"
+    description: "Must have wages in at least 2 quarters"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 8000
+      base_period_quarters_worked: 1
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ny_ui_monetarily_eligible: false
+    citations:
+      - "NY Labor Law 527: requires wages in 2+ quarters"
+
+  # =============================================================================
+  # WEEKLY BENEFIT AMOUNT (NY Labor Law 590)
+  # NY calculates WBA as 1/26 of high quarter wages
+  # =============================================================================
+
+  - name: "WBA calculation - 1/26 formula"
+    description: "Standard WBA based on high quarter wages"
+    inputs:
+      high_quarter_wages: 10000  # 10000 / 26 = $385
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ny_ui_eligible: true
+      ny_ui_weekly_benefit_amount: 385
+    citations:
+      - "NY Labor Law 590: 1/26 of high quarter wages"
+
+  - name: "WBA at minimum"
+    description: "Low earner gets minimum WBA"
+    inputs:
+      high_quarter_wages: 3500  # 3500 / 26 = $135 < $143 min
+      base_period_wages: 5500
+      base_period_quarters_worked: 2
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ny_ui_eligible: true
+      ny_ui_weekly_benefit_amount: 143  # Minimum
+    citations:
+      - "NY Labor Law 590"
+
+  - name: "WBA at maximum"
+    description: "High earner capped at maximum"
+    inputs:
+      high_quarter_wages: 20000  # 20000 / 26 = $769 > $504 max
+      base_period_wages: 70000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ny_ui_eligible: true
+      ny_ui_weekly_benefit_amount: 504  # Maximum
+    citations:
+      - "NY Labor Law 591"
+
+  # =============================================================================
+  # PARTIAL BENEFITS - DAYS WORKED SYSTEM (NY Labor Law 590)
+  # NY reduces benefits by 25% per day worked (0-3 days)
+  # 4+ days = no benefits
+  # =============================================================================
+
+  - name: "No days worked - full WBA"
+    description: "Full benefit when not working"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      current_week_number: 2
+      weeks_claimed: 1
+      days_worked_this_week: 0
+    expected:
+      ny_ui_eligible: true
+      ny_ui_current_weekly_payment: 385  # Full WBA
+    citations:
+      - "NY Labor Law 590"
+
+  - name: "1 day worked - 75% of WBA"
+    description: "25% reduction for 1 day worked"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      current_week_number: 2
+      weeks_claimed: 1
+      days_worked_this_week: 1
+    expected:
+      ny_ui_eligible: true
+      ny_ui_current_weekly_payment: 289  # 385 * 0.75 = 289
+    citations:
+      - "NY Labor Law 590: 25% reduction per day"
+
+  - name: "2 days worked - 50% of WBA"
+    description: "50% reduction for 2 days worked"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      current_week_number: 2
+      weeks_claimed: 1
+      days_worked_this_week: 2
+    expected:
+      ny_ui_eligible: true
+      ny_ui_current_weekly_payment: 193  # 385 * 0.50 = 193
+    citations:
+      - "NY Labor Law 590"
+
+  - name: "3 days worked - 25% of WBA"
+    description: "75% reduction for 3 days worked"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      current_week_number: 2
+      weeks_claimed: 1
+      days_worked_this_week: 3
+    expected:
+      ny_ui_eligible: true
+      ny_ui_current_weekly_payment: 96  # 385 * 0.25 = 96
+    citations:
+      - "NY Labor Law 590"
+
+  - name: "4+ days worked - no benefits"
+    description: "Full-time work = no UI benefits"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      current_week_number: 2
+      weeks_claimed: 1
+      days_worked_this_week: 4
+    expected:
+      ny_ui_eligible: true
+      ny_ui_current_weekly_payment: 0
+    citations:
+      - "NY Labor Law 590: 4+ days = no benefits"
+
+  # =============================================================================
+  # SEPARATION DISQUALIFICATIONS (NY Labor Law 593)
+  # =============================================================================
+
+  - name: "Voluntary quit without good cause - disqualified"
+    description: "Must requalify by earning 10x WBA"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: voluntary_quit
+      voluntary_quit_good_cause: false
+    expected:
+      ny_ui_separation_eligible: false
+      ny_ui_eligible: false
+    citations:
+      - "NY Labor Law 593(1)"
+
+  - name: "Voluntary quit with good cause - eligible"
+    description: "Good cause quit qualifies"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: voluntary_quit
+      voluntary_quit_good_cause: true
+    expected:
+      ny_ui_separation_eligible: true
+      ny_ui_eligible: true
+    citations:
+      - "NY Labor Law 593(1)"
+
+  - name: "Misconduct discharge - disqualified"
+    description: "Must requalify after misconduct"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: misconduct
+    expected:
+      ny_ui_separation_eligible: false
+      ny_ui_eligible: false
+    citations:
+      - "NY Labor Law 593(2)"
+
+  - name: "Layoff - eligible"
+    description: "Involuntary separation qualifies"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ny_ui_separation_eligible: true
+      ny_ui_eligible: true
+    citations:
+      - "NY Labor Law 593"
+
+  # =============================================================================
+  # NON-MONETARY ELIGIBILITY
+  # =============================================================================
+
+  - name: "Unable to work - ineligible"
+    description: "Must be able to work"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: false
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ny_ui_nonmonetarily_eligible: false
+      ny_ui_eligible: false
+    citations:
+      - "NY Labor Law 591"
+
+  - name: "Not available for work - ineligible"
+    description: "Must be available for suitable work"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: false
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ny_ui_nonmonetarily_eligible: false
+      ny_ui_eligible: false
+    citations:
+      - "NY Labor Law 591"
+
+  # =============================================================================
+  # MAXIMUM BENEFIT AMOUNT AND DURATION (NY Labor Law 594)
+  # =============================================================================
+
+  - name: "Maximum benefit amount calculation"
+    description: "26 weeks of benefits available"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ny_ui_eligible: true
+      ny_ui_weekly_benefit_amount: 385
+      ny_ui_maximum_weeks: 26
+      ny_ui_maximum_benefit_amount: 10010  # 26 * 385
+    citations:
+      - "NY Labor Law 594"
+
+  - name: "Benefits exhausted"
+    description: "No more regular benefits after 26 weeks"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 26
+      current_week_number: 27
+    expected:
+      ny_ui_eligible: true
+      ny_ui_weeks_remaining: 0
+      ny_ui_current_weekly_payment: 0
+    citations:
+      - "NY Labor Law 594"
+
+  # =============================================================================
+  # REQUALIFICATION (NY Labor Law 593)
+  # =============================================================================
+
+  - name: "Requalification after disqualification"
+    description: "Worker earned 10x WBA to requalify"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: misconduct
+      post_separation_wages: 4000  # 4000 >= 385 * 10 = 3850
+    expected:
+      ny_ui_has_requalified: true
+      ny_ui_separation_eligible: true
+      ny_ui_eligible: true
+    citations:
+      - "NY Labor Law 593(1): 10x WBA to requalify"
+
+  # =============================================================================
+  # FULLY ELIGIBLE WORKER
+  # =============================================================================
+
+  - name: "Fully eligible New York worker"
+    description: "All requirements met"
+    inputs:
+      high_quarter_wages: 12000
+      base_period_wages: 40000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      current_week_number: 5
+      weeks_claimed: 4
+      days_worked_this_week: 0
+    expected:
+      ny_ui_monetarily_eligible: true
+      ny_ui_nonmonetarily_eligible: true
+      ny_ui_separation_eligible: true
+      ny_ui_eligible: true
+      ny_ui_weekly_benefit_amount: 462  # 12000 / 26 = 462
+      ny_ui_weeks_remaining: 22
+      ny_ui_current_weekly_payment: 462
+    citations:
+      - "NY Labor Law Article 18"

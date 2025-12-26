@@ -1,0 +1,470 @@
+# California Unemployment Insurance Tests
+#
+# Tests for California-specific UI rules under the California Unemployment
+# Insurance Code (CUIC), administered by the Employment Development Department.
+#
+# Key statutes:
+# - CUIC 1275-1281: Eligibility and benefit amounts
+# - CUIC 1252-1253: Able/available requirements
+# - CUIC 1256-1257: Disqualifications
+
+variable: ca_ui_eligible
+year: 2024
+
+test_cases:
+  # =============================================================================
+  # MONETARY ELIGIBILITY (CUIC 1281)
+  # California requires:
+  # - At least $1,300 in highest quarter, AND
+  # - Total base period wages >= 1.25x high quarter wages, OR
+  # - At least $900 in high quarter + wages outside high quarter
+  # =============================================================================
+
+  - name: "Standard monetary eligibility - meets both tests"
+    description: "Worker with $1,300+ HQ and 1.25x multiplier"
+    inputs:
+      high_quarter_wages: 5000
+      base_period_wages: 12000  # 12000 >= 5000 * 1.25 = 6250 CHECK
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ca_ui_monetarily_eligible: true
+      ca_ui_eligible: true
+    citations:
+      - "Cal. Unemp. Ins. Code 1281(a)"
+
+  - name: "Below $1,300 high quarter - ineligible"
+    description: "High quarter wages below $1,300 minimum"
+    inputs:
+      high_quarter_wages: 1200
+      base_period_wages: 4000
+      base_period_quarters_worked: 3
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ca_ui_monetarily_eligible: false
+      ca_ui_eligible: false
+    citations:
+      - "Cal. Unemp. Ins. Code 1281(a): requires $1,300 minimum"
+
+  - name: "Fails 1.25x multiplier - single quarter only"
+    description: "All wages in one quarter fails distribution test"
+    inputs:
+      high_quarter_wages: 3000
+      base_period_wages: 3000  # All in one quarter; 3000 < 3000 * 1.25 = 3750
+      base_period_quarters_worked: 1
+      outside_high_quarter_wages: 0
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ca_ui_monetarily_eligible: false
+    citations:
+      - "Cal. Unemp. Ins. Code 1281(a): 1.25x multiplier"
+
+  - name: "Alternative test - $900+ HQ with outside wages"
+    description: "Alternative monetary test for lower earners"
+    inputs:
+      high_quarter_wages: 950
+      base_period_wages: 1500
+      base_period_quarters_worked: 2
+      outside_high_quarter_wages: 550  # Has wages outside HQ
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ca_ui_monetarily_eligible: true
+    citations:
+      - "Cal. Unemp. Ins. Code 1281(a)(2): $900 alternative"
+
+  # =============================================================================
+  # WEEKLY BENEFIT AMOUNT (CUIC 1280)
+  # =============================================================================
+
+  - name: "WBA at minimum level"
+    description: "Low wages result in $40 minimum WBA"
+    inputs:
+      high_quarter_wages: 1300  # At threshold
+      base_period_wages: 2000
+      base_period_quarters_worked: 2
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ca_ui_eligible: true
+      ca_ui_weekly_benefit_amount: 50  # Per wage table
+    citations:
+      - "Cal. Unemp. Ins. Code 1280"
+
+  - name: "WBA mid-range calculation"
+    description: "Moderate wages produce mid-range WBA"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ca_ui_eligible: true
+      ca_ui_weekly_benefit_amount: 347  # Per wage table
+    citations:
+      - "Cal. Unemp. Ins. Code 1280"
+
+  - name: "WBA at maximum - high earner"
+    description: "High quarter wages at maximum cap"
+    inputs:
+      high_quarter_wages: 15000
+      base_period_wages: 50000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ca_ui_eligible: true
+      ca_ui_weekly_benefit_amount: 450  # Maximum
+    citations:
+      - "Cal. Unemp. Ins. Code 1280: $450 maximum"
+
+  - name: "WBA very high earner - still capped"
+    description: "Wages far above cap still get maximum WBA"
+    inputs:
+      high_quarter_wages: 50000
+      base_period_wages: 180000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ca_ui_eligible: true
+      ca_ui_weekly_benefit_amount: 450
+    citations:
+      - "Cal. Unemp. Ins. Code 1280"
+
+  # =============================================================================
+  # MAXIMUM BENEFIT AMOUNT (CUIC 1281)
+  # Lesser of: 26 weeks * WBA or 50% of base period wages
+  # =============================================================================
+
+  - name: "Maximum benefit - standard 26 weeks"
+    description: "Benefit limited by 26 weeks"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 30000  # 50% = $15,000 > 26 * $347 = $9,022
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ca_ui_eligible: true
+      ca_ui_weekly_benefit_amount: 347
+      ca_ui_maximum_benefit_amount: 9022  # 26 weeks * $347
+      ca_ui_maximum_weeks: 26
+    citations:
+      - "Cal. Unemp. Ins. Code 1281(a)"
+
+  - name: "Maximum benefit - limited by base period wages"
+    description: "Low earner limited by 50% of BP wages"
+    inputs:
+      high_quarter_wages: 3000
+      base_period_wages: 5000  # 50% = $2,500 < 26 * $130 = $3,380
+      base_period_quarters_worked: 3
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ca_ui_eligible: true
+      ca_ui_maximum_benefit_amount: 2500  # 50% of BP wages
+    citations:
+      - "Cal. Unemp. Ins. Code 1281(a)"
+
+  # =============================================================================
+  # WAITING WEEK (CUIC 1253)
+  # =============================================================================
+
+  - name: "First week - waiting week"
+    description: "No payment during 1-week waiting period"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      current_week_number: 1
+      weeks_claimed: 0
+    expected:
+      ca_ui_eligible: true
+      ca_ui_waiting_week: true
+      ca_ui_current_weekly_payment: 0
+    citations:
+      - "Cal. Unemp. Ins. Code 1253"
+
+  - name: "Second week - benefits begin"
+    description: "Full WBA after waiting week"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      current_week_number: 2
+      weeks_claimed: 1
+    expected:
+      ca_ui_eligible: true
+      ca_ui_waiting_week: false
+      ca_ui_current_weekly_payment: 347
+    citations:
+      - "Cal. Unemp. Ins. Code 1279"
+
+  # =============================================================================
+  # EARNINGS OFFSET (CUIC 1279)
+  # First 25% of WBA is disregarded; rest reduces benefits dollar-for-dollar
+  # =============================================================================
+
+  - name: "Part-time earnings - within disregard"
+    description: "Earnings under 25% of WBA not offset"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      current_week_number: 3
+      weeks_claimed: 2
+      current_week_earnings: 80  # Below 25% of $347 = $86.75
+    expected:
+      ca_ui_eligible: true
+      ca_ui_current_weekly_payment: 347  # No reduction
+    citations:
+      - "Cal. Unemp. Ins. Code 1279(a)"
+
+  - name: "Part-time earnings - above disregard"
+    description: "Earnings above 25% reduce benefits"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      current_week_number: 3
+      weeks_claimed: 2
+      current_week_earnings: 200  # 200 - 86.75 = 113.25 offset
+    expected:
+      ca_ui_eligible: true
+      ca_ui_current_weekly_payment: 234  # 347 - 113 = 234
+    citations:
+      - "Cal. Unemp. Ins. Code 1279(a)"
+
+  - name: "Full-time earnings - benefits exhausted"
+    description: "High earnings eliminate weekly benefit"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      current_week_number: 3
+      weeks_claimed: 2
+      current_week_earnings: 500  # Above WBA
+    expected:
+      ca_ui_eligible: true
+      ca_ui_current_weekly_payment: 0  # Reduced to zero
+    citations:
+      - "Cal. Unemp. Ins. Code 1279(a)"
+
+  # =============================================================================
+  # SEPARATION DISQUALIFICATIONS (CUIC 1256)
+  # =============================================================================
+
+  - name: "Voluntary quit without good cause - disqualified"
+    description: "Must requalify by earning 5x WBA"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: voluntary_quit
+      voluntary_quit_good_cause: false
+    expected:
+      ca_ui_separation_eligible: false
+      ca_ui_eligible: false
+    citations:
+      - "Cal. Unemp. Ins. Code 1256"
+
+  - name: "Voluntary quit with good cause - eligible"
+    description: "Good cause quit qualifies for benefits"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: voluntary_quit
+      voluntary_quit_good_cause: true
+    expected:
+      ca_ui_separation_eligible: true
+      ca_ui_eligible: true
+    citations:
+      - "Cal. Unemp. Ins. Code 1256"
+
+  - name: "Discharge for misconduct - disqualified"
+    description: "Misconduct requires requalification"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: misconduct
+    expected:
+      ca_ui_separation_eligible: false
+      ca_ui_eligible: false
+    citations:
+      - "Cal. Unemp. Ins. Code 1256"
+
+  - name: "Layoff - eligible"
+    description: "Job loss through no fault qualifies"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ca_ui_separation_eligible: true
+      ca_ui_eligible: true
+    citations:
+      - "Cal. Unemp. Ins. Code 1256"
+
+  # =============================================================================
+  # NON-MONETARY ELIGIBILITY (CUIC 1252-1253)
+  # =============================================================================
+
+  - name: "Not able to work - ineligible"
+    description: "Illness prevents work ability"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: false
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ca_ui_nonmonetarily_eligible: false
+      ca_ui_eligible: false
+    citations:
+      - "Cal. Unemp. Ins. Code 1253"
+
+  - name: "Not available for work - ineligible"
+    description: "Personal circumstances prevent availability"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: false
+      is_actively_seeking_work: true
+      separation_reason: layoff
+    expected:
+      ca_ui_nonmonetarily_eligible: false
+      ca_ui_eligible: false
+    citations:
+      - "Cal. Unemp. Ins. Code 1253"
+
+  - name: "Not actively seeking work - ineligible"
+    description: "Must actively search for work"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: false
+      separation_reason: layoff
+    expected:
+      ca_ui_nonmonetarily_eligible: false
+      ca_ui_eligible: false
+    citations:
+      - "Cal. Unemp. Ins. Code 1253"
+
+  # =============================================================================
+  # BENEFIT EXHAUSTION
+  # =============================================================================
+
+  - name: "Benefits exhausted after 26 weeks"
+    description: "No more regular benefits after maximum"
+    inputs:
+      high_quarter_wages: 8000
+      base_period_wages: 25000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 26
+      current_week_number: 27
+    expected:
+      ca_ui_eligible: true
+      ca_ui_weeks_remaining: 0
+      ca_ui_current_weekly_payment: 0
+    citations:
+      - "Cal. Unemp. Ins. Code 1281"
+
+  # =============================================================================
+  # FULLY ELIGIBLE WORKER
+  # =============================================================================
+
+  - name: "Fully eligible California worker"
+    description: "All requirements met, mid-claim"
+    inputs:
+      high_quarter_wages: 10000
+      base_period_wages: 35000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      current_week_number: 10
+      weeks_claimed: 9
+      current_week_earnings: 0
+    expected:
+      ca_ui_monetarily_eligible: true
+      ca_ui_nonmonetarily_eligible: true
+      ca_ui_separation_eligible: true
+      ca_ui_eligible: true
+      ca_ui_weekly_benefit_amount: 434
+      ca_ui_waiting_week: false
+      ca_ui_weeks_remaining: 17
+      ca_ui_current_weekly_payment: 434
+    citations:
+      - "Cal. Unemp. Ins. Code 1275-1281"

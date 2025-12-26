@@ -1,0 +1,434 @@
+# Tests for 42 USC 1758 - School Lunch and Breakfast Program Eligibility
+#
+# National School Lunch Act (NSLA) establishes eligibility for free and
+# reduced-price meals in the National School Lunch Program (NSLP) and
+# School Breakfast Program (SBP).
+#
+# Eligibility categories:
+# 1. Income eligibility: Based on Federal Poverty Guidelines
+#    - Free meals: <= 130% FPL
+#    - Reduced-price meals: 130-185% FPL
+#    - Paid meals: > 185% FPL
+# 2. Categorical eligibility: Automatic eligibility through program participation
+#    - SNAP household members: Free meals
+#    - TANF recipients: Free meals
+#    - FDPIR (Food Distribution Program on Indian Reservations): Free meals
+#    - Foster children: Free meals
+#    - Head Start participants: Free meals
+#    - Homeless children (McKinney-Vento): Free meals
+#    - Migrant children: Free meals
+#    - Runaway/homeless youth: Free meals
+# 3. Direct certification: State match with benefit programs
+# 4. Community Eligibility Provision (CEP): School-wide free meals
+#
+# Test organization:
+# 1. Income eligibility tests
+# 2. Categorical eligibility tests
+# 3. Combined eligibility tests
+# 4. Meal tier determination tests
+
+variable: school_meal_eligibility_tier
+school_year: 2024-2025
+
+# ==============================================================================
+# 42 USC 1758(b)(1) - Income Eligibility Guidelines
+# "(1) Not later than June 1 of each fiscal year, the Secretary shall prescribe
+# income guidelines for determining eligibility for free and reduced price
+# lunches during the following school year..."
+# ==============================================================================
+
+test_cases:
+  # --- FREE MEALS: Income at or below 130% FPL ---
+  - name: "Zero income - free meals"
+    description: "Household with no income qualifies for free meals"
+    inputs:
+      household_size: 1
+      household_gross_annual_income: 0
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_income_eligible_free: true
+      school_meal_income_eligible_reduced: true
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(1): income guidelines for free meals"
+
+  - name: "1-person at exactly 130% FPL - free meals"
+    description: "Income at 130% FPL threshold qualifies for free meals"
+    inputs:
+      household_size: 1
+      household_gross_annual_income: 20345  # 130% of $15,650 = $20,345
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_income_eligible_free: true
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(1)(A): free meals at or below 130% FPL"
+
+  # --- REDUCED PRICE MEALS: 130-185% FPL ---
+  - name: "1-person at 140% FPL - reduced price meals"
+    description: "Income between 130% and 185% FPL qualifies for reduced price"
+    inputs:
+      household_size: 1
+      household_gross_annual_income: 21910  # 140% of $15,650
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_income_eligible_free: false
+      school_meal_income_eligible_reduced: true
+      school_meal_eligibility_tier: "reduced"
+    citations:
+      - "42 USC 1758(b)(1)(A): reduced price between 130-185% FPL"
+
+  - name: "1-person at exactly 185% FPL - reduced price meals"
+    description: "Income at 185% FPL threshold qualifies for reduced price"
+    inputs:
+      household_size: 1
+      household_gross_annual_income: 28952  # 185% of $15,650 = $28,952.50
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_income_eligible_reduced: true
+      school_meal_eligibility_tier: "reduced"
+    citations:
+      - "42 USC 1758(b)(1)(A): at or below 185% FPL"
+
+  # --- PAID MEALS: Above 185% FPL ---
+  - name: "1-person over 185% FPL - paid meals"
+    description: "Income above 185% FPL does not qualify for free or reduced"
+    inputs:
+      household_size: 1
+      household_gross_annual_income: 35000
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_income_eligible_free: false
+      school_meal_income_eligible_reduced: false
+      school_meal_eligibility_tier: "paid"
+    citations:
+      - "42 USC 1758(b)(1): above 185% FPL"
+
+  # --- Larger household tests ---
+  - name: "4-person at 130% FPL - free meals"
+    description: "Family of 4 at free meal threshold"
+    inputs:
+      household_size: 4
+      household_gross_annual_income: 41795  # 130% of $32,150
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_income_eligible_free: true
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(1)(A): 130% FPL by household size"
+
+  - name: "4-person at 185% FPL - reduced price meals"
+    description: "Family of 4 at reduced price threshold"
+    inputs:
+      household_size: 4
+      household_gross_annual_income: 59477  # 185% of $32,150
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_income_eligible_reduced: true
+      school_meal_eligibility_tier: "reduced"
+    citations:
+      - "42 USC 1758(b)(1)(A): 185% FPL by household size"
+
+  - name: "8-person at 130% FPL - free meals"
+    description: "Large family at free meal threshold"
+    inputs:
+      household_size: 8
+      household_gross_annual_income: 70395  # 130% of $54,150
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_income_eligible_free: true
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(1)(A): 130% FPL for 8 persons"
+
+# ==============================================================================
+# 42 USC 1758(b)(2) - Categorical Eligibility
+# "(2)(C)(ii) A child... is a member of a household receiving assistance under
+# the supplemental nutrition assistance program... shall be considered
+# automatically eligible for free lunches and free breakfasts"
+# ==============================================================================
+
+  # --- SNAP Categorical Eligibility ---
+  - name: "SNAP recipient - categorically free"
+    description: "Child in SNAP household gets free meals regardless of income"
+    inputs:
+      household_size: 4
+      household_gross_annual_income: 80000  # Well above income limits
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: true
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_categorically_eligible: true
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(2)(C)(ii)(I): SNAP household members"
+
+  # --- TANF Categorical Eligibility ---
+  - name: "TANF recipient - categorically free"
+    description: "Child receiving TANF gets free meals"
+    inputs:
+      household_size: 3
+      household_gross_annual_income: 50000
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: true
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_categorically_eligible: true
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(2)(C)(ii)(II): TANF recipients"
+
+  # --- FDPIR Categorical Eligibility ---
+  - name: "FDPIR recipient - categorically free"
+    description: "Child in FDPIR household gets free meals"
+    inputs:
+      household_size: 4
+      household_gross_annual_income: 60000
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: true
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_categorically_eligible: true
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(2)(C)(ii)(III): FDPIR households"
+
+  # --- Foster Child Categorical Eligibility ---
+  - name: "Foster child - categorically free"
+    description: "Foster children are automatically eligible for free meals"
+    inputs:
+      household_size: 1
+      household_gross_annual_income: 0
+      is_foster_child: true
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_categorically_eligible: true
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(5): foster children"
+
+  # --- Homeless Child Categorical Eligibility ---
+  - name: "Homeless child - categorically free"
+    description: "Children experiencing homelessness (McKinney-Vento) get free meals"
+    inputs:
+      household_size: 2
+      household_gross_annual_income: 0
+      is_foster_child: false
+      is_homeless: true
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_categorically_eligible: true
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(12)(A): homeless children under McKinney-Vento"
+
+  # --- Migrant Child Categorical Eligibility ---
+  - name: "Migrant child - categorically free"
+    description: "Children of migrant workers get free meals"
+    inputs:
+      household_size: 5
+      household_gross_annual_income: 30000
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: true
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_categorically_eligible: true
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(12)(A): migrant children"
+
+  # --- Head Start Categorical Eligibility ---
+  - name: "Head Start participant - categorically free"
+    description: "Children enrolled in Head Start get free meals"
+    inputs:
+      household_size: 3
+      household_gross_annual_income: 40000
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: true
+      attends_cep_school: false
+    expected:
+      school_meal_categorically_eligible: true
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(12)(A): Head Start participants"
+
+# ==============================================================================
+# 42 USC 1758(b)(1)(A) - Community Eligibility Provision (CEP)
+# Schools with high percentages of directly certified students can provide
+# free meals to all students without applications.
+# ==============================================================================
+
+  - name: "Student at CEP school - free meals"
+    description: "All students at CEP schools get free meals regardless of income"
+    inputs:
+      household_size: 4
+      household_gross_annual_income: 150000  # High income
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: true
+    expected:
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(1)(A): Community Eligibility Provision"
+
+# ==============================================================================
+# Combined Eligibility Tests
+# Categorical eligibility takes precedence over income eligibility
+# ==============================================================================
+
+  - name: "SNAP recipient with high income - still free"
+    description: "Categorical eligibility overrides income test"
+    inputs:
+      household_size: 4
+      household_gross_annual_income: 200000
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: true
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_income_eligible_free: false
+      school_meal_income_eligible_reduced: false
+      school_meal_categorically_eligible: true
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(2)(C)(ii): categorical overrides income"
+
+  - name: "Low income without categorical - free by income"
+    description: "Income eligibility when no categorical programs"
+    inputs:
+      household_size: 4
+      household_gross_annual_income: 35000
+      is_foster_child: false
+      is_homeless: false
+      is_migrant: false
+      receives_snap: false
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_income_eligible_free: true
+      school_meal_categorically_eligible: false
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b)(1): income-based eligibility"
+
+  - name: "Multiple categorical factors - still free"
+    description: "Multiple categorical triggers result in free meals"
+    inputs:
+      household_size: 2
+      household_gross_annual_income: 0
+      is_foster_child: true
+      is_homeless: true
+      is_migrant: false
+      receives_snap: true
+      receives_tanf: false
+      receives_fdpir: false
+      attends_head_start: false
+      attends_cep_school: false
+    expected:
+      school_meal_categorically_eligible: true
+      school_meal_eligibility_tier: "free"
+    citations:
+      - "42 USC 1758(b): categorical eligibility"

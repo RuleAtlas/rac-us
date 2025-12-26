@@ -1,0 +1,156 @@
+# 26 USC 3304(a)(1)-(3) - Coverage Requirements
+#
+# Federal requirements for state unemployment compensation law coverage.
+# States must cover substantially all employers subject to FUTA to receive
+# federal approval and the 5.4% FUTA credit.
+#
+# (a)(1): Methods of administration reasonably calculated to insure full
+#         payment of compensation when due
+# (a)(2): All compensation paid through public employment offices or
+#         approved agencies
+# (a)(3): Opportunity for fair hearing before impartial tribunal
+
+module statute.26.3304.a
+version "2024.1"
+
+references {
+  # Federal parameters
+  futa_wage_base: statute/26/3304/parameters/futa_wage_base
+  futa_gross_tax_rate: statute/26/3304/parameters/futa_gross_tax_rate
+}
+
+# =============================================================================
+# COVERED EMPLOYMENT (26 USC 3306(c))
+# =============================================================================
+
+variable is_covered_employment {
+  entity Person
+  period Year
+  dtype Boolean
+  label "Covered employment for UI purposes"
+  description "Employment covered under state UI law per FUTA requirements"
+  reference (
+    "26 USC 3306(c)",
+    "26 USC 3304(a)(1)"
+  )
+
+  formula {
+    # Most employment is covered; exceptions defined in 3306(c)
+    # Exceptions include:
+    # - Agricultural labor (unless employer has 10+ workers or $20k+ payroll)
+    # - Domestic service (unless $1,000+ per quarter)
+    # - Self-employment
+    # - Federal government employees (separate system)
+    # - Certain nonprofit employees (optional coverage)
+
+    return is_employee and not is_excluded_employment
+  }
+
+  default true
+}
+
+variable is_excluded_employment {
+  entity Person
+  period Year
+  dtype Boolean
+  label "Excluded from UI coverage"
+  description "Employment excluded from state UI coverage per 26 USC 3306(c)"
+  reference "26 USC 3306(c)"
+
+  formula {
+    # Employment specifically excluded from FUTA coverage
+    return (
+      is_self_employed or
+      is_railroad_employee or  # Covered under separate system
+      is_federal_employee or   # Covered under UCFE
+      is_military_service or   # Covered under UCX
+      (is_agricultural_worker and not agricultural_employer_covered) or
+      (is_domestic_worker and not domestic_employer_covered)
+    )
+  }
+
+  default false
+}
+
+# =============================================================================
+# EMPLOYER COVERAGE THRESHOLD (26 USC 3306(a))
+# =============================================================================
+
+variable is_covered_employer {
+  entity TaxUnit  # Employer entity
+  period Year
+  dtype Boolean
+  label "Employer subject to FUTA"
+  description "Employer meets FUTA coverage threshold per 26 USC 3306(a)"
+  reference "26 USC 3306(a)"
+
+  formula {
+    # General employer: paid $1,500+ wages in any quarter OR
+    # employed 1+ person for 20+ weeks in current or prior year
+    let wages_threshold_met = max_quarterly_wages >= 1500
+    let employment_threshold_met = weeks_with_employees >= 20
+
+    # Agricultural employer: 10+ workers OR $20,000+ wages
+    let ag_threshold_met = is_agricultural_employer and (
+      num_agricultural_workers >= 10 or
+      agricultural_wages >= 20000
+    )
+
+    # Domestic employer: $1,000+ per quarter
+    let domestic_threshold_met = is_domestic_employer and domestic_quarterly_wages >= 1000
+
+    return wages_threshold_met or employment_threshold_met or ag_threshold_met or domestic_threshold_met
+  }
+
+  default false
+}
+
+# =============================================================================
+# FUTA TAXABLE WAGES (26 USC 3306(b))
+# =============================================================================
+
+variable futa_taxable_wages {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "FUTA taxable wages"
+  description "Wages subject to FUTA tax per 26 USC 3306(b)(1)"
+  reference "26 USC 3306(b)(1)"
+
+  formula {
+    # First $7,000 in wages per employee per year
+    let total_wages = gross_wages
+    let wage_base = futa_wage_base
+
+    return min(total_wages, wage_base)
+  }
+
+  default 0
+}
+
+variable futa_tax_liability {
+  entity TaxUnit  # Employer entity
+  period Year
+  dtype Money
+  unit "USD"
+  label "FUTA tax liability"
+  description "Federal unemployment tax owed by employer per 26 USC 3301"
+  reference (
+    "26 USC 3301",
+    "26 USC 3302"
+  )
+
+  formula {
+    # FUTA = taxable wages * gross rate - state credit
+    let taxable = sum_employee_futa_taxable_wages
+    let gross_tax = taxable * futa_gross_tax_rate
+
+    # Credit for state contributions (max 5.4%)
+    let state_credit = min(state_ui_contributions, taxable * 0.054)
+
+    return max(0, gross_tax - state_credit)
+  }
+
+  default 0
+}

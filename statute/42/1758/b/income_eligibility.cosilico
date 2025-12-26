@@ -1,0 +1,96 @@
+# 42 USC 1758(b)(1) - Income Eligibility for School Meals
+#
+# "(1) Not later than June 1 of each fiscal year, the Secretary shall prescribe
+# income guidelines for determining eligibility for free and reduced price
+# lunches during the following school year..."
+#
+# "(A)(i) except as provided in clause (ii), a child shall be served a free
+# lunch if the household income is at or below 130 percent of the applicable
+# family size income level contained in the nonfarm income poverty guidelines"
+#
+# "(ii) a child shall be served a reduced price lunch if the household income
+# is above 130 percent but at or below 185 percent of the applicable family
+# size income level"
+
+references {
+  free_meal_limit: statute/42/1758/income_eligibility_guidelines/free_meal
+  reduced_price_limit: statute/42/1758/income_eligibility_guidelines/reduced_price_meal
+  free_meal_limit_pct_fpl: statute/42/1758/income/free_meal_limit_pct_fpl
+  reduced_price_limit_pct_fpl: statute/42/1758/income/reduced_price_limit_pct_fpl
+  fpl: statute/42/1758/fpl
+}
+
+# Calculate annual FPL for household based on size
+variable school_meal_household_fpl {
+  entity Household
+  period Year
+  dtype Money
+
+  formula {
+    # FPL = base for size 1-8, then additional per person for each beyond 8
+    let size = min(household_size, 8)
+    let base = fpl.by_household_size[size]
+    let extra_members = max(0, household_size - 8)
+    let additional = fpl.additional_per_person
+
+    return base + (additional * extra_members)
+  }
+}
+
+# Calculate annual free meal income limit for household
+variable school_meal_free_income_limit {
+  entity Household
+  period Year
+  dtype Money
+
+  formula {
+    let size = min(household_size, 8)
+    let base = free_meal_limit.by_household_size[size]
+    let extra_members = max(0, household_size - 8)
+    let additional = free_meal_limit.additional_per_person
+
+    return base + (additional * extra_members)
+  }
+}
+
+# Calculate annual reduced-price meal income limit for household
+variable school_meal_reduced_income_limit {
+  entity Household
+  period Year
+  dtype Money
+
+  formula {
+    let size = min(household_size, 8)
+    let base = reduced_price_limit.by_household_size[size]
+    let extra_members = max(0, household_size - 8)
+    let additional = reduced_price_limit.additional_per_person
+
+    return base + (additional * extra_members)
+  }
+}
+
+# 42 USC 1758(b)(1)(A)(i): Eligible for free meals by income
+# "a child shall be served a free lunch if the household income is at or
+# below 130 percent of the applicable family size income level"
+variable school_meal_income_eligible_free {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    return household_gross_annual_income <= school_meal_free_income_limit
+  }
+}
+
+# 42 USC 1758(b)(1)(A)(ii): Eligible for reduced-price meals by income
+# "at or below 185 percent of the applicable family size income level"
+# Note: This returns true for ANYONE at or below 185% FPL (including free-eligible)
+variable school_meal_income_eligible_reduced {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    return household_gross_annual_income <= school_meal_reduced_income_limit
+  }
+}

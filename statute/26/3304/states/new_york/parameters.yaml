@@ -1,0 +1,326 @@
+# New York Unemployment Insurance Parameters
+#
+# New York UI is administered by the Department of Labor (DOL)
+# under New York Labor Law Article 18.
+#
+# Key statutes:
+# - NY Labor Law 590: Benefit rates and amounts
+# - NY Labor Law 591: Maximum weekly benefit
+# - NY Labor Law 593: Disqualifying acts
+# - NY Labor Law 594: Duration of benefits
+
+variable: ny_ui_parameters
+entity: Person
+period: Week
+dtype: Money
+
+# =============================================================================
+# MONETARY ELIGIBILITY THRESHOLDS
+# NY Labor Law 527
+# =============================================================================
+
+minimum_base_period_wages:
+  description: "New York requires minimum wages in base period for UI eligibility per NY Labor Law 527"
+  unit: USD
+  period: year
+  label: "Minimum base period wages"
+  values:
+    2024-01-01: 3300  # Approximately 2x high quarter wages for low earners
+    2020-01-01: 2900
+    2015-01-01: 2400
+  citations:
+    - "NY Labor Law 527"
+  reference: "https://dol.ny.gov/unemployment-insurance"
+
+high_quarter_multiplier:
+  description: "New York requires base period wages to be at least 1.5 times high quarter wages per NY Labor Law 527"
+  unit: rate
+  period: year
+  label: "High quarter wage multiplier"
+  values:
+    1939-01-01: 1.5  # Base period wages >= 1.5 * high quarter wages
+  citations:
+    - "NY Labor Law 527"
+
+minimum_quarters_with_wages:
+  description: "New York requires wages in at least 2 quarters per NY Labor Law 527"
+  unit: quarters
+  period: year
+  label: "Minimum quarters with wages"
+  values:
+    1939-01-01: 2
+  citations:
+    - "NY Labor Law 527"
+
+# =============================================================================
+# WEEKLY BENEFIT AMOUNT (WBA)
+# NY Labor Law 590
+# =============================================================================
+
+wba_fraction:
+  description: "New York calculates WBA as 1/26 of high quarter wages per NY Labor Law 590"
+  unit: rate
+  period: week
+  label: "WBA calculation fraction"
+  values:
+    1939-01-01: 0.03846  # 1/26 of high quarter wages
+  citations:
+    - "NY Labor Law 590"
+  reference: "https://dol.ny.gov/unemployment-insurance-benefits"
+
+minimum_wba:
+  description: "New York minimum weekly benefit amount per NY Labor Law 590"
+  unit: USD
+  period: week
+  label: "Minimum weekly benefit"
+  values:
+    2024-01-01: 143
+    2020-01-01: 143
+    2015-01-01: 100
+  citations:
+    - "NY Labor Law 590"
+
+maximum_wba:
+  description: "New York maximum weekly benefit amount per NY Labor Law 591"
+  unit: USD
+  period: week
+  label: "Maximum weekly benefit"
+  values:
+    2024-01-01: 504  # Indexed to state average weekly wage
+    2023-10-02: 504
+    2022-10-03: 504
+    2021-10-04: 504
+    2020-10-05: 504
+    2019-09-30: 504
+    2018-10-01: 504
+    2017-10-02: 450
+    2016-10-03: 430
+  notes:
+    - "Indexed to 50% of state average weekly wage"
+    - "Adjusted annually, typically in October"
+  citations:
+    - "NY Labor Law 591"
+  reference: "https://dol.ny.gov/unemployment-insurance-benefit-rate"
+
+# =============================================================================
+# BENEFIT DURATION
+# NY Labor Law 594
+# =============================================================================
+
+maximum_weeks:
+  description: "New York maximum duration of regular UI benefits per NY Labor Law 594"
+  unit: weeks
+  period: year
+  label: "Maximum benefit weeks"
+  values:
+    1939-01-01: 26
+  citations:
+    - "NY Labor Law 594"
+
+# =============================================================================
+# WAITING PERIOD
+# NY Labor Law 590
+# =============================================================================
+
+waiting_period_weeks:
+  description: "New York requires 1 week serving period (not unpaid waiting week) per NY Labor Law 590"
+  unit: weeks
+  period: week
+  label: "Serving period"
+  values:
+    # NY calls this a "serving week" but pays benefits for it later
+    2024-01-01: 0  # Effectively no unpaid waiting week as of recent changes
+    2020-01-01: 1  # Prior: 1 week serving period
+  notes:
+    - "NY waived waiting week during COVID; some provisions remain"
+    - "The 'serving week' may be retroactively paid"
+  citations:
+    - "NY Labor Law 590"
+
+# =============================================================================
+# PARTIAL BENEFITS / EARNINGS OFFSET
+# NY Labor Law 590
+# =============================================================================
+
+earnings_days_threshold:
+  description: "New York reduces benefits based on days worked, not dollar amount per NY Labor Law 590"
+  unit: days
+  period: week
+  label: "Days worked threshold"
+  values:
+    2024-01-01: 4  # Can work up to 3 days without losing all benefits
+  notes:
+    - "NY uses a unique system based on days worked"
+    - "4+ days = no benefits; 1-3 days = partial benefits"
+  citations:
+    - "NY Labor Law 590"
+
+partial_benefit_day_reduction:
+  description: "New York reduces WBA by 25% per day worked (up to 3 days) per NY Labor Law 590"
+  unit: rate
+  period: day
+  label: "Per-day benefit reduction"
+  values:
+    2024-01-01: 0.25  # 25% reduction per day worked
+  notes:
+    - "0 days = full WBA"
+    - "1 day = 75% of WBA"
+    - "2 days = 50% of WBA"
+    - "3 days = 25% of WBA"
+    - "4+ days = 0"
+  citations:
+    - "NY Labor Law 590"
+
+earnings_amount_threshold:
+  description: "New York earnings threshold above which benefits reduced per NY Labor Law 590"
+  unit: USD
+  period: week
+  label: "Earnings threshold"
+  values:
+    2024-01-01: 504  # At or above max WBA = no benefits (earnings test)
+  notes:
+    - "If earnings >= WBA, no benefits paid"
+  citations:
+    - "NY Labor Law 590"
+
+# =============================================================================
+# DISQUALIFICATION PERIODS
+# NY Labor Law 593
+# =============================================================================
+
+disqualification_voluntary_quit:
+  description: "New York disqualification for voluntary quit without good cause per NY Labor Law 593"
+  unit: weeks
+  period: week
+  label: "Voluntary quit disqualification"
+  values:
+    # NY: varies; typically requires working and earning 10x WBA
+    1939-01-01: 0  # Until reemployed and earns 10x WBA
+  notes:
+    - "Disqualified until claimant works and earns at least 10 times WBA"
+    - "Not a fixed week count; depends on reemployment"
+  citations:
+    - "NY Labor Law 593(1)"
+
+disqualification_earnings_multiplier:
+  description: "New York requires earnings of 10 times WBA to purge disqualification per NY Labor Law 593"
+  unit: rate
+  period: week
+  label: "Requalification earnings multiplier"
+  values:
+    1939-01-01: 10.0  # Must earn 10x WBA through employment
+  citations:
+    - "NY Labor Law 593(1)"
+
+disqualification_misconduct:
+  description: "New York disqualification for discharge due to misconduct per NY Labor Law 593"
+  unit: weeks
+  period: week
+  label: "Misconduct disqualification"
+  values:
+    1939-01-01: 0  # Until reemployed and earns 10x WBA
+  notes:
+    - "Same requalification requirement as voluntary quit"
+    - "Gross misconduct may result in benefit reduction"
+  citations:
+    - "NY Labor Law 593(2)"
+
+gross_misconduct_benefit_forfeiture:
+  description: "New York forfeits benefit credits for gross misconduct per NY Labor Law 593"
+  unit: rate
+  period: year
+  label: "Gross misconduct forfeiture"
+  values:
+    1939-01-01: 1.0  # All effective days forfeited for gross misconduct
+  citations:
+    - "NY Labor Law 593(2)"
+
+# =============================================================================
+# STATE UI TAX (Employer Side)
+# NY Labor Law 581
+# =============================================================================
+
+state_ui_taxable_wage_base:
+  description: "New York UI taxable wage base (SUI) per NY Labor Law 517"
+  unit: USD
+  period: year
+  label: "State UI wage base"
+  values:
+    2024-01-01: 12500  # Higher than federal $7,000
+    2023-01-01: 12300
+    2022-01-01: 12000
+    2021-01-01: 11800
+    2020-01-01: 11600
+    2019-01-01: 11400
+    2014-01-01: 10500
+    2013-01-01: 10300
+  notes:
+    - "Indexed annually"
+    - "Higher than federal FUTA base of $7,000"
+  citations:
+    - "NY Labor Law 517"
+
+new_employer_tax_rate:
+  description: "New York new employer UI tax rate per NY Labor Law 581"
+  unit: rate
+  period: year
+  label: "New employer tax rate"
+  values:
+    2024-01-01: 0.030  # 3.0% for new non-construction employers
+    # Higher rates apply to construction industry
+  citations:
+    - "NY Labor Law 581"
+
+new_employer_tax_rate_construction:
+  description: "New York new employer UI tax rate for construction per NY Labor Law 581"
+  unit: rate
+  period: year
+  label: "New employer tax rate (construction)"
+  values:
+    2024-01-01: 0.045  # 4.5% for construction employers
+  citations:
+    - "NY Labor Law 581"
+
+minimum_tax_rate:
+  description: "New York minimum employer UI tax rate per NY Labor Law 581"
+  unit: rate
+  period: year
+  label: "Minimum employer tax rate"
+  values:
+    2024-01-01: 0.015  # 1.5% minimum (lowest experience rate)
+  citations:
+    - "NY Labor Law 581"
+
+maximum_tax_rate:
+  description: "New York maximum employer UI tax rate per NY Labor Law 581"
+  unit: rate
+  period: year
+  label: "Maximum employer tax rate"
+  values:
+    2024-01-01: 0.095  # 9.5% maximum (negative balance employers)
+  citations:
+    - "NY Labor Law 581"
+
+# =============================================================================
+# ADDITIONAL STATE SURCHARGES
+# =============================================================================
+
+subsidiary_tax_rate:
+  description: "New York subsidiary tax rate to fund state UI administration per NY Labor Law 575"
+  unit: rate
+  period: year
+  label: "Subsidiary tax rate"
+  values:
+    2024-01-01: 0.00525  # 0.525% of taxable wages
+  citations:
+    - "NY Labor Law 575"
+
+reemployment_fund_contribution:
+  description: "New York reemployment services fund contribution per NY Labor Law 575-a"
+  unit: rate
+  period: year
+  label: "Reemployment fund rate"
+  values:
+    2024-01-01: 0.00075  # 0.075% of taxable wages
+  citations:
+    - "NY Labor Law 575-a"

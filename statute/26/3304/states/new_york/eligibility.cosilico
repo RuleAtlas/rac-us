@@ -1,0 +1,351 @@
+# New York Unemployment Insurance Eligibility
+#
+# New York UI is governed by NY Labor Law Article 18,
+# administered by the NY Department of Labor.
+#
+# Key sections:
+# - NY Labor Law 527: Monetary eligibility
+# - NY Labor Law 590-591: Benefit amounts
+# - NY Labor Law 593: Disqualifications
+# - NY Labor Law 594: Duration
+
+module statute.26.3304.states.new_york
+version "2024.1"
+
+references {
+  # New York parameters
+  minimum_base_period_wages: statute/26/3304/states/new_york/parameters/minimum_base_period_wages
+  high_quarter_multiplier: statute/26/3304/states/new_york/parameters/high_quarter_multiplier
+  minimum_quarters_with_wages: statute/26/3304/states/new_york/parameters/minimum_quarters_with_wages
+  wba_fraction: statute/26/3304/states/new_york/parameters/wba_fraction
+  minimum_wba: statute/26/3304/states/new_york/parameters/minimum_wba
+  maximum_wba: statute/26/3304/states/new_york/parameters/maximum_wba
+  maximum_weeks: statute/26/3304/states/new_york/parameters/maximum_weeks
+  waiting_period_weeks: statute/26/3304/states/new_york/parameters/waiting_period_weeks
+  partial_benefit_day_reduction: statute/26/3304/states/new_york/parameters/partial_benefit_day_reduction
+  earnings_days_threshold: statute/26/3304/states/new_york/parameters/earnings_days_threshold
+  disqualification_earnings_multiplier: statute/26/3304/states/new_york/parameters/disqualification_earnings_multiplier
+}
+
+# =============================================================================
+# MONETARY ELIGIBILITY (NY Labor Law 527)
+# =============================================================================
+
+variable ny_ui_monetarily_eligible {
+  entity Person
+  period Week
+  dtype Boolean
+  label "New York UI monetary eligibility"
+  description "Meets New York minimum wage requirements per NY Labor Law 527"
+  reference "NY Labor Law 527"
+
+  formula {
+    let hq_wages = high_quarter_wages
+    let bp_wages = base_period_wages
+    let quarters = base_period_quarters_worked
+
+    # Minimum base period wages
+    let meets_minimum_wages = bp_wages >= minimum_base_period_wages
+
+    # 1.5x high quarter test
+    let meets_hq_multiplier = bp_wages >= hq_wages * high_quarter_multiplier
+
+    # Must have wages in at least 2 quarters
+    let meets_quarter_requirement = quarters >= minimum_quarters_with_wages
+
+    return meets_minimum_wages and meets_hq_multiplier and meets_quarter_requirement
+  }
+
+  default false
+}
+
+# =============================================================================
+# NON-MONETARY ELIGIBILITY (NY Labor Law 591)
+# =============================================================================
+
+variable ny_ui_nonmonetarily_eligible {
+  entity Person
+  period Week
+  dtype Boolean
+  label "New York UI non-monetary eligibility"
+  description "Meets able/available requirements per NY Labor Law 591"
+  reference "NY Labor Law 591"
+
+  formula {
+    return is_able_to_work and is_available_for_work and is_actively_seeking_work
+  }
+
+  default false
+}
+
+# =============================================================================
+# SEPARATION ELIGIBILITY (NY Labor Law 593)
+# =============================================================================
+
+variable ny_ui_separation_eligible {
+  entity Person
+  period Week
+  dtype Boolean
+  label "New York UI separation eligibility"
+  description "Job separation qualifies for UI per NY Labor Law 593"
+  reference (
+    "NY Labor Law 593(1)",
+    "NY Labor Law 593(2)"
+  )
+
+  formula {
+    let reason = separation_reason
+
+    # Layoff, reduction in force, employer closure = eligible
+    if reason == "layoff" then
+      return true
+    elif reason == "reduction_in_force" then
+      return true
+    elif reason == "employer_closure" then
+      return true
+    # Voluntary quit = check for good cause OR requalification
+    elif reason == "voluntary_quit" then
+      if voluntary_quit_good_cause then
+        return true
+      else
+        return ny_ui_has_requalified
+    # Misconduct = check for requalification
+    elif reason == "misconduct" then
+      return ny_ui_has_requalified
+    elif reason == "gross_misconduct" then
+      # Gross misconduct forfeits benefit credits
+      return false
+    else
+      return false
+  }
+
+  default false
+}
+
+# =============================================================================
+# REQUALIFICATION (NY Labor Law 593)
+# Must earn 10x WBA to purge disqualification
+# =============================================================================
+
+variable ny_ui_requalification_amount {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "New York requalification earnings requirement"
+  description "Earnings required to purge disqualification per NY Labor Law 593"
+  reference "NY Labor Law 593(1)"
+
+  formula {
+    let wba = ny_ui_weekly_benefit_amount
+    return wba * disqualification_earnings_multiplier
+  }
+
+  default 0
+}
+
+variable ny_ui_has_requalified {
+  entity Person
+  period Week
+  dtype Boolean
+  label "Has requalified after disqualification"
+  description "Earned sufficient wages through employment per NY Labor Law 593"
+  reference "NY Labor Law 593(1)"
+
+  formula {
+    let required = ny_ui_requalification_amount
+    let post_separation_earnings = post_separation_wages
+
+    return post_separation_earnings >= required
+  }
+
+  default false
+}
+
+# =============================================================================
+# COMBINED ELIGIBILITY
+# =============================================================================
+
+variable ny_ui_eligible {
+  entity Person
+  period Week
+  dtype Boolean
+  label "New York UI eligibility"
+  description "Eligible for New York unemployment insurance benefits"
+  reference "NY Labor Law Article 18"
+
+  formula {
+    return (
+      ny_ui_monetarily_eligible and
+      ny_ui_nonmonetarily_eligible and
+      ny_ui_separation_eligible
+    )
+  }
+
+  default false
+}
+
+# =============================================================================
+# WEEKLY BENEFIT AMOUNT (NY Labor Law 590)
+# 1/26 of high quarter wages
+# =============================================================================
+
+variable ny_ui_weekly_benefit_amount {
+  entity Person
+  period Week
+  dtype Money
+  unit "USD"
+  label "New York weekly benefit amount"
+  description "Weekly UI benefit as 1/26 of high quarter wages per NY Labor Law 590"
+  reference "NY Labor Law 590"
+
+  formula {
+    if not ny_ui_eligible then
+      return 0
+
+    let hq_wages = high_quarter_wages
+
+    # 1/26 of high quarter wages
+    let calculated = round(hq_wages * wba_fraction)
+
+    # Apply minimum and maximum
+    return max(minimum_wba, min(calculated, maximum_wba))
+  }
+
+  default 0
+}
+
+# =============================================================================
+# MAXIMUM BENEFIT AMOUNT (NY Labor Law 594)
+# =============================================================================
+
+variable ny_ui_maximum_benefit_amount {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "New York maximum benefit amount"
+  description "Total UI benefits available in benefit year per NY Labor Law 594"
+  reference "NY Labor Law 594"
+
+  formula {
+    let wba = ny_ui_weekly_benefit_amount
+    return wba * maximum_weeks
+  }
+
+  default 0
+}
+
+variable ny_ui_maximum_weeks {
+  entity Person
+  period Year
+  dtype Integer
+  label "New York maximum benefit weeks"
+  description "Maximum weeks of regular UI benefits per NY Labor Law 594"
+  reference "NY Labor Law 594"
+
+  formula {
+    return maximum_weeks  # 26 weeks
+  }
+
+  default 26
+}
+
+# =============================================================================
+# WEEKS REMAINING
+# =============================================================================
+
+variable ny_ui_weeks_remaining {
+  entity Person
+  period Week
+  dtype Integer
+  label "New York UI weeks remaining"
+  description "Weeks of benefits still available"
+
+  formula {
+    let max_weeks = ny_ui_maximum_weeks
+    let used_weeks = weeks_claimed
+
+    return max(0, max_weeks - used_weeks)
+  }
+
+  default 26
+}
+
+# =============================================================================
+# PARTIAL BENEFITS - DAYS WORKED SYSTEM (NY Labor Law 590)
+# NY uses a unique system: 25% reduction per day worked
+# =============================================================================
+
+variable ny_ui_partial_benefit_rate {
+  entity Person
+  period Week
+  dtype Rate
+  label "New York partial benefit rate"
+  description "Benefit reduction factor based on days worked per NY Labor Law 590"
+  reference "NY Labor Law 590"
+
+  formula {
+    let days = days_worked_this_week
+    let threshold = earnings_days_threshold  # 4 days
+    let reduction_per_day = partial_benefit_day_reduction  # 0.25
+
+    if days >= threshold then
+      return 0  # No benefits if 4+ days worked
+
+    # Each day worked reduces by 25%
+    # 0 days = 100%, 1 day = 75%, 2 days = 50%, 3 days = 25%
+    let reduction = days * reduction_per_day
+    return max(0, 1 - reduction)
+  }
+
+  default 1.0
+}
+
+variable ny_ui_current_weekly_payment {
+  entity Person
+  period Week
+  dtype Money
+  unit "USD"
+  label "New York current week UI payment"
+  description "UI payment for current week based on days worked per NY Labor Law 590"
+  reference "NY Labor Law 590"
+
+  formula {
+    if not ny_ui_eligible then
+      return 0
+
+    # No payment if benefits exhausted
+    if ny_ui_weeks_remaining <= 0 then
+      return 0
+
+    let wba = ny_ui_weekly_benefit_amount
+    let partial_rate = ny_ui_partial_benefit_rate
+
+    return round(wba * partial_rate)
+  }
+
+  default 0
+}
+
+# =============================================================================
+# WAITING PERIOD
+# Note: NY has modified waiting week rules; currently may be 0
+# =============================================================================
+
+variable ny_ui_waiting_week {
+  entity Person
+  period Week
+  dtype Boolean
+  label "New York UI waiting week"
+  description "Currently in serving period per NY Labor Law 590"
+  reference "NY Labor Law 590"
+
+  formula {
+    # NY's waiting week rules have changed; currently effectively 0
+    let week_num = current_week_number
+    return week_num <= waiting_period_weeks
+  }
+
+  default false
+}

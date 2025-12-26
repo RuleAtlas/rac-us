@@ -1,0 +1,425 @@
+# Tests for 26 USC 3304 - Unemployment Insurance Federal Requirements
+#
+# Federal standards for state UI programs under FUTA (26 USC 3301-3311).
+# States must meet these minimum requirements to participate in the
+# federal-state unemployment compensation system.
+#
+# Key federal requirements:
+# - 26 USC 3304(a)(1): Coverage requirements
+# - 26 USC 3304(a)(4): Experience rating
+# - 26 USC 3304(a)(5): Wage credits and benefit eligibility
+# - 26 USC 3304(a)(6): Denial of benefits (voluntary quit, misconduct)
+# - 26 USC 3304(a)(7): Weekly benefit amounts
+# - 26 USC 3304(a)(11): Extended benefits
+# - 26 USC 3306(b): Wages definition ($7,000 FUTA wage base)
+
+variable: ui_eligible
+year: 2024
+
+# =============================================================================
+# MONETARY ELIGIBILITY (Base Period Wages)
+# Federal law requires states to use wages in "base period" (typically first
+# 4 of last 5 completed calendar quarters) to determine monetary eligibility.
+# =============================================================================
+
+test_cases:
+  # --- Basic Monetary Eligibility ---
+  - name: "Worker with sufficient base period wages - eligible"
+    description: "Worker with wages in multiple quarters meets monetary requirements"
+    inputs:
+      state: CA
+      base_period_wages: 5000
+      high_quarter_wages: 2500
+      base_period_quarters_worked: 2
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 0
+    expected:
+      ui_monetarily_eligible: true
+      ui_eligible: true
+    citations:
+      - "26 USC 3304(a)(5): monetary eligibility based on wages"
+
+  - name: "Worker with insufficient wages - ineligible"
+    description: "Wages below state minimum disqualifies"
+    inputs:
+      state: CA
+      base_period_wages: 900
+      high_quarter_wages: 900
+      base_period_quarters_worked: 1
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 0
+    expected:
+      ui_monetarily_eligible: false
+      ui_eligible: false
+    citations:
+      - "26 USC 3304(a)(5): insufficient wages"
+
+  - name: "Worker with wages in single quarter only - varies by state"
+    description: "Many states require wages in multiple quarters"
+    inputs:
+      state: CA
+      base_period_wages: 3000
+      high_quarter_wages: 3000
+      base_period_quarters_worked: 1
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 0
+    expected:
+      ui_monetarily_eligible: false  # CA requires 1.25x HQW in base period
+    citations:
+      - "Cal. Unemp. Ins. Code 1281: multiple quarter requirement"
+
+# =============================================================================
+# NON-MONETARY ELIGIBILITY (Able and Available)
+# 26 USC 3304(a)(5)(A): Must be "able to work and available for work"
+# =============================================================================
+
+  - name: "Able and available for work - eligible"
+    description: "Worker meets able/available requirements"
+    inputs:
+      state: CA
+      base_period_wages: 15000
+      high_quarter_wages: 6000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 0
+    expected:
+      ui_nonmonetarily_eligible: true
+      ui_eligible: true
+    citations:
+      - "26 USC 3304(a)(5)(A): able and available"
+
+  - name: "Unable to work due to illness - ineligible"
+    description: "Worker not able to work fails non-monetary test"
+    inputs:
+      state: CA
+      base_period_wages: 15000
+      high_quarter_wages: 6000
+      base_period_quarters_worked: 4
+      is_able_to_work: false
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 0
+    expected:
+      ui_nonmonetarily_eligible: false
+      ui_eligible: false
+    citations:
+      - "26 USC 3304(a)(5)(A): must be able to work"
+
+  - name: "Not available for work - ineligible"
+    description: "Worker not available fails non-monetary test"
+    inputs:
+      state: CA
+      base_period_wages: 15000
+      high_quarter_wages: 6000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: false
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 0
+    expected:
+      ui_nonmonetarily_eligible: false
+      ui_eligible: false
+    citations:
+      - "26 USC 3304(a)(5)(A): must be available for work"
+
+  - name: "Not actively seeking work - ineligible"
+    description: "Active work search typically required"
+    inputs:
+      state: CA
+      base_period_wages: 15000
+      high_quarter_wages: 6000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: false
+      separation_reason: layoff
+      weeks_claimed: 0
+    expected:
+      ui_nonmonetarily_eligible: false
+      ui_eligible: false
+    citations:
+      - "Most state laws require active work search"
+
+# =============================================================================
+# SEPARATION REASON (26 USC 3304(a)(5)(A))
+# Federal law allows states to disqualify for voluntary quit or misconduct
+# =============================================================================
+
+  - name: "Laid off through no fault - eligible"
+    description: "Layoff is qualifying separation"
+    inputs:
+      state: CA
+      base_period_wages: 15000
+      high_quarter_wages: 6000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 0
+    expected:
+      ui_separation_eligible: true
+      ui_eligible: true
+    citations:
+      - "26 USC 3304(a)(5)(A): eligible if unemployed through no fault"
+
+  - name: "Voluntary quit without good cause - ineligible"
+    description: "Voluntary quit without good cause disqualifies"
+    inputs:
+      state: CA
+      base_period_wages: 15000
+      high_quarter_wages: 6000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: voluntary_quit
+      voluntary_quit_good_cause: false
+      weeks_claimed: 0
+    expected:
+      ui_separation_eligible: false
+      ui_eligible: false
+    citations:
+      - "26 USC 3304(a)(5)(A): states may disqualify voluntary quits"
+
+  - name: "Voluntary quit with good cause - eligible"
+    description: "Good cause quit may be allowed"
+    inputs:
+      state: CA
+      base_period_wages: 15000
+      high_quarter_wages: 6000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: voluntary_quit
+      voluntary_quit_good_cause: true
+      weeks_claimed: 0
+    expected:
+      ui_separation_eligible: true
+      ui_eligible: true
+    citations:
+      - "State law defines good cause"
+
+  - name: "Fired for misconduct - ineligible"
+    description: "Misconduct discharge disqualifies"
+    inputs:
+      state: CA
+      base_period_wages: 15000
+      high_quarter_wages: 6000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: misconduct
+      weeks_claimed: 0
+    expected:
+      ui_separation_eligible: false
+      ui_eligible: false
+    citations:
+      - "26 USC 3304(a)(5)(A): states may disqualify for misconduct"
+
+# =============================================================================
+# WEEKLY BENEFIT AMOUNT (WBA) CALCULATION
+# Federal law does not set WBA; states determine based on wages
+# Common formula: fraction of high quarter wages (1/23 to 1/26)
+# =============================================================================
+
+  - name: "WBA calculation - California formula"
+    description: "CA uses wage table; approximately 60-70% of weekly wage up to max"
+    inputs:
+      state: CA
+      base_period_wages: 20000
+      high_quarter_wages: 8000  # ~$615/week for 13 weeks
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 0
+    expected:
+      ui_eligible: true
+      ui_weekly_benefit_amount: 347  # CA: $8,000 HQW = ~$347 WBA
+      ui_maximum_benefit_amount: 9051  # 26 weeks max
+    citations:
+      - "Cal. Unemp. Ins. Code 1280: WBA schedule"
+      - "Cal. Unemp. Ins. Code 1281: Maximum benefits"
+
+  - name: "WBA at maximum - high earner"
+    description: "Benefits capped at state maximum"
+    inputs:
+      state: CA
+      base_period_wages: 100000
+      high_quarter_wages: 30000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 0
+    expected:
+      ui_eligible: true
+      ui_weekly_benefit_amount: 450  # CA maximum WBA for 2024
+      ui_maximum_benefit_amount: 11700  # 26 weeks at max
+    citations:
+      - "Cal. Unemp. Ins. Code 1280: maximum WBA"
+
+# =============================================================================
+# MAXIMUM BENEFIT DURATION
+# Most states: 26 weeks standard (some vary by wages or unemployment rate)
+# =============================================================================
+
+  - name: "Standard duration - 26 weeks"
+    description: "Standard maximum benefit duration"
+    inputs:
+      state: CA
+      base_period_wages: 20000
+      high_quarter_wages: 8000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 0
+    expected:
+      ui_maximum_weeks: 26
+    citations:
+      - "Cal. Unemp. Ins. Code 1281: 26 weeks maximum"
+
+  - name: "Benefits exhausted - no more payments"
+    description: "Cannot receive after exhausting benefits"
+    inputs:
+      state: CA
+      base_period_wages: 20000
+      high_quarter_wages: 8000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 26
+    expected:
+      ui_weeks_remaining: 0
+      ui_current_weekly_payment: 0
+    citations:
+      - "26 USC 3304(a): benefits limited by duration"
+
+# =============================================================================
+# WAITING WEEK (26 USC 3304(a)(7))
+# Federal law allows 1-week waiting period before benefits begin
+# =============================================================================
+
+  - name: "First week - waiting week applies"
+    description: "No payment during first week (waiting week)"
+    inputs:
+      state: CA
+      base_period_wages: 20000
+      high_quarter_wages: 8000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 0
+      current_week_number: 1
+    expected:
+      ui_eligible: true
+      ui_waiting_week: true
+      ui_current_weekly_payment: 0
+    citations:
+      - "26 USC 3304(a)(7)(A): waiting period allowed"
+      - "Cal. Unemp. Ins. Code 1253: 1 week waiting period"
+
+  - name: "Second week - benefits begin"
+    description: "Benefits paid starting week 2"
+    inputs:
+      state: CA
+      base_period_wages: 20000
+      high_quarter_wages: 8000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 1
+      current_week_number: 2
+    expected:
+      ui_eligible: true
+      ui_waiting_week: false
+      ui_current_weekly_payment: 347
+    citations:
+      - "Benefits begin after waiting week"
+
+# =============================================================================
+# FUTA WAGE BASE (26 USC 3306(b))
+# =============================================================================
+
+  - name: "FUTA taxable wages calculation"
+    description: "FUTA taxes only first $7,000 in wages per employee"
+    inputs:
+      employee_annual_wages: 50000
+    expected:
+      futa_taxable_wages: 7000
+    citations:
+      - "26 USC 3306(b)(1): $7,000 FUTA wage base"
+
+# =============================================================================
+# COMBINED ELIGIBILITY SCENARIOS
+# =============================================================================
+
+  - name: "Fully eligible worker - all requirements met"
+    description: "Worker meets all federal requirements"
+    inputs:
+      state: CA
+      base_period_wages: 25000
+      high_quarter_wages: 10000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 1
+      current_week_number: 2
+    expected:
+      ui_monetarily_eligible: true
+      ui_nonmonetarily_eligible: true
+      ui_separation_eligible: true
+      ui_eligible: true
+      ui_weekly_benefit_amount: 434
+      ui_current_weekly_payment: 434
+    citations:
+      - "26 USC 3304(a): all federal requirements met"
+
+  - name: "New York worker - different state formula"
+    description: "NY uses different WBA calculation (1/26 of HQW)"
+    inputs:
+      state: NY
+      base_period_wages: 25000
+      high_quarter_wages: 10000
+      base_period_quarters_worked: 4
+      is_able_to_work: true
+      is_available_for_work: true
+      is_actively_seeking_work: true
+      separation_reason: layoff
+      weeks_claimed: 1
+      current_week_number: 2
+    expected:
+      ui_eligible: true
+      ui_weekly_benefit_amount: 385  # NY: 1/26 of HQW, max $504
+      ui_maximum_weeks: 26
+    citations:
+      - "NY Labor Law 590: 1/26 of high quarter wages"

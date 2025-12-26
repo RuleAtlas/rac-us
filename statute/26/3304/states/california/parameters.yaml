@@ -1,0 +1,332 @@
+# California Unemployment Insurance Parameters
+#
+# California UI is administered by the Employment Development Department (EDD)
+# under the California Unemployment Insurance Code.
+#
+# Key statutes:
+# - Cal. Unemp. Ins. Code 1275-1279: Eligibility requirements
+# - Cal. Unemp. Ins. Code 1280-1281: Weekly benefit amount
+# - Cal. Unemp. Ins. Code 1252-1253: Able/available requirements
+# - Cal. Unemp. Ins. Code 1256-1257: Disqualifications
+
+variable: ca_ui_parameters
+entity: Person
+period: Week
+dtype: Money
+
+# =============================================================================
+# MONETARY ELIGIBILITY THRESHOLDS
+# Cal. Unemp. Ins. Code 1281
+# =============================================================================
+
+minimum_base_period_wages:
+  description: "California requires minimum wages in base period for UI eligibility per Cal. Unemp. Ins. Code 1281(a)"
+  unit: USD
+  period: year
+  label: "Minimum base period wages"
+  values:
+    2024-01-01: 1300  # Must have at least $1,300 in highest quarter
+    2020-01-01: 1300
+    2010-01-01: 1300
+  citations:
+    - "Cal. Unemp. Ins. Code 1281(a)"
+  reference: "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=UIC&sectionNum=1281"
+
+high_quarter_multiplier:
+  description: "California requires total base period wages to be at least 1.25 times high quarter wages per Cal. Unemp. Ins. Code 1281(a)"
+  unit: rate
+  period: year
+  label: "High quarter wage multiplier"
+  values:
+    1939-01-01: 1.25  # Base period wages >= 1.25 * high quarter wages
+  citations:
+    - "Cal. Unemp. Ins. Code 1281(a)"
+  reference: "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=UIC&sectionNum=1281"
+
+minimum_outside_high_quarter:
+  description: "California requires wages outside high quarter OR $900+ in high quarter per Cal. Unemp. Ins. Code 1281(a)(2)"
+  unit: USD
+  period: quarter
+  label: "Alternative high quarter minimum"
+  values:
+    2024-01-01: 900
+  citations:
+    - "Cal. Unemp. Ins. Code 1281(a)(2)"
+
+# =============================================================================
+# WEEKLY BENEFIT AMOUNT (WBA)
+# Cal. Unemp. Ins. Code 1280
+# =============================================================================
+
+wba_fraction:
+  description: "California calculates WBA using wage table; approximately 60-70% of weekly wage per Cal. Unemp. Ins. Code 1280"
+  unit: rate
+  period: week
+  label: "WBA calculation fraction"
+  values:
+    # CA uses a wage table, not a simple fraction
+    # This approximates the effective replacement rate
+    2024-01-01: 0.0434  # Approximately 1/23 of HQW for mid-range wages
+  notes:
+    - "California uses a detailed wage table in CUIC 1280"
+    - "Actual WBA depends on high quarter wages bracket"
+  citations:
+    - "Cal. Unemp. Ins. Code 1280"
+  reference: "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=UIC&sectionNum=1280"
+
+minimum_wba:
+  description: "California minimum weekly benefit amount per Cal. Unemp. Ins. Code 1280"
+  unit: USD
+  period: week
+  label: "Minimum weekly benefit"
+  values:
+    2024-01-01: 40
+    2020-01-01: 40
+    2010-01-01: 40
+  citations:
+    - "Cal. Unemp. Ins. Code 1280"
+
+maximum_wba:
+  description: "California maximum weekly benefit amount per Cal. Unemp. Ins. Code 1280"
+  unit: USD
+  period: week
+  label: "Maximum weekly benefit"
+  values:
+    2024-01-01: 450  # For claims beginning on/after 1/1/2024
+    2023-01-01: 450
+    2022-01-01: 450
+    2020-01-01: 450
+    2019-01-01: 450
+    2018-01-01: 450
+    2017-01-01: 450
+    2016-01-01: 450
+    2005-01-01: 450  # Increased from $370
+    2002-01-01: 370
+    1992-01-01: 230
+  citations:
+    - "Cal. Unemp. Ins. Code 1280"
+  reference: "https://edd.ca.gov/en/unemployment/ui-benefits-amounts/"
+
+# =============================================================================
+# BENEFIT DURATION
+# Cal. Unemp. Ins. Code 1281
+# =============================================================================
+
+maximum_weeks:
+  description: "California maximum duration of regular UI benefits per Cal. Unemp. Ins. Code 1281(a)"
+  unit: weeks
+  period: year
+  label: "Maximum benefit weeks"
+  values:
+    1939-01-01: 26
+  citations:
+    - "Cal. Unemp. Ins. Code 1281(a)"
+
+# =============================================================================
+# WAITING PERIOD
+# Cal. Unemp. Ins. Code 1253
+# =============================================================================
+
+waiting_period_weeks:
+  description: "California requires 1 week unpaid waiting period per Cal. Unemp. Ins. Code 1253"
+  unit: weeks
+  period: week
+  label: "Waiting period"
+  values:
+    1939-01-01: 1
+  notes:
+    - "Waiting week can be served concurrent with training or approved absence"
+  citations:
+    - "Cal. Unemp. Ins. Code 1253"
+
+# =============================================================================
+# EARNINGS DISREGARD
+# Cal. Unemp. Ins. Code 1279
+# =============================================================================
+
+earnings_disregard:
+  description: "California allows up to 25% of WBA as earnings disregard per Cal. Unemp. Ins. Code 1279(a)"
+  unit: rate
+  period: week
+  label: "Earnings disregard rate"
+  values:
+    1939-01-01: 0.25  # First 25% of WBA not counted
+  citations:
+    - "Cal. Unemp. Ins. Code 1279(a)"
+
+earnings_offset_rate:
+  description: "California reduces WBA dollar-for-dollar for earnings above disregard per Cal. Unemp. Ins. Code 1279(a)"
+  unit: rate
+  period: week
+  label: "Earnings offset rate"
+  values:
+    1939-01-01: 1.0  # $1 reduction for each $1 above disregard
+  citations:
+    - "Cal. Unemp. Ins. Code 1279(a)"
+
+# =============================================================================
+# DISQUALIFICATION PERIODS
+# Cal. Unemp. Ins. Code 1256-1257
+# =============================================================================
+
+disqualification_voluntary_quit:
+  description: "California disqualification for voluntary quit without good cause per Cal. Unemp. Ins. Code 1256"
+  unit: weeks
+  period: week
+  label: "Voluntary quit disqualification"
+  values:
+    1939-01-01: 0  # Until reemployed and earns 5x WBA (indefinite)
+  notes:
+    - "Disqualification until claimant earns 5 times WBA in bona fide work"
+    - "Not a fixed week count; depends on reemployment"
+  citations:
+    - "Cal. Unemp. Ins. Code 1256"
+
+disqualification_misconduct:
+  description: "California disqualification for discharge due to misconduct per Cal. Unemp. Ins. Code 1256"
+  unit: weeks
+  period: week
+  label: "Misconduct disqualification"
+  values:
+    1939-01-01: 0  # Until reemployed and earns 5x WBA
+  notes:
+    - "Same requalification requirement as voluntary quit"
+  citations:
+    - "Cal. Unemp. Ins. Code 1256"
+
+disqualification_earnings_multiplier:
+  description: "California requires earnings of 5 times WBA to purge disqualification per Cal. Unemp. Ins. Code 1260"
+  unit: rate
+  period: week
+  label: "Requalification earnings multiplier"
+  values:
+    1939-01-01: 5.0  # Must earn 5x WBA in bona fide work
+  citations:
+    - "Cal. Unemp. Ins. Code 1260"
+
+# =============================================================================
+# STATE UI TAX (Employer Side)
+# Cal. Unemp. Ins. Code 976-984
+# =============================================================================
+
+state_ui_taxable_wage_base:
+  description: "California UI taxable wage base (SUI) per Cal. Unemp. Ins. Code 930"
+  unit: USD
+  period: year
+  label: "State UI wage base"
+  values:
+    2024-01-01: 7000
+    1983-01-01: 7000  # Matches federal FUTA base
+  citations:
+    - "Cal. Unemp. Ins. Code 930"
+
+new_employer_tax_rate:
+  description: "California new employer UI tax rate per Cal. Unemp. Ins. Code 977"
+  unit: rate
+  period: year
+  label: "New employer tax rate"
+  values:
+    2024-01-01: 0.034  # 3.4% for new employers
+    2020-01-01: 0.034
+  citations:
+    - "Cal. Unemp. Ins. Code 977"
+
+minimum_tax_rate:
+  description: "California minimum employer UI tax rate per Cal. Unemp. Ins. Code 977"
+  unit: rate
+  period: year
+  label: "Minimum employer tax rate"
+  values:
+    2024-01-01: 0.015  # 1.5% minimum
+  citations:
+    - "Cal. Unemp. Ins. Code 977"
+
+maximum_tax_rate:
+  description: "California maximum employer UI tax rate per Cal. Unemp. Ins. Code 977"
+  unit: rate
+  period: year
+  label: "Maximum employer tax rate"
+  values:
+    2024-01-01: 0.062  # 6.2% maximum
+  citations:
+    - "Cal. Unemp. Ins. Code 977"
+
+# =============================================================================
+# STATE DISABILITY INSURANCE (Employee Side)
+# Cal. Unemp. Ins. Code 984-987
+# =============================================================================
+
+sdi_rate:
+  description: "California State Disability Insurance rate (employee contribution) per Cal. Unemp. Ins. Code 984"
+  unit: rate
+  period: year
+  label: "SDI rate"
+  values:
+    2024-01-01: 0.009  # 0.9% (increased from 0.8% in 2023)
+    2023-01-01: 0.009
+    2022-01-01: 0.011
+    2021-01-01: 0.012
+    2020-01-01: 0.01
+  citations:
+    - "Cal. Unemp. Ins. Code 984"
+
+sdi_taxable_wage_limit:
+  description: "California SDI taxable wage limit per Cal. Unemp. Ins. Code 985"
+  unit: USD
+  period: year
+  label: "SDI wage limit"
+  values:
+    2024-01-01: 153164  # Indexed annually
+    2023-01-01: 153164
+    2022-01-01: 145600
+    2021-01-01: 128298
+    2020-01-01: 122909
+  citations:
+    - "Cal. Unemp. Ins. Code 985"
+
+# =============================================================================
+# WBA TABLE (Simplified version)
+# Cal. Unemp. Ins. Code 1280
+# =============================================================================
+
+wba_table:
+  description: "California weekly benefit amount table based on high quarter wages per Cal. Unemp. Ins. Code 1280"
+  type: bracket_table
+  unit: USD
+  period: week
+  label: "WBA lookup table"
+  values:
+    2024-01-01:
+      # High Quarter Wages : Weekly Benefit Amount
+      # Simplified representation - actual table has ~100+ entries
+      - hqw_min: 0
+        hqw_max: 928
+        wba: 0  # Below minimum
+      - hqw_min: 929
+        hqw_max: 1299
+        wba: 40  # Minimum WBA
+      - hqw_min: 1300
+        hqw_max: 1549
+        wba: 50
+      - hqw_min: 1550
+        hqw_max: 1849
+        wba: 60
+      - hqw_min: 1850
+        hqw_max: 2149
+        wba: 70
+      - hqw_min: 2150
+        hqw_max: 2449
+        wba: 80
+      - hqw_min: 2450
+        hqw_max: 2749
+        wba: 90
+      - hqw_min: 2750
+        hqw_max: 3049
+        wba: 100
+      # ... continues in $300 increments
+      - hqw_min: 10350
+        hqw_max: 999999
+        wba: 450  # Maximum WBA
+  citations:
+    - "Cal. Unemp. Ins. Code 1280"
+  reference: "https://edd.ca.gov/en/unemployment/ui-benefits-amounts/"

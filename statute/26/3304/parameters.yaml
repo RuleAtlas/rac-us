@@ -1,0 +1,197 @@
+# 26 USC 3304 - Federal Unemployment Insurance Parameters
+#
+# Federal requirements for state UI programs under FUTA (26 USC 3301-3311).
+# These are minimum federal standards; states may be more generous.
+#
+# Key statutes:
+# - 26 USC 3301-3311: Federal Unemployment Tax Act (FUTA)
+# - 26 USC 3304: Approval of state laws
+# - 26 USC 3306: Definitions (including wage base)
+
+variable: ui_federal_parameters
+entity: Person
+period: Week
+dtype: Money
+
+# =============================================================================
+# FUTA WAGE BASE (26 USC 3306(b)(1))
+# Amount of wages subject to federal unemployment tax per employee per year
+# =============================================================================
+
+futa_wage_base:
+  description: "Maximum wages subject to FUTA tax per employee per year per 26 USC 3306(b)(1)"
+  unit: USD
+  period: year
+  label: "FUTA taxable wage base"
+  values:
+    # The federal wage base has been $7,000 since 1983
+    # Congress has not adjusted it despite inflation
+    1983-01-01: 7000
+    # Historical values for reference
+    1978-01-01: 6000
+    1972-01-01: 4200
+    1970-01-01: 3000
+    1939-01-01: 3000
+  citations:
+    - "26 USC 3306(b)(1): wages up to $7,000 per employee"
+  reference: "https://uscode.house.gov/view.xhtml?req=26+USC+3306"
+
+# =============================================================================
+# FUTA TAX RATES (26 USC 3301)
+# =============================================================================
+
+futa_gross_tax_rate:
+  description: "Gross FUTA tax rate imposed on employers per 26 USC 3301"
+  unit: rate
+  period: year
+  label: "FUTA gross tax rate"
+  values:
+    2011-07-01: 0.060  # 6.0% gross rate
+    1985-01-01: 0.062  # 6.2% gross rate
+    1983-01-01: 0.062
+    1961-01-01: 0.031
+    1939-01-01: 0.030
+  citations:
+    - "26 USC 3301: 6.0% of taxable wages"
+  reference: "https://uscode.house.gov/view.xhtml?req=26+USC+3301"
+
+futa_credit_reduction_max:
+  description: "Maximum credit against FUTA tax for state contributions per 26 USC 3302"
+  unit: rate
+  period: year
+  label: "FUTA state credit maximum"
+  values:
+    1985-01-01: 0.054  # 5.4% maximum credit
+    1983-01-01: 0.054
+  citations:
+    - "26 USC 3302(c): credit up to 5.4%"
+  reference: "https://uscode.house.gov/view.xhtml?req=26+USC+3302"
+
+futa_net_tax_rate:
+  description: "Net FUTA tax rate after maximum state credit per 26 USC 3301-3302"
+  unit: rate
+  period: year
+  label: "FUTA net tax rate"
+  values:
+    2011-07-01: 0.006  # 6.0% - 5.4% = 0.6% net
+    1985-01-01: 0.008  # 6.2% - 5.4% = 0.8% net
+  citations:
+    - "26 USC 3301-3302: net rate = gross - credit"
+
+# =============================================================================
+# WAITING PERIOD (26 USC 3304(a)(7))
+# Federal law allows states to impose up to 1 week waiting period
+# =============================================================================
+
+waiting_period_weeks:
+  description: "Maximum waiting period allowed before UI benefits begin per 26 USC 3304(a)(7)(A)"
+  unit: weeks
+  period: week
+  label: "UI waiting period"
+  values:
+    1939-01-01: 1  # States may require up to 1 week waiting period
+  citations:
+    - "26 USC 3304(a)(7)(A): state may require waiting period"
+  reference: "https://uscode.house.gov/view.xhtml?req=26+USC+3304"
+
+# =============================================================================
+# EXTENDED BENEFITS TRIGGER (26 USC 3304(a)(11))
+# Federal-state extended benefits program during high unemployment
+# =============================================================================
+
+extended_benefits_weeks:
+  description: "Standard extended benefits duration per 26 USC 3304(a)(11)"
+  unit: weeks
+  period: week
+  label: "Extended benefits weeks"
+  values:
+    1970-08-10: 13  # Standard extended benefits: 13 additional weeks
+  citations:
+    - "26 USC 3304(a)(11)(A): up to 13 weeks extended benefits"
+
+extended_benefits_high_unemployment_weeks:
+  description: "High unemployment extended benefits duration per 26 USC 3304(a)(11)"
+  unit: weeks
+  period: week
+  label: "High unemployment extended benefits"
+  values:
+    1970-08-10: 20  # During high unemployment: up to 20 weeks
+  citations:
+    - "26 USC 3304(a)(11)(B): up to 20 weeks during high unemployment"
+
+insured_unemployment_rate_trigger:
+  description: "Insured unemployment rate trigger for extended benefits per 26 USC 3304(a)(11)"
+  unit: rate
+  period: week
+  label: "IUR trigger rate"
+  values:
+    2009-02-17: 0.05  # 5% IUR triggers extended benefits (ARRA modification)
+    1970-08-10: 0.05  # 5% insured unemployment rate
+  citations:
+    - "26 USC 3304(a)(11): 5% IUR or 120% of prior 2 years"
+
+# =============================================================================
+# DISQUALIFICATION PERIODS (26 USC 3304(a)(5))
+# Federal law permits states to disqualify for misconduct or voluntary quit
+# These are typical state ranges for reference
+# =============================================================================
+
+disqualification_period_voluntary_quit:
+  description: "Typical state disqualification period for voluntary quit without good cause"
+  unit: weeks
+  period: week
+  label: "Voluntary quit disqualification"
+  values:
+    # Varies by state; common ranges shown
+    1939-01-01: null  # State-specific; see state parameters
+  notes:
+    - "Federal law allows states to set disqualification periods"
+    - "Ranges from 1-26 weeks depending on state"
+  citations:
+    - "26 USC 3304(a)(5)(A): states may deny for voluntary leaving"
+
+disqualification_period_misconduct:
+  description: "Typical state disqualification period for discharge due to misconduct"
+  unit: weeks
+  period: week
+  label: "Misconduct disqualification"
+  values:
+    1939-01-01: null  # State-specific
+  notes:
+    - "Federal law allows states to set disqualification periods"
+    - "Some states have permanent disqualification for gross misconduct"
+  citations:
+    - "26 USC 3304(a)(5)(A): states may deny for misconduct"
+
+# =============================================================================
+# BENEFIT COMPUTATION REQUIREMENTS
+# Federal guidelines for how states compute benefits
+# =============================================================================
+
+minimum_base_period_quarters:
+  description: "Federal expectation for base period wage calculation"
+  unit: quarters
+  period: year
+  label: "Base period length"
+  values:
+    1939-01-01: 4  # Typically first 4 of last 5 completed quarters
+  notes:
+    - "States use either standard or alternate base period"
+    - "Standard: First 4 of last 5 completed calendar quarters"
+    - "Alternate: Most recent 4 completed quarters"
+  citations:
+    - "26 USC 3304(a)(5): wages in base period"
+
+# =============================================================================
+# RECIPROCAL ARRANGEMENTS (26 USC 3304(a)(9))
+# =============================================================================
+
+combined_wage_claims_required:
+  description: "Federal requirement for combined wage claims per 26 USC 3304(a)(9)"
+  unit: boolean
+  period: year
+  label: "Combined wage claims"
+  values:
+    1970-08-10: true  # States must participate in combined wage arrangements
+  citations:
+    - "26 USC 3304(a)(9): interstate reciprocal arrangements required"

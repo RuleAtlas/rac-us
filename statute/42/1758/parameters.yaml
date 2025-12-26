@@ -1,0 +1,185 @@
+# National School Lunch Program (NSLP) and School Breakfast Program (SBP) Parameters
+# 42 USC 1751-1769j
+#
+# The National School Lunch Act establishes income eligibility guidelines for
+# free and reduced-price school meals, updated annually by USDA FNS.
+#
+# Key statute sections:
+# - 42 USC 1758(b)(1): Income eligibility guidelines
+# - 42 USC 1758(b)(2): Categorical eligibility (SNAP, TANF, FDPIR)
+# - 42 USC 1758(b)(5): Foster children
+# - 42 USC 1758(b)(12): Homeless, runaway, and migrant children
+#
+# References:
+# - USDA FNS Income Eligibility Guidelines: https://www.fns.usda.gov/cn/income-eligibility-guidelines
+
+variable: school_meal_eligibility_tier
+entity: Person
+period: SchoolYear
+dtype: Category  # free, reduced, paid
+
+# ==============================================================================
+# Income Eligibility Thresholds
+# 42 USC 1758(b)(1): "The Secretary shall prescribe income guidelines"
+# ==============================================================================
+
+income:
+  description: "Income eligibility thresholds for school meal programs per 42 USC 1758(b)(1)"
+
+  free_meal_limit_pct_fpl:
+    description: "Maximum income as percentage of FPL for free meals per 42 USC 1758(b)(1)(A)(i)"
+    unit: ratio
+    value: 1.30  # 130% of FPL
+
+  reduced_price_limit_pct_fpl:
+    description: "Maximum income as percentage of FPL for reduced-price meals per 42 USC 1758(b)(1)(A)(ii)"
+    unit: ratio
+    value: 1.85  # 185% of FPL
+
+# ==============================================================================
+# Federal Poverty Level Guidelines
+# Used for school meal income eligibility determination
+# Values published annually by HHS, used for school year beginning July 1
+# ==============================================================================
+
+fpl:
+  description: "Federal Poverty Level guidelines for 48 contiguous states per HHS annual update"
+  unit: USD
+  period: year
+
+  # 2025 HHS Poverty Guidelines (used for 2024-2025 school year, effective July 1, 2024)
+  # Federal Register Vol. 89, No. 23, February 2, 2024
+  2025:
+    by_household_size:
+      1: 15650
+      2: 21150
+      3: 26650
+      4: 32150
+      5: 37650
+      6: 43150
+      7: 48650
+      8: 54150
+    additional_per_person: 5500
+
+# ==============================================================================
+# Income Eligibility Guidelines (Pre-calculated from FPL)
+# Published annually by USDA FNS for school year beginning July 1
+# These are the actual thresholds schools use for eligibility determination
+# ==============================================================================
+
+income_eligibility_guidelines:
+  description: "Annual income limits for school meal eligibility per USDA FNS guidance"
+  unit: USD
+  period: year
+
+  # 2024-2025 School Year (effective July 1, 2024)
+  # Source: USDA FNS Income Eligibility Guidelines
+  # https://www.fns.usda.gov/cn/income-eligibility-guidelines
+  2024_2025:
+    free_meal:
+      description: "Annual income at or below this amount qualifies for free meals (130% FPL)"
+      by_household_size:
+        1: 20345   # 15650 * 1.30
+        2: 27495   # 21150 * 1.30
+        3: 34645   # 26650 * 1.30
+        4: 41795   # 32150 * 1.30
+        5: 48945   # 37650 * 1.30
+        6: 56095   # 43150 * 1.30
+        7: 63245   # 48650 * 1.30
+        8: 70395   # 54150 * 1.30
+      additional_per_person: 7150  # 5500 * 1.30
+
+    reduced_price_meal:
+      description: "Annual income at or below this amount qualifies for reduced-price meals (185% FPL)"
+      by_household_size:
+        1: 28952   # 15650 * 1.85 (rounded)
+        2: 39127   # 21150 * 1.85
+        3: 49302   # 26650 * 1.85
+        4: 59477   # 32150 * 1.85
+        5: 69652   # 37650 * 1.85
+        6: 79827   # 43150 * 1.85
+        7: 90002   # 48650 * 1.85
+        8: 100177  # 54150 * 1.85
+      additional_per_person: 10175  # 5500 * 1.85
+
+# ==============================================================================
+# Monthly Income Guidelines (derived for monthly income verification)
+# Some schools and districts verify income on a monthly basis
+# ==============================================================================
+
+income_eligibility_guidelines_monthly:
+  description: "Monthly income limits for school meal eligibility (annual / 12)"
+  unit: USD
+  period: month
+
+  2024_2025:
+    free_meal:
+      description: "Monthly income at or below this amount qualifies for free meals"
+      by_household_size:
+        1: 1695    # 20345 / 12
+        2: 2291    # 27495 / 12
+        3: 2887    # 34645 / 12
+        4: 3483    # 41795 / 12
+        5: 4078    # 48945 / 12
+        6: 4674    # 56095 / 12
+        7: 5270    # 63245 / 12
+        8: 5866    # 70395 / 12
+      additional_per_person: 596  # 7150 / 12
+
+    reduced_price_meal:
+      description: "Monthly income at or below this amount qualifies for reduced-price meals"
+      by_household_size:
+        1: 2412    # 28952 / 12
+        2: 3260    # 39127 / 12
+        3: 4108    # 49302 / 12
+        4: 4956    # 59477 / 12
+        5: 5804    # 69652 / 12
+        6: 6652    # 79827 / 12
+        7: 7500    # 90002 / 12
+        8: 8348    # 100177 / 12
+      additional_per_person: 848  # 10175 / 12
+
+# ==============================================================================
+# Meal Prices
+# 42 USC 1758(b)(3): Maximum reduced-price charges
+# "(3) A school... shall not charge a price of more than 40 cents for a
+# reduced price lunch... and shall not charge a price of more than 30 cents
+# for a reduced price breakfast"
+# ==============================================================================
+
+meal_prices:
+  description: "Maximum meal charges per 42 USC 1758(b)(3)"
+
+  reduced_price_lunch_max:
+    description: "Maximum charge for reduced-price lunch per 42 USC 1758(b)(3)"
+    unit: USD
+    value: 0.40
+
+  reduced_price_breakfast_max:
+    description: "Maximum charge for reduced-price breakfast per 42 USC 1758(b)(9)(A)"
+    unit: USD
+    value: 0.30
+
+# ==============================================================================
+# Community Eligibility Provision (CEP) Thresholds
+# 42 USC 1758(b)(1)(A): Schools may provide free meals to all students
+# if identified student percentage (ISP) meets threshold
+# ==============================================================================
+
+community_eligibility:
+  description: "Community Eligibility Provision parameters per 42 USC 1758(b)(1)(A)"
+
+  identified_student_percentage_threshold:
+    description: "Minimum percentage of identified students (directly certified) for CEP eligibility"
+    unit: ratio
+    value: 0.25  # 25%
+
+  claiming_percentage_multiplier:
+    description: "Multiplier applied to ISP to determine claiming percentage for reimbursement"
+    unit: ratio
+    value: 1.60  # ISP * 1.6 = claiming percentage for free meals
+
+  max_claiming_percentage:
+    description: "Maximum claiming percentage for free meal reimbursement"
+    unit: ratio
+    value: 1.00  # 100%

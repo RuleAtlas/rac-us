@@ -1,0 +1,207 @@
+# 42 USC 1758(b) - Categorical Eligibility for School Meals
+#
+# Certain children are automatically eligible for free meals without income
+# verification through "categorical eligibility" (also called "direct certification"):
+#
+# 42 USC 1758(b)(2)(C)(ii): Benefit program participation
+# "(ii) A child... is a member of a household receiving assistance under
+# the supplemental nutrition assistance program authorized under the Food
+# and Nutrition Act of 2008... shall be considered automatically eligible
+# for free lunches and free breakfasts"
+#
+# 42 USC 1758(b)(5): Foster children
+# "(5) A child who is a member of a household receiving assistance under the
+# program for aid to families with dependent children... who is a foster
+# child whose care and placement is the responsibility of an agency..."
+#
+# 42 USC 1758(b)(12)(A): Homeless, runaway, and migrant children
+# "(12)(A) A child who is a member of a household that receives assistance
+# under a program funded by the McKinney-Vento Homeless Assistance Act...
+# a runaway child... or a migratory child..."
+#
+# Head Start: Children enrolled in Head Start are categorically eligible
+# per section 9(b)(2)(A) of the Richard B. Russell National School Lunch Act
+
+references {
+  school_meal_income_eligible_free: statute/42/1758/b/school_meal_income_eligible_free
+  school_meal_income_eligible_reduced: statute/42/1758/b/school_meal_income_eligible_reduced
+}
+
+# 42 USC 1758(b)(2)(C)(ii): SNAP categorical eligibility
+# "(I) the supplemental nutrition assistance program authorized under the
+# Food and Nutrition Act of 2008 (7 U.S.C. 2011 et seq.)"
+variable school_meal_snap_categorically_eligible {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    return receives_snap
+  }
+}
+
+# 42 USC 1758(b)(2)(C)(ii)(II): TANF categorical eligibility
+# "(II) a State program funded under the program of block grants to States
+# for temporary assistance for needy families"
+variable school_meal_tanf_categorically_eligible {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    return receives_tanf
+  }
+}
+
+# 42 USC 1758(b)(2)(C)(ii)(III): FDPIR categorical eligibility
+# "(III) the food distribution program on Indian reservations established
+# under section 2013(b) of title 7"
+variable school_meal_fdpir_categorically_eligible {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    return receives_fdpir
+  }
+}
+
+# 42 USC 1758(b)(5): Foster child categorical eligibility
+# "a foster child whose care and placement is the responsibility of an
+# agency that administers a State plan under part B or E of title IV of
+# the Social Security Act"
+variable school_meal_foster_categorically_eligible {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    return is_foster_child
+  }
+}
+
+# 42 USC 1758(b)(12)(A): Homeless child categorical eligibility
+# "a child who is a member of a household that receives assistance under
+# a program funded by the McKinney-Vento Homeless Assistance Act"
+variable school_meal_homeless_categorically_eligible {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    return is_homeless
+  }
+}
+
+# 42 USC 1758(b)(12)(A): Migrant child categorical eligibility
+# "a migratory child (as defined in section 6399 of title 20)"
+variable school_meal_migrant_categorically_eligible {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    return is_migrant
+  }
+}
+
+# Head Start categorical eligibility
+# Section 9(b)(2)(A) of the Richard B. Russell National School Lunch Act
+# Children enrolled in Head Start are deemed to meet income eligibility
+variable school_meal_head_start_categorically_eligible {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    return attends_head_start
+  }
+}
+
+# Combined categorical eligibility
+# Any of the categorical eligibility pathways qualifies for free meals
+variable school_meal_categorically_eligible {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    return school_meal_snap_categorically_eligible or
+           school_meal_tanf_categorically_eligible or
+           school_meal_fdpir_categorically_eligible or
+           school_meal_foster_categorically_eligible or
+           school_meal_homeless_categorically_eligible or
+           school_meal_migrant_categorically_eligible or
+           school_meal_head_start_categorically_eligible
+  }
+}
+
+# Community Eligibility Provision (CEP) eligibility
+# 42 USC 1758(b)(1)(A): Schools with high percentages of directly certified
+# students may provide free meals to all students
+variable school_meal_cep_eligible {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    return attends_cep_school
+  }
+}
+
+# Final school meal eligibility tier determination
+# Categorical eligibility and CEP take precedence over income eligibility
+variable school_meal_eligibility_tier {
+  entity Person
+  period Year
+  dtype Category  # "free", "reduced", "paid"
+
+  formula {
+    # Step 1: Check categorical/CEP eligibility (automatic free meals)
+    if school_meal_categorically_eligible or school_meal_cep_eligible then
+      return "free"
+
+    # Step 2: Check income eligibility for free meals (<=130% FPL)
+    if school_meal_income_eligible_free then
+      return "free"
+
+    # Step 3: Check income eligibility for reduced-price meals (130-185% FPL)
+    if school_meal_income_eligible_reduced then
+      return "reduced"
+
+    # Step 4: Above 185% FPL - paid meals
+    return "paid"
+  }
+}
+
+# Boolean helpers for specific eligibility checks
+variable school_meal_eligible_free {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    return school_meal_eligibility_tier == "free"
+  }
+}
+
+variable school_meal_eligible_reduced {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    return school_meal_eligibility_tier == "reduced"
+  }
+}
+
+variable school_meal_eligible_free_or_reduced {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    let tier = school_meal_eligibility_tier
+    return tier == "free" or tier == "reduced"
+  }
+}

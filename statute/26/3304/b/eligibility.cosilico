@@ -1,0 +1,436 @@
+# 26 USC 3304(a)(4)-(7) - Unemployment Insurance Eligibility
+#
+# Federal requirements for individual eligibility to receive UI benefits.
+# States must meet these minimum standards for their UI laws to be approved.
+#
+# Key sections:
+# (a)(4): Experience rating requirements
+# (a)(5): Eligibility conditions (able/available, separation reasons)
+# (a)(6): Denial for refusal of suitable work
+# (a)(7): Weekly benefit amount and waiting period
+
+module statute.26.3304.b
+version "2024.1"
+
+references {
+  # Federal parameters
+  waiting_period_weeks: statute/26/3304/parameters/waiting_period_weeks
+  extended_benefits_weeks: statute/26/3304/parameters/extended_benefits_weeks
+
+  # State-specific parameters (resolved at runtime)
+  state_minimum_base_period_wages: state_parameters/minimum_base_period_wages
+  state_high_quarter_multiplier: state_parameters/high_quarter_multiplier
+  state_wba_fraction: state_parameters/wba_fraction
+  state_maximum_wba: state_parameters/maximum_wba
+  state_maximum_weeks: state_parameters/maximum_weeks
+}
+
+# =============================================================================
+# MONETARY ELIGIBILITY (26 USC 3304(a)(5))
+# Based on wages earned during "base period"
+# =============================================================================
+
+variable ui_base_period_wages {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Base period wages for UI"
+  description "Total wages in base period (first 4 of last 5 completed quarters)"
+  reference "26 USC 3304(a)(5)"
+
+  formula {
+    # Standard base period: first 4 of last 5 completed calendar quarters
+    # States may also offer "alternate base period" using most recent 4 quarters
+    # This calculation would typically use quarterly wage data
+    return base_period_wages
+  }
+
+  default 0
+}
+
+variable ui_high_quarter_wages {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Highest quarter wages"
+  description "Wages in highest-earning quarter of base period"
+  reference "26 USC 3304(a)(5)"
+
+  formula {
+    return high_quarter_wages
+  }
+
+  default 0
+}
+
+variable ui_monetarily_eligible {
+  entity Person
+  period Week
+  dtype Boolean
+  label "UI monetary eligibility"
+  description "Meets minimum wage requirements for UI per federal and state law"
+  reference "26 USC 3304(a)(5)"
+
+  formula {
+    # Federal requirement: must have sufficient wages in base period
+    # Specific thresholds set by state law
+    # Common patterns:
+    # - Minimum base period wages (e.g., $1,300 in CA)
+    # - High quarter times multiplier (e.g., 1.25x HQW in CA)
+    # - Wages in multiple quarters
+
+    let bp_wages = ui_base_period_wages
+    let hq_wages = ui_high_quarter_wages
+    let min_wages = state_minimum_base_period_wages
+    let hq_multiplier = state_high_quarter_multiplier
+
+    # Must meet both minimums
+    let meets_minimum = bp_wages >= min_wages
+    let meets_hq_test = bp_wages >= hq_wages * hq_multiplier
+
+    return meets_minimum and meets_hq_test
+  }
+
+  default false
+}
+
+# =============================================================================
+# NON-MONETARY ELIGIBILITY (26 USC 3304(a)(5)(A))
+# "Able to work, available for work, and actively seeking work"
+# =============================================================================
+
+variable ui_able_to_work {
+  entity Person
+  period Week
+  dtype Boolean
+  label "Able to work"
+  description "Physically and mentally able to work per 26 USC 3304(a)(5)(A)"
+  reference "26 USC 3304(a)(5)(A)"
+
+  formula {
+    # Claimant must be able to perform work
+    # Temporary illness may affect this
+    return is_able_to_work
+  }
+
+  default true
+}
+
+variable ui_available_for_work {
+  entity Person
+  period Week
+  dtype Boolean
+  label "Available for work"
+  description "Ready and willing to accept suitable work per 26 USC 3304(a)(5)(A)"
+  reference "26 USC 3304(a)(5)(A)"
+
+  formula {
+    # Must be available for full-time or part-time work
+    # Cannot have conditions that would prevent accepting work
+    return is_available_for_work
+  }
+
+  default true
+}
+
+variable ui_actively_seeking_work {
+  entity Person
+  period Week
+  dtype Boolean
+  label "Actively seeking work"
+  description "Making reasonable efforts to find work"
+  reference "26 USC 3304(a)(5)(A)"
+
+  formula {
+    # Most states require active work search
+    # Typically 2-3 employer contacts per week
+    return is_actively_seeking_work
+  }
+
+  default true
+}
+
+variable ui_nonmonetarily_eligible {
+  entity Person
+  period Week
+  dtype Boolean
+  label "UI non-monetary eligibility"
+  description "Meets able/available/seeking requirements per 26 USC 3304(a)(5)(A)"
+  reference "26 USC 3304(a)(5)(A)"
+
+  formula {
+    return ui_able_to_work and ui_available_for_work and ui_actively_seeking_work
+  }
+
+  default false
+}
+
+# =============================================================================
+# SEPARATION ELIGIBILITY (26 USC 3304(a)(5))
+# Reason for unemployment affects eligibility
+# =============================================================================
+
+variable ui_separation_eligible {
+  entity Person
+  period Week
+  dtype Boolean
+  label "UI separation eligibility"
+  description "Job separation does not disqualify from UI per 26 USC 3304(a)(5)"
+  reference "26 USC 3304(a)(5)(A)"
+
+  formula {
+    # Federal law allows states to disqualify for:
+    # - Voluntary quit without good cause
+    # - Discharge for misconduct
+    # - Refusal of suitable work
+
+    let reason = separation_reason
+
+    if reason == "layoff" then
+      return true
+    elif reason == "reduction_in_force" then
+      return true
+    elif reason == "employer_closure" then
+      return true
+    elif reason == "voluntary_quit" then
+      # Good cause quit may be eligible
+      return voluntary_quit_good_cause
+    elif reason == "misconduct" then
+      # Misconduct disqualifies
+      return false
+    elif reason == "gross_misconduct" then
+      # Gross misconduct = total disqualification
+      return false
+    else
+      # Default: review required
+      return false
+  }
+
+  default false
+}
+
+# =============================================================================
+# COMBINED ELIGIBILITY
+# =============================================================================
+
+variable ui_eligible {
+  entity Person
+  period Week
+  dtype Boolean
+  label "UI eligibility"
+  description "Eligible to receive unemployment insurance benefits"
+  reference (
+    "26 USC 3304(a)(5)",
+    "26 USC 3304(a)(6)"
+  )
+
+  formula {
+    return (
+      ui_monetarily_eligible and
+      ui_nonmonetarily_eligible and
+      ui_separation_eligible
+    )
+  }
+
+  default false
+}
+
+# =============================================================================
+# WEEKLY BENEFIT AMOUNT (26 USC 3304(a)(7))
+# =============================================================================
+
+variable ui_weekly_benefit_amount {
+  entity Person
+  period Week
+  dtype Money
+  unit "USD"
+  label "Weekly benefit amount"
+  description "Weekly UI benefit based on prior wages"
+  reference "26 USC 3304(a)(7)"
+
+  formula {
+    # State-specific formulas; common patterns:
+    # - 1/23 to 1/26 of high quarter wages
+    # - Percentage of average weekly wage
+    # - Wage table lookup
+
+    if not ui_eligible then
+      return 0
+
+    let hq_wages = ui_high_quarter_wages
+    let calculated = hq_wages * state_wba_fraction
+    let maximum = state_maximum_wba
+
+    return min(calculated, maximum)
+  }
+
+  default 0
+}
+
+variable ui_maximum_benefit_amount {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Maximum benefit amount"
+  description "Total UI benefits available in benefit year"
+  reference "26 USC 3304(a)(7)"
+
+  formula {
+    let wba = ui_weekly_benefit_amount
+    let max_weeks = state_maximum_weeks
+
+    # Some states also cap at percentage of base period wages
+    let weeks_based = wba * max_weeks
+    let wage_based = ui_base_period_wages * 0.5  # Common: 50% of BP wages
+
+    return min(weeks_based, wage_based)
+  }
+
+  default 0
+}
+
+# =============================================================================
+# WAITING WEEK (26 USC 3304(a)(7)(A))
+# =============================================================================
+
+variable ui_waiting_week {
+  entity Person
+  period Week
+  dtype Boolean
+  label "UI waiting week"
+  description "Currently in unpaid waiting period per 26 USC 3304(a)(7)(A)"
+  reference "26 USC 3304(a)(7)(A)"
+
+  formula {
+    # First week is typically unpaid waiting week
+    let week_num = current_week_number
+    let waiting_weeks = waiting_period_weeks  # Usually 1
+
+    return week_num <= waiting_weeks
+  }
+
+  default false
+}
+
+variable ui_maximum_weeks {
+  entity Person
+  period Year
+  dtype Integer
+  label "Maximum benefit weeks"
+  description "Maximum weeks of UI benefits available"
+  reference "26 USC 3304(a)(7)"
+
+  formula {
+    # Standard: 26 weeks in most states
+    # Some states vary by wages or unemployment rate
+    return state_maximum_weeks
+  }
+
+  default 26
+}
+
+variable ui_weeks_remaining {
+  entity Person
+  period Week
+  dtype Integer
+  label "Benefit weeks remaining"
+  description "Weeks of UI benefits still available"
+
+  formula {
+    let max_weeks = ui_maximum_weeks
+    let used_weeks = weeks_claimed
+
+    return max(0, max_weeks - used_weeks)
+  }
+
+  default 26
+}
+
+# =============================================================================
+# CURRENT PAYMENT
+# =============================================================================
+
+variable ui_current_weekly_payment {
+  entity Person
+  period Week
+  dtype Money
+  unit "USD"
+  label "Current week UI payment"
+  description "UI payment for current week after waiting period and deductions"
+
+  formula {
+    if not ui_eligible then
+      return 0
+
+    if ui_waiting_week then
+      return 0
+
+    if ui_weeks_remaining <= 0 then
+      return 0
+
+    let wba = ui_weekly_benefit_amount
+    let earnings = current_week_earnings
+
+    # Earnings offset (varies by state)
+    # Common: can earn 25-50% of WBA before reduction
+    let earnings_disregard = wba * 0.25
+    let excess_earnings = max(0, earnings - earnings_disregard)
+    let reduction = excess_earnings
+
+    return max(0, wba - reduction)
+  }
+
+  default 0
+}
+
+# =============================================================================
+# EXTENDED BENEFITS (26 USC 3304(a)(11))
+# =============================================================================
+
+variable ui_extended_benefits_eligible {
+  entity Person
+  period Week
+  dtype Boolean
+  label "Extended benefits eligibility"
+  description "Eligible for extended benefits per 26 USC 3304(a)(11)"
+  reference "26 USC 3304(a)(11)"
+
+  formula {
+    # Extended benefits triggered when:
+    # - State IUR >= 5% and >= 120% of prior 2 years, OR
+    # - State TUR >= 6.5% (optional trigger)
+
+    let regular_exhausted = ui_weeks_remaining <= 0 and weeks_claimed >= 26
+    let eb_active = state_extended_benefits_active
+
+    return regular_exhausted and eb_active
+  }
+
+  default false
+}
+
+variable ui_extended_benefits_weeks {
+  entity Person
+  period Year
+  dtype Integer
+  label "Extended benefits weeks"
+  description "Additional weeks available under extended benefits"
+  reference "26 USC 3304(a)(11)"
+
+  formula {
+    if not ui_extended_benefits_eligible then
+      return 0
+
+    # Standard: 13 weeks
+    # High unemployment: 20 weeks
+    if state_high_unemployment_period then
+      return extended_benefits_high_unemployment_weeks
+    else
+      return extended_benefits_weeks
+  }
+
+  default 0
+}
