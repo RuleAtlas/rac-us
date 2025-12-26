@@ -14,17 +14,20 @@ jobs:
       - name: Checkout cosilico-us
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate .rac schema
+        run: python3 scripts/validate_schema.py
+
       - name: Checkout cosilico-validators
         uses: actions/checkout@v4
         with:
           repository: CosilicoAI/cosilico-validators
           path: validators
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
 
       - name: Install validators
         run: |
