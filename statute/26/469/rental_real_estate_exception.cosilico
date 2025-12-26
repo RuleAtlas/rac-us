@@ -1,0 +1,221 @@
+# 26 USC Section 469(i) - Rental Real Estate Exception ($25,000 Offset)
+#
+# "(i) $25,000 offset for rental real estate activities.--
+#  (1) In general.--In the case of any natural person, subsection (a) shall not
+#      apply to that portion of the passive activity loss or the deduction
+#      equivalent (within the meaning of subsection (j)(5)) of the passive activity
+#      credit, for any taxable year which is attributable to all rental real estate
+#      activities with respect to which such person actively participated in such
+#      taxable year (and if any portion of such loss or credit arose in another
+#      taxable year, in such other taxable year).
+#
+#  (2) Dollar limitation.--The aggregate amount to which paragraph (1) applies
+#      for any taxable year shall not exceed $25,000.
+#
+#  (3) Phase-out of exemption.--
+#   (A) In general.--In the case of any taxpayer, the $25,000 amount under
+#       paragraph (2) shall be reduced (but not below zero) by 50 percent of
+#       the amount by which the adjusted gross income of the taxpayer for the
+#       taxable year exceeds $100,000.
+#
+#   (B) Special phase-out of rehabilitation credit.--In the case of any portion
+#       of the passive activity credit for any taxable year which is attributable
+#       to the rehabilitation credit... the preceding sentence shall be applied
+#       by substituting '$200,000' for '$100,000'."
+
+imports:
+  # AGI for phaseout calculation
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  # Filing status for determining thresholds
+  filing_status: statute/26/1/filing_status
+
+  # Inputs for rental real estate activities
+  rental_real_estate_loss: inputs/rental_real_estate_loss
+  rental_real_estate_income: inputs/rental_real_estate_income
+  actively_participates_in_rental: inputs/actively_participates_in_rental_real_estate
+  lived_apart_from_spouse_all_year: inputs/lived_apart_from_spouse_all_year
+
+  # Real estate professional status (Section 469(c)(7))
+  is_real_estate_professional: statute/26/469/real_estate_professional#is_real_estate_professional
+
+  # Parameters
+  allowance_amount: parameters#rental_real_estate.allowance_amount
+  allowance_amount_mfs: parameters#rental_real_estate.allowance_amount_mfs
+  phaseout_start: parameters#rental_real_estate.phaseout_start
+  phaseout_start_mfs: parameters#rental_real_estate.phaseout_start_mfs
+  phaseout_rate: parameters#rental_real_estate.phaseout_rate
+
+# =============================================================================
+# Net Rental Real Estate Loss - For Exception Calculation
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Net Rental Real Estate Loss"
+description "Losses from rental real estate activities exceeding income per 26 USC 469(i)"
+
+formula:
+  return max(0, rental_real_estate_loss - rental_real_estate_income)
+
+default 0
+
+# =============================================================================
+# Active Participation Status - Section 469(i)(6)
+# =============================================================================
+# Note: "Active participation" is a LOWER standard than "material participation"
+# Per 469(i)(6)(A): Active participation includes making management decisions
+# such as approving tenants, rental terms, capital expenditures, etc.
+# A 10% or greater ownership interest is required.
+#
+# This is different from the "material participation" test in 469(h).
+# Active participation is sufficient for the $25,000 rental exception.
+
+entity TaxUnit
+period Year
+dtype Boolean
+unit ""
+label "Actively Participates in Rental Real Estate"
+description "Whether taxpayer actively participates in rental real estate per 26 USC 469(i)(6)"
+
+input {
+# Active participation is a lower standard than material participation
+# Requires:
+# 1. 10% or greater ownership interest
+# 2. Making management decisions (approving tenants, rental terms, repairs, etc.)
+# OR substantially all services performed by unrelated parties
+
+default false
+
+# =============================================================================
+# Applicable Allowance Amount - Depends on Filing Status
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Base Rental Real Estate Allowance"
+description "Base $25,000 allowance amount before phaseout per 26 USC 469(i)(2)"
+
+formula:
+  # Per 469(i)(5)(A): MFS living together gets $0
+  # Per 469(i)(5)(B): MFS living apart gets $12,500
+  # All others get $25,000
+
+  is_mfs = filing_status == "married_separate"
+  lived_apart = lived_apart_from_spouse_all_year
+
+  return if is_mfs then
+    if lived_apart then
+      allowance_amount_mfs  # $12,500
+    else
+      0  # MFS living together - no allowance
+  else
+    allowance_amount  # $25,000
+
+default 0
+
+# =============================================================================
+# Phaseout Threshold - Depends on Filing Status
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Rental Real Estate Phaseout Threshold"
+description "Modified AGI threshold where phaseout begins per 26 USC 469(i)(3)"
+
+formula:
+  # Per 469(i)(5)(B): MFS living apart uses $50,000 threshold
+  # All others (including MFS living together, who get $0 anyway) use $100,000
+
+  is_mfs = filing_status == "married_separate"
+  lived_apart = lived_apart_from_spouse_all_year
+
+  return if is_mfs and lived_apart then
+    phaseout_start_mfs  # $50,000
+  else
+    phaseout_start  # $100,000
+
+default 100000
+
+# =============================================================================
+# Phaseout Reduction - Section 469(i)(3)(A)
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Rental Real Estate Allowance Phaseout"
+description "Reduction in allowance due to AGI phaseout per 26 USC 469(i)(3)"
+
+formula:
+  # Per 469(i)(3)(A): Reduce by 50% of AGI over threshold
+  excess_agi = max(0, adjusted_gross_income - rental_real_estate_phaseout_threshold)
+  return excess_agi * phaseout_rate
+
+default 0
+
+# =============================================================================
+# Allowance After Phaseout - Section 469(i)(2) and (3)
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Rental Real Estate Allowance After Phaseout"
+description "Allowance remaining after AGI-based phaseout per 26 USC 469(i)"
+
+formula:
+  return max(0, base_rental_real_estate_allowance - rental_real_estate_allowance_phaseout)
+
+default 0
+
+# =============================================================================
+# Final Rental Real Estate Loss Allowance
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Rental Real Estate Loss Allowance"
+description "Amount of rental real estate loss allowed against non-passive income per 26 USC 469(i)"
+
+formula:
+  # Requirements per 469(i):
+  # 1. Natural person (not corporation, trust, or estate - simplified here)
+  # 2. Active participation in rental real estate
+
+  # Real estate professionals are not subject to passive loss rules for rentals
+  # Per 469(c)(7): Their rental activities are treated as non-passive
+  # So they can deduct unlimited rental losses (no need for this exception)
+  if is_real_estate_professional then
+    # Real estate professionals can deduct full rental losses
+    # The passive activity rules do not apply to their rental activities
+    return net_rental_real_estate_loss
+  else if actively_participates_in_rental then
+    # Active participants get up to $25,000 (or $12,500 MFS) after phaseout
+    allowance = rental_real_estate_allowance_after_phaseout
+    # Limited to actual net loss
+    return min(net_rental_real_estate_loss, allowance)
+  else
+    # No active participation - no exception, passive loss rules apply fully
+    return 0
+
+default 0
+
+# =============================================================================
+# Disallowed Rental Real Estate Loss
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Disallowed Rental Real Estate Loss"
+description "Rental real estate loss that is suspended per 26 USC 469(a)"
+
+formula:
+  # Loss that cannot be deducted this year - carries forward
+  return max(0, net_rental_real_estate_loss - rental_real_estate_loss_allowance)
+
+default 0

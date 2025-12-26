@@ -1,0 +1,640 @@
+# 26 USC Section 121 - Exclusion of Gain from Sale of Principal Residence - Test Cases
+#
+# Comprehensive tests for:
+# - Basic exclusion amounts ($250,000 single, $500,000 joint)
+# - Ownership and use requirements (2 out of 5 years)
+# - Frequency limitation (once every 2 years)
+# - Reduced exclusion for unforeseen circumstances
+# - Special rules for joint returns
+# - Depreciation recapture
+#
+# Sources:
+# - IRS Publication 523: Selling Your Home
+# - 26 USC Section 121 and Reg. Section 1.121-1 through 1.121-5
+# - Rev. Proc. 2005-14 (safe harbors for unforeseen circumstances)
+
+metadata:
+  module: statute.26.121
+  description: Principal residence gain exclusion test cases
+  maintainer: cosilico-team
+  tags: [home-sale, exclusion, principal-residence]
+
+# =============================================================================
+# Section 121(a) - Basic Exclusion Rule
+# =============================================================================
+
+tests:
+  - name: "Single filer - gain under limit, full exclusion"
+    description: "All requirements met, gain fully excluded"
+    reference: "26 USC Section 121(a), 121(b)(1)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 150000
+        years_owned: 3.5
+        years_used_as_residence: 3.5
+        prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      meets_ownership_test: true
+      meets_use_test: true
+      meets_frequency_test: true
+      meets_full_requirements: true
+      applicable_exclusion_limit: 250000
+      principal_residence_gain_exclusion: 150000
+      taxable_gain: 0
+
+  - name: "Single filer - gain exceeds limit"
+    description: "Gain exceeds $250,000 limit"
+    reference: "26 USC Section 121(b)(1)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 350000
+        years_owned: 4
+        years_used_as_residence: 4
+        prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      meets_full_requirements: true
+      applicable_exclusion_limit: 250000
+      principal_residence_gain_exclusion: 250000
+      taxable_gain: 100000
+
+  - name: "Single filer - large gain from longtime home"
+    description: "Significant appreciation over many years"
+    reference: "26 USC Section 121(b)(1)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 800000
+        years_owned: 25
+        years_used_as_residence: 25
+        prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      principal_residence_gain_exclusion: 250000
+      taxable_gain: 550000
+
+  - name: "Head of household - same limit as single"
+    description: "HOH uses $250,000 limit"
+    reference: "26 USC Section 121(b)(1)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: head_of_household
+        realized_gain_on_residence: 200000
+        years_owned: 3
+        years_used_as_residence: 3
+        prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      applicable_exclusion_limit: 250000
+      principal_residence_gain_exclusion: 200000
+
+# =============================================================================
+# Section 121(b)(2) - Joint Return Rules
+# =============================================================================
+
+  - name: "Joint filers - full $500,000 exclusion"
+    description: "Both spouses meet all requirements"
+    reference: "26 USC Section 121(b)(2)(A)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: married_filing_jointly
+        realized_gain_on_residence: 400000
+        years_owned: 5
+        years_used_as_residence: 5
+        spouse_meets_use_test: true
+        prior_exclusion_claimed: false
+        spouse_prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      qualifies_for_joint_limit: true
+      applicable_exclusion_limit: 500000
+      principal_residence_gain_exclusion: 400000
+      taxable_gain: 0
+
+  - name: "Joint filers - gain exceeds $500,000"
+    description: "Large gain partially taxable"
+    reference: "26 USC Section 121(b)(2)(A)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: married_filing_jointly
+        realized_gain_on_residence: 750000
+        years_owned: 10
+        years_used_as_residence: 10
+        spouse_meets_use_test: true
+        prior_exclusion_claimed: false
+        spouse_prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      qualifies_for_joint_limit: true
+      applicable_exclusion_limit: 500000
+      principal_residence_gain_exclusion: 500000
+      taxable_gain: 250000
+
+  - name: "Joint filers - only one spouse meets use test"
+    description: "Limited to $250,000 when only one spouse qualifies"
+    reference: "26 USC Section 121(b)(2)(A)(ii)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: married_filing_jointly
+        realized_gain_on_residence: 300000
+        years_owned: 5
+        years_used_as_residence: 3
+        spouse_meets_use_test: false  # Spouse did not live there 2+ years
+        prior_exclusion_claimed: false
+        spouse_prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      qualifies_for_joint_limit: false
+      applicable_exclusion_limit: 250000
+      principal_residence_gain_exclusion: 250000
+      taxable_gain: 50000
+
+  - name: "Joint filers - one spouse used exclusion recently"
+    description: "Limited to $250,000 when one spouse used exclusion in prior 2 years"
+    reference: "26 USC Section 121(b)(2)(A)(iii)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: married_filing_jointly
+        realized_gain_on_residence: 400000
+        years_owned: 4
+        years_used_as_residence: 4
+        spouse_meets_use_test: true
+        prior_exclusion_claimed: false
+        spouse_prior_exclusion_claimed: true  # Spouse claimed in prior 2 years
+        depreciation_after_1997: 0
+    expected:
+      qualifies_for_joint_limit: false
+      applicable_exclusion_limit: 250000
+      principal_residence_gain_exclusion: 250000
+
+  - name: "Married filing separately"
+    description: "MFS gets $250,000 limit per spouse"
+    reference: "26 USC Section 121(b)(1)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: married_filing_separately
+        realized_gain_on_residence: 200000
+        years_owned: 3
+        years_used_as_residence: 3
+        prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      qualifies_for_joint_limit: false
+      applicable_exclusion_limit: 250000
+      principal_residence_gain_exclusion: 200000
+
+# =============================================================================
+# Section 121(b)(3) - Ownership and Use Requirements
+# =============================================================================
+
+  - name: "Ownership test not met - owned less than 2 years"
+    description: "Sold after 18 months of ownership"
+    reference: "26 USC Section 121(a)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 80000
+        years_owned: 1.5
+        years_used_as_residence: 1.5
+        prior_exclusion_claimed: false
+        qualifies_for_reduced_exclusion: false  # No unforeseen circumstances
+        depreciation_after_1997: 0
+    expected:
+      meets_ownership_test: false
+      meets_full_requirements: false
+      principal_residence_gain_exclusion: 0
+      taxable_gain: 80000
+
+  - name: "Use test not met - rental property converted"
+    description: "Owned 3 years but lived there only 1 year"
+    reference: "26 USC Section 121(a)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 100000
+        years_owned: 3
+        years_used_as_residence: 1  # Was rental for 2 years
+        prior_exclusion_claimed: false
+        qualifies_for_reduced_exclusion: false
+        depreciation_after_1997: 0
+    expected:
+      meets_ownership_test: true
+      meets_use_test: false
+      meets_full_requirements: false
+      principal_residence_gain_exclusion: 0
+
+  - name: "Exactly 2 years - meets requirements"
+    description: "Boundary case at exactly 2 years"
+    reference: "26 USC Section 121(a)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 100000
+        years_owned: 2.0
+        years_used_as_residence: 2.0
+        prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      meets_ownership_test: true
+      meets_use_test: true
+      meets_full_requirements: true
+      principal_residence_gain_exclusion: 100000
+
+  - name: "Just under 2 years - fails requirements"
+    description: "Boundary case at 1.99 years"
+    reference: "26 USC Section 121(a)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 100000
+        years_owned: 1.99
+        years_used_as_residence: 1.99
+        prior_exclusion_claimed: false
+        qualifies_for_reduced_exclusion: false
+        depreciation_after_1997: 0
+    expected:
+      meets_ownership_test: false
+      meets_full_requirements: false
+      principal_residence_gain_exclusion: 0
+
+# =============================================================================
+# Section 121(b)(3) - Frequency Limitation
+# =============================================================================
+
+  - name: "Exclusion claimed within prior 2 years - ineligible"
+    description: "Cannot claim again within 2-year window"
+    reference: "26 USC Section 121(b)(3)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 150000
+        years_owned: 3
+        years_used_as_residence: 3
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 1.5  # Only 18 months ago
+        qualifies_for_reduced_exclusion: false
+        depreciation_after_1997: 0
+    expected:
+      meets_frequency_test: false
+      meets_full_requirements: false
+      principal_residence_gain_exclusion: 0
+
+  - name: "Prior exclusion exactly 2 years ago - eligible"
+    description: "Exactly 2 years since prior exclusion"
+    reference: "26 USC Section 121(b)(3)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 180000
+        years_owned: 2.5
+        years_used_as_residence: 2.5
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 2.0
+        depreciation_after_1997: 0
+    expected:
+      meets_frequency_test: true
+      meets_full_requirements: true
+      principal_residence_gain_exclusion: 180000
+
+  - name: "Prior exclusion 3 years ago - eligible"
+    description: "More than 2 years since prior exclusion"
+    reference: "26 USC Section 121(b)(3)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 200000
+        years_owned: 4
+        years_used_as_residence: 4
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 3
+        depreciation_after_1997: 0
+    expected:
+      meets_frequency_test: true
+      meets_full_requirements: true
+      principal_residence_gain_exclusion: 200000
+
+# =============================================================================
+# Section 121(c) - Reduced Exclusion (Unforeseen Circumstances)
+# =============================================================================
+
+  - name: "Reduced exclusion - job relocation after 1 year"
+    description: "50% of limit available for 1 year of ownership/use"
+    reference: "26 USC Section 121(c)(2)(A)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 100000
+        years_owned: 1.0
+        years_used_as_residence: 1.0
+        prior_exclusion_claimed: false
+        qualifies_for_reduced_exclusion: true  # Job relocation
+        depreciation_after_1997: 0
+    expected:
+      meets_full_requirements: false
+      reduced_exclusion_fraction: 0.50  # 1 year / 2 years required
+      applicable_exclusion_limit: 125000  # 50% of $250,000
+      principal_residence_gain_exclusion: 100000  # Gain is under reduced limit
+
+  - name: "Reduced exclusion - health reasons after 6 months"
+    description: "25% of limit available for 6 months"
+    reference: "26 USC Section 121(c)(2)(B)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 80000
+        years_owned: 0.5
+        years_used_as_residence: 0.5
+        prior_exclusion_claimed: false
+        qualifies_for_reduced_exclusion: true  # Health reasons
+        depreciation_after_1997: 0
+    expected:
+      reduced_exclusion_fraction: 0.25  # 0.5 years / 2 years
+      applicable_exclusion_limit: 62500  # 25% of $250,000
+      principal_residence_gain_exclusion: 62500  # Limited to reduced limit
+
+  - name: "Reduced exclusion - divorce after 18 months"
+    description: "Unforeseen circumstance - divorce"
+    reference: "26 USC Section 121(c)(2)(C), Rev. Proc. 2005-14"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 120000
+        years_owned: 1.5
+        years_used_as_residence: 1.5
+        prior_exclusion_claimed: false
+        qualifies_for_reduced_exclusion: true  # Divorce
+        depreciation_after_1997: 0
+    expected:
+      reduced_exclusion_fraction: 0.75  # 1.5 / 2
+      applicable_exclusion_limit: 187500  # 75% of $250,000
+      principal_residence_gain_exclusion: 120000
+
+  - name: "Reduced exclusion - MFJ with unforeseen circumstances"
+    description: "Joint filers with 1 year of residence due to job"
+    reference: "26 USC Section 121(c)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: married_filing_jointly
+        realized_gain_on_residence: 200000
+        years_owned: 1.0
+        years_used_as_residence: 1.0
+        spouse_meets_use_test: true
+        prior_exclusion_claimed: false
+        spouse_prior_exclusion_claimed: false
+        qualifies_for_reduced_exclusion: true
+        depreciation_after_1997: 0
+    expected:
+      reduced_exclusion_fraction: 0.50
+      applicable_exclusion_limit: 250000  # 50% of $500,000
+      principal_residence_gain_exclusion: 200000
+
+  - name: "No reduced exclusion without qualifying event"
+    description: "Early sale without unforeseen circumstances"
+    reference: "26 USC Section 121(c)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 100000
+        years_owned: 1.0
+        years_used_as_residence: 1.0
+        prior_exclusion_claimed: false
+        qualifies_for_reduced_exclusion: false  # No qualifying event
+        depreciation_after_1997: 0
+    expected:
+      reduced_exclusion_fraction: 0
+      applicable_exclusion_limit: 0
+      principal_residence_gain_exclusion: 0
+
+# =============================================================================
+# Section 121(d)(6) - Depreciation Recapture
+# =============================================================================
+
+  - name: "Home office depreciation recapture"
+    description: "Depreciation after May 6, 1997 not excludable"
+    reference: "26 USC Section 121(d)(6)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 280000
+        years_owned: 5
+        years_used_as_residence: 5
+        prior_exclusion_claimed: false
+        depreciation_after_1997: 30000  # Home office depreciation
+    expected:
+      excludable_gain: 250000  # 280000 - 30000
+      principal_residence_gain_exclusion: 250000
+      depreciation_recapture: 30000  # Taxed at 25% rate per Section 1(h)(6)
+
+  - name: "Rental conversion with significant depreciation"
+    description: "Former rental with depreciation recapture"
+    reference: "26 USC Section 121(d)(6)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: married_filing_jointly
+        realized_gain_on_residence: 600000
+        years_owned: 15
+        years_used_as_residence: 10  # 5 years rental, 10 years residence
+        spouse_meets_use_test: true
+        prior_exclusion_claimed: false
+        spouse_prior_exclusion_claimed: false
+        depreciation_after_1997: 100000  # Depreciation from rental period
+    expected:
+      excludable_gain: 500000  # 600000 - 100000
+      principal_residence_gain_exclusion: 500000
+      depreciation_recapture: 100000
+
+  - name: "No depreciation - full exclusion available"
+    description: "Pure residence with no business use"
+    reference: "26 USC Section 121(a)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 200000
+        years_owned: 8
+        years_used_as_residence: 8
+        prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      excludable_gain: 200000
+      principal_residence_gain_exclusion: 200000
+
+# =============================================================================
+# Edge Cases and Special Scenarios
+# =============================================================================
+
+  - name: "No gain on sale"
+    description: "Sale at loss or break-even"
+    reference: "26 USC Section 121"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 0  # Break-even sale
+        years_owned: 5
+        years_used_as_residence: 5
+        prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      principal_residence_gain_exclusion: 0
+      taxable_gain: 0
+
+  - name: "Loss on sale"
+    description: "Losses on personal residence are not deductible"
+    reference: "26 USC Section 165(c)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: -50000  # Loss
+        years_owned: 4
+        years_used_as_residence: 4
+        prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      principal_residence_gain_exclusion: 0
+      taxable_gain: 0  # Loss not deductible for personal residence
+    notes: |
+      Losses on sale of personal residence are not deductible under Section 165.
+      The exclusion only applies to gains. This test verifies the formula handles
+      negative/zero gain correctly.
+
+  - name: "Very long ownership - still limited to $250k"
+    description: "40 years of appreciation"
+    reference: "26 USC Section 121(b)(1)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 1500000
+        years_owned: 40
+        years_used_as_residence: 40
+        prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      principal_residence_gain_exclusion: 250000
+      taxable_gain: 1250000
+
+  - name: "Small gain - fully excluded"
+    description: "Modest gain well under limit"
+    reference: "26 USC Section 121(a)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 25000
+        years_owned: 3
+        years_used_as_residence: 3
+        prior_exclusion_claimed: false
+        depreciation_after_1997: 0
+    expected:
+      principal_residence_gain_exclusion: 25000
+      taxable_gain: 0
+
+# =============================================================================
+# Combined Scenarios
+# =============================================================================
+
+  - name: "Joint filers - one spouse only, depreciation recapture"
+    description: "Complex scenario with multiple limitations"
+    reference: "26 USC Section 121(b)(2), 121(d)(6)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: married_filing_jointly
+        realized_gain_on_residence: 400000
+        years_owned: 5
+        years_used_as_residence: 4
+        spouse_meets_use_test: false  # Spouse doesn't qualify
+        prior_exclusion_claimed: false
+        spouse_prior_exclusion_claimed: false
+        depreciation_after_1997: 50000
+    expected:
+      qualifies_for_joint_limit: false  # Only one spouse meets use
+      excludable_gain: 350000  # 400000 - 50000 depreciation
+      applicable_exclusion_limit: 250000  # Single limit applies
+      principal_residence_gain_exclusion: 250000
+      taxable_gain: 100000  # (350000 - 250000) + 50000 depreciation at 25%
+
+  - name: "Reduced exclusion with frequency limitation"
+    description: "Both time and frequency reduce exclusion"
+    reference: "26 USC Section 121(c)"
+    period: 2024
+    input:
+      tax_unit:
+        filing_status: single
+        realized_gain_on_residence: 80000
+        years_owned: 1.5
+        years_used_as_residence: 1.5
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 1.0  # Only 1 year since last exclusion
+        qualifies_for_reduced_exclusion: true  # Unforeseen circumstances
+        depreciation_after_1997: 0
+    expected:
+      # min(1.5/2 ownership, 1.5/2 use, 1.0/2 frequency) = 0.50
+      reduced_exclusion_fraction: 0.50
+      applicable_exclusion_limit: 125000
+      principal_residence_gain_exclusion: 80000
+
+# =============================================================================
+# Property-Based Tests
+# =============================================================================
+
+properties:
+  - name: "Exclusion cannot exceed gain"
+    description: "Exclusion is bounded by actual gain"
+    for_all:
+      variables: [principal_residence_gain_exclusion, realized_gain_on_residence]
+      where:
+        realized_gain_on_residence: "> 0"
+      constraint: principal_residence_gain_exclusion <= realized_gain_on_residence
+
+  - name: "Exclusion cannot exceed limit"
+    description: "Exclusion is bounded by applicable limit"
+    for_all:
+      variables: [principal_residence_gain_exclusion, applicable_exclusion_limit]
+      constraint: principal_residence_gain_exclusion <= applicable_exclusion_limit
+
+  - name: "Exclusion is non-negative"
+    description: "Exclusion cannot be negative"
+    for_all:
+      variables: [principal_residence_gain_exclusion]
+      constraint: principal_residence_gain_exclusion >= 0
+
+  - name: "Joint limit greater than single limit"
+    description: "$500,000 > $250,000"
+    for_all:
+      variables: [single_exclusion_limit, joint_exclusion_limit]
+      constraint: joint_exclusion_limit > single_exclusion_limit
+
+  - name: "Reduced fraction between 0 and 1"
+    description: "Fraction must be valid"
+    for_all:
+      variables: [reduced_exclusion_fraction]
+      constraint: 0 <= reduced_exclusion_fraction <= 1

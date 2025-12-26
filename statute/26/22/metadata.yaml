@@ -1,0 +1,139 @@
+# Encoding Metadata for 26 USC Section 22 (Credit for the Elderly and the Disabled)
+
+encoding:
+  created: 2024-12-26
+  updated: 2024-12-26
+  status: implemented
+  encoded_by: claude-opus-4.5
+
+variable:
+  name: elderly_disabled_credit
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+
+coverage:
+  tax_years: [1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  notes: |
+    Credit for the Elderly and the Disabled enacted in 1984.
+    Parameters have NOT been indexed for inflation since enactment:
+    - Initial amounts: $5,000 single, $7,500 joint (both qualified), $3,750 MFS
+    - AGI thresholds: $7,500 single/HoH, $10,000 joint, $5,000 MFS
+    - Credit rate: 15%
+
+sources:
+  statute:
+    - citation: "26 USC Section 22"
+      title: "Credit for the elderly and the disabled"
+      path: statute/26/22/
+      files:
+        - a/elderly_disabled_credit.cosilico  # Main credit calculation
+        - a/inputs.cosilico                   # Input variables
+        - b/applicable_percentage.yaml        # 15% credit rate
+        - c/initial_amount.cosilico           # Initial section 22 amount
+        - c/initial_amount.yaml               # Amount parameters
+        - d/reduction.yaml                    # AGI thresholds and rates
+        - d/nontaxable_reduction.cosilico     # Social Security/pension reduction
+        - d/agi_threshold.cosilico            # AGI threshold by filing status
+        - d/agi_reduction.cosilico            # AGI-based reduction
+        - d/adjusted_section_22_amount.cosilico  # Final adjusted amount
+        - e/qualified_individual.yaml         # Age threshold parameter
+        - e/is_qualified_individual.cosilico  # Qualified individual determination
+        - e/num_qualified_individuals.cosilico  # Count for tax unit
+
+  guidance:
+    - citation: "IRS Schedule R (Form 1040)"
+      title: "Credit for the Elderly or the Disabled"
+      source: https://www.irs.gov/forms-pubs/about-schedule-r-form-1040
+      provides:
+        - calculation_worksheet: Schedule R
+
+architecture:
+  description: |
+    The Credit for the Elderly and Disabled follows the statute structure:
+
+    1. Section 22(a) - Allowance of Credit
+       - 15% of the adjusted section 22 amount
+       - Nonrefundable (limited to tax liability)
+       - a/elderly_disabled_credit.cosilico
+
+    2. Section 22(b) - Applicable Percentage
+       - Fixed at 15%
+       - b/applicable_percentage.yaml
+
+    3. Section 22(c) - Section 22 Amount
+       - $5,000 for single, HoH, surviving spouse, or joint with one qualified
+       - $7,500 for joint where both spouses are qualified
+       - $3,750 for married filing separately
+       - c/initial_amount.cosilico, c/initial_amount.yaml
+
+    4. Section 22(d) - Reduction to Section 22 Amount
+       - (d)(1): Reduced by Social Security, pensions, disability income
+       - (d)(2): Reduced by 50% of AGI above threshold
+       - Thresholds: $7,500 single/HoH, $10,000 joint, $5,000 MFS
+       - d/nontaxable_reduction.cosilico, d/agi_reduction.cosilico
+
+    5. Section 22(e) - Qualified Individual Definition
+       - Age 65+ before year end, OR
+       - Permanently and totally disabled (and retired)
+       - e/is_qualified_individual.cosilico
+
+  key_provisions:
+    - provision: "Section 22(a)"
+      description: "Credit calculation"
+      variable: elderly_disabled_credit
+      parameters:
+        - b/applicable_percentage#applicable_percentage
+
+    - provision: "Section 22(c)"
+      description: "Initial section 22 amount"
+      variable: sec22_initial_amount
+      parameters:
+        - c/initial_amount#initial_amount_single
+        - c/initial_amount#initial_amount_joint_both
+        - c/initial_amount#initial_amount_separate
+
+    - provision: "Section 22(d)(1)"
+      description: "Nontaxable income reduction"
+      variable: sec22_nontaxable_reduction
+      input_variables:
+        - nontaxable_social_security
+        - taxable_pension_annuity
+        - taxable_disability_income
+
+    - provision: "Section 22(d)(2)"
+      description: "AGI-based reduction"
+      variable: sec22_agi_reduction
+      parameters:
+        - d/reduction#agi_reduction_rate
+        - d/reduction#agi_threshold_single
+        - d/reduction#agi_threshold_joint
+        - d/reduction#agi_threshold_separate
+
+    - provision: "Section 22(e)"
+      description: "Qualified individual definition"
+      variable: is_sec22_qualified_individual
+      parameters:
+        - e/qualified_individual#elderly_age_threshold
+
+  dependencies:
+    - path: statute/26/62/a
+      description: "Adjusted gross income"
+    - path: statute/26/26/a
+      description: "Tax liability before credits"
+    - path: statute/26/1
+      description: "Filing status"
+
+test_files:
+  - tests.yaml  # Comprehensive validation tests
+
+notes: |
+  Key characteristics of this credit:
+  1. Very low income limits - designed for low-income elderly/disabled
+  2. Parameters not indexed - same amounts since 1984
+  3. Double reduction mechanism:
+     - First reduced by Social Security and pensions
+     - Then reduced by 50% of AGI above threshold
+  4. Maximum possible credit: $1,125 for joint ($7,500 * 15%)
+  5. Rarely claimed due to low thresholds and Social Security reduction
+  6. Nonrefundable - limited to tax liability

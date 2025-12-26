@@ -1,0 +1,263 @@
+# 26 USC Section 469 - Passive Activity Losses and Credits
+#
+# "(a) Disallowance.--
+#  (1) In general.--If for any taxable year the taxpayer is described in
+#      paragraph (2), neither--
+#   (A) the passive activity loss, nor
+#   (B) the passive activity credit,
+#      for the taxable year shall be allowed.
+#
+#  (2) Persons described.--The following are described in this paragraph:
+#   (A) any individual, estate, or trust,
+#   (B) any closely held C corporation, and
+#   (C) any personal service corporation.
+#
+# (b) Disallowed Loss or Credit Carried to Next Year.--
+#     Except as otherwise provided in this section, any loss or credit from
+#     an activity which is disallowed under subsection (a) shall be treated
+#     as a deduction or credit allocable to such activity in the next
+#     taxable year.
+#
+# (c) Passive Activity Defined.--
+#  (1) In general.--The term 'passive activity' means any activity--
+#   (A) which involves the conduct of any trade or business, and
+#   (B) in which the taxpayer does not materially participate.
+#
+#  (2) Passive activity includes any rental activity.--
+#      Except as provided in paragraph (7), the term 'passive activity' includes
+#      any rental activity.
+#
+# (d) Passive Activity Loss and Credit Defined.--
+#  (1) Passive activity loss.--The term 'passive activity loss' means the
+#      amount (if any) by which--
+#   (A) the aggregate losses from all passive activities for the taxable year,
+#       exceed
+#   (B) the aggregate income from all passive activities for such year."
+
+imports:
+  # Input: Passive activity income (from rental properties, limited partnerships, etc.)
+  passive_activity_income: inputs/passive_activity_income
+  # Input: Passive activity losses (expenses exceeding income from passive activities)
+  passive_activity_losses: inputs/passive_activity_losses
+  # Input: Passive activity credits (rehabilitation credits, low-income housing credits, etc.)
+  passive_activity_credits: inputs/passive_activity_credits
+  # Input: Prior year suspended passive losses
+  suspended_passive_losses_prior: inputs/suspended_passive_losses
+  # Input: Prior year suspended passive credits
+  suspended_passive_credits_prior: inputs/suspended_passive_credits
+  # Input: Whether taxpayer materially participates in each activity
+  # Note: Material participation is activity-specific; simplified as boolean
+  has_material_participation: inputs/has_material_participation_in_activity
+  # Input: Whether activity is a rental activity
+  is_rental_activity: inputs/is_rental_activity
+
+  # Rental real estate exception amounts (from rental_real_estate_exception.cosilico)
+  rental_real_estate_allowance: statute/26/469/rental_real_estate_exception#rental_real_estate_loss_allowance
+
+  # Filing status for determining limits
+  filing_status: statute/26/1/filing_status
+
+# =============================================================================
+# Net Passive Activity Income/(Loss) - Section 469(d)(1)
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Net Passive Activity Income"
+description "Aggregate income from all passive activities per 26 USC 469(d)(1)"
+
+formula:
+  # Per 469(d)(1): Passive activity loss = losses - income (if positive)
+  # Net income is the reverse: income - losses (if positive)
+  return max(0, passive_activity_income - passive_activity_losses)
+
+default 0
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Gross Passive Activity Loss"
+description "Aggregate losses from all passive activities exceeding aggregate income per 26 USC 469(d)(1)"
+
+formula:
+  # Per 469(d)(1): The excess of aggregate losses over aggregate income
+  return max(0, passive_activity_losses - passive_activity_income)
+
+default 0
+
+# =============================================================================
+# Available Passive Losses - Section 469(b) Carryforward
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Available Passive Losses"
+description "Current year passive losses plus prior year suspended losses per 26 USC 469(b)"
+
+formula:
+  # Current year gross loss plus carryforward from prior years
+  return gross_passive_activity_loss + suspended_passive_losses_prior
+
+default 0
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Available Passive Credits"
+description "Current year passive credits plus prior year suspended credits"
+
+formula:
+  return passive_activity_credits + suspended_passive_credits_prior
+
+default 0
+
+# =============================================================================
+# Allowable Passive Loss Deduction - Section 469(a) and (i)
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Allowable Passive Activity Loss Deduction"
+description "Passive losses allowed after limitations per 26 USC 469"
+
+formula:
+  # Step 1: Calculate passive losses usable against passive income
+  # Passive losses can always offset passive income (no limitation)
+  loss_against_passive_income = min(total_available_passive_losses, passive_activity_income)
+
+  # Step 2: Calculate excess passive losses
+  excess_passive_loss = total_available_passive_losses - loss_against_passive_income
+
+  # Step 3: Apply rental real estate exception for active participation
+  # Per 469(i): Up to $25,000 of rental real estate losses may be allowed
+  # (This is calculated in rental_real_estate_exception.cosilico)
+  rental_exception_amount = rental_real_estate_allowance
+
+  # Step 4: Determine allowable excess loss
+  # The rental exception allows deducting some passive losses against non-passive income
+  allowable_excess = min(excess_passive_loss, rental_exception_amount)
+
+  # Total allowable = offset against passive income + rental exception
+  return loss_against_passive_income + allowable_excess
+
+default 0
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Disallowed Passive Activity Loss"
+description "Passive losses disallowed and carried forward per 26 USC 469(a) and (b)"
+
+formula:
+  # Disallowed = Total available - Allowable deduction
+  return max(0, total_available_passive_losses - allowable_passive_activity_loss_deduction)
+
+default 0
+
+# =============================================================================
+# Suspended Passive Losses - Section 469(b) Carryforward
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Suspended Passive Losses"
+description "Passive losses carried forward to next year per 26 USC 469(b)"
+
+formula:
+  # Per 469(b): Disallowed losses are treated as deductions in the next year
+  return disallowed_passive_activity_loss
+
+default 0
+
+# =============================================================================
+# Passive Activity Credit Limitation - Section 469(a)(1)(B)
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Allowable Passive Activity Credits"
+description "Passive credits allowed after limitations per 26 USC 469"
+
+formula:
+  # Per 469(a)(1)(B): Passive credits are disallowed (with exceptions)
+  # Credits can offset tax from passive income activities
+  # Full implementation requires tracking tax from passive vs non-passive income
+  # Simplified: Allow credits up to rental exception equivalent
+  # (More complex implementation would track "tax attributable to passive income")
+
+  # For the rental real estate exception, credits get same treatment as losses
+  return min(total_available_passive_credits, rental_real_estate_allowance)
+
+default 0
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Suspended Passive Credits"
+description "Passive credits carried forward to next year per 26 USC 469(b)"
+
+formula:
+  return max(0, total_available_passive_credits - allowable_passive_activity_credits)
+
+default 0
+
+# =============================================================================
+# Material Participation Determination - Section 469(h)
+# =============================================================================
+# Note: Material participation is complex and activity-specific.
+# Per 469(h)(1), a taxpayer materially participates if involved on a
+# regular, continuous, and substantial basis. Temp. Reg. 1.469-5T
+# provides 7 tests including:
+# - 500+ hours during year
+# - Substantially all participation in activity
+# - 100+ hours and not less than any other individual
+# - Aggregate 500+ hours in significant participation activities
+# - Material participation in 5 of 10 prior years
+# - Personal service activity with 3 prior years
+# - Facts and circumstances (100+ hours regular, continuous, substantial)
+#
+# This is simplified to an input flag. Full implementation would require
+# tracking hours by activity.
+
+entity TaxUnit
+period Year
+dtype Boolean
+unit ""
+label "Materially Participates in Activity"
+description "Whether taxpayer meets material participation tests per 26 USC 469(h)"
+
+input {
+# Set to true if taxpayer meets any of the 7 material participation tests
+# from Temp. Reg. 1.469-5T
+
+default false
+
+# =============================================================================
+# Passive Activity Status - Section 469(c)
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Boolean
+unit ""
+label "Has Passive Activities"
+description "Whether taxpayer has any passive activities per 26 USC 469(c)"
+
+formula:
+  # A taxpayer has passive activities if:
+  # 1. They have rental activities (presumed passive per 469(c)(2)), OR
+  # 2. They have trade/business activities without material participation
+  has_passive_rental = is_rental_activity
+  has_passive_business = not has_material_participation
+
+  return has_passive_rental or has_passive_business
+
+default false

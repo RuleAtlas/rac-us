@@ -1,0 +1,129 @@
+# Encoding Metadata for 26 USC Section 469 (Passive Activity Losses and Credits)
+
+encoding:
+  created: 2024-12-26
+  updated: 2024-12-26
+  status: initial
+  encoded_by: claude-opus-4.5
+
+variable:
+  name: passive_activity_loss_limitation
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+
+coverage:
+  tax_years: [1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  notes: |
+    Section 469 was added by the Tax Reform Act of 1986, effective for
+    tax years beginning after December 31, 1986.
+
+    Major legislative changes:
+    - TRA 1986: Original enactment
+    - OBRA 1993: Added Section 469(c)(7) real estate professional exception
+      (effective for tax years beginning after December 31, 1993)
+
+    The core provisions ($25,000 rental exception, $100,000-$150,000 phaseout)
+    have remained unchanged since 1986 and are NOT inflation-adjusted.
+
+sources:
+  statute:
+    - citation: "26 USC 469"
+      title: "Passive Activity Losses and Credits Limited"
+      sections:
+        - a: Disallowance - general rule
+        - b: Carryforward of disallowed losses/credits
+        - c: Passive activity defined (no material participation)
+        - d: Passive activity loss and credit defined
+        - e: Special rules for spouses
+        - f: Treatment of former passive activities
+        - g: Disposition of entire interest
+        - h: Material participation defined
+        - i: $25,000 offset for rental real estate activities
+        - j: Other definitions and special rules
+        - k: Separate treatment of certain activities
+        - l: Regulations
+
+    - citation: "Tax Reform Act of 1986, P.L. 99-514, Section 501"
+      title: "Limitation on losses from passive activities"
+      notes: Original enactment
+
+    - citation: "OBRA 1993, P.L. 103-66, Section 13143"
+      title: "Rental real estate professional exception"
+      notes: Added Section 469(c)(7)
+
+  regulations:
+    - citation: "Temp. Reg. 1.469-5T"
+      title: "Material participation"
+      notes: Seven tests for material participation
+
+    - citation: "Reg. 1.469-1 through 1.469-11"
+      title: "Passive activity loss regulations"
+
+  guidance:
+    - citation: "IRS Publication 925"
+      title: "Passive Activity and At-Risk Rules"
+      source: https://www.irs.gov/publications/p925
+
+    - citation: "IRS Form 8582"
+      title: "Passive Activity Loss Limitations"
+
+architecture:
+  description: |
+    Section 469 limits the deduction of losses from passive activities.
+    This is one of the most complex tax provisions, designed to prevent
+    high-income taxpayers from sheltering income using "tax shelters."
+
+    CORE CONCEPTS:
+
+    1. PASSIVE ACTIVITY (469(c))
+       - Trade or business without material participation
+       - Rental activities (presumed passive with exceptions)
+
+    2. PASSIVE ACTIVITY LOSS (469(d))
+       - Aggregate losses from passive activities MINUS
+       - Aggregate income from passive activities
+
+    3. DISALLOWANCE RULE (469(a))
+       - Passive losses can ONLY offset passive income
+       - Excess losses are suspended and carried forward
+
+    4. RENTAL REAL ESTATE EXCEPTION (469(i))
+       - Up to $25,000 of rental losses allowed for active participants
+       - Phaseout: 50% of (AGI - $100,000)
+       - Fully phased out at $150,000 AGI
+
+    5. REAL ESTATE PROFESSIONAL EXCEPTION (469(c)(7))
+       - 750+ hours in real property trades/businesses
+       - More than 50% of services in real property businesses
+       - Rental activities treated as non-passive
+
+  formula_structure: |
+    Main calculation:
+    passive_activity_loss =
+      max(0, aggregate_passive_losses - aggregate_passive_income)
+
+    allowable_deduction =
+      passive_income_offset +
+      min(excess_loss, rental_real_estate_allowance)
+
+    rental_real_estate_allowance =
+      max(0, $25,000 - 50% * max(0, AGI - $100,000))
+
+    suspended_loss = passive_activity_loss - allowable_deduction
+
+  key_variables:
+    - gross_passive_activity_loss
+    - net_passive_activity_income
+    - allowable_passive_activity_loss_deduction
+    - disallowed_passive_activity_loss
+    - suspended_passive_losses
+    - rental_real_estate_loss_allowance
+    - is_real_estate_professional
+
+  limitations:
+    - Material participation is simplified to input flag
+    - Activity-level tracking not fully implemented
+    - Credits are simplified (full implementation requires tax allocation)
+    - At-risk rules (Section 465) not included
+    - Grouping elections not modeled

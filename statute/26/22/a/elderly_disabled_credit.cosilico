@@ -1,0 +1,66 @@
+# 26 USC 22 - Credit for the Elderly and the Disabled
+#
+# "(a) GENERAL RULE. -- In the case of a qualified individual, there shall be
+# allowed as a credit against the tax imposed by this chapter for the taxable
+# year an amount equal to 15 percent of such individual's section 22 amount
+# for such taxable year."
+#
+# Credit = 15% x Adjusted Section 22 Amount
+#
+# Key components:
+#   - 22(a): 15% credit rate
+#   - 22(c): Initial section 22 amount ($5,000/$7,500/$3,750 based on filing status)
+#   - 22(d): Reductions for Social Security, pensions, and excess AGI
+#   - 22(e): Qualified individual (65+ or permanently disabled)
+#
+# This is a nonrefundable credit - limited to tax liability.
+
+imports:
+  # Credit rate
+  applicable_percentage: statute/26/22/b/applicable_percentage#applicable_percentage
+
+  # Section 22 amount after reductions
+  adjusted_sec22_amount: statute/26/22/d/adjusted_section_22_amount#adjusted_sec22_amount
+
+  # Number of qualified individuals (to determine eligibility)
+  num_sec22_qualified_individuals: statute/26/22/e/num_qualified_individuals#num_sec22_qualified_individuals
+
+  # Tax liability for nonrefundable limitation
+  tax_liability_before_credits: statute/26/26/a/tax_liability_before_credits#tax_liability_before_credits
+
+# Tentative credit before tax liability limitation
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Tentative Credit for the Elderly or Disabled"
+description "Credit for the elderly or disabled before tax liability limitation per 26 USC 22"
+
+formula:
+  # No credit if no qualified individuals
+  if num_sec22_qualified_individuals == 0 then
+  return 0
+
+  # Credit is 15% of the adjusted section 22 amount
+  return adjusted_sec22_amount * applicable_percentage
+
+default 0
+
+# Final credit (limited to tax liability)
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Credit for the Elderly or Disabled"
+description "Final credit for the elderly or disabled per 26 USC 22 (nonrefundable)"
+
+formula:
+  tentative = sec22_tentative_credit
+
+  # Nonrefundable credit - cannot exceed tax liability
+  return min(tentative, tax_liability_before_credits)
+
+defined_for:
+  num_sec22_qualified_individuals > 0
+
+default 0

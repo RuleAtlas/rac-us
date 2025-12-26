@@ -1,0 +1,47 @@
+# 26 USC 22(c) - Section 22 Amount (Initial Amount)
+#
+# "(1) IN GENERAL. -- Except as provided in paragraph (2), the section 22 amount is--
+#   (A) $5,000 in the case of--
+#     (i) a joint return where only one spouse is a qualified individual,
+#     (ii) a return of a surviving spouse, or
+#     (iii) a return of a head of household or an individual who is not married,
+#   (B) $7,500 in the case of a joint return where both spouses are qualified individuals, or
+#   (C) $3,750 in the case of a married individual filing a separate return."
+#
+# "(2) DISABILITY INCOME LIMIT. -- In the case of a qualified individual who has not
+# attained age 65 before the close of the taxable year, the section 22 amount...
+# shall not exceed the disability income received."
+
+imports:
+  # Initial amounts from parameters
+  initial_amount_single: statute/26/22/c/initial_amount#initial_amount_single
+  initial_amount_joint_both: statute/26/22/c/initial_amount#initial_amount_joint_both
+  initial_amount_separate: statute/26/22/c/initial_amount#initial_amount_separate
+
+  # Number of qualified individuals in tax unit
+  num_sec22_qualified_individuals: statute/26/22/e/num_qualified_individuals#num_sec22_qualified_individuals
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Section 22 Initial Amount"
+description "Initial section 22 amount before reductions per 26 USC 22(c)(1)"
+
+formula:
+  # No credit if no qualified individuals
+  if num_sec22_qualified_individuals == 0 then
+  return 0
+
+  # Married filing separately: $3,750
+  if filing_status == SEPARATE then
+  return initial_amount_separate
+
+  # Joint return with both spouses qualified: $7,500
+  if filing_status == JOINT and num_sec22_qualified_individuals >= 2 then
+  return initial_amount_joint_both
+
+  # All other cases (single, HoH, surviving spouse, or joint with one qualified): $5,000
+  return initial_amount_single
+
+default 0

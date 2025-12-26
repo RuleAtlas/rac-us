@@ -1,0 +1,56 @@
+# 26 USC 129(a)(2) and 129(e) - Dollar Limitations
+#
+# "(a) EXCLUSION. --
+#   (2) LIMITATION. -- The amount which may be excluded under paragraph (1)
+#   for dependent care assistance with respect to dependent care services
+#   provided during a taxable year shall not exceed $5,000 ($2,500 in the
+#   case of a separate return by a married individual)."
+#
+# ARPA 2021 (P.L. 117-2, Sec. 9632):
+# - Increased limit to $10,500 ($5,250 for MFS) for 2021 only
+
+# Maximum exclusion for general filers (single, joint, HoH)
+exclusion_limit:
+  description: "Maximum dependent care assistance excludable from gross income"
+  unit: currency-USD
+  values:
+    1982-01-01: 5000    # Original ERTA 1981 amount
+    2021-01-01: 10500   # ARPA 2021 temporary increase
+    2022-01-01: 5000    # Reverted to permanent law
+  citations:
+    - "26 USC 129(a)(2)(A): $5,000 limitation"
+    - "P.L. 117-2 Sec. 9632(b): $10,500 for 2021"
+
+# Maximum exclusion for married filing separately
+exclusion_limit_mfs:
+  description: "Maximum dependent care assistance excludable for married filing separately"
+  unit: currency-USD
+  values:
+    1982-01-01: 2500    # Half of regular limit
+    2021-01-01: 5250    # ARPA 2021 temporary (half of $10,500)
+    2022-01-01: 2500    # Reverted
+  citations:
+    - "26 USC 129(a)(2)(A): $2,500 in the case of a separate return by a married individual"
+    - "P.L. 117-2 Sec. 9632(b): proportional increase for 2021"
+
+# Student/disabled spouse imputed earned income
+# Per 129(b)(2), if spouse is student or disabled, deemed to have monthly earned income
+imputed_earned_income_monthly_one:
+  description: "Monthly imputed earned income for student/disabled spouse with 1 qualifying individual"
+  unit: currency-USD
+  values:
+    1982-01-01: 200     # Original amount
+    2003-01-01: 250     # JGTRRA 2003 conformity with 21(d)(2)
+  citations:
+    - "26 USC 129(b)(2)(B): deemed earned income for student or disabled spouse"
+    - "26 USC 21(d)(2): $250 per month for 1 qualifying individual"
+
+imputed_earned_income_monthly_two:
+  description: "Monthly imputed earned income for student/disabled spouse with 2+ qualifying individuals"
+  unit: currency-USD
+  values:
+    1982-01-01: 400     # Original amount
+    2003-01-01: 500     # JGTRRA 2003 conformity with 21(d)(2)
+  citations:
+    - "26 USC 129(b)(2)(B): deemed earned income for student or disabled spouse"
+    - "26 USC 21(d)(2): $500 per month for 2+ qualifying individuals"

@@ -1,0 +1,173 @@
+# 26 USC Section 469 - Passive Activity Losses and Credits
+#
+# Time-varying parameters for passive activity loss limitations.
+# Key parameters from subsections (h) and (i).
+
+description: "Parameters for passive activity loss limitations under IRC Section 469"
+reference: "26 USC 469"
+
+# =============================================================================
+# Section 469(h)(2) - Rental Real Estate Exception ($25,000 Offset)
+# =============================================================================
+rental_real_estate:
+  description: "Parameters for the rental real estate passive loss exception"
+
+  # Section 469(i)(2) - $25,000 allowance for active participation rental real estate
+  allowance_amount:
+    description: "Maximum rental real estate loss offset for active participants"
+    unit: currency-USD
+    values:
+      - date: 1987-01-01
+        value: 25000
+        reference: "26 USC 469(i)(2) - $25,000 offset for rental real estate"
+    notes: |
+      Per 469(i)(2): "The amount of the passive activity loss... which is disallowed
+      for any taxable year by reason of subsection (a) shall not apply to that
+      portion of such loss... which is attributable to... rental real estate
+      activities... in an amount not in excess of $25,000."
+      This amount is NOT inflation-adjusted.
+
+  # Section 469(i)(2) - MFS amount is $12,500 if living apart all year
+  allowance_amount_mfs:
+    description: "Rental real estate loss offset for MFS taxpayers living apart"
+    unit: currency-USD
+    values:
+      - date: 1987-01-01
+        value: 12500
+        reference: "26 USC 469(i)(5)(B)"
+    notes: |
+      Per 469(i)(5)(B): A married individual filing separately who lived apart
+      from spouse for entire year gets $12,500 (half of $25,000).
+      MFS living together at any time during year gets $0.
+
+  # Section 469(i)(3)(A) - Phaseout start (MAGI threshold)
+  phaseout_start:
+    description: "Modified AGI threshold where rental real estate allowance phaseout begins"
+    unit: currency-USD
+    values:
+      - date: 1987-01-01
+        value: 100000
+        reference: "26 USC 469(i)(3)(A)"
+    notes: |
+      Per 469(i)(3)(A): "The $25,000 amount under paragraph (2) shall be reduced
+      (but not below zero) by 50 percent of the amount by which the adjusted gross
+      income of the taxpayer for the taxable year exceeds $100,000."
+      This amount is NOT inflation-adjusted.
+
+  # Calculated phaseout end = start + (allowance / 0.5) = $100K + $50K = $150K
+  phaseout_end:
+    description: "Modified AGI threshold where rental real estate allowance is fully phased out"
+    unit: currency-USD
+    values:
+      - date: 1987-01-01
+        value: 150000
+        reference: "26 USC 469(i)(3)(A) - calculated"
+    notes: |
+      Phaseout rate is 50%, so allowance is fully eliminated when
+      MAGI exceeds $100,000 + ($25,000 / 0.50) = $150,000.
+
+  phaseout_start_mfs:
+    description: "Modified AGI threshold for MFS taxpayers (living apart)"
+    unit: currency-USD
+    values:
+      - date: 1987-01-01
+        value: 50000
+        reference: "26 USC 469(i)(5)(B)"
+    notes: |
+      MFS taxpayers living apart use half the thresholds:
+      $50,000 phaseout start with $12,500 allowance.
+
+  phaseout_end_mfs:
+    description: "Modified AGI threshold where MFS allowance is fully phased out"
+    unit: currency-USD
+    values:
+      - date: 1987-01-01
+        value: 75000
+        reference: "26 USC 469(i)(5)(B) - calculated"
+    notes: |
+      $50,000 + ($12,500 / 0.50) = $75,000
+
+  # Phaseout rate - statutory 50%
+  phaseout_rate:
+    description: "Rate at which rental real estate allowance phases out"
+    unit: rate
+    values:
+      - date: 1987-01-01
+        value: 0.50
+        reference: "26 USC 469(i)(3)(A)"
+    notes: |
+      Per 469(i)(3)(A): "reduced... by 50 percent of the amount by which
+      the adjusted gross income... exceeds $100,000."
+
+# =============================================================================
+# Section 469(i)(6) - Rehabilitation and Low-Income Housing Credits
+# =============================================================================
+rehabilitation_credit:
+  description: "Enhanced rules for rehabilitation and low-income housing credits"
+
+  # Section 469(i)(6)(B) - Higher phaseout start for certain credits
+  phaseout_start:
+    description: "Modified AGI threshold for rehabilitation/low-income housing credits"
+    unit: currency-USD
+    values:
+      - date: 1987-01-01
+        value: 200000
+        reference: "26 USC 469(i)(6)(B)"
+    notes: |
+      Per 469(i)(6)(B): Credits from rehabilitation and low-income housing
+      have a higher phaseout threshold of $200,000 MAGI (not $100,000).
+      Phaseout rate remains 50%, so fully phased out at $250,000.
+
+  phaseout_end:
+    description: "Modified AGI threshold where rehabilitation credits fully phased out"
+    unit: currency-USD
+    values:
+      - date: 1987-01-01
+        value: 250000
+        reference: "26 USC 469(i)(6)(B) - calculated"
+
+# =============================================================================
+# Section 469(c)(7) - Real Estate Professional Exception
+# =============================================================================
+real_estate_professional:
+  description: "Requirements for real estate professional status"
+
+  # Section 469(c)(7)(B)(ii) - Hours threshold
+  hours_threshold:
+    description: "Minimum hours of real property trade/business participation"
+    unit: hours
+    values:
+      - date: 1994-01-01
+        value: 750
+        reference: "26 USC 469(c)(7)(B)(ii)"
+    notes: |
+      Per 469(c)(7)(B): A taxpayer is treated as materially participating in
+      rental real estate if:
+      (i) more than half of personal services performed in trades/businesses
+          are in real property trades/businesses in which the taxpayer
+          materially participates, AND
+      (ii) such taxpayer performs more than 750 hours of services during the
+           taxable year in real property trades/businesses in which the
+           taxpayer materially participates.
+      This provision was added by OBRA 1993, effective for tax years
+      beginning after December 31, 1993.
+
+# =============================================================================
+# Section 469(h)(2) - Material Participation by Limited Partners
+# =============================================================================
+limited_partner:
+  description: "Special rules for limited partnership interests"
+
+  # Section 469(h)(2) references temporary regulations for material participation
+  # Temp. Reg. 1.469-5T(e)(3) - 500 hour threshold
+  hours_threshold:
+    description: "Hours threshold for limited partner material participation"
+    unit: hours
+    values:
+      - date: 1987-01-01
+        value: 500
+        reference: "Temp. Reg. 1.469-5T(e)(3)"
+    notes: |
+      Per Temp. Reg. 1.469-5T(e)(3), a limited partner can establish
+      material participation by participating more than 500 hours
+      during the taxable year.

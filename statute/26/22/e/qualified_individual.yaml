@@ -1,0 +1,15 @@
+# 26 USC § 22(e) - Definitions and Special Rules
+#
+# "(1) QUALIFIED INDIVIDUAL. -- The term 'qualified individual' means any individual--
+#   (A) who has attained age 65 before the close of the taxable year, or
+#   (B) who retired on disability before the close of the taxable year and who,
+#       when he retired, was permanently and totally disabled."
+
+# Age threshold for elderly qualification
+elderly_age_threshold:
+  description: "Age at which a taxpayer qualifies for the credit as an elderly individual"
+  unit: year
+  values:
+    1984-01-01: 65
+  citations:
+    - "26 USC § 22(e)(1)(A): attained age 65 before the close of the taxable year"

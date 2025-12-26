@@ -1,0 +1,500 @@
+# Tests for 26 USC 129 - Dependent Care Assistance Programs
+#
+# IRC Section 129 allows employees to exclude employer-provided dependent care
+# assistance from gross income, subject to dollar limits and earned income
+# limitations.
+#
+# Key rules tested:
+#   - 129(a)(2): Dollar limits $5,000 / $2,500 for MFS
+#   - 129(b): Earned income limitation (lesser of spouses' earned income)
+#   - 129(b)(2): Special rule for student/disabled spouse
+#   - ARPA 2021: Temporary increase to $10,500 / $5,250 for MFS
+
+reference: "26 USC 129"
+tax_year: 2024
+
+tests:
+  # ============================================================================
+  # Basic Exclusion - Within Limits
+  # ============================================================================
+
+  - name: "Single parent - full exclusion under limit"
+    description: "DCAP benefits under $5,000 are fully excludable"
+    inputs:
+      filing_status: single
+      earned_income: 40000
+      dcap_benefits_received: 3000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_maximum_exclusion: 5000
+      dcap_earned_income_limit: 40000
+      dcap_exclusion: 3000
+      dcap_taxable_amount: 0
+    citations:
+      - "26 USC 129(a)(1): exclusion from gross income"
+      - "26 USC 129(a)(2): $5,000 limitation"
+
+  - name: "Single parent - at maximum exclusion"
+    description: "DCAP benefits exactly at $5,000 limit"
+    inputs:
+      filing_status: single
+      earned_income: 50000
+      dcap_benefits_received: 5000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_maximum_exclusion: 5000
+      dcap_exclusion: 5000
+      dcap_taxable_amount: 0
+    citations:
+      - "26 USC 129(a)(2)(A): $5,000 limitation"
+
+  - name: "Married filing jointly - full exclusion"
+    description: "MFJ taxpayers can exclude up to $5,000"
+    inputs:
+      filing_status: joint
+      persons:
+        head:
+          earned_income: 45000
+          is_tax_unit_head: true
+        spouse:
+          earned_income: 35000
+          is_tax_unit_spouse: true
+      dcap_benefits_received: 5000
+      num_cdcc_qualifying_individuals: 2
+    expected:
+      dcap_maximum_exclusion: 5000
+      dcap_earned_income_limit: 35000  # Lesser of spouses
+      dcap_exclusion: 5000
+      dcap_taxable_amount: 0
+    citations:
+      - "26 USC 129(a)(2): $5,000 for married joint filers"
+      - "26 USC 129(b)(1)(B): lesser of spouses' earned income"
+
+  # ============================================================================
+  # Dollar Limit Exceeded
+  # ============================================================================
+
+  - name: "Benefits exceed $5,000 limit"
+    description: "Excess over $5,000 is taxable"
+    inputs:
+      filing_status: single
+      earned_income: 60000
+      dcap_benefits_received: 7000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_maximum_exclusion: 5000
+      dcap_exclusion: 5000  # Limited to $5,000
+      dcap_taxable_amount: 2000  # $7,000 - $5,000 = $2,000 taxable
+    citations:
+      - "26 USC 129(a)(2): exclusion capped at $5,000"
+
+  - name: "Joint filers - large DCAP contribution"
+    description: "MFJ with $6,000 in DCAP benefits"
+    inputs:
+      filing_status: joint
+      persons:
+        head:
+          earned_income: 80000
+          is_tax_unit_head: true
+        spouse:
+          earned_income: 60000
+          is_tax_unit_spouse: true
+      dcap_benefits_received: 6000
+      num_cdcc_qualifying_individuals: 2
+    expected:
+      dcap_maximum_exclusion: 5000
+      dcap_exclusion: 5000
+      dcap_taxable_amount: 1000  # $6,000 - $5,000 = $1,000 taxable
+    citations:
+      - "26 USC 129(a)(2): limitation applies to all filers"
+
+  # ============================================================================
+  # Married Filing Separately - $2,500 Limit
+  # ============================================================================
+
+  - name: "MFS - $2,500 limit applies"
+    description: "Married filing separately gets half the exclusion limit"
+    inputs:
+      filing_status: separate
+      earned_income: 50000
+      dcap_benefits_received: 4000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_maximum_exclusion: 2500
+      dcap_exclusion: 2500  # Limited to $2,500
+      dcap_taxable_amount: 1500  # $4,000 - $2,500 = $1,500 taxable
+    citations:
+      - "26 USC 129(a)(2)(A): $2,500 for married filing separately"
+
+  - name: "MFS - benefits under limit"
+    description: "MFS with DCAP under $2,500"
+    inputs:
+      filing_status: separate
+      earned_income: 40000
+      dcap_benefits_received: 2000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_maximum_exclusion: 2500
+      dcap_exclusion: 2000
+      dcap_taxable_amount: 0
+    citations:
+      - "26 USC 129(a)(2)(A): $2,500 limit for MFS"
+
+  # ============================================================================
+  # Earned Income Limitation
+  # ============================================================================
+
+  - name: "Single - earned income limits exclusion"
+    description: "Exclusion cannot exceed earned income"
+    inputs:
+      filing_status: single
+      earned_income: 3000
+      dcap_benefits_received: 5000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_maximum_exclusion: 5000
+      dcap_earned_income_limit: 3000
+      dcap_exclusion: 3000  # Limited by earned income
+      dcap_taxable_amount: 2000
+    citations:
+      - "26 USC 129(b)(1)(A): limited to earned income for unmarried taxpayer"
+
+  - name: "Married - lower spouse's income limits exclusion"
+    description: "Exclusion limited to lesser of spouses' earned income"
+    inputs:
+      filing_status: joint
+      persons:
+        head:
+          earned_income: 60000
+          is_tax_unit_head: true
+        spouse:
+          earned_income: 4000
+          is_tax_unit_spouse: true
+      dcap_benefits_received: 5000
+      num_cdcc_qualifying_individuals: 2
+    expected:
+      dcap_maximum_exclusion: 5000
+      dcap_earned_income_limit: 4000  # Lesser of $60,000 and $4,000
+      dcap_exclusion: 4000  # Limited by lower spouse's income
+      dcap_taxable_amount: 1000
+    citations:
+      - "26 USC 129(b)(1)(B): lesser of spouses' earned incomes"
+
+  - name: "Married - zero earned income spouse"
+    description: "Stay-at-home spouse with no earned income"
+    inputs:
+      filing_status: joint
+      persons:
+        head:
+          earned_income: 80000
+          is_tax_unit_head: true
+        spouse:
+          earned_income: 0
+          is_tax_unit_spouse: true
+      dcap_benefits_received: 5000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_earned_income_limit: 0
+      dcap_exclusion: 0  # Limited by $0 earned income
+      dcap_taxable_amount: 5000  # All taxable
+    citations:
+      - "26 USC 129(b)(1)(B): limited to lesser spouse's earned income"
+
+  # ============================================================================
+  # Student/Disabled Spouse - Imputed Income (129(b)(2))
+  # ============================================================================
+
+  - name: "Full-time student spouse - 1 qualifying individual"
+    description: "Student spouse deemed to have $250/month = $3,000/year"
+    inputs:
+      filing_status: joint
+      persons:
+        head:
+          earned_income: 50000
+          is_tax_unit_head: true
+        spouse:
+          earned_income: 0
+          is_tax_unit_spouse: true
+          is_full_time_student: true
+      dcap_benefits_received: 5000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_earned_income_limit: 3000  # 12 * $250 = $3,000
+      dcap_exclusion: 3000
+      dcap_taxable_amount: 2000
+    citations:
+      - "26 USC 129(b)(2)(A): $250 per month for student spouse"
+
+  - name: "Full-time student spouse - 2 qualifying individuals"
+    description: "Student spouse deemed to have $500/month = $6,000/year"
+    inputs:
+      filing_status: joint
+      persons:
+        head:
+          earned_income: 60000
+          is_tax_unit_head: true
+        spouse:
+          earned_income: 0
+          is_tax_unit_spouse: true
+          is_full_time_student: true
+      dcap_benefits_received: 5000
+      num_cdcc_qualifying_individuals: 2
+    expected:
+      dcap_earned_income_limit: 5000  # min($60k, $6k imputed) but capped by dollar limit
+      dcap_exclusion: 5000  # $6,000 imputed > $5,000 limit
+      dcap_taxable_amount: 0
+    citations:
+      - "26 USC 129(b)(2)(B): $500 per month for 2+ qualifying individuals"
+
+  - name: "Disabled spouse - imputed income"
+    description: "Disabled spouse incapable of self-care deemed to have income"
+    inputs:
+      filing_status: joint
+      persons:
+        head:
+          earned_income: 55000
+          is_tax_unit_head: true
+        spouse:
+          earned_income: 0
+          is_tax_unit_spouse: true
+          is_disabled: true
+      dcap_benefits_received: 4000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_earned_income_limit: 3000  # 12 * $250 = $3,000 imputed
+      dcap_exclusion: 3000
+      dcap_taxable_amount: 1000
+    citations:
+      - "26 USC 129(b)(2): special rule for spouse incapable of self-care"
+
+  - name: "Student spouse with some actual income"
+    description: "Use higher of actual or imputed income"
+    inputs:
+      filing_status: joint
+      persons:
+        head:
+          earned_income: 50000
+          is_tax_unit_head: true
+        spouse:
+          earned_income: 4000
+          is_tax_unit_spouse: true
+          is_full_time_student: true
+      dcap_benefits_received: 5000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      # Imputed = $3,000, actual = $4,000, use higher
+      dcap_earned_income_limit: 4000
+      dcap_exclusion: 4000
+      dcap_taxable_amount: 1000
+    citations:
+      - "26 USC 129(b)(2): deemed to have not less than imputed amount"
+
+  # ============================================================================
+  # No Qualifying Individuals - No Exclusion
+  # ============================================================================
+
+  - name: "No qualifying individuals"
+    description: "Cannot exclude DCAP without a qualifying individual"
+    inputs:
+      filing_status: single
+      earned_income: 50000
+      dcap_benefits_received: 5000
+      num_cdcc_qualifying_individuals: 0
+    expected:
+      dcap_maximum_exclusion: 0
+      dcap_exclusion: 0
+      dcap_taxable_amount: 5000  # All benefits taxable
+    citations:
+      - "26 USC 129(a): requires dependent care for qualifying individual"
+
+  - name: "Child aged 13 - not qualifying"
+    description: "Child 13 or older does not qualify (unless disabled)"
+    inputs:
+      filing_status: single
+      earned_income: 40000
+      dcap_benefits_received: 3000
+      persons:
+        parent:
+          is_tax_unit_head: true
+        child:
+          age: 13
+          is_dependent: true
+          is_disabled: false
+      num_cdcc_qualifying_individuals: 0
+    expected:
+      dcap_exclusion: 0
+      dcap_taxable_amount: 3000
+    citations:
+      - "26 USC 129(e)(1): references 21(b)(1) for qualifying individual"
+      - "26 USC 21(b)(1)(A): under age 13"
+
+  # ============================================================================
+  # ARPA 2021 - Increased Limits
+  # ============================================================================
+
+  - name: "ARPA 2021 - $10,500 limit"
+    description: "2021 temporary increase to $10,500"
+    tax_year: 2021
+    inputs:
+      filing_status: single
+      earned_income: 60000
+      dcap_benefits_received: 10500
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_maximum_exclusion: 10500
+      dcap_exclusion: 10500
+      dcap_taxable_amount: 0
+    citations:
+      - "P.L. 117-2 Sec. 9632(b): $10,500 for 2021"
+
+  - name: "ARPA 2021 - benefits exceed increased limit"
+    description: "Excess over $10,500 is taxable in 2021"
+    tax_year: 2021
+    inputs:
+      filing_status: joint
+      persons:
+        head:
+          earned_income: 80000
+          is_tax_unit_head: true
+        spouse:
+          earned_income: 60000
+          is_tax_unit_spouse: true
+      dcap_benefits_received: 12000
+      num_cdcc_qualifying_individuals: 2
+    expected:
+      dcap_maximum_exclusion: 10500
+      dcap_exclusion: 10500
+      dcap_taxable_amount: 1500  # $12,000 - $10,500
+    citations:
+      - "P.L. 117-2 Sec. 9632(b): increased limit for 2021"
+
+  - name: "ARPA 2021 - MFS limit $5,250"
+    description: "MFS gets $5,250 in 2021 (half of $10,500)"
+    tax_year: 2021
+    inputs:
+      filing_status: separate
+      earned_income: 40000
+      dcap_benefits_received: 6000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_maximum_exclusion: 5250
+      dcap_exclusion: 5250
+      dcap_taxable_amount: 750  # $6,000 - $5,250
+    citations:
+      - "P.L. 117-2 Sec. 9632(b): proportional MFS limit"
+
+  - name: "2022 - reverted to $5,000"
+    description: "2022 returns to permanent $5,000 limit"
+    tax_year: 2022
+    inputs:
+      filing_status: single
+      earned_income: 50000
+      dcap_benefits_received: 8000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_maximum_exclusion: 5000
+      dcap_exclusion: 5000
+      dcap_taxable_amount: 3000
+    citations:
+      - "26 USC 129(a)(2): $5,000 permanent limit"
+
+  # ============================================================================
+  # Head of Household
+  # ============================================================================
+
+  - name: "Head of household - full $5,000 limit"
+    description: "HoH filers get full $5,000 exclusion (not MFS limit)"
+    inputs:
+      filing_status: head_of_household
+      earned_income: 55000
+      dcap_benefits_received: 5000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_maximum_exclusion: 5000
+      dcap_exclusion: 5000
+      dcap_taxable_amount: 0
+    citations:
+      - "26 USC 129(a)(2): $5,000 for all except MFS"
+
+  # ============================================================================
+  # Edge Cases
+  # ============================================================================
+
+  - name: "Zero DCAP benefits"
+    description: "No exclusion when no benefits received"
+    inputs:
+      filing_status: single
+      earned_income: 40000
+      dcap_benefits_received: 0
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_exclusion: 0
+      dcap_taxable_amount: 0
+    citations:
+      - "26 USC 129(a): exclusion for amounts actually received"
+
+  - name: "Multiple limitations binding"
+    description: "All limits interact: dollar, earned income"
+    inputs:
+      filing_status: joint
+      persons:
+        head:
+          earned_income: 40000
+          is_tax_unit_head: true
+        spouse:
+          earned_income: 2000
+          is_tax_unit_spouse: true
+      dcap_benefits_received: 4000
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_maximum_exclusion: 5000
+      dcap_earned_income_limit: 2000  # Lesser spouse's income
+      dcap_exclusion: 2000  # Limited by earned income
+      dcap_taxable_amount: 2000
+    citations:
+      - "26 USC 129: multiple limitations apply"
+
+  - name: "Very high earners - no phaseout"
+    description: "DCAP exclusion has no income-based phaseout"
+    inputs:
+      filing_status: joint
+      persons:
+        head:
+          earned_income: 500000
+          is_tax_unit_head: true
+        spouse:
+          earned_income: 400000
+          is_tax_unit_spouse: true
+      dcap_benefits_received: 5000
+      num_cdcc_qualifying_individuals: 2
+    expected:
+      dcap_maximum_exclusion: 5000
+      dcap_exclusion: 5000  # Full exclusion regardless of income
+      dcap_taxable_amount: 0
+    citations:
+      - "26 USC 129: no AGI-based limitation"
+
+  # ============================================================================
+  # Interaction with Section 21 (CDCC)
+  # Note: These test the conceptual relationship; actual coordination
+  # requires integration with section 21 variables
+  # ============================================================================
+
+  - name: "DCAP reduces CDCC expenses basis"
+    description: "DCAP exclusion reduces expenses available for CDCC"
+    notes: |
+      Per 26 USC 21(c), expenses eligible for the credit are reduced by
+      amounts excluded under section 129. This test documents the
+      interaction but actual coordination is in the section 21 encoding.
+    inputs:
+      filing_status: single
+      earned_income: 40000
+      dcap_benefits_received: 3000
+      cdcc_expenses_paid: 5000  # Total expenses paid
+      num_cdcc_qualifying_individuals: 1
+    expected:
+      dcap_exclusion: 3000
+      # Conceptually: CDCC-eligible expenses = $5,000 - $3,000 = $2,000
+    citations:
+      - "26 USC 21(c): reduced by amounts excluded under section 129"
+      - "26 USC 129(e)(7): coordination with section 21"

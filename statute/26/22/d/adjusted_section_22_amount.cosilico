@@ -1,0 +1,34 @@
+# 26 USC 22(d) - Adjusted Section 22 Amount
+#
+# The section 22 amount (from subsection c) is reduced by:
+#   (1) Nontaxable pensions, annuities, Social Security, and disability income
+#   (2) 50% of AGI in excess of the applicable threshold
+#
+# This is the amount to which the 15% credit rate is applied.
+
+imports:
+  sec22_initial_amount: statute/26/22/c/initial_amount#sec22_initial_amount
+  sec22_nontaxable_reduction: statute/26/22/d/nontaxable_reduction#sec22_nontaxable_reduction
+  sec22_agi_reduction: statute/26/22/d/agi_reduction#sec22_agi_reduction
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Adjusted Section 22 Amount"
+description "Section 22 amount after all reductions per 26 USC 22(d)"
+
+formula:
+  # Start with initial amount
+  initial = sec22_initial_amount
+
+  # Subtract nontaxable income reduction (d)(1)
+  after_nontaxable = max(0, initial - sec22_nontaxable_reduction)
+
+  # Subtract AGI reduction (d)(2)
+  # Note: Both reductions apply - the total reduction is the sum
+  after_agi = max(0, after_nontaxable - sec22_agi_reduction)
+
+  return after_agi
+
+default 0

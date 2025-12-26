@@ -1,0 +1,213 @@
+# Encoding Metadata for 26 USC Section 121 - Exclusion of Gain from Sale of Principal Residence
+#
+# This encoding implements the home sale exclusion rules that allow taxpayers
+# to exclude up to $250,000 ($500,000 for married filing jointly) of gain from
+# the sale of a principal residence.
+
+encoding:
+  created: 2024-12-26
+  updated: 2024-12-26
+  status: implemented
+  encoded_by: claude-opus-4.5
+  version: "1.0"
+
+scope:
+  title: 26
+  subchapter: B
+  part: III
+  sections: [121]
+  related_sections: [1001, 1011, 1012, 1014, 1015, 1016, 1034]
+
+# =============================================================================
+# File Structure
+# =============================================================================
+
+files:
+  - path: principal_residence_exclusion.cosilico
+    description: |
+      Main exclusion calculation per Section 121(a).
+      Implements: Exclusion = min(realized_gain, exclusion_limit)
+    sections_covered:
+      - "121(a): General exclusion rule"
+      - "121(b)(1)-(2): $250,000/$500,000 limits"
+      - "121(b)(3): Ownership and use requirements (2 out of 5 years)"
+      - "121(b)(4): One sale every 2 years"
+      - "121(c): Reduced exclusion for unforeseen circumstances"
+      - "121(d): Special rules for joint returns"
+    key_variables:
+      - principal_residence_gain_exclusion
+      - principal_residence_exclusion_limit
+      - meets_ownership_test
+      - meets_use_test
+      - qualifies_for_exclusion
+      - reduced_exclusion_percentage
+
+  - path: parameters.yaml
+    description: |
+      Statutory limits and thresholds for home sale exclusion.
+      Fixed amounts from Section 121(b).
+    parameters:
+      - single_exclusion_limit: $250,000
+      - joint_exclusion_limit: $500,000
+      - ownership_period_years: 2
+      - use_period_years: 2
+      - lookback_period_years: 5
+      - waiting_period_years: 2
+
+  - path: tests.yaml
+    description: |
+      Comprehensive test cases covering exclusion scenarios.
+      Includes single/joint filers, partial exclusions, ineligible cases.
+
+# =============================================================================
+# Coverage Details
+# =============================================================================
+
+coverage:
+  tax_years: [1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+              2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018,
+              2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  notes: |
+    Section 121 was added by the Taxpayer Relief Act of 1997, replacing the
+    old Section 1034 rollover rules and Section 121 one-time $125,000 exclusion
+    for taxpayers over 55.
+
+    Key coverage:
+    - Basic exclusion ($250,000 single, $500,000 MFJ)
+    - Ownership and use tests (2 out of 5 years)
+    - Frequency limitation (once every 2 years)
+    - Reduced exclusion for unforeseen circumstances
+    - Special rules for joint returns (both spouses' requirements)
+    - Surviving spouse rules
+
+# =============================================================================
+# Not Implemented (Non-Simulatable Rules)
+# =============================================================================
+
+not_implemented:
+  - provision: "Section 121(b)(3) - Full 2/5 year tracking"
+    description: "Precise ownership and use period tracking"
+    reason: |
+      PolicyEngine operates on point-in-time basis. Cannot track historical
+      ownership/use periods. Implementation assumes eligibility inputs are
+      provided or defaults to eligible.
+
+  - provision: "Section 121(b)(4) - Prior sale tracking"
+    description: "Whether taxpayer used exclusion in prior 2 years"
+    reason: |
+      Requires historical data on prior home sales. Implementation accepts
+      input flag for prior exclusion use.
+
+  - provision: "Section 121(d)(5) - Military/Foreign Service special periods"
+    description: "Suspended 5-year period for certain government service"
+    reason: |
+      Complex temporal tracking of service periods. Can be added as input.
+
+  - provision: "Section 121(d)(6) - Expatriates"
+    description: "Exclusion denied to certain expatriates"
+    reason: |
+      Rare provision requiring Section 877 analysis.
+
+  - provision: "Section 121(d)(10) - Business/Rental use allocation"
+    description: "Depreciation recapture and non-qualified use"
+    reason: |
+      Requires detailed property use history. Implemented as simplified input.
+
+# =============================================================================
+# Dependencies
+# =============================================================================
+
+dependencies:
+  - path: statute/26/1/filing_status
+    description: "Filing status for determining exclusion limit"
+
+  - path: statute/26/1001/capital_gains
+    description: "Realized gain calculation"
+
+  - path: statute/26/1011
+    description: "Adjusted basis determination"
+
+# =============================================================================
+# Sources
+# =============================================================================
+
+sources:
+  statutes:
+    - citation: "26 USC Section 121"
+      title: "Exclusion of gain from sale of principal residence"
+      url: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title26-section121"
+
+  guidance:
+    - citation: "IRS Publication 523"
+      title: "Selling Your Home"
+      url: "https://www.irs.gov/pub/irs-pdf/p523.pdf"
+
+    - citation: "Reg. Section 1.121-1 through 1.121-5"
+      title: "Treasury regulations on Section 121"
+      url: "https://www.ecfr.gov/current/title-26/chapter-I/subchapter-A/part-1"
+
+    - citation: "Rev. Proc. 2005-14"
+      title: "Safe harbor for unforeseen circumstances"
+      url: "https://www.irs.gov/pub/irs-drop/rp-05-14.pdf"
+
+# =============================================================================
+# Validation
+# =============================================================================
+
+validation:
+  external_calculators:
+    - name: "IRS Publication 523 Worksheets"
+      note: "Manual worksheet comparison"
+
+    - name: "TurboTax"
+      note: "Commercial tax software comparison"
+
+    - name: "H&R Block"
+      note: "Commercial tax software comparison"
+
+  tolerance_dollars: 1
+  notes: |
+    Validation tests various scenarios:
+    - Single filer with gain under limit
+    - Single filer with gain over limit
+    - Joint filers meeting both spouses' requirements
+    - Joint filer with only one spouse meeting requirements
+    - Partial exclusion due to unforeseen circumstances
+    - Ineligible due to recent prior exclusion
+    - Depreciation recapture situations
+
+# =============================================================================
+# Architecture Notes
+# =============================================================================
+
+architecture:
+  description: |
+    The Section 121 exclusion follows a straightforward calculation:
+
+    1. **Eligibility Check** (principal_residence_exclusion.cosilico)
+       - Ownership test: Owned 2+ years in last 5
+       - Use test: Used as principal residence 2+ years in last 5
+       - Frequency test: No exclusion claimed in prior 2 years
+
+    2. **Limit Determination** (principal_residence_exclusion.cosilico)
+       - Single/HoH/MFS: $250,000
+       - MFJ with both spouses meeting tests: $500,000
+       - MFJ with only one spouse meeting tests: $250,000
+
+    3. **Reduced Exclusion** (when not fully meeting requirements)
+       - Prorated based on actual time / required time
+       - Applies for unforeseen circumstances (health, employment, etc.)
+
+    4. **Final Exclusion**
+       - Exclusion = min(realized_gain, applicable_limit)
+       - Gain in excess of limit is taxable as capital gain
+
+  entity_model: |
+    - TaxUnit: Primary calculation level
+    - Person: For spouse-specific ownership/use tests
+    - Asset: Principal residence with basis and holding info
+
+  cross_references:
+    - Section 1001 capital gains calculation for realized gain
+    - Section 1(h) preferential rates for non-excluded gain
+    - Prior Section 1034 (repealed) for rollover history

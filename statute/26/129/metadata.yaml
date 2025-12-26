@@ -1,0 +1,118 @@
+# Encoding Metadata for 26 USC 129 (Dependent Care Assistance Programs)
+
+encoding:
+  created: 2024-12-26
+  updated: 2024-12-26
+  status: implemented
+  encoded_by: claude-opus-4.5
+
+variable:
+  name: dcap_exclusion
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+
+coverage:
+  tax_years: [1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  notes: |
+    Section 129 allows employees to exclude employer-provided dependent care
+    assistance from gross income.
+
+    Key provisions:
+    - Maximum exclusion: $5,000 ($2,500 for MFS)
+    - Must have qualifying individual (same definition as 21(b)(1))
+    - Earned income limitation applies (same as 21(d))
+    - ARPA 2021: Temporarily increased limit to $10,500 for 2021
+
+sources:
+  statute:
+    - citation: "26 USC 129"
+      title: "Dependent care assistance programs"
+      path: statute/26/129/
+      files:
+        - a/exclusion.cosilico           # Main exclusion calculation
+        - a/inputs.cosilico              # Input variables
+        - b/earned_income_limit.cosilico # Earned income limitation
+        - d/requirements.cosilico        # Program requirements
+        - e/parameters.yaml              # Dollar limits
+
+  guidance:
+    - citation: "IRS Publication 503"
+      title: "Child and Dependent Care Expenses"
+      source: https://www.irs.gov/publications/p503
+      notes: |
+        Provides guidance on interaction between DCAP exclusion and
+        child/dependent care credit under section 21.
+
+architecture:
+  description: |
+    The Dependent Care Assistance Program (DCAP) exclusion encoding follows
+    the statute structure:
+
+    1. 129(a) - Exclusion from Gross Income
+       - Amounts paid or incurred by employer for dependent care assistance
+       - Up to applicable dollar limit per 129(a)(2)
+       - a/exclusion.cosilico
+
+    2. 129(b) - Earned Income Limitation
+       - Cannot exceed lesser of employee's or spouse's earned income
+       - Special rule for disabled or student spouse
+       - b/earned_income_limit.cosilico
+
+    3. 129(c) - Payments to Related Individuals
+       - Not includible if paid to dependents or children under 19
+       - (Tracked via exclusion of such expenses)
+
+    4. 129(d) - Dependent Care Assistance Program Requirements
+       - Written plan requirements
+       - Nondiscrimination requirements
+       - (Assumed compliant for simulation purposes)
+
+    5. 129(e) - Dollar Limits
+       - $5,000 per year ($2,500 for MFS)
+       - ARPA 2021: $10,500 for 2021 only
+       - e/parameters.yaml
+
+  key_provisions:
+    - provision: "129(a)"
+      description: "Exclusion from gross income"
+      variable: dcap_exclusion
+      parameters:
+        - e/parameters#exclusion_limit
+        - e/parameters#exclusion_limit_mfs
+
+    - provision: "129(b)"
+      description: "Earned income limitation"
+      variable: dcap_earned_income_limit
+      parameters: []
+
+    - provision: "129(e)"
+      description: "Dollar limits"
+      variable: dcap_maximum_exclusion
+      parameters:
+        - e/parameters#exclusion_limit
+        - e/parameters#exclusion_limit_mfs
+
+  dependencies:
+    - path: statute/26/1
+      description: "Filing status"
+    - path: statute/26/32/c/2/A
+      description: "Earned income definition"
+    - path: statute/26/21/e
+      description: "Qualifying individual definition (incorporated by reference)"
+
+  interaction_with_section_21:
+    description: |
+      Section 129(e)(7) requires coordination with section 21 credit:
+      "The amount excludable under subsection (a) for any taxable year shall
+      not exceed the amount which may be taken into account under section 21(c)
+      for such taxable year, reduced by the aggregate amount excludable under
+      subsection (a) for such taxable year."
+
+      In practice, this means:
+      - Employment-related expenses are first reduced by DCAP amounts
+      - The remaining expenses are then eligible for the section 21 credit
+      - Total benefit from both cannot exceed the 21(c) limits
+
+test_files:
+  - tests.yaml  # Comprehensive validation tests

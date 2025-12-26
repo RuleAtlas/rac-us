@@ -1,0 +1,35 @@
+# 26 USC 22(e)(1) - Qualified Individual
+#
+# "(1) QUALIFIED INDIVIDUAL. -- The term 'qualified individual' means any individual--
+#   (A) who has attained age 65 before the close of the taxable year, or
+#   (B) who retired on disability before the close of the taxable year and who,
+#       when he retired, was permanently and totally disabled."
+#
+# Note: For disabled individuals under 65, additional requirements apply per (c)(2):
+# - Must have disability income during the year
+# - Has not reached mandatory retirement age
+
+imports:
+  elderly_age_threshold: statute/26/22/e/qualified_individual#elderly_age_threshold
+
+# Person-level: Is this person a qualified individual?
+entity Person
+period Year
+dtype Boolean
+label "Is Section 22 Qualified Individual"
+description "Whether the person qualifies for the credit for the elderly or disabled per 26 USC 22(e)(1)"
+
+formula:
+  # Age at end of tax year
+  taxpayer_age = age
+
+  # Qualifies if 65+ at end of tax year
+  is_elderly = taxpayer_age >= elderly_age_threshold
+
+  # Qualifies if permanently and totally disabled (under 65)
+  # is_permanently_disabled is assumed to be an input indicating permanent/total disability
+  is_disabled_and_under_65 = is_permanently_disabled and taxpayer_age < elderly_age_threshold
+
+  return is_elderly or is_disabled_and_under_65
+
+default false

@@ -1,0 +1,93 @@
+# 26 USC 129 - Dependent Care Assistance Programs
+#
+# "(a) EXCLUSION. --
+#   (1) IN GENERAL. -- Gross income of an employee does not include amounts paid
+#       or incurred by the employer for dependent care assistance provided to such
+#       employee if the assistance is furnished pursuant to a program which is
+#       described in subsection (d).
+#
+#   (2) LIMITATION. -- The amount which may be excluded under paragraph (1) for
+#       dependent care assistance with respect to dependent care services provided
+#       during a taxable year shall not exceed $5,000 ($2,500 in the case of a
+#       separate return by a married individual)."
+#
+# The exclusion is subject to:
+#   - Dollar limit per 129(a)(2): $5,000 / $2,500 for MFS
+#   - Earned income limit per 129(b): lesser of spouses' earned income
+#   - Qualifying individual requirement (same as 21(b)(1))
+#
+# Key interaction with section 21:
+#   - DCAP amounts reduce the expenses eligible for the section 21 credit
+#   - Per 21(c), amounts excluded under 129 reduce the 21(c) limit
+
+imports:
+# Number of qualifying individuals (must have at least 1)
+  num_cdcc_qualifying_individuals: statute/26/21/e/num_qualifying_individuals#num_cdcc_qualifying_individuals
+
+# Dollar limit parameters
+  exclusion_limit: statute/26/129/e/parameters#exclusion_limit
+  exclusion_limit_mfs: statute/26/129/e/parameters#exclusion_limit_mfs
+
+# Earned income limit
+  dcap_earned_income_limit: statute/26/129/b/earned_income_limit#dcap_earned_income_limit
+
+# Filing status
+  filing_status: statute/26/1/filing_status
+
+# Actual DCAP benefits received (input)
+  dcap_benefits_received: statute/26/129/a/inputs#dcap_benefits_received
+
+# Maximum dollar exclusion based on filing status
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "DCAP Maximum Exclusion"
+description "Maximum dependent care assistance excludable based on filing status per 26 USC 129(a)(2)"
+
+formula:
+  # No qualifying individuals = no exclusion
+  if num_cdcc_qualifying_individuals == 0 then
+    return 0
+
+  # MFS gets half the limit
+  if filing_status == MARRIED_FILING_SEPARATELY then
+    return exclusion_limit_mfs
+
+  # All other statuses get the full limit
+  return exclusion_limit
+
+# The final excludable amount after all limitations
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "DCAP Exclusion"
+description "Dependent care assistance excluded from gross income per 26 USC 129"
+
+formula:
+  # No qualifying individuals = no exclusion
+  if num_cdcc_qualifying_individuals == 0 then
+    return 0
+
+  # Apply all limitations: actual benefits, dollar limit, earned income limit
+  return min(dcap_benefits_received, dcap_maximum_exclusion, dcap_earned_income_limit)
+
+defined_for:
+  num_cdcc_qualifying_individuals > 0
+
+default 0
+
+# Taxable DCAP amount (benefits exceeding exclusion)
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "DCAP Taxable Amount"
+description "Dependent care assistance benefits that exceed the exclusion and are taxable"
+
+formula:
+  # Any DCAP benefits above the excludable amount are included in income
+  return max(0, dcap_benefits_received - dcap_exclusion)
+
+default 0

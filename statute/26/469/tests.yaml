@@ -1,0 +1,580 @@
+# Tests for 26 USC Section 469 - Passive Activity Losses and Credits
+#
+# Test categories:
+# 1. Basic passive loss disallowance
+# 2. Rental real estate $25,000 exception
+# 3. AGI phaseout of rental exception
+# 4. Real estate professional exception
+# 5. MFS special rules
+# 6. Carryforward scenarios
+# 7. Passive income offset
+# 8. Edge cases
+
+variable: passive_activity_loss_limitation
+tax_year: 2024
+
+test_cases:
+
+  # ===========================================================================
+  # Category 1: Basic Passive Loss Disallowance
+  # ===========================================================================
+
+  - name: "Passive loss fully disallowed - no passive income, no active participation"
+    description: "Limited partner with no active participation gets zero deduction"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 80000
+      passive_activity_losses: 15000
+      passive_activity_income: 0
+      actively_participates_in_rental_real_estate: false
+      is_rental_activity: true
+    expected:
+      gross_passive_activity_loss: 15000
+      allowable_passive_activity_loss_deduction: 0
+      disallowed_passive_activity_loss: 15000
+      suspended_passive_losses: 15000
+    citations:
+      - "26 USC 469(a)(1): Disallowance of passive losses"
+      - "26 USC 469(b): Carryforward to next year"
+
+  - name: "Non-rental passive activity - no material participation"
+    description: "Limited partnership investment without material participation"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 200000
+      passive_activity_losses: 50000
+      passive_activity_income: 0
+      has_material_participation_in_activity: false
+      is_rental_activity: false
+    expected:
+      gross_passive_activity_loss: 50000
+      allowable_passive_activity_loss_deduction: 0
+      disallowed_passive_activity_loss: 50000
+    citations:
+      - "26 USC 469(c)(1): Passive activity = no material participation"
+
+  - name: "Material participation - loss fully deductible"
+    description: "Trade or business with material participation is not passive"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 150000
+      passive_activity_losses: 0  # Not passive if materially participating
+      passive_activity_income: 0
+      has_material_participation_in_activity: true
+      is_rental_activity: false
+      # Business loss would be in regular income, not passive
+    expected:
+      gross_passive_activity_loss: 0
+      allowable_passive_activity_loss_deduction: 0
+    citations:
+      - "26 USC 469(c)(1)(B): Material participation = not passive"
+
+  # ===========================================================================
+  # Category 2: Rental Real Estate $25,000 Exception
+  # ===========================================================================
+
+  - name: "Full $25,000 rental exception - low AGI"
+    description: "Active participant with AGI under $100,000 gets full exception"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 75000
+      rental_real_estate_loss: 30000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: false
+    expected:
+      net_rental_real_estate_loss: 30000
+      base_rental_real_estate_allowance: 25000
+      rental_real_estate_allowance_phaseout: 0
+      rental_real_estate_allowance_after_phaseout: 25000
+      rental_real_estate_loss_allowance: 25000  # Capped at $25K
+      disallowed_rental_real_estate_loss: 5000   # $30K - $25K
+    citations:
+      - "26 USC 469(i)(1): $25,000 offset for active participants"
+      - "26 USC 469(i)(2): Dollar limitation"
+
+  - name: "Rental loss less than $25,000 - full deduction"
+    description: "Active participant with small rental loss gets full deduction"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 90000
+      rental_real_estate_loss: 18000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: false
+    expected:
+      net_rental_real_estate_loss: 18000
+      rental_real_estate_loss_allowance: 18000
+      disallowed_rental_real_estate_loss: 0
+    citations:
+      - "26 USC 469(i)(2): Loss limited to $25,000 (but full loss if less)"
+
+  - name: "No active participation - no rental exception"
+    description: "Passive investor in rental property gets no exception"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 80000
+      rental_real_estate_loss: 20000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: false
+      is_real_estate_professional: false
+    expected:
+      rental_real_estate_loss_allowance: 0
+      disallowed_rental_real_estate_loss: 20000
+    citations:
+      - "26 USC 469(i)(1): Requires active participation"
+      - "26 USC 469(i)(6)(A): Active participation standard"
+
+  # ===========================================================================
+  # Category 3: AGI Phaseout of Rental Exception
+  # ===========================================================================
+
+  - name: "Phaseout at $100,000 AGI - no reduction"
+    description: "At exactly $100,000 AGI, no phaseout applies"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 100000
+      rental_real_estate_loss: 25000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: false
+    expected:
+      rental_real_estate_phaseout_threshold: 100000
+      rental_real_estate_allowance_phaseout: 0  # 50% * $0 = $0
+      rental_real_estate_allowance_after_phaseout: 25000
+      rental_real_estate_loss_allowance: 25000
+    citations:
+      - "26 USC 469(i)(3)(A): Phaseout begins at $100,000"
+
+  - name: "Partial phaseout at $120,000 AGI"
+    description: "At $120,000 AGI, allowance reduced by $10,000"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 120000
+      rental_real_estate_loss: 25000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: false
+    expected:
+      # Phaseout = 50% * ($120,000 - $100,000) = 50% * $20,000 = $10,000
+      rental_real_estate_allowance_phaseout: 10000
+      rental_real_estate_allowance_after_phaseout: 15000  # $25K - $10K
+      rental_real_estate_loss_allowance: 15000
+      disallowed_rental_real_estate_loss: 10000
+    citations:
+      - "26 USC 469(i)(3)(A): 50% reduction for excess over $100,000"
+
+  - name: "Midpoint phaseout at $125,000 AGI"
+    description: "Halfway through phaseout range"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 125000
+      rental_real_estate_loss: 30000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: false
+    expected:
+      # Phaseout = 50% * ($125,000 - $100,000) = 50% * $25,000 = $12,500
+      rental_real_estate_allowance_phaseout: 12500
+      rental_real_estate_allowance_after_phaseout: 12500  # $25K - $12.5K
+      rental_real_estate_loss_allowance: 12500
+      disallowed_rental_real_estate_loss: 17500  # $30K - $12.5K
+    citations:
+      - "26 USC 469(i)(3)(A): Phaseout calculation"
+
+  - name: "Full phaseout at $150,000 AGI"
+    description: "At $150,000+ AGI, allowance fully phased out"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 150000
+      rental_real_estate_loss: 25000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: false
+    expected:
+      # Phaseout = 50% * ($150,000 - $100,000) = 50% * $50,000 = $25,000
+      rental_real_estate_allowance_phaseout: 25000
+      rental_real_estate_allowance_after_phaseout: 0
+      rental_real_estate_loss_allowance: 0
+      disallowed_rental_real_estate_loss: 25000
+    citations:
+      - "26 USC 469(i)(3)(A): Fully phased out at $150,000"
+
+  - name: "Above full phaseout at $200,000 AGI"
+    description: "High income taxpayer gets no rental exception"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 200000
+      rental_real_estate_loss: 40000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: false
+    expected:
+      # Phaseout = 50% * ($200,000 - $100,000) = $50,000 > $25,000
+      rental_real_estate_allowance_after_phaseout: 0
+      rental_real_estate_loss_allowance: 0
+      disallowed_rental_real_estate_loss: 40000
+    citations:
+      - "26 USC 469(i)(3)(A): Zero allowance above $150,000"
+
+  # ===========================================================================
+  # Category 4: Real Estate Professional Exception
+  # ===========================================================================
+
+  - name: "Real estate professional - unlimited rental deduction"
+    description: "Qualifying real estate professional can deduct all rental losses"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 500000
+      rental_real_estate_loss: 100000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: true
+      total_hours_in_trades_businesses: 2000
+      hours_in_real_property_trades_businesses: 1200
+      materially_participates_in_real_property_business: true
+    expected:
+      # Real estate pro = unlimited deduction (not subject to passive rules)
+      rental_real_estate_loss_allowance: 100000
+      disallowed_rental_real_estate_loss: 0
+    citations:
+      - "26 USC 469(c)(7)(A): Rental activities not passive for RE professionals"
+
+  - name: "Real estate professional test - meets both requirements"
+    description: "Taxpayer meets 750-hour and majority tests"
+    inputs:
+      filing_status: single
+      total_hours_in_trades_businesses: 1500
+      hours_in_real_property_trades_businesses: 800
+      materially_participates_in_real_property_business: true
+    expected:
+      # 800/1500 = 53.3% > 50% (majority test passed)
+      # 800 > 750 (hours test passed)
+      meets_majority_services_test: true
+      meets_750_hour_test: true
+      is_real_estate_professional: true
+    citations:
+      - "26 USC 469(c)(7)(B): Two-part test"
+
+  - name: "Real estate professional test - fails majority"
+    description: "750+ hours but less than half of services in real property"
+    inputs:
+      filing_status: single
+      total_hours_in_trades_businesses: 2000
+      hours_in_real_property_trades_businesses: 900
+      materially_participates_in_real_property_business: true
+    expected:
+      # 900/2000 = 45% < 50% (majority test failed)
+      # 900 > 750 (hours test passed)
+      meets_majority_services_test: false
+      meets_750_hour_test: true
+      is_real_estate_professional: false
+    citations:
+      - "26 USC 469(c)(7)(B)(i): More than half requirement"
+
+  - name: "Real estate professional test - fails hours"
+    description: "Majority in real property but under 750 hours"
+    inputs:
+      filing_status: single
+      total_hours_in_trades_businesses: 1000
+      hours_in_real_property_trades_businesses: 600
+      materially_participates_in_real_property_business: true
+    expected:
+      # 600/1000 = 60% > 50% (majority test passed)
+      # 600 < 750 (hours test failed)
+      meets_majority_services_test: true
+      meets_750_hour_test: false
+      is_real_estate_professional: false
+    citations:
+      - "26 USC 469(c)(7)(B)(ii): 750 hours requirement"
+
+  # ===========================================================================
+  # Category 5: MFS Special Rules
+  # ===========================================================================
+
+  - name: "MFS living together - no rental exception"
+    description: "MFS taxpayers living together get $0 allowance"
+    inputs:
+      filing_status: married_separate
+      adjusted_gross_income: 80000
+      rental_real_estate_loss: 20000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      lived_apart_from_spouse_all_year: false
+      is_real_estate_professional: false
+    expected:
+      base_rental_real_estate_allowance: 0
+      rental_real_estate_loss_allowance: 0
+      disallowed_rental_real_estate_loss: 20000
+    citations:
+      - "26 USC 469(i)(5)(A): Zero for MFS living together"
+
+  - name: "MFS living apart - reduced allowance and threshold"
+    description: "MFS taxpayers living apart get $12,500 with $50,000 threshold"
+    inputs:
+      filing_status: married_separate
+      adjusted_gross_income: 45000
+      rental_real_estate_loss: 15000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      lived_apart_from_spouse_all_year: true
+      is_real_estate_professional: false
+    expected:
+      base_rental_real_estate_allowance: 12500
+      rental_real_estate_phaseout_threshold: 50000
+      rental_real_estate_allowance_phaseout: 0  # AGI < $50K
+      rental_real_estate_loss_allowance: 12500
+      disallowed_rental_real_estate_loss: 2500  # $15K - $12.5K
+    citations:
+      - "26 USC 469(i)(5)(B): $12,500 and $50,000 for MFS living apart"
+
+  - name: "MFS living apart - partial phaseout"
+    description: "MFS living apart with AGI in phaseout range"
+    inputs:
+      filing_status: married_separate
+      adjusted_gross_income: 60000
+      rental_real_estate_loss: 20000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      lived_apart_from_spouse_all_year: true
+      is_real_estate_professional: false
+    expected:
+      base_rental_real_estate_allowance: 12500
+      rental_real_estate_phaseout_threshold: 50000
+      # Phaseout = 50% * ($60,000 - $50,000) = $5,000
+      rental_real_estate_allowance_phaseout: 5000
+      rental_real_estate_allowance_after_phaseout: 7500  # $12.5K - $5K
+      rental_real_estate_loss_allowance: 7500
+    citations:
+      - "26 USC 469(i)(5)(B): Reduced thresholds for MFS"
+
+  - name: "MFS living apart - full phaseout at $75,000"
+    description: "MFS living apart fully phased out"
+    inputs:
+      filing_status: married_separate
+      adjusted_gross_income: 75000
+      rental_real_estate_loss: 15000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      lived_apart_from_spouse_all_year: true
+      is_real_estate_professional: false
+    expected:
+      # Phaseout = 50% * ($75,000 - $50,000) = $12,500
+      rental_real_estate_allowance_after_phaseout: 0
+      rental_real_estate_loss_allowance: 0
+    citations:
+      - "26 USC 469(i)(5)(B): Full phaseout at $75,000 for MFS"
+
+  # ===========================================================================
+  # Category 6: Carryforward Scenarios
+  # ===========================================================================
+
+  - name: "Prior year carryforward included"
+    description: "Suspended losses from prior year added to current year"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 80000
+      passive_activity_losses: 10000
+      passive_activity_income: 0
+      suspended_passive_losses_prior: 15000
+      actively_participates_in_rental_real_estate: true
+      rental_real_estate_loss: 10000
+      rental_real_estate_income: 0
+      is_real_estate_professional: false
+    expected:
+      total_available_passive_losses: 25000  # $10K + $15K carryforward
+      rental_real_estate_loss_allowance: 10000  # Current year rental
+      # Remaining $15K suspended loss stays suspended unless it qualifies
+    citations:
+      - "26 USC 469(b): Disallowed losses treated as next year deduction"
+
+  - name: "Carryforward used against passive income"
+    description: "Prior suspended losses offset current passive income"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 200000
+      passive_activity_losses: 0
+      passive_activity_income: 20000
+      suspended_passive_losses_prior: 30000
+      actively_participates_in_rental_real_estate: false
+      is_real_estate_professional: false
+    expected:
+      total_available_passive_losses: 30000
+      # $20K passive income offsets $20K of suspended losses
+      # No rental exception (AGI above phaseout)
+      allowable_passive_activity_loss_deduction: 20000
+      disallowed_passive_activity_loss: 10000  # $30K - $20K
+    citations:
+      - "26 USC 469(d)(1): Losses offset passive income"
+
+  # ===========================================================================
+  # Category 7: Passive Income Offset
+  # ===========================================================================
+
+  - name: "Passive losses offset passive income - no limitation"
+    description: "Passive losses can always offset passive income"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 300000  # High AGI - no rental exception
+      passive_activity_losses: 50000
+      passive_activity_income: 50000
+      actively_participates_in_rental_real_estate: false
+      is_real_estate_professional: false
+    expected:
+      gross_passive_activity_loss: 0  # Net = 0
+      net_passive_activity_income: 0
+      allowable_passive_activity_loss_deduction: 50000
+      disallowed_passive_activity_loss: 0
+    citations:
+      - "26 USC 469(a): Losses limited to passive income"
+      - "26 USC 469(d): Loss = excess of losses over income"
+
+  - name: "Partial offset with rental exception"
+    description: "Passive income plus rental exception allows deduction"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 90000
+      passive_activity_losses: 40000
+      passive_activity_income: 10000
+      rental_real_estate_loss: 40000
+      rental_real_estate_income: 10000
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: false
+    expected:
+      # Net loss = $40K - $10K = $30K
+      net_rental_real_estate_loss: 30000
+      # Full $25K rental exception (AGI < $100K)
+      rental_real_estate_loss_allowance: 25000
+      # Offset against passive income: $10K
+      # Rental exception: $25K
+      # Total deductible: $35K
+      # Disallowed: $5K
+      allowable_passive_activity_loss_deduction: 35000
+      disallowed_passive_activity_loss: 5000
+    citations:
+      - "26 USC 469(d) and 469(i): Offset + rental exception"
+
+  # ===========================================================================
+  # Category 8: Edge Cases
+  # ===========================================================================
+
+  - name: "Zero passive activity - no limitation"
+    description: "Taxpayer with no passive activities"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 100000
+      passive_activity_losses: 0
+      passive_activity_income: 0
+      is_rental_activity: false
+      has_material_participation_in_activity: true
+    expected:
+      has_passive_activities: false
+      gross_passive_activity_loss: 0
+      allowable_passive_activity_loss_deduction: 0
+    citations:
+      - "26 USC 469(c): Definition of passive activity"
+
+  - name: "Rental income exceeds losses"
+    description: "Profitable rental property - net passive income"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 120000
+      rental_real_estate_loss: 5000
+      rental_real_estate_income: 15000
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: false
+    expected:
+      net_rental_real_estate_loss: 0  # Income exceeds loss
+      # Net income of $10K - taxable as ordinary income
+    citations:
+      - "26 USC 469(d): Loss = excess of losses over income"
+
+  - name: "Head of household - same rules as single"
+    description: "HOH uses same thresholds as single filers"
+    inputs:
+      filing_status: head_of_household
+      adjusted_gross_income: 100000
+      rental_real_estate_loss: 25000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: false
+    expected:
+      base_rental_real_estate_allowance: 25000  # Same as single
+      rental_real_estate_phaseout_threshold: 100000  # Same as single
+      rental_real_estate_loss_allowance: 25000
+    citations:
+      - "26 USC 469(i): HOH treated same as single"
+
+  - name: "Exactly at $100,000 AGI boundary"
+    description: "Taxpayer precisely at phaseout threshold"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 100000
+      rental_real_estate_loss: 25000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: false
+    expected:
+      rental_real_estate_allowance_phaseout: 0
+      rental_real_estate_loss_allowance: 25000
+    citations:
+      - "26 USC 469(i)(3)(A): Phaseout for excess over $100,000"
+
+  - name: "Exactly at $150,000 AGI boundary"
+    description: "Taxpayer precisely at full phaseout point"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 150000
+      rental_real_estate_loss: 25000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: false
+    expected:
+      rental_real_estate_allowance_phaseout: 25000
+      rental_real_estate_loss_allowance: 0
+    citations:
+      - "26 USC 469(i)(3): Fully phased out at $150,000"
+
+  # ===========================================================================
+  # Category 9: Combined Scenarios
+  # ===========================================================================
+
+  - name: "Multiple rental properties - aggregate treatment"
+    description: "Losses from multiple properties aggregated"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 110000
+      rental_real_estate_loss: 35000  # Total from all properties
+      rental_real_estate_income: 5000   # Total from all properties
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: false
+    expected:
+      net_rental_real_estate_loss: 30000
+      # Phaseout = 50% * ($110K - $100K) = $5,000
+      rental_real_estate_allowance_phaseout: 5000
+      rental_real_estate_allowance_after_phaseout: 20000  # $25K - $5K
+      rental_real_estate_loss_allowance: 20000
+      disallowed_rental_real_estate_loss: 10000  # $30K - $20K
+    citations:
+      - "26 USC 469(i): Applies to all rental real estate activities"
+
+  - name: "Real estate professional with high income"
+    description: "RE professional with $1M income can deduct all rental losses"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 1000000
+      rental_real_estate_loss: 200000
+      rental_real_estate_income: 0
+      actively_participates_in_rental_real_estate: true
+      is_real_estate_professional: true
+      total_hours_in_trades_businesses: 2500
+      hours_in_real_property_trades_businesses: 1500
+      materially_participates_in_real_property_business: true
+    expected:
+      is_real_estate_professional: true
+      # Not subject to $25K limitation or phaseout
+      rental_real_estate_loss_allowance: 200000
+      disallowed_rental_real_estate_loss: 0
+    citations:
+      - "26 USC 469(c)(7): Real estate professional exception"
+      - "No AGI limitation for RE professionals"

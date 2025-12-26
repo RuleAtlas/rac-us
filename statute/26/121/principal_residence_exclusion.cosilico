@@ -1,0 +1,264 @@
+# 26 USC Section 121 - Exclusion of Gain from Sale of Principal Residence
+#
+# "Gross income shall not include gain from the sale or exchange of property if,
+# during the 5-year period ending on the date of the sale or exchange, such
+# property has been owned and used by the taxpayer as the taxpayer's principal
+# residence for periods aggregating 2 years or more."
+#
+# Key provisions:
+# - 121(a): General exclusion rule - up to $250,000 of gain
+# - 121(b)(1): Basic limitation - $250,000 per taxpayer
+# - 121(b)(2): Joint return limitation - $500,000 if both spouses meet requirements
+# - 121(b)(3): Frequency limitation - once every 2 years
+# - 121(c): Reduced exclusion for unforeseen circumstances
+# - 121(d): Special rules (joint returns, surviving spouses, depreciation)
+
+imports:
+  # Filing status for determining applicable limit
+  filing_status: statute/26/1/filing_status
+
+  # Property information (inputs)
+  realized_gain_on_residence: inputs/realized_gain_on_residence
+  years_owned: inputs/years_owned
+  years_used_as_residence: inputs/years_used_as_residence
+  years_since_last_exclusion: inputs/years_since_last_exclusion
+  prior_exclusion_claimed: inputs/prior_exclusion_claimed
+
+  # Joint return spouse requirements
+  spouse_meets_use_test: inputs/spouse_meets_use_test
+  spouse_prior_exclusion_claimed: inputs/spouse_prior_exclusion_claimed
+
+  # Unforeseen circumstances / reduced exclusion
+  qualifies_for_reduced_exclusion: inputs/qualifies_for_reduced_exclusion
+
+  # Depreciation recapture (not excludable)
+  depreciation_after_1997: inputs/depreciation_after_1997
+
+  # Parameters from Section 121
+  single_limit: params/121/single_exclusion_limit
+  joint_limit: params/121/joint_exclusion_limit
+  ownership_required: params/121/ownership_period_years
+  use_required: params/121/use_period_years
+  lookback_period: params/121/lookback_period_years
+  waiting_period: params/121/waiting_period_years
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Principal Residence Gain Exclusion"
+description "Amount of gain from sale of principal residence excluded from gross income per 26 USC 121"
+
+# =============================================================================
+# Intermediate Variables
+# =============================================================================
+
+# 121(b)(3)(A): Ownership requirement - owned 2+ years in last 5
+variable meets_ownership_test:
+  dtype Boolean
+  description "Whether taxpayer meets 2-year ownership requirement"
+  formula:
+    return years_owned >= ownership_required
+
+# 121(a): Use requirement - used as principal residence 2+ years in last 5
+variable meets_use_test:
+  dtype Boolean
+  description "Whether taxpayer meets 2-year use requirement"
+  formula:
+    return years_used_as_residence >= use_required
+
+# 121(b)(3): Frequency limitation - no exclusion claimed in prior 2 years
+variable meets_frequency_test:
+  dtype Boolean
+  description "Whether taxpayer meets once-every-2-years limitation"
+  formula:
+    if not prior_exclusion_claimed then
+      return true
+    return years_since_last_exclusion >= waiting_period
+
+# Combined basic eligibility (all three tests)
+variable meets_full_requirements:
+  dtype Boolean
+  description "Whether taxpayer fully qualifies for exclusion"
+  formula:
+    return meets_ownership_test and meets_use_test and meets_frequency_test
+
+# =============================================================================
+# Section 121(b)(2) - Joint Return Special Rules
+# =============================================================================
+
+# For $500,000 limit, need: (1) either spouse owns 2+ years,
+# (2) BOTH spouses used 2+ years, (3) NEITHER spouse claimed exclusion in prior 2 years
+variable qualifies_for_joint_limit:
+  dtype Boolean
+  description "Whether married filing jointly qualifies for $500,000 limit"
+  formula:
+    if filing_status != JOINT then
+      return false
+
+    # Either spouse meets ownership (we assume primary taxpayer's ownership)
+    either_spouse_owns = meets_ownership_test
+
+    # Both spouses must meet use test
+    both_spouses_used = meets_use_test and spouse_meets_use_test
+
+    # Neither spouse used exclusion in prior 2 years
+    neither_used_recently = meets_frequency_test and not spouse_prior_exclusion_claimed
+
+    return either_spouse_owns and both_spouses_used and neither_used_recently
+
+# =============================================================================
+# Section 121(c) - Reduced Exclusion
+# =============================================================================
+
+# Reduced exclusion applies when requirements not fully met due to:
+# (1) Change in employment, (2) Health, or (3) Unforeseen circumstances
+# The exclusion is prorated based on time actually meeting requirements
+
+variable reduced_exclusion_fraction:
+  dtype Rate
+  description "Fraction of full exclusion available under 121(c)"
+  formula:
+    if meets_full_requirements then
+      return 1.0
+
+    if not qualifies_for_reduced_exclusion then
+      return 0.0
+
+    # Fraction = shorter of (ownership/use time) or (time since last exclusion)
+    # divided by required period (2 years)
+
+    # Ownership fraction
+    ownership_fraction = min(years_owned / ownership_required, 1.0)
+
+    # Use fraction
+    use_fraction = min(years_used_as_residence / use_required, 1.0)
+
+    # Frequency fraction (if applicable)
+    if prior_exclusion_claimed then
+      frequency_fraction = min(years_since_last_exclusion / waiting_period, 1.0)
+    else
+      frequency_fraction = 1.0
+
+    # Take the minimum of all applicable fractions
+    return min(ownership_fraction, use_fraction, frequency_fraction)
+
+# =============================================================================
+# Applicable Exclusion Limit
+# =============================================================================
+
+variable applicable_exclusion_limit:
+  dtype Money
+  unit "USD"
+  description "Maximum exclusion available based on filing status and requirements"
+  formula:
+    # Determine base limit
+    if qualifies_for_joint_limit then
+      base_limit = joint_limit
+    else
+      base_limit = single_limit
+
+    # Apply reduced exclusion fraction if not fully meeting requirements
+    return base_limit * reduced_exclusion_fraction
+
+# =============================================================================
+# Section 121(d)(6) - Depreciation Recapture
+# =============================================================================
+
+# Gain attributable to depreciation after May 6, 1997 is NOT excludable
+variable excludable_gain:
+  dtype Money
+  unit "USD"
+  description "Gain eligible for exclusion (realized gain minus depreciation recapture)"
+  formula:
+    # Depreciation taken after May 6, 1997 is not excludable
+    # It is taxed as unrecaptured Section 1250 gain (25% rate)
+    return max(0, realized_gain_on_residence - depreciation_after_1997)
+
+# =============================================================================
+# Main Formula - Final Exclusion Amount
+# =============================================================================
+
+formula:
+  # If no gain, no exclusion needed
+  if realized_gain_on_residence <= 0 then
+    return 0
+
+  # Calculate the excludable gain (after removing depreciation recapture)
+  gain_available = excludable_gain
+
+  # Calculate applicable limit
+  limit = applicable_exclusion_limit
+
+  # If limit is zero (doesn't qualify for any exclusion), return 0
+  if limit <= 0 then
+    return 0
+
+  # Exclusion is the lesser of gain or limit
+  return min(gain_available, limit)
+
+# Default if inputs missing
+default 0
+
+# =============================================================================
+# Examples and Validation Hooks
+# =============================================================================
+
+examples:
+  - name: "Single filer, full exclusion"
+    description: "Gain under $250,000, all requirements met"
+    inputs:
+      filing_status: SINGLE
+      realized_gain_on_residence: 150000
+      years_owned: 3
+      years_used_as_residence: 3
+      prior_exclusion_claimed: false
+      depreciation_after_1997: 0
+    expected: 150000
+
+  - name: "Single filer, gain exceeds limit"
+    description: "Gain over $250,000"
+    inputs:
+      filing_status: SINGLE
+      realized_gain_on_residence: 350000
+      years_owned: 4
+      years_used_as_residence: 4
+      prior_exclusion_claimed: false
+      depreciation_after_1997: 0
+    expected: 250000
+
+  - name: "Joint filers, full $500,000 exclusion"
+    description: "Both spouses meet all requirements"
+    inputs:
+      filing_status: JOINT
+      realized_gain_on_residence: 400000
+      years_owned: 5
+      years_used_as_residence: 5
+      spouse_meets_use_test: true
+      prior_exclusion_claimed: false
+      spouse_prior_exclusion_claimed: false
+      depreciation_after_1997: 0
+    expected: 400000
+
+  - name: "Reduced exclusion - unforeseen circumstances"
+    description: "Sold after 1 year due to job relocation"
+    inputs:
+      filing_status: SINGLE
+      realized_gain_on_residence: 100000
+      years_owned: 1
+      years_used_as_residence: 1
+      prior_exclusion_claimed: false
+      qualifies_for_reduced_exclusion: true
+      depreciation_after_1997: 0
+    expected: 100000  # $125,000 limit (50% of $250k), but gain is only $100k
+
+  - name: "Depreciation recapture reduces exclusion"
+    description: "Home office depreciation not excludable"
+    inputs:
+      filing_status: SINGLE
+      realized_gain_on_residence: 280000
+      years_owned: 5
+      years_used_as_residence: 5
+      prior_exclusion_claimed: false
+      depreciation_after_1997: 30000
+    expected: 250000  # Full excludable gain ($250k), but $30k depreciation recaptured separately

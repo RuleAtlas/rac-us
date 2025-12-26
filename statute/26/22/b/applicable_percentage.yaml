@@ -1,0 +1,14 @@
+# 26 USC § 22(a) - Applicable Percentage
+#
+# "(a) GENERAL RULE. -- In the case of a qualified individual, there shall be
+# allowed as a credit against the tax imposed by this chapter for the taxable
+# year an amount equal to 15 percent of such individual's section 22 amount
+# for such taxable year."
+
+applicable_percentage:
+  description: "Credit rate applied to section 22 amount"
+  unit: /1
+  values:
+    1984-01-01: 0.15
+  citations:
+    - "26 USC § 22(a): 15 percent of the section 22 amount"

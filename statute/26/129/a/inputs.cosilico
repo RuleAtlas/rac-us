@@ -1,0 +1,15 @@
+# 26 USC 129 - Input Variables
+#
+# Employer-provided dependent care assistance received during the taxable year.
+# This represents amounts paid or incurred by the employer for dependent care
+# assistance under a qualifying program (cafeteria plan, FSA, etc.).
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "DCAP Benefits Received"
+description "Employer-provided dependent care assistance received during the year"
+
+# Input variable - no formula
+default 0

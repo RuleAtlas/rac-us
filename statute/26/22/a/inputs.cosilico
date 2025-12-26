@@ -1,0 +1,46 @@
+# 26 USC 22 - Input Variables
+#
+# Input variables needed to calculate the Credit for the Elderly or Disabled.
+# These are amounts received that reduce the section 22 amount per 26 USC 22(d)(1).
+
+# Nontaxable Social Security benefits
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Nontaxable Social Security Benefits"
+description "Social Security benefits not included in gross income (for section 22 reduction)"
+
+default 0
+
+# Railroad retirement tier 1 benefits (treated like Social Security)
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Nontaxable Railroad Retirement Benefits"
+description "Railroad retirement tier 1 benefits not included in gross income"
+
+default 0
+
+# Disability income received while under 65
+# Per 22(c)(2)(B)(iii), this only applies to disabled individuals under 65
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Taxable Disability Income"
+description "Disability income included in gross income for qualified individuals under age 65"
+
+default 0
+
+# Pensions and annuities received (taxable portion)
+# Per 22(d)(1)(B), pensions/annuities included in gross income reduce section 22 amount
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Taxable Pension and Annuity Income"
+description "Pension and annuity income included in gross income (excludes Social Security)"
+
+default 0

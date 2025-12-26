@@ -1,0 +1,37 @@
+# 26 USC 22(d)(1) - Nontaxable Pension and Annuity Reduction
+#
+# "(1) NONTAXABLE PENSIONS, ANNUITIES, OR DISABILITY INCOME. --
+# The section 22 amount shall be reduced by an amount equal to any amount received--
+#   (A) any amount received as a pension or annuity or as a disability benefit
+#       under any provision of title II of the Social Security Act which is
+#       excluded from gross income...
+#   (B) any amount included in gross income under section 72, 402, 403, or 408
+#       as a pension, annuity, or similar allowance...
+#   (C) any amount received as a disability benefit for the taxable year
+#       under a public or private disability plan..."
+#
+# Key: This reduction applies BEFORE the AGI reduction per 22(d)(2).
+
+imports:
+  nontaxable_social_security: statute/26/22/a/inputs#nontaxable_social_security
+  nontaxable_railroad_retirement: statute/26/22/a/inputs#nontaxable_railroad_retirement
+  taxable_pension_annuity: statute/26/22/a/inputs#taxable_pension_annuity
+  taxable_disability_income: statute/26/22/a/inputs#taxable_disability_income
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Section 22 Nontaxable Income Reduction"
+description "Reduction to section 22 amount for nontaxable pensions, Social Security, and disability income per 26 USC 22(d)(1)"
+
+formula:
+  # Sum all amounts that reduce the section 22 amount
+  # Per statute: Social Security (nontaxable) + pensions/annuities (taxable) + disability
+  social_security_reduction = nontaxable_social_security + nontaxable_railroad_retirement
+  pension_reduction = taxable_pension_annuity
+  disability_reduction = taxable_disability_income
+
+  return social_security_reduction + pension_reduction + disability_reduction
+
+default 0

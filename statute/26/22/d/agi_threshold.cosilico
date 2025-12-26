@@ -1,0 +1,32 @@
+# 26 USC 22(d)(2) - AGI Threshold
+#
+# "(2) ADJUSTED GROSS INCOME. --
+# If the adjusted gross income of the taxpayer exceeds--
+#   (A) $7,500 in the case of a single individual or head of household,
+#   (B) $10,000 in the case of a joint return, or
+#   (C) $5,000 in the case of a married individual filing a separate return,
+# the section 22 amount shall be reduced by one-half of the excess."
+
+imports:
+  agi_threshold_single: statute/26/22/d/reduction#agi_threshold_single
+  agi_threshold_joint: statute/26/22/d/reduction#agi_threshold_joint
+  agi_threshold_separate: statute/26/22/d/reduction#agi_threshold_separate
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Section 22 AGI Threshold"
+description "AGI threshold for section 22 reduction based on filing status per 26 USC 22(d)(2)"
+
+formula:
+  if filing_status == JOINT then
+  return agi_threshold_joint
+
+  if filing_status == SEPARATE then
+  return agi_threshold_separate
+
+  # Single, head of household, surviving spouse
+  return agi_threshold_single
+
+default 7500

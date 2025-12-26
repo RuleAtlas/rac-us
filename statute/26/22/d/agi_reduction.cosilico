@@ -1,0 +1,27 @@
+# 26 USC 22(d)(2) - AGI Reduction
+#
+# "If the adjusted gross income of the taxpayer exceeds [threshold]...
+# the section 22 amount shall be reduced by one-half of the excess."
+#
+# The reduction is 50% of AGI above the applicable threshold.
+
+imports:
+  agi_reduction_rate: statute/26/22/d/reduction#agi_reduction_rate
+  sec22_agi_threshold: statute/26/22/d/agi_threshold#sec22_agi_threshold
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Section 22 AGI Reduction"
+description "Reduction to section 22 amount based on excess AGI per 26 USC 22(d)(2)"
+
+formula:
+  # Calculate excess AGI over threshold
+  excess_agi = max(0, adjusted_gross_income - sec22_agi_threshold)
+
+  # Reduction is 50% of excess
+  return excess_agi * agi_reduction_rate
+
+default 0

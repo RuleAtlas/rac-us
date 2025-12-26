@@ -1,0 +1,168 @@
+# 26 USC Section 121 - Exclusion of Gain from Sale of Principal Residence
+#
+# This file contains statutory limits and thresholds for the home sale exclusion.
+# These values are fixed in statute (NOT inflation-adjusted).
+#
+# Sources:
+# - 26 USC Section 121(b): Limitations
+# - Taxpayer Relief Act of 1997, Pub.L. 105-34
+
+reference: "26 USC Section 121"
+description: Principal residence gain exclusion limits and requirements
+last_updated: 2024-12-26
+
+# =============================================================================
+# Section 121(b)(1) - Maximum Exclusion Amounts
+# =============================================================================
+
+single_exclusion_limit:
+  description: "Maximum gain exclusion for single, head of household, or married filing separately filers"
+  unit: currency-USD
+  values:
+    # Effective date: Sales after May 6, 1997
+    1997-05-07: 250000
+  citations:
+    - "26 USC Section 121(b)(1): 'gross income shall not include gain... in an amount not to exceed $250,000'"
+    - "Taxpayer Relief Act of 1997, Pub.L. 105-34, Section 312"
+  notes: |
+    This limit applies to:
+    - Single filers
+    - Head of household filers
+    - Married filing separately filers
+    - One spouse on joint return if only that spouse meets requirements
+    This amount is NOT adjusted for inflation.
+
+joint_exclusion_limit:
+  description: "Maximum gain exclusion for married filing jointly when both spouses meet requirements"
+  unit: currency-USD
+  values:
+    1997-05-07: 500000
+  citations:
+    - "26 USC Section 121(b)(2)(A): 'the limitation... shall be $500,000'"
+    - "Taxpayer Relief Act of 1997, Pub.L. 105-34, Section 312"
+  notes: |
+    The $500,000 limit applies only if:
+    (1) Either spouse meets the ownership requirement
+    (2) Both spouses meet the use requirement
+    (3) Neither spouse used the exclusion in the prior 2 years
+    If these conditions are not met, the limit is $250,000.
+
+# =============================================================================
+# Section 121(b)(3) - Ownership and Use Requirements
+# =============================================================================
+
+ownership_period_years:
+  description: "Minimum years of ownership required within the lookback period"
+  unit: years
+  values:
+    1997-05-07: 2
+  citations:
+    - "26 USC Section 121(a): 'the taxpayer... has owned and used such property as the taxpayer's principal residence for periods aggregating 2 years or more'"
+  notes: |
+    The 2-year ownership requirement can be satisfied by owning the property
+    for any 24 months (aggregated, not necessarily consecutive) during the
+    5-year lookback period.
+
+use_period_years:
+  description: "Minimum years of use as principal residence required within the lookback period"
+  unit: years
+  values:
+    1997-05-07: 2
+  citations:
+    - "26 USC Section 121(a): 'used such property as the taxpayer's principal residence for periods aggregating 2 years or more'"
+  notes: |
+    The 2-year use requirement can be satisfied by living in the property
+    as principal residence for any 24 months (aggregated, not necessarily
+    consecutive) during the 5-year lookback period.
+
+lookback_period_years:
+  description: "Period during which ownership and use requirements must be met"
+  unit: years
+  values:
+    1997-05-07: 5
+  citations:
+    - "26 USC Section 121(a): 'during the 5-year period ending on the date of the sale or exchange'"
+  notes: |
+    The 5-year period ends on the date of sale. Special rules in Section 121(d)
+    may suspend this period for certain government/military service.
+
+# =============================================================================
+# Section 121(b)(3) - Frequency Limitation
+# =============================================================================
+
+waiting_period_years:
+  description: "Minimum years between exclusion claims"
+  unit: years
+  values:
+    1997-05-07: 2
+  citations:
+    - "26 USC Section 121(b)(3): 'shall not apply to any sale or exchange by the taxpayer if, during the 2-year period ending on the date of such sale or exchange, there was any other sale or exchange'"
+  notes: |
+    A taxpayer cannot claim the exclusion if they claimed it on another
+    home sale within the 2-year period ending on the date of the current sale.
+    Partial exclusions under 121(c) do count toward this limitation.
+
+# =============================================================================
+# Section 121(c) - Reduced Maximum Exclusion (Unforeseen Circumstances)
+# =============================================================================
+# Note: The reduced exclusion is calculated as a fraction of the full exclusion
+# based on the shorter of:
+# (1) Time owned and used / Required time (2 years)
+# (2) Time since last exclusion / Required waiting period (2 years)
+
+safe_harbor_events:
+  description: "Safe harbor events qualifying for reduced exclusion per Rev. Proc. 2005-14"
+  type: list
+  values:
+    - "change_in_employment"
+    - "health"
+    - "unforeseen_circumstances"
+  citations:
+    - "26 USC Section 121(c)(2): Unforeseen circumstances"
+    - "Reg. Section 1.121-3(e): Safe harbor definitions"
+    - "Rev. Proc. 2005-14: Detailed safe harbor rules"
+  notes: |
+    Section 121(c) allows a reduced exclusion when the full ownership/use
+    requirements are not met due to:
+    (A) Change in place of employment (50+ miles farther from residence)
+    (B) Health (physician recommendation to move for patient/family health)
+    (C) Unforeseen circumstances defined by Treasury regulations
+
+    Rev. Proc. 2005-14 provides safe harbors for:
+    - Death of qualified individual
+    - Divorce or legal separation
+    - Becoming eligible for unemployment compensation
+    - Change in employment making home unaffordable
+    - Multiple births from same pregnancy
+    - Damage from disaster/war/terrorism
+    - Condemnation/seizure/conversion
+
+# =============================================================================
+# Section 121(d)(9) - Depreciation After May 6, 1997 (Recapture)
+# =============================================================================
+
+depreciation_recapture_start_date:
+  description: "Date after which depreciation must be recaptured (not excludable)"
+  type: date
+  values:
+    permanent: 1997-05-06
+  citations:
+    - "26 USC Section 121(d)(6): 'shall not apply to so much of the gain from the sale of any property as does not exceed the portion of the depreciation adjustments... attributable to periods after May 6, 1997'"
+  notes: |
+    Gain attributable to depreciation deductions taken after May 6, 1997
+    (for example, if the home was used as a rental or home office) cannot
+    be excluded under Section 121. This depreciation recapture is taxed
+    as unrecaptured Section 1250 gain (25% rate) per Section 1(h)(6).
+
+# =============================================================================
+# Cross-References
+# =============================================================================
+
+cross_references:
+  prior_law:
+    - "Section 1034 (repealed): Rollover of gain on sale of principal residence"
+    - "Section 121 (pre-1997): One-time $125,000 exclusion for taxpayers age 55+"
+  related_sections:
+    - "Section 1001: Determination of gain or loss"
+    - "Section 1(h)(6): 25% rate on unrecaptured Section 1250 gain"
+    - "Section 1041: Transfers incident to divorce"

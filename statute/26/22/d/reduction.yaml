@@ -1,0 +1,51 @@
+# 26 USC § 22(d) - Reduction
+#
+# "(d) ADJUSTED SECTION 22 AMOUNT. --
+#   (1) NONTAXABLE PENSIONS, ANNUITIES, OR DISABILITY INCOME. --
+#     The section 22 amount shall be reduced by an amount equal to...
+#     (A) any amount received as a pension or annuity... under the Social Security Act...
+#     (B) any amount included in gross income... as a pension or annuity...
+#     (C) any amount received as a disability benefit for the taxable year...
+#
+#   (2) ADJUSTED GROSS INCOME. --
+#     If the adjusted gross income of the taxpayer exceeds--
+#       (A) $7,500 in the case of a single individual or head of household,
+#       (B) $10,000 in the case of a joint return, or
+#       (C) $5,000 in the case of a married individual filing a separate return,
+#     the section 22 amount shall be reduced by one-half of the excess."
+
+# AGI reduction rate
+agi_reduction_rate:
+  description: "Rate at which excess AGI reduces the section 22 amount"
+  unit: /1
+  values:
+    1984-01-01: 0.50
+  citations:
+    - "26 USC § 22(d)(2): reduced by one-half of the excess"
+
+# AGI threshold for single filers and head of household
+agi_threshold_single:
+  description: "AGI threshold above which section 22 amount is reduced for single filers and heads of household"
+  unit: currency-USD
+  values:
+    1984-01-01: 7500
+  citations:
+    - "26 USC § 22(d)(2)(A): $7,500 for single individual or head of household"
+
+# AGI threshold for joint filers
+agi_threshold_joint:
+  description: "AGI threshold above which section 22 amount is reduced for joint filers"
+  unit: currency-USD
+  values:
+    1984-01-01: 10000
+  citations:
+    - "26 USC § 22(d)(2)(B): $10,000 for joint return"
+
+# AGI threshold for married filing separately
+agi_threshold_separate:
+  description: "AGI threshold above which section 22 amount is reduced for married filing separately"
+  unit: currency-USD
+  values:
+    1984-01-01: 5000
+  citations:
+    - "26 USC § 22(d)(2)(C): $5,000 for married individual filing separate return"

@@ -1,0 +1,38 @@
+# 26 USC § 22(c) - Section 22 Amount
+#
+# "(1) IN GENERAL. -- Except as provided in paragraph (2), the section 22 amount is--
+#   (A) $5,000 in the case of--
+#     (i) a joint return where only one spouse is a qualified individual,
+#     (ii) a return of a surviving spouse, or
+#     (iii) a return of a head of household or an individual who is not married,
+#   (B) $7,500 in the case of a joint return where both spouses are qualified individuals, or
+#   (C) $3,750 in the case of a married individual filing a separate return."
+#
+# These amounts have not been indexed and remain at their 1984 statutory levels.
+
+# Initial amount for single, head of household, or one qualified spouse
+initial_amount_single:
+  description: "Section 22 initial amount for single filer, head of household, qualifying surviving spouse, or joint return where only one spouse is a qualified individual"
+  unit: currency-USD
+  values:
+    1984-01-01: 5000
+  citations:
+    - "26 USC § 22(c)(1)(A): $5,000 for single, head of household, or joint with one qualified spouse"
+
+# Initial amount for joint return with both spouses qualified
+initial_amount_joint_both:
+  description: "Section 22 initial amount for joint return where both spouses are qualified individuals"
+  unit: currency-USD
+  values:
+    1984-01-01: 7500
+  citations:
+    - "26 USC § 22(c)(1)(B): $7,500 for joint return where both spouses are qualified"
+
+# Initial amount for married filing separately
+initial_amount_separate:
+  description: "Section 22 initial amount for married filing separately"
+  unit: currency-USD
+  values:
+    1984-01-01: 3750
+  citations:
+    - "26 USC § 22(c)(1)(C): $3,750 for married individual filing separate return"

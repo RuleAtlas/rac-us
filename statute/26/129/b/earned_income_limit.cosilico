@@ -1,0 +1,73 @@
+# 26 USC 129(b) - Earned Income Limitation
+#
+# "(b) EARNED INCOME LIMITATION. --
+#   (1) IN GENERAL. -- The amount excluded from the gross income of an employee
+#       under subsection (a) for any taxable year shall not exceed --
+#       (A) in the case of an employee who is not married at the close of such
+#           taxable year, the earned income of such employee for such taxable year, or
+#       (B) in the case of an employee who is married at the close of such taxable
+#           year, the lesser of --
+#           (i) the earned income of such employee for such taxable year, or
+#           (ii) the earned income of the spouse of such employee for such taxable year.
+#
+#   (2) SPECIAL RULE FOR CERTAIN SPOUSES. -- For purposes of paragraph (1), in
+#       the case of a spouse who is a student or is incapable of caring for himself,
+#       the spouse is deemed to have earned income of not less than --
+#       (A) $250 per month during which such spouse is a full-time student..., or
+#       (B) $500 per month during which such spouse is incapable of caring for himself"
+#
+# This mirrors the earned income limitation under section 21(d).
+
+imports:
+# Filing status
+  filing_status: statute/26/1/filing_status
+
+# Earned income
+  earned_income: statute/26/32/c/2/A/earned_income
+
+# Person-level characteristics
+  is_tax_unit_head: statute/26/1/person/is_tax_unit_head
+  is_tax_unit_spouse: statute/26/1/person/is_tax_unit_spouse
+  is_full_time_student: statute/26/1/person/is_full_time_student
+  is_disabled: statute/26/1/person/is_disabled
+
+# Parameters for imputed income
+  imputed_monthly_one: statute/26/129/e/parameters#imputed_earned_income_monthly_one
+  imputed_monthly_two: statute/26/129/e/parameters#imputed_earned_income_monthly_two
+
+# Number of qualifying individuals (from section 21)
+  num_cdcc_qualifying_individuals: statute/26/21/e/num_qualifying_individuals#num_cdcc_qualifying_individuals
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "DCAP Earned Income Limit"
+description "Earned income limitation on dependent care assistance exclusion per 26 USC 129(b)"
+
+formula:
+  # For single/HoH filers: use the head's earned income
+  if filing_status == SINGLE or filing_status == HEAD_OF_HOUSEHOLD then
+    return tax_unit.members.sum(earned_income, where: is_tax_unit_head)
+
+  # For married filers: use lesser of two spouses' earned income
+  # But first apply the special rule for student/disabled spouse
+  head_earned = tax_unit.members.sum(earned_income, where: is_tax_unit_head)
+
+  # Check if spouse is student or disabled
+  spouse_actual_earned = tax_unit.members.sum(earned_income, where: is_tax_unit_spouse)
+  spouse_is_student = tax_unit.members.any(is_full_time_student, where: is_tax_unit_spouse)
+  spouse_is_disabled = tax_unit.members.any(is_disabled, where: is_tax_unit_spouse)
+
+  # Determine imputed income for student/disabled spouse
+  # Imputed for 12 months (annual amount)
+  imputed_monthly = if num_cdcc_qualifying_individuals >= 2 then imputed_monthly_two else imputed_monthly_one
+  imputed_annual = imputed_monthly * 12
+
+  # If spouse is student or disabled, use higher of actual or imputed income
+  spouse_earned = if spouse_is_student or spouse_is_disabled then
+    max(spouse_actual_earned, imputed_annual)
+  else
+    spouse_actual_earned
+
+  return min(head_earned, spouse_earned)

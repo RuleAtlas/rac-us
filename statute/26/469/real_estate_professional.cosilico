@@ -1,0 +1,139 @@
+# 26 USC Section 469(c)(7) - Real Estate Professional Exception
+#
+# "(7) Special rules for certain rental activities.--
+#  (A) In general.--In the case of a taxpayer to whom this paragraph applies--
+#   (i) paragraph (2) shall not apply to any interests of the taxpayer in rental
+#       real estate activities, and
+#   (ii) such interests shall be treated as a single rental real estate activity
+#        for purposes of this section (unless the taxpayer elects otherwise).
+#
+#  (B) Taxpayers to whom this paragraph applies.--This paragraph shall apply
+#      to a taxpayer for a taxable year if--
+#   (i) more than one-half of the personal services performed in trades or
+#       businesses by the taxpayer during such taxable year are performed in
+#       real property trades or businesses in which the taxpayer materially
+#       participates, and
+#   (ii) such taxpayer performs more than 750 hours of services during the
+#        taxable year in real property trades or businesses in which the
+#        taxpayer materially participates.
+#
+#  (C) Real property trade or business.--For purposes of this paragraph, the term
+#      'real property trade or business' means any real property development,
+#      redevelopment, construction, reconstruction, acquisition, conversion, rental,
+#      operation, management, leasing, or brokerage trade or business."
+#
+# This provision was added by OBRA 1993, effective for tax years beginning
+# after December 31, 1993.
+
+imports:
+  # Inputs for real estate professional determination
+  total_hours_in_trades_businesses: inputs/total_hours_in_trades_businesses
+  hours_in_real_property_trades_businesses: inputs/hours_in_real_property_trades_businesses
+  materially_participates_in_real_property_business: inputs/materially_participates_in_real_property_business
+
+  # Parameters
+  hours_threshold: parameters#real_estate_professional.hours_threshold
+
+# =============================================================================
+# Real Property Trade or Business - Section 469(c)(7)(C)
+# =============================================================================
+# Per 469(c)(7)(C), "real property trade or business" includes:
+# - Real property development
+# - Real property redevelopment
+# - Real property construction
+# - Real property reconstruction
+# - Real property acquisition
+# - Real property conversion
+# - Real property rental
+# - Real property operation
+# - Real property management
+# - Real property leasing
+# - Real property brokerage
+#
+# These activities must be trades/businesses, not mere investment activities.
+
+# =============================================================================
+# Hours Test - Section 469(c)(7)(B)(ii)
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Boolean
+unit ""
+label "Meets 750-Hour Test"
+description "Whether taxpayer performs 750+ hours in real property trades/businesses per 26 USC 469(c)(7)(B)(ii)"
+
+formula:
+  # Per 469(c)(7)(B)(ii): More than 750 hours in real property trades/businesses
+  # where taxpayer materially participates
+  hours_in_real_property = hours_in_real_property_trades_businesses
+  materially_participates = materially_participates_in_real_property_business
+
+  return materially_participates and (hours_in_real_property > hours_threshold)
+
+default false
+
+# =============================================================================
+# Majority Test - Section 469(c)(7)(B)(i)
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Boolean
+unit ""
+label "Meets Majority Services Test"
+description "Whether majority of personal services are in real property trades/businesses per 26 USC 469(c)(7)(B)(i)"
+
+formula:
+  # Per 469(c)(7)(B)(i): More than half of personal services in all trades/businesses
+  # must be in real property trades/businesses with material participation
+
+  # Avoid division by zero
+  total_hours = max(1, total_hours_in_trades_businesses)
+  hours_in_real_property = hours_in_real_property_trades_businesses
+
+  real_property_share = hours_in_real_property / total_hours
+
+  # More than half (> 50%) must be in real property
+  return real_property_share > 0.5
+
+default false
+
+# =============================================================================
+# Real Estate Professional Status - Section 469(c)(7)(B)
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Boolean
+unit ""
+label "Real Estate Professional"
+description "Whether taxpayer qualifies as real estate professional per 26 USC 469(c)(7)"
+
+formula:
+  # Both tests must be met per 469(c)(7)(B):
+  # (i) Majority test - more than half of services in real property businesses
+  # (ii) Hours test - more than 750 hours in real property businesses
+
+  return meets_majority_services_test and meets_750_hour_test
+
+default false
+
+# =============================================================================
+# Effect of Real Estate Professional Status
+# =============================================================================
+# Per 469(c)(7)(A), if a taxpayer qualifies as a real estate professional:
+#
+# 1. Paragraph (2) does not apply - rental activities are NOT automatically
+#    treated as passive activities.
+#
+# 2. The taxpayer's rental real estate interests are treated as a SINGLE
+#    activity for purposes of material participation (unless taxpayer
+#    elects to treat each property separately).
+#
+# This means:
+# - If the taxpayer materially participates in their rental activities
+#   (aggregated as one activity), the rental income/loss is NOT passive.
+# - They can deduct rental losses against wages, business income, etc.
+# - The $25,000 rental exception becomes irrelevant - unlimited deduction.
+#
+# NOTE: Joint filers - at least one spouse must independently qualify.
+# The hours of married couple cannot be combined for 750-hour test.
+# However, if one spouse qualifies, the joint return can benefit.

@@ -1,0 +1,23 @@
+# 26 USC 22(e) - Number of Qualified Individuals in Tax Unit
+#
+# Counts the number of qualified individuals (taxpayer and/or spouse) in the
+# tax unit. Used to determine the initial section 22 amount per 22(c)(1).
+#
+# For joint returns:
+#   - If both spouses are qualified: $7,500 initial amount
+#   - If only one spouse is qualified: $5,000 initial amount
+
+imports:
+  is_sec22_qualified_individual: statute/26/22/e/is_qualified_individual#is_sec22_qualified_individual
+
+entity TaxUnit
+period Year
+dtype Integer
+label "Number of Section 22 Qualified Individuals"
+description "Count of qualified individuals (elderly or disabled) in the tax unit"
+
+formula:
+  # Sum the boolean values of is_qualified for head and spouse
+  return sum(is_sec22_qualified_individual)
+
+default 0
