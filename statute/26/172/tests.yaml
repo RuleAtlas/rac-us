@@ -1,0 +1,88 @@
+# 26 USC Section 172 - Net Operating Loss Deduction Tests
+#
+# Test cases validating NOL deduction calculations, including:
+# - 80% taxable income limitation (post-2017 NOLs)
+# - Pre-2018 NOL grandfathering (100% offset)
+# - Farming loss carryback rules
+# - NOL carryforward computations
+
+- name: "Basic post-2017 NOL with 80% limitation"
+  period: 2024
+  input:
+    taxable_income: 100000
+    nol_carryforward_post_2017: 50000
+    nol_carryforward_pre_2018: 0
+  output:
+    nol_deduction: 50000  # 50k NOL < 80% of 100k (80k), so full deduction
+    nol_carryforward_remaining_post_2017: 0
+
+- name: "Post-2017 NOL hits 80% limitation"
+  period: 2024
+  input:
+    taxable_income: 100000
+    nol_carryforward_post_2017: 100000
+    nol_carryforward_pre_2018: 0
+  output:
+    nol_deduction: 80000  # Limited to 80% of 100k
+    nol_carryforward_remaining_post_2017: 20000  # Carries forward
+
+- name: "Pre-2018 NOL - no 80% limitation"
+  period: 2024
+  input:
+    taxable_income: 100000
+    nol_carryforward_pre_2018: 100000
+    nol_carryforward_post_2017: 0
+  output:
+    nol_deduction: 100000  # Pre-2018 can offset 100%
+    nol_carryforward_remaining_pre_2018: 0
+
+- name: "Mixed pre-2018 and post-2017 NOLs"
+  period: 2024
+  input:
+    taxable_income: 100000
+    nol_carryforward_pre_2018: 40000
+    nol_carryforward_post_2017: 80000
+  output:
+    nol_deduction_pre_2018: 40000  # Uses all pre-2018
+    nol_deduction_post_2017: 48000  # 80% of remaining 60k
+    nol_deduction: 88000  # Total deduction
+    nol_carryforward_remaining_post_2017: 32000  # 80k - 48k
+
+- name: "No taxable income - no NOL deduction"
+  period: 2024
+  input:
+    taxable_income: 0
+    nol_carryforward_post_2017: 50000
+  output:
+    nol_deduction: 0  # Nothing to offset
+    nol_carryforward_remaining_post_2017: 50000  # All carries forward
+
+- name: "Farming loss carryback eligibility"
+  period: 2024
+  input:
+    is_farming_business: true
+    current_year_farming_loss: 25000
+  output:
+    farming_loss_carryback_allowed: true
+    farming_loss_carryback_years: 2
+
+- name: "Non-farming business - no carryback"
+  period: 2024
+  input:
+    is_farming_business: false
+    current_year_farming_loss: 0
+  output:
+    farming_loss_carryback_allowed: false
+    farming_loss_carryback_years: 0
+    nol_carryback_allowed: false
+
+- name: "NOL calculation with capital loss modification"
+  period: 2024
+  input:
+    taxable_income: -50000  # Negative taxable income
+    capital_gains: 5000
+    capital_losses: 25000  # Excess losses
+    personal_exemption: 0
+  output:
+    nol_modification_capital_losses: 20000  # Excess capital loss added back
+    # NOL reduced by modification - only business losses count

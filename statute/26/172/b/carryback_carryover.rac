@@ -1,0 +1,249 @@
+# 26 USC Section 172(b) - Net Operating Loss Carrybacks and Carryovers
+#
+# "(b) Net operating loss carrybacks and carryovers.--
+#      (1) Years to which loss may be carried.--
+#          (A) General rule.-- A net operating loss for any taxable year--
+#              (i) shall not be a net operating loss carryback to any taxable year
+#                  preceding the taxable year of such loss, and
+#              (ii) shall be a net operating loss carryover to each taxable year
+#                   following the taxable year of the loss.
+#          (B) Special rules for farming losses.--
+#              (i) In general.-- In the case of any portion of a net operating
+#                  loss for the taxable year which is a farming loss, such loss
+#                  shall be a net operating loss carryback to each of the 2 taxable
+#                  years preceding the taxable year of such loss."
+#
+# Post-TCJA (2018+): NOLs generally can only be carried forward indefinitely.
+# Exception: Farming losses may be carried back 2 years.
+
+parameters:
+  # 80% taxable income limitation for post-2017 NOLs
+  nol_limitation_rate: statute/26/172/b/parameters
+
+imports:
+  taxable_income: statute/26/63/a/taxable_income
+  filing_status: statute/26/1/filing_status
+
+  # Inputs for NOL carryforwards
+  nol_carryforward_pre_2018: statute/26/172/inputs
+  nol_carryforward_post_2017: statute/26/172/inputs
+  farming_loss_carryback: statute/26/172/inputs
+  is_farming_business: statute/26/172/inputs
+  current_year_farming_loss: statute/26/172/inputs
+
+# --- Section 172(b)(1)(A): General Carryforward Rule ---
+
+variable nol_carryforward_allowed:
+entity TaxUnit
+period Year
+dtype Boolean
+label "NOL Carryforward Allowed"
+description "Whether NOL can be carried forward per 172(b)(1)(A)"
+reference "26 USC 172(b)(1)(A)"
+
+formula:
+  # Post-2017: NOLs can be carried forward indefinitely
+  # No limitation period on carryforwards
+  return true
+
+default true
+
+---
+
+# --- Section 172(b)(1)(A): No General Carryback ---
+
+variable nol_carryback_allowed:
+entity TaxUnit
+period Year
+dtype Boolean
+label "NOL Carryback Allowed"
+description "Whether NOL can be carried back (generally no for post-2017)"
+reference "26 USC 172(b)(1)(A)(i)"
+
+formula:
+  # Post-TCJA: General carryback eliminated
+  # Exception for farming losses under 172(b)(1)(B)
+  return false
+
+default false
+
+---
+
+# --- Section 172(b)(1)(B): Farming Loss Carryback ---
+
+variable farming_loss_carryback_allowed:
+entity TaxUnit
+period Year
+dtype Boolean
+label "Farming Loss Carryback Allowed"
+description "Whether farming loss qualifies for 2-year carryback per 172(b)(1)(B)"
+reference "26 USC 172(b)(1)(B)"
+
+formula:
+  # Farming losses may be carried back 2 years
+  # Taxpayer must have a farming business and farming loss
+  return is_farming_business and current_year_farming_loss > 0
+
+default false
+
+---
+
+variable farming_loss_carryback_years:
+entity TaxUnit
+period Year
+dtype Integer
+label "Farming Loss Carryback Years"
+description "Number of years farming loss can be carried back"
+reference "26 USC 172(b)(1)(B)(i)"
+
+formula:
+  if farming_loss_carryback_allowed:
+    return 2
+  else:
+    return 0
+
+default 0
+
+---
+
+# --- Available NOL Carryforward for Current Year ---
+
+variable total_nol_carryforward:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total NOL Carryforward Available"
+description "Total NOL carryforward from all prior years available for deduction"
+reference "26 USC 172(b)(1)(A)(ii)"
+
+formula:
+  # Sum of pre-2018 and post-2017 NOL carryforwards
+  # These are tracked separately due to different limitation rules
+  return nol_carryforward_pre_2018 + nol_carryforward_post_2017
+
+default 0
+
+---
+
+# --- Taxable Income Limitation (80% Rule) ---
+# Post-2017 NOLs limited to 80% of taxable income
+
+variable nol_taxable_income_for_limitation:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Taxable Income for NOL Limitation"
+description "Taxable income computed without NOL deduction for 80% limitation"
+reference "26 USC 172(a)(2)"
+
+formula:
+  # Use taxable income before NOL deduction
+  # This creates a circular dependency that must be resolved iteratively
+  # For practical purposes, we use taxable income plus any NOL already taken
+  return max(0, taxable_income)
+
+default 0
+
+---
+
+variable nol_limitation_amount:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "NOL Limitation Amount"
+description "Maximum NOL deduction based on 80% taxable income limitation"
+reference "26 USC 172(a)(2)"
+
+formula:
+  # Post-2017 NOLs limited to 80% of taxable income
+  # Pre-2018 NOLs not subject to this limitation
+  ti = nol_taxable_income_for_limitation
+
+  return ti * nol_limitation_rate
+
+default 0
+
+---
+
+# --- NOL Deduction Components ---
+
+variable nol_deduction_pre_2018:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Pre-2018 NOL Deduction"
+description "NOL deduction from pre-2018 losses (not subject to 80% limit)"
+reference "26 USC 172(a)"
+
+formula:
+  ti = nol_taxable_income_for_limitation
+  available = nol_carryforward_pre_2018
+
+  # Pre-2018 NOLs can offset 100% of taxable income
+  return min(available, ti)
+
+default 0
+
+---
+
+variable nol_deduction_post_2017:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Post-2017 NOL Deduction"
+description "NOL deduction from post-2017 losses (subject to 80% limit)"
+reference "26 USC 172(a)(2)"
+
+formula:
+  ti = nol_taxable_income_for_limitation
+  available = nol_carryforward_post_2017
+
+  # First apply any pre-2018 NOL
+  remaining_ti = max(0, ti - nol_deduction_pre_2018)
+
+  # Post-2017 NOLs limited to 80% of remaining taxable income
+  limitation = remaining_ti * nol_limitation_rate
+
+  return min(available, limitation)
+
+default 0
+
+---
+
+# --- Remaining NOL Carryforward ---
+# Unused NOL carries to future years
+
+variable nol_carryforward_remaining_pre_2018:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Remaining Pre-2018 NOL Carryforward"
+description "Pre-2018 NOL remaining after current year deduction"
+reference "26 USC 172(b)(1)(A)(ii)"
+
+formula:
+  return max(0, nol_carryforward_pre_2018 - nol_deduction_pre_2018)
+
+default 0
+
+---
+
+variable nol_carryforward_remaining_post_2017:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Remaining Post-2017 NOL Carryforward"
+description "Post-2017 NOL remaining after current year deduction"
+reference "26 USC 172(b)(1)(A)(ii)"
+
+formula:
+  return max(0, nol_carryforward_post_2017 - nol_deduction_post_2017)
+
+default 0

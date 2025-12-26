@@ -1,0 +1,47 @@
+# 26 USC Section 165 - Capital Losses (Stub)
+#
+# "(f) Capital losses.-- Losses from sales or exchanges of capital assets
+#      shall be allowed only to the extent allowed in sections 1211 and 1212."
+#
+# This is a stub file for capital losses. The full implementation would
+# include the $3,000 annual limitation (§1211) and carryover rules (§1212).
+
+imports:
+  capital_gains: statute/26/61/a/3/gains_from_property
+
+variable capital_losses:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Capital Losses"
+description "Losses from sales or exchanges of capital assets"
+reference "26 USC 165(f)", "26 USC 1211", "26 USC 1212"
+input true
+
+default 0
+
+---
+
+# Net capital loss deduction is limited to $3,000 ($1,500 MFS)
+
+variable capital_loss_deduction:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Capital Loss Deduction"
+description "Deductible capital loss (limited to $3,000)"
+reference "26 USC 1211(b)"
+
+formula:
+  net_loss = capital_losses - capital_gains
+
+  if net_loss <= 0:
+    return 0
+
+  # Limited to $3,000 for non-MFS, $1,500 for MFS
+  # Simplified - using $3,000 limit
+  return min(3000, net_loss)
+
+default 0

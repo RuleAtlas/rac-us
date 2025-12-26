@@ -29,13 +29,22 @@ sections:
 
   58:
     title: "Denial of Certain Losses"
-    status: "not_implemented"
-    notes: "Farm losses and passive activity losses - complex, rarely applies"
+    status: "implemented"
+    subsections:
+      a: "Farm Losses"
+      c: "Mining Exploration/Development Costs"
+    notes: "Farm loss disallowance for tax shelter activities, mining cost preferences"
 
   59:
     title: "Other Definitions and Special Rules"
-    status: "partially_implemented"
-    notes: "Some definitions incorporated into main sections"
+    status: "implemented"
+    subsections:
+      a: "AMT Foreign Tax Credit"
+      e: "Election to Amortize Intangibles"
+      g: "Tax Shelter Defined"
+      i: "Net Operating Loss Deduction"
+      j: "Treatment of Unearned Income of Minor Child"
+    notes: "Key definitions and computational rules for AMT"
 
 # Implementation status
 implementation:
@@ -87,6 +96,30 @@ implementation:
 
     - path: "../57/preferences.rac"
       description: "Tax preference items (PAB interest, depletion, etc.)"
+
+    - path: "../58/denial_of_losses.rac"
+      description: "Farm loss and mining cost adjustments"
+      variables:
+        - is_material_participant_farming
+        - farm_loss_for_amt
+        - amt_farm_loss_disallowance
+        - mining_cost_preference_for_amt
+        - total_section_58_adjustments
+
+    - path: "../59/special_rules.rac"
+      description: "AMT FTC, NOL rules, 59(e) election, definitions"
+      variables:
+        - amt_foreign_source_income
+        - amt_foreign_tax_credit_limitation
+        - amt_foreign_tax_credit
+        - section_59e_election_made
+        - section_59e_amortization_amount
+        - has_tax_shelter_farm_activity
+        - amt_nol_deduction
+        - child_amt_exemption_limit
+
+    - path: "../59/parameters.yaml"
+      description: "Parameters for NOL limitation, child exemption, amortization periods"
 
     - path: "../422/b/iso_bargain_element.rac"
       description: "ISO bargain element input variables for AMT adjustment"
@@ -143,7 +176,7 @@ notes:
 
 # Future work
 todo:
-  - "Add Section 58 farm/passive loss adjustments"
-  - "Add Section 59 special rules for NOLs"
-  - "Add AMT foreign tax credit (Section 59(a))"
   - "Add minimum tax credit carryforward (Section 53)"
+  - "Add Section 58(b) passive activity loss rules for pre-1987 property"
+  - "Add detailed AMT foreign tax credit allocation by income category"
+  - "Add Section 59(c) estate and trust AMT rules"

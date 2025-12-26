@@ -5,39 +5,65 @@
 # (A) determined with the adjustments provided in section 56 and section 58, and
 # (B) increased by the amount of the items of tax preference described in section 57."
 #
-# AMTI = Taxable Income + AMT Adjustments (Section 56) + Tax Preferences (Section 57)
+# AMTI = Taxable Income + AMT Adjustments (Sections 56/58) + Tax Preferences (Section 57)
+#        - AMT NOL Deduction (Section 59(i))
 
 imports:
 # Regular taxable income
   taxable_income: statute/26/63/c/taxable_income
 
-# AMT adjustments from Section 56
+# AMT adjustments from Section 56 (includes Section 58 loss adjustments)
   amt_adjustments: statute/26/56/adjustments#amt_adjustments
 
 # Tax preference items from Section 57
   amt_preferences: statute/26/57/preferences#amt_preferences
+
+# AMT NOL deduction from Section 59(i) - limited to 90% of AMTI
+  amt_nol_deduction: statute/26/59/special_rules#amt_nol_deduction
+
+# --- AMTI Before NOL (for Section 59(i) limitation) ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMTI Before NOL"
+description "AMTI computed before applying AMT NOL deduction"
+
+formula:
+  # Start with regular taxable income
+  base = taxable_income
+
+  # Add AMT adjustments from Sections 56 and 58
+  adjustments = amt_adjustments
+
+  # Add tax preference items from Section 57
+  preferences = amt_preferences
+
+  return max(0, base + adjustments + preferences)
+
+default 0
+
+---
+
+# --- Final AMTI ---
 
 entity TaxUnit
 period Year
 dtype Money
 unit "USD"
 label "Alternative Minimum Taxable Income"
-description "AMTI computed per Section 55(b)(2) as taxable income plus adjustments and preferences"
+description "AMTI computed per Section 55(b)(2) as taxable income plus adjustments and preferences, less AMT NOL"
 
 formula:
-  # Start with regular taxable income
-  base = taxable_income
+  # Start with AMTI before NOL
+  amti_before_nol = amti_before_nol
 
-  # Add AMT adjustments from Section 56
-  # These are items disallowed or modified for AMT purposes
-  adjustments = amt_adjustments
-
-  # Add tax preference items from Section 57
-  # These are tax benefits that must be added back for AMT
-  preferences = amt_preferences
+  # Subtract AMT NOL deduction (limited per Section 59(i) to 90% of AMTI)
+  nol_deduction = amt_nol_deduction
 
   # AMTI cannot be less than zero
-  return max(0, base + adjustments + preferences)
+  return max(0, amti_before_nol - nol_deduction)
 
 defined_for:
   taxable_income > 0 or amt_adjustments > 0 or amt_preferences > 0

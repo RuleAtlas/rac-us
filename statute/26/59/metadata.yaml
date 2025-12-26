@@ -1,0 +1,143 @@
+# 26 USC Section 59 - Other Definitions and Special Rules
+#
+# Section 59 provides miscellaneous definitions and rules for the AMT regime.
+# This includes the AMT foreign tax credit, NOL limitations, election to
+# amortize certain expenditures, and special rules for minor children.
+
+title: "Other Definitions and Special Rules"
+chapter: "1 - Normal Taxes and Surtaxes"
+subchapter: "A - Determination of Tax Liability"
+part: "VI - Alternative Minimum Tax"
+
+sections:
+  a:
+    title: "Alternative Minimum Tax Foreign Tax Credit"
+    status: "implemented"
+    notes: |
+      Limits foreign tax credit against AMT based on ratio of AMT foreign
+      source income to total AMTI. Foreign income must be recomputed using
+      AMT adjustments and preferences.
+
+  b:
+    title: "Allowance of Credit for Prior Year Minimum Tax Liability"
+    status: "not_implemented"
+    notes: |
+      This subsection was repealed. The minimum tax credit is now covered
+      under Section 53.
+
+  c:
+    title: "Treatment of Estates and Trusts"
+    status: "not_implemented"
+    notes: "Estate and trust AMT rules require separate implementation"
+
+  d:
+    title: "Coordination with NIIT"
+    status: "cross_reference"
+    notes: "NIIT under Section 1411 is computed separately from AMT"
+
+  e:
+    title: "Election to Amortize Intangibles"
+    status: "implemented"
+    notes: |
+      Taxpayers may elect to amortize qualified expenditures (circulation,
+      R&D, IDC, mining) to avoid creating AMT preference items. The election
+      spreads deductions over 3-10 years depending on expenditure type.
+
+  f:
+    title: "Coordination with Section 291"
+    status: "not_implemented"
+    notes: "Corporate preference items - not applicable to individuals"
+
+  g:
+    title: "Tax Shelter Defined"
+    status: "implemented"
+    notes: |
+      Defines "tax shelter" for Section 58(a) farm loss rules. A tax shelter
+      is an arrangement where a significant purpose is tax avoidance, including
+      passive farming activities.
+
+  h:
+    title: "Coordination with Section 55(d)(3)"
+    status: "cross_reference"
+    notes: "Special rules for married filing separately - incorporated in 55(a)"
+
+  i:
+    title: "Net Operating Loss Deduction"
+    status: "implemented"
+    notes: |
+      The AMT NOL deduction is limited to 90% of AMTI (computed without
+      regard to the NOL). This prevents NOLs from completely eliminating
+      AMT liability.
+
+  j:
+    title: "Treatment of Unearned Income of Minor Child"
+    status: "implemented"
+    notes: |
+      For children subject to kiddie tax (Section 1(g)), the AMT exemption
+      is limited to earned income plus a base amount ($9,250 for 2024).
+
+implementation:
+  version: "2024.1"
+  status: "partial"
+  notes: |
+    Core individual provisions implemented. Estate/trust rules (59(c)) and
+    corporate provisions (59(f)) not implemented. Section 53 minimum tax
+    credit is a separate section.
+
+  components:
+    - path: "special_rules.rac"
+      description: "Main Section 59 formulas"
+      variables:
+        - amt_foreign_source_income
+        - amt_foreign_tax_credit_limitation
+        - amt_foreign_tax_credit
+        - section_59e_election_made
+        - section_59e_qualified_expenditures
+        - section_59e_amortization_amount
+        - has_tax_shelter_farm_activity
+        - amt_nol_deduction
+        - child_amt_exemption_limit
+        - regular_tax
+
+    - path: "parameters.yaml"
+      description: "Section 59 parameters"
+      parameters:
+        - amt_nol_limitation_rate
+        - child_amt_exemption_base
+        - circulation_expenditure_amortization_period
+        - research_expenditure_amortization_period
+        - idc_amortization_period
+        - mining_exploration_amortization_period
+
+    - path: "tests.yaml"
+      description: "Comprehensive test cases"
+
+references:
+  statute:
+    - "26 USC Section 59 - Other Definitions and Special Rules"
+    - "26 USC Section 53 - Credit for Prior Year Minimum Tax Liability"
+    - "26 USC Section 901 - Foreign Tax Credit"
+    - "26 USC Section 172 - Net Operating Loss Deduction"
+    - "26 USC Section 1(g) - Kiddie Tax"
+
+  irs_guidance:
+    - "IRS Form 6251 - Alternative Minimum Tax - Individuals"
+    - "IRS Form 1116 - Foreign Tax Credit"
+    - "IRS Form 8801 - Credit for Prior Year Minimum Tax"
+    - "Rev. Proc. 2023-34 - Inflation-adjusted amounts for 2024"
+    - "Rev. Proc. 2024-40 - Inflation-adjusted amounts for 2025"
+
+parameter_sources:
+  2024:
+    child_amt_exemption_base: 9250
+    source: "Rev. Proc. 2023-34, Section 3.05"
+  2025:
+    child_amt_exemption_base: 9500
+    source: "Rev. Proc. 2024-40"
+
+notes:
+  - "AMT FTC must be separately computed using AMT foreign source income"
+  - "The 90% NOL limitation prevents complete offset of AMT"
+  - "Section 59(e) election is irrevocable once made"
+  - "Different amortization periods apply to different expenditure types"
+  - "Child exemption limitation applies to children subject to kiddie tax"

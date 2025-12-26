@@ -1,0 +1,129 @@
+# 26 USC Section 58 - Denial of Certain Losses Test Cases
+#
+# Tests for farm loss disallowance and mining cost preferences.
+
+reference: "26 USC Section 58"
+tax_year: 2024
+
+tests:
+  # ==========================================================================
+  # SECTION 58(a) - FARM LOSS TESTS
+  # ==========================================================================
+
+  - name: "Material participant - no farm loss disallowance"
+    description: "Farmer who materially participates can deduct full farm loss"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      farming_income: 50000
+      farming_loss: 80000  # Net loss of $30,000
+      is_material_participant_farming: true
+    expected:
+      farm_loss_for_amt: 30000  # 80000 - 50000
+      amt_farm_loss_disallowance: 0  # Material participant, no disallowance
+    notes: "Material participation exempts from tax shelter treatment"
+
+  - name: "Non-material participant - full farm loss disallowed"
+    description: "Passive farmer has entire farm loss disallowed for AMT"
+    inputs:
+      filing_status: SINGLE
+      farming_income: 20000
+      farming_loss: 60000  # Net loss of $40,000
+      is_material_participant_farming: false
+    expected:
+      farm_loss_for_amt: 40000  # 60000 - 20000
+      amt_farm_loss_disallowance: 40000  # Entire loss disallowed
+    notes: "Non-material participant treated as tax shelter farm activity"
+
+  - name: "No farm loss - no adjustment needed"
+    inputs:
+      filing_status: SINGLE
+      farming_income: 100000
+      farming_loss: 50000  # Net profit of $50,000
+      is_material_participant_farming: false
+    expected:
+      farm_loss_for_amt: 0  # No net loss
+      amt_farm_loss_disallowance: 0
+    notes: "No adjustment when farming is profitable"
+
+  - name: "Zero farming activity"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      farming_income: 0
+      farming_loss: 0
+      is_material_participant_farming: false
+    expected:
+      farm_loss_for_amt: 0
+      amt_farm_loss_disallowance: 0
+    notes: "No farming activity, no adjustment"
+
+  # ==========================================================================
+  # SECTION 58(c) - MINING EXPLORATION/DEVELOPMENT COSTS
+  # ==========================================================================
+
+  - name: "Mining exploration costs - preference adjustment"
+    description: "Mining costs must be amortized over 10 years for AMT"
+    inputs:
+      filing_status: SINGLE
+      mining_exploration_costs: 100000
+      mining_development_costs: 0
+    expected:
+      # Regular deduction: $100,000 (immediate)
+      # AMT deduction: $10,000/year (10-year amortization)
+      # Preference: $100,000 - $10,000 = $90,000
+      mining_cost_preference_for_amt: 90000
+    notes: "90% of mining costs become AMT preference in first year"
+
+  - name: "Combined mining costs"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      mining_exploration_costs: 50000
+      mining_development_costs: 30000
+    expected:
+      # Total: $80,000
+      # Annual amortization: $8,000
+      # Preference: $72,000
+      mining_cost_preference_for_amt: 72000
+    notes: "Both exploration and development costs combined"
+
+  - name: "No mining activity"
+    inputs:
+      filing_status: SINGLE
+      mining_exploration_costs: 0
+      mining_development_costs: 0
+    expected:
+      mining_cost_preference_for_amt: 0
+    notes: "No mining costs, no adjustment"
+
+  # ==========================================================================
+  # COMBINED SECTION 58 ADJUSTMENTS
+  # ==========================================================================
+
+  - name: "Combined farm and mining adjustments"
+    description: "Taxpayer with both farm losses and mining costs"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      farming_income: 10000
+      farming_loss: 50000  # $40,000 net loss
+      is_material_participant_farming: false
+      mining_exploration_costs: 25000
+      mining_development_costs: 0
+    expected:
+      farm_loss_for_amt: 40000
+      amt_farm_loss_disallowance: 40000
+      mining_cost_preference_for_amt: 22500  # 25000 - 2500
+      total_section_58_adjustments: 62500
+    notes: "Both adjustments add to AMTI"
+
+  - name: "Material participant farmer with mining"
+    inputs:
+      filing_status: SINGLE
+      farming_income: 20000
+      farming_loss: 60000
+      is_material_participant_farming: true
+      mining_exploration_costs: 10000
+      mining_development_costs: 5000
+    expected:
+      amt_farm_loss_disallowance: 0  # Material participant
+      mining_cost_preference_for_amt: 13500  # (15000 - 1500)
+      total_section_58_adjustments: 13500
+    notes: "Only mining creates adjustment when material participant in farming"

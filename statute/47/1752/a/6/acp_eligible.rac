@@ -1,0 +1,32 @@
+# 47 USC 1752(a)(6) - Overall ACP Eligibility
+#
+# "(6) ELIGIBLE HOUSEHOLD.—The term 'eligible household' means...
+#  a household in which—
+#  (A) at least 1 member of the household meets the qualifications in
+#      subsection (a) or (b) of section 54.409... [income or categorical]"
+#
+# Eligible if income-based OR categorically eligible.
+# Program must be active (benefit amount > 0).
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+imports:
+  acp_income_eligible: statute/47/1752/a/6/acp_income_eligible
+  acp_categorically_eligible: statute/47/1752/a/6/acp_categorically_eligible
+  acp_standard_benefit: statute/47/1752/parameters/benefit_amount/standard
+
+entity Household
+period Month
+dtype Boolean
+label "ACP Eligible"
+description "Overall Affordable Connectivity Program eligibility per 47 USC 1752(a)(6)"
+
+default false
+
+formula:
+  # Check if program is active (benefit amount > 0)
+  if acp_standard_benefit <= 0:
+    return false
+
+  # Eligible if income-based OR categorically eligible
+  return acp_income_eligible or acp_categorically_eligible

@@ -1,0 +1,23 @@
+# 47 USC 1752(a)(7) + 47 CFR 54.400(e) - ACP Tribal Land Status
+#
+# Tribal lands include per 47 CFR 54.400(e):
+# - Reservations, Pueblos, and Colonies
+# - Trust lands
+# - Alaska Native regions
+# - Hawaiian Home Lands
+#
+# Households on tribal land receive enhanced $75 monthly benefit
+# instead of standard $30.
+#
+# Reference: https://www.law.cornell.edu/cfr/text/47/54.400
+
+entity Household
+period Month
+dtype Boolean
+label "ACP Household on Tribal Land"
+description "Household located on Tribal land for enhanced benefit per 47 USC 1752(a)(7)"
+
+default false
+
+formula:
+  return is_on_tribal_land

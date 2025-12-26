@@ -1,0 +1,90 @@
+# 26 USC Section 172 - Input Variables
+#
+# Net operating loss carryover and carryback amounts from prior years.
+# These track the taxpayer's available NOL deductions.
+
+# --- NOL Carryforward Available ---
+# Total NOL carryforward from prior years, split by origination period
+
+variable nol_carryforward_pre_2018:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Pre-2018 NOL Carryforward"
+description "Net operating losses originating before 2018, not subject to 80% limitation"
+input true
+
+default 0
+
+---
+
+variable nol_carryforward_post_2017:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Post-2017 NOL Carryforward"
+description "Net operating losses originating after 2017, subject to 80% limitation"
+input true
+
+default 0
+
+---
+
+# --- Farming Loss Carryback ---
+# Section 172(b)(1)(B) allows 2-year carryback for farming losses
+
+variable farming_loss_carryback:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Farming Loss Carryback"
+description "Farming loss available for 2-year carryback under Section 172(b)(1)(B)"
+input true
+
+default 0
+
+---
+
+# --- Current Year Business/Farm Classification ---
+
+variable is_farming_business:
+entity TaxUnit
+period Year
+dtype Boolean
+label "Farming Business"
+description "Whether taxpayer has a farming business per Section 263A(e)(4)"
+input true
+
+default false
+
+---
+
+variable current_year_farming_loss:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Current Year Farming Loss"
+description "Net operating loss from farming business in current year"
+input true
+
+default 0
+
+---
+
+# --- Prior NOL Deduction (for modifications) ---
+# Used to avoid circular dependency when computing if current year has NOL
+
+variable prior_nol_deduction_claimed:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Prior NOL Deduction Claimed"
+description "NOL deduction amount claimed in current year (for modification calculation)"
+input true
+
+default 0

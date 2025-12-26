@@ -1,11 +1,13 @@
-# 47 USC § 254 - Universal Service and FCC Programs
+# 47 USC § 254 - Universal Service (Lifeline Program)
 #
-# Parameters for Lifeline and Affordable Connectivity Program (ACP)
-# implementing low-income telecommunications subsidies.
+# Parameters for the Lifeline program implementing low-income
+# telecommunications subsidies.
 #
 # Statutory Authority:
 # - Lifeline: 47 CFR § 54.403, § 54.409 (FCC regulations under § 254)
-# - ACP: 47 USC § 1752 (Infrastructure Investment and Jobs Act, 2021)
+#
+# Note: ACP (Affordable Connectivity Program) parameters have been moved to
+# statute/47/1752/parameters.yaml per the statute's proper location.
 
 # ===========================================================================
 # Lifeline Program Parameters (47 CFR § 54.403, § 54.409)
@@ -82,67 +84,10 @@ lifeline:
 
 
 # ===========================================================================
-# Affordable Connectivity Program (ACP) Parameters (47 USC § 1752)
+# ACP Parameters (DEPRECATED - moved to statute/47/1752/)
 # ===========================================================================
-
-acp:
-  # Benefit amounts per 47 USC § 1752(a)(7)
-  amount:
-    standard:
-      description: "Monthly ACP broadband benefit for non-tribal households"
-      unit: currency-USD
-      period: month
-      values:
-        2022-01-01: 30
-        2024-06-01: 0  # Program funding expired
-      citations:
-        - title: "47 USC § 1752(a)(7)(A) - Benefit amounts"
-          href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752&edition=prelim"
-        - title: "FCC Release 399712A1 - Program wind-down"
-          href: "https://docs.fcc.gov/public/attachments/DOC-399712A1.pdf"
-
-    tribal:
-      description: "Monthly ACP broadband benefit for tribal households"
-      unit: currency-USD
-      period: month
-      values:
-        2022-01-01: 75
-        2024-06-01: 0  # Program funding expired
-      citations:
-        - title: "47 USC § 1752(a)(7)(A) - Enhanced Tribal benefit"
-          href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752&edition=prelim"
-        - title: "FCC Release 399712A1 - Program wind-down"
-          href: "https://docs.fcc.gov/public/attachments/DOC-399712A1.pdf"
-
-  # Income eligibility threshold per 47 USC § 1752(a)(6)(A)
-  fpg_limit:
-    description: "Maximum household income as fraction of Federal Poverty Guidelines"
-    unit: ratio
-    period: year
-    values:
-      2022-01-01: 2.00
-    citations:
-      - title: "47 USC § 1752(a)(6)(A) - Income-based eligibility"
-        href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752&edition=prelim"
-
-  # Categorical eligibility per 47 USC § 1752(a)(6)(B)-(F)
-  # Note: ACP also accepts Lifeline categorical eligibility
-  categorical_eligibility:
-    description: "Programs that qualify household for ACP (beyond Lifeline programs)"
-    values:
-      2022-01-01:
-        - free_school_meals        # 47 USC 1752(a)(6)(B)
-        - reduced_price_school_meals  # 47 USC 1752(a)(6)(B)
-        - pell_grant               # 47 USC 1752(a)(6)(C)
-        - wic                      # 47 USC 1752(a)(6)(E)
-        - lifeline                 # Lifeline participants also qualify
-        # Not implemented:
-        # - provider_low_income_program  # 47 USC 1752(a)(6)(D)
-    citations:
-      - title: "47 USC § 1752(a)(6) - Eligible households"
-        href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752&edition=prelim"
-      - title: "FCC Affordable Connectivity Program"
-        href: "https://www.fcc.gov/acp"
+# See statute/47/1752/parameters.yaml for ACP parameters.
+# ACP is codified at 47 USC 1752, not 47 USC 254.
 
 
 # ===========================================================================

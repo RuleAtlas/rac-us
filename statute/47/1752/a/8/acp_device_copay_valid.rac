@@ -1,0 +1,23 @@
+# 47 USC 1752(a)(8)(A) - ACP Device Copay Validation
+#
+# "...if the charge to such eligible household is more than $10
+#  but less than $50 for such connected device..."
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+imports:
+  min_copay: statute/47/1752/parameters/connected_device/min_copay
+  max_copay: statute/47/1752/parameters/connected_device/max_copay
+
+entity Household
+period Month
+dtype Boolean
+label "ACP Device Copay Valid"
+description "Device copay is more than $10 but less than $50 per 47 USC 1752(a)(8)"
+
+default false
+
+formula:
+  # Copay must be > $10 and < $50
+  copay = connected_device_copay
+  return copay > min_copay and copay < max_copay

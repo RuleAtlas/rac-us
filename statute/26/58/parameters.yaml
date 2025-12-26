@@ -1,0 +1,20 @@
+# 26 USC Section 58 - Denial of Certain Losses Parameters
+#
+# Parameters for farm loss and other limitation thresholds.
+# These values are subject to inflation adjustment.
+
+# --- Section 58(a) Farm Loss Parameters ---
+
+farm_loss_agi_threshold:
+  description: "AGI threshold above which farm loss limitations apply"
+  unit: currency-USD
+  notes: "Not directly in statute - relates to material participation thresholds"
+  values:
+    1993-01-01: 150000
+  citations:
+    - "Section 58(a) - Farm loss limitation applies to tax shelter farm activities"
+    - "Material participation determined under Section 469 regulations"
+
+# Note: Section 58 does not have many specific dollar thresholds
+# Most limitations are based on the character of activity (tax shelter vs. non-tax shelter)
+# and material participation rules under Section 469.

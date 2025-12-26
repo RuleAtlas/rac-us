@@ -1,0 +1,33 @@
+# 47 USC 1752(a)(6)(B)-(F) - ACP Combined Categorical Eligibility
+#
+# Combined check for all categorical eligibility pathways:
+# - School meal programs (B)
+# - Pell Grant (C)
+# - WIC (E)
+# - Lifeline programs (A, F)
+# - Tribal programs (F)
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+imports:
+  acp_school_meal_eligible: statute/47/1752/a/6/acp_school_meal_eligible
+  acp_pell_grant_eligible: statute/47/1752/a/6/acp_pell_grant_eligible
+  acp_wic_eligible: statute/47/1752/a/6/acp_wic_eligible
+  acp_lifeline_categorical_eligible: statute/47/1752/a/6/acp_lifeline_categorical_eligible
+  acp_tribal_program_eligible: statute/47/1752/a/6/acp_tribal_program_eligible
+
+entity Household
+period Month
+dtype Boolean
+label "ACP Categorically Eligible"
+description "Eligible through any qualifying program per 47 USC 1752(a)(6)(B)-(F)"
+
+default false
+
+formula:
+  school_meal = acp_school_meal_eligible
+  pell = acp_pell_grant_eligible
+  wic = acp_wic_eligible
+  lifeline = acp_lifeline_categorical_eligible
+  tribal = acp_tribal_program_eligible
+  return school_meal or pell or wic or lifeline or tribal

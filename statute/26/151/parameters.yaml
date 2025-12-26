@@ -1,0 +1,18 @@
+# 26 USC Section 151 - Personal Exemption Amount
+#
+# Personal exemption amounts per taxpayer, spouse, and dependent.
+# Suspended at $0 for 2018-2025 by TCJA Section 11041.
+
+exemption_amount:
+  description: "Personal exemption amount per person"
+  unit: currency-USD
+  values:
+    # Pre-TCJA amounts (inflation adjusted)
+    2017-01-01: 4050
+    # TCJA Section 11041: Suspended (reduced to $0)
+    2018-01-01: 0
+    # Scheduled to return after 2025 (will need update)
+    2026-01-01: 0  # TBD - will be inflation adjusted from 2017
+  citations:
+    - "26 USC 151(d)(1)"
+    - "TCJA Section 11041(a): exemption amount shall be zero"

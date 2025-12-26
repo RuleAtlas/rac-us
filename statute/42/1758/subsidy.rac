@@ -33,47 +33,35 @@ label "School Meal Daily Subsidy"
 description "Daily reimbursement value per child based on tier and location"
 
 formula:
-  # Get state group for rate lookup (AK, HI, or contiguous US)
+  # Get state group and tier for rate lookup
   state = household.state
-
-  # Get tier for household (assumes all children same tier)
-  # In reality this is per-person, but simplifying to household level
   tier = household.school_meal_tier
+  is_ak = state == "AK"
+  is_hi = state == "HI"
+  is_free = tier == FREE
+  is_reduced = tier == REDUCED
 
-  # Look up NSLP and SBP rates based on state and tier
-  if state == "AK":
-    if tier == FREE:
-      nslp_rate = nslp.alaska.free
-      sbp_rate = sbp.alaska.free
-    elif tier == REDUCED:
-      nslp_rate = nslp.alaska.reduced
-      sbp_rate = sbp.alaska.reduced
-    else:
-      nslp_rate = nslp.alaska.paid
-      sbp_rate = sbp.alaska.paid
-  elif state == "HI":
-    if tier == FREE:
-      nslp_rate = nslp.hawaii.free
-      sbp_rate = sbp.hawaii.free
-    elif tier == REDUCED:
-      nslp_rate = nslp.hawaii.reduced
-      sbp_rate = sbp.hawaii.reduced
-    else:
-      nslp_rate = nslp.hawaii.paid
-      sbp_rate = sbp.hawaii.paid
+  # Flattened lookup: state x tier combinations
+  if is_ak and is_free:
+    return nslp.alaska.free + sbp.alaska.free
+  elif is_ak and is_reduced:
+    return nslp.alaska.reduced + sbp.alaska.reduced
+  elif is_ak:
+    return nslp.alaska.paid + sbp.alaska.paid
+  elif is_hi and is_free:
+    return nslp.hawaii.free + sbp.hawaii.free
+  elif is_hi and is_reduced:
+    return nslp.hawaii.reduced + sbp.hawaii.reduced
+  elif is_hi:
+    return nslp.hawaii.paid + sbp.hawaii.paid
+  elif is_free:
+    return nslp.contiguous_us.free + sbp.contiguous_us.free
+  elif is_reduced:
+    return nslp.contiguous_us.reduced + sbp.contiguous_us.reduced
   else:
-    # Contiguous US (48 states + DC)
-    if tier == FREE:
-      nslp_rate = nslp.contiguous_us.free
-      sbp_rate = sbp.contiguous_us.free
-    elif tier == REDUCED:
-      nslp_rate = nslp.contiguous_us.reduced
-      sbp_rate = sbp.contiguous_us.reduced
-    else:
-      nslp_rate = nslp.contiguous_us.paid
-      sbp_rate = sbp.contiguous_us.paid
+    return nslp.contiguous_us.paid + sbp.contiguous_us.paid
 
-  return nslp_rate + sbp_rate
+default 0
 
 # ------------------------------------------------------------------------------
 # school_meal_paid_daily_subsidy
@@ -93,18 +81,17 @@ formula:
   # Get state group for rate lookup
   state = household.state
 
-  # Look up PAID tier rates
+  # Look up PAID tier rates - return sum directly
   if state == "AK":
-    nslp_paid = nslp.alaska.paid
-    sbp_paid = sbp.alaska.paid
+    return nslp.alaska.paid + sbp.alaska.paid
   elif state == "HI":
-    nslp_paid = nslp.hawaii.paid
-    sbp_paid = sbp.hawaii.paid
+    return nslp.hawaii.paid + sbp.hawaii.paid
   else:
-    nslp_paid = nslp.contiguous_us.paid
-    sbp_paid = sbp.contiguous_us.paid
+    return nslp.contiguous_us.paid + sbp.contiguous_us.paid
 
-  return nslp_paid + sbp_paid
+default 0
+
+---
 
 # ------------------------------------------------------------------------------
 # school_meal_net_daily_subsidy
@@ -125,6 +112,8 @@ formula:
   paid_baseline = school_meal_paid_daily_subsidy
 
   return max(gross_subsidy - paid_baseline, 0)
+
+default 0
 
 # ------------------------------------------------------------------------------
 # school_meal_annual_subsidy
@@ -151,6 +140,8 @@ formula:
   children_in_school = sum(household.members.is_in_k12_school)
 
   return daily_subsidy * days * children_in_school
+
+default 0
 
 # ------------------------------------------------------------------------------
 # free_school_meals

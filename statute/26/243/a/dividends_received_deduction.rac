@@ -226,11 +226,9 @@ description "Final DRD after all limitations"
 formula:
   drd = drd_after_debt_reduction
 
-  # Taxable income limitation
-  if taxable_income_before_drd is null:
+  # Taxable income limitation - if no TI provided, return full DRD
+  if taxable_income_before_drd == 0:
     return drd
-  else:
-    pass
 
   # If already in NOL, limitation doesn't apply
   if taxable_income_before_drd <= 0: return drd

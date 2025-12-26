@@ -1,0 +1,34 @@
+# 47 USC 1752(a)(7) - ACP Monthly Benefit Amount
+#
+# "...a monthly discount...in an amount equal to such amount charged,
+#  but not more than $30, or, if an internet service offering is
+#  provided to an eligible household on Tribal land, not more than $75."
+#
+# Benefit equals actual charge, up to maximum ($30 standard / $75 tribal).
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+imports:
+  acp_eligible: statute/47/1752/a/6/acp_eligible
+  acp_max_benefit: statute/47/1752/a/7/acp_max_benefit
+
+entity Household
+period Month
+dtype Money
+unit "USD"
+label "ACP Monthly Benefit"
+description "Monthly discount equal to amount charged, up to maximum per 47 USC 1752(a)(7)"
+
+default 0
+
+formula:
+  # Must be eligible to receive benefit
+  if not acp_eligible:
+    return 0
+
+  # Benefit is lesser of actual charge or maximum benefit
+  # "in an amount equal to such amount charged, but not more than..."
+  max_benefit = acp_max_benefit
+  actual_charge = broadband_monthly_charge
+
+  return min(actual_charge, max_benefit)

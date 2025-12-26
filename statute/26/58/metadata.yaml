@@ -1,0 +1,77 @@
+# 26 USC Section 58 - Denial of Certain Losses
+#
+# This section limits deductions for certain losses when computing AMTI.
+# The primary targets are "tax shelter" activities where taxpayers use
+# accelerated deductions to reduce regular tax liability.
+
+title: "Denial of Certain Losses"
+chapter: "1 - Normal Taxes and Surtaxes"
+subchapter: "A - Determination of Tax Liability"
+part: "VI - Alternative Minimum Tax"
+
+sections:
+  a:
+    title: "Farm Losses"
+    subsections:
+      1: "Loss from farming - disallowed for tax shelter farm activities"
+      2: "Application of Section 465 (at-risk rules)"
+      3: "Application of Section 469 (passive activity rules)"
+    status: "implemented"
+    notes: "Farm losses from tax shelter activities fully disallowed for AMT"
+
+  b:
+    title: "Passive Activity Loss (Pre-1987)"
+    status: "not_implemented"
+    notes: |
+      Section 58(b) related to passive activity losses for property placed
+      in service before 1987. This provision is largely obsolete as most
+      pre-1987 property has been fully depreciated.
+
+  c:
+    title: "Mining Exploration and Development Costs"
+    status: "implemented"
+    notes: |
+      Mining costs must be capitalized and amortized for AMT purposes,
+      creating a preference item for the excess over amortization.
+
+implementation:
+  version: "2024.1"
+  status: "partial"
+  notes: |
+    Section 58(b) passive activity rules for pre-1987 property not implemented
+    due to limited contemporary relevance. Farm loss and mining cost provisions
+    fully encoded.
+
+  components:
+    - path: "denial_of_losses.rac"
+      description: "Main Section 58 formulas"
+      variables:
+        - is_material_participant_farming
+        - farm_loss_for_amt
+        - amt_farm_loss_disallowance
+        - mining_cost_preference_for_amt
+        - total_section_58_adjustments
+
+    - path: "parameters.yaml"
+      description: "Section 58 thresholds (minimal)"
+
+    - path: "tests.yaml"
+      description: "Test cases for farm and mining adjustments"
+
+references:
+  statute:
+    - "26 USC Section 58 - Denial of Certain Losses"
+    - "26 USC Section 469 - Passive Activity Losses (material participation)"
+    - "26 USC Section 465 - At-Risk Rules"
+    - "26 USC Section 617 - Mining Exploration Expenditures"
+    - "26 USC Section 616 - Mining Development Expenditures"
+
+  irs_guidance:
+    - "IRS Form 6251, Line 27 - Farm loss adjustments"
+    - "Treasury Regulations Section 1.469-5T - Material participation tests"
+
+notes:
+  - "Tax shelter farm activities are defined under Section 59(g)"
+  - "Material participation is determined under Section 469 regulations"
+  - "Seven tests exist for material participation (500 hours, sole participant, etc.)"
+  - "Mining preferences are calculated as immediate deduction minus 10-year amortization"

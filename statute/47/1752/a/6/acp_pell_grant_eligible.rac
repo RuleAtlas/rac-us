@@ -1,0 +1,21 @@
+# 47 USC 1752(a)(6)(C) - ACP Pell Grant Eligibility
+#
+# "(C) at least 1 member of the household has received a Federal Pell
+#  Grant under section 401 of the Higher Education Act of 1965
+#  (20 U.S.C. 1070a) in the current award year, if such grant is
+#  verifiable through the National Verifier or National Lifeline
+#  Accountability Database"
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+entity Household
+period Month
+dtype Boolean
+label "ACP Pell Grant Eligibility"
+description "Eligible through Federal Pell Grant receipt per 47 USC 1752(a)(6)(C)"
+
+default false
+
+formula:
+  # At least one member received Pell Grant in current award year
+  return any(members.receives_pell_grant)

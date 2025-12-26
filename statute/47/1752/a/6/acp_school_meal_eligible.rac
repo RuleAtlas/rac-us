@@ -1,0 +1,22 @@
+# 47 USC 1752(a)(6)(B) - ACP School Meal Program Eligibility
+#
+# "(B) at least 1 member of the household has applied for and been
+#  approved to receive benefits under the free and reduced price
+#  lunch program under the Richard B. Russell National School
+#  Lunch Act (42 U.S.C. 1751 et seq.) or the school breakfast
+#  program under section 4 of the Child Nutrition Act of 1966
+#  (42 U.S.C. 1773)"
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+entity Household
+period Month
+dtype Boolean
+label "ACP School Meal Eligibility"
+description "Eligible through free or reduced price school lunch/breakfast per 47 USC 1752(a)(6)(B)"
+
+default false
+
+formula:
+  # At least one member approved for free or reduced price meals
+  return any(members.receives_free_school_meals) or any(members.receives_reduced_price_school_meals)

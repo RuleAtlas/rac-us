@@ -1,0 +1,31 @@
+# 47 USC 1752(b)(3) - ACP Enrollment Eligibility
+#
+# "(3) LIMITATION.—An eligible household may receive only 1 affordable
+#  connectivity benefit under this section."
+#
+# Combines eligibility check with one-per-household limit.
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+imports:
+  acp_eligible: statute/47/1752/a/6/acp_eligible
+  acp_already_receiving: statute/47/1752/b/acp_already_receiving
+
+entity Household
+period Month
+dtype Boolean
+label "ACP Enrollment Eligible"
+description "Eligible to enroll in ACP (meets requirements and not already receiving)"
+
+default false
+
+formula:
+  # Must be eligible for ACP
+  if not acp_eligible:
+    return false
+
+  # Cannot already be receiving benefit
+  if acp_already_receiving:
+    return false
+
+  return true

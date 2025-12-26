@@ -87,21 +87,22 @@ formula:
   state = household.state_code
 
   # Pregnant women: check FCEP first (more states offer it), then standard
-  if is_pregnant:
-    # Return highest applicable limit (state may offer both pathways)
-    if fcep_income_limit[state] > 0:
-      return fcep_income_limit[state]
-    elif pregnant_income_limit[state] > 0:
-      return pregnant_income_limit[state]
-    else:
-      return 0  # No pregnant coverage in this state
-
-  # Children: use child income limit
-  if age < max_age:
+  if is_pregnant and fcep_income_limit[state] > 0:
+    return fcep_income_limit[state]
+  elif is_pregnant and pregnant_income_limit[state] > 0:
+    return pregnant_income_limit[state]
+  elif is_pregnant:
+    return 0  # No pregnant coverage in this state
+  elif age < max_age:
+    # Children: use child income limit
     return child_income_limit[state]
+  else:
+    # Not eligible (over age, not pregnant)
+    return 0
 
-  # Not eligible (over age, not pregnant)
-  return 0
+default 0
+
+---
 
 # Check income eligibility
 entity Person
@@ -158,24 +159,20 @@ formula:
   state = household.state_code
 
   # Check child eligibility first (primary CHIP population)
-  if age < max_age:
-    child_limit = child_income_limit[state]
-    if child_limit > 0:
-      return CHIPCategory.CHILD
-
-  # Check pregnant woman eligibility
-  if is_pregnant:
+  if age < max_age and child_income_limit[state] > 0:
+    return CHIPCategory.CHILD
+  elif is_pregnant and fcep_income_limit[state] > 0:
     # FCEP pathway (unborn child coverage)
-    fcep_limit = fcep_income_limit[state]
-    if fcep_limit > 0:
-      return CHIPCategory.PREGNANT_FCEP
-
+    return CHIPCategory.PREGNANT_FCEP
+  elif is_pregnant and pregnant_income_limit[state] > 0:
     # Standard pregnant pathway
-    pregnant_limit = pregnant_income_limit[state]
-    if pregnant_limit > 0:
-      return CHIPCategory.PREGNANT_STANDARD
+    return CHIPCategory.PREGNANT_STANDARD
+  else:
+    return CHIPCategory.NONE
 
-  return CHIPCategory.NONE
+default CHIPCategory.NONE
+
+---
 
 # =============================================================================
 # CHILD ELIGIBILITY

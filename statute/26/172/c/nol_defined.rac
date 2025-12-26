@@ -1,0 +1,57 @@
+# 26 USC Section 172(c) - Net Operating Loss Defined
+#
+# "(c) Net operating loss defined.-- For purposes of this section, the term
+#      'net operating loss' means the excess of the deductions allowed by this
+#      chapter over the gross income. Such excess shall be computed with the
+#      modifications specified in subsection (d)."
+#
+# A net operating loss occurs when allowable deductions exceed gross income,
+# calculated with certain modifications from 172(d).
+
+imports:
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  taxable_income: statute/26/63/a/taxable_income
+  nol_modifications: statute/26/172/d/nol_modifications
+
+variable net_operating_loss:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Net Operating Loss"
+description "Excess of deductions over gross income per 26 USC 172(c)"
+reference "26 USC 172(c)"
+
+formula:
+  # NOL = negative taxable income (before NOL deduction), with modifications
+  # Per 172(c), we compute the excess of deductions over income
+  # with modifications from 172(d)
+
+  modified_taxable_income = taxable_income + nol_modifications
+
+  # NOL only exists when modified taxable income is negative
+  if modified_taxable_income >= 0:
+    return 0
+
+  # Return the absolute value of the loss
+  return -modified_taxable_income
+
+default 0
+
+---
+
+# --- Has Net Operating Loss ---
+# Boolean indicator for whether taxpayer has an NOL in current year
+
+variable has_net_operating_loss:
+entity TaxUnit
+period Year
+dtype Boolean
+label "Has Net Operating Loss"
+description "Whether taxpayer has a net operating loss in the current year"
+reference "26 USC 172(c)"
+
+formula:
+  return net_operating_loss > 0
+
+default false

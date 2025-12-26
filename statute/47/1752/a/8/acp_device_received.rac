@@ -1,0 +1,19 @@
+# 47 USC 1752(a)(8) - ACP Device Already Received
+#
+# Tracks whether household has previously received a subsidized device.
+# "...a participating provider may receive reimbursement for no more
+#  than 1 connected device per eligible household."
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+entity Household
+period Year
+dtype Boolean
+label "ACP Device Already Received"
+description "Whether household has previously received subsidized connected device"
+
+default false
+
+formula:
+  # Input variable - tracked externally via National Lifeline Database
+  return has_received_acp_device

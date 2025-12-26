@@ -1,0 +1,27 @@
+# 47 USC 1752(a)(6)(A) - ACP FPL Income Threshold
+#
+# Calculates 200% of Federal Poverty Level for household size.
+# Part of the income-based eligibility determination.
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+imports:
+  fpg_limit: statute/47/1752/parameters/income/fpg_limit
+  fpl_by_household_size: statute/7/2014/c/fpl_by_household_size
+
+entity Household
+period Month
+dtype Money
+unit "USD"
+label "ACP FPL Income Limit"
+description "200% of Federal Poverty Level for household size per 47 USC 1752(a)(6)(A)"
+
+default 0
+
+formula:
+  base_fpl = fpl_by_household_size[1]
+  additional_per_person = fpl_by_household_size["additional_per_person"]
+  extra_members = max(0, household_size - 1)
+  annual_fpl = base_fpl + (additional_per_person * extra_members)
+  # Return monthly threshold at 200% FPL
+  return (annual_fpl * fpg_limit) / 12

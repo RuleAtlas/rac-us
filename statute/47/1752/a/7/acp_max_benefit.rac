@@ -1,0 +1,29 @@
+# 47 USC 1752(a)(7) - ACP Maximum Benefit Amount
+#
+# "(7) AFFORDABLE CONNECTIVITY BENEFIT.—The term 'affordable connectivity
+#  benefit' means a monthly discount for an eligible household applied to
+#  the actual amount charged to such household, in an amount equal to
+#  such amount charged, but not more than $30, or, if an internet service
+#  offering is provided to an eligible household on Tribal land, not more
+#  than $75."
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+imports:
+  acp_on_tribal_land: statute/47/1752/a/6/acp_on_tribal_land
+  standard_benefit: statute/47/1752/parameters/benefit_amount/standard
+  tribal_benefit: statute/47/1752/parameters/benefit_amount/tribal
+
+entity Household
+period Month
+dtype Money
+unit "USD"
+label "ACP Maximum Monthly Benefit"
+description "Maximum monthly benefit: $75 on Tribal land, $30 otherwise per 47 USC 1752(a)(7)"
+
+default 0
+
+formula:
+  if acp_on_tribal_land:
+    return tribal_benefit
+  return standard_benefit

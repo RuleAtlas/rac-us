@@ -1,0 +1,48 @@
+# 47 USC 1752(a)(8) - ACP Connected Device Eligibility
+#
+# "(8) REIMBURSEMENT FOR CONNECTED DEVICE.—
+#  (A) IN GENERAL.—A participating provider that, in addition to
+#      providing the affordable connectivity benefit to an eligible
+#      household, supplies such household with a connected device
+#      may be reimbursed up to $100..."
+#
+# Requirements:
+# - Must be ACP eligible
+# - Program must be active
+# - Cannot have already received a device
+# - Copay must be in valid range ($10 < copay < $50)
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+imports:
+  acp_eligible: statute/47/1752/a/6/acp_eligible
+  acp_device_received: statute/47/1752/a/8/acp_device_received
+  acp_device_copay_valid: statute/47/1752/a/8/acp_device_copay_valid
+  max_reimbursement: statute/47/1752/parameters/connected_device/max_reimbursement
+
+entity Household
+period Month
+dtype Boolean
+label "ACP Connected Device Eligible"
+description "Eligible for connected device subsidy per 47 USC 1752(a)(8)"
+
+default false
+
+formula:
+  # Must be ACP eligible
+  if not acp_eligible:
+    return false
+
+  # Check if program is active
+  if max_reimbursement <= 0:
+    return false
+
+  # Cannot have already received a device
+  if acp_device_received:
+    return false
+
+  # Copay must be in valid range
+  if not acp_device_copay_valid:
+    return false
+
+  return true

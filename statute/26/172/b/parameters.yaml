@@ -1,0 +1,45 @@
+# 26 USC Section 172(a)(2) - NOL Limitation Rate
+#
+# "(2) Limitation.-- For purposes of paragraph (1), the net operating loss
+#      deduction shall not exceed 80 percent of taxable income (determined
+#      without regard to the deduction allowed under this section)."
+#
+# This 80% limitation applies to NOLs arising in taxable years after 2017.
+# Pre-2018 NOLs can still offset 100% of taxable income.
+
+nol_limitation_rate:
+  description: "NOL deduction limited to this percentage of taxable income"
+  unit: rate
+  values:
+    # Pre-TCJA: 100% of taxable income could be offset
+    2000-01-01: 1.00
+    # TCJA Section 13302 reduced to 80% for losses arising after 12/31/2017
+    2018-01-01: 0.80
+  citations:
+    - "26 USC 172(a)(2): shall not exceed 80 percent of taxable income"
+    - "TCJA Section 13302(a)(1)"
+
+# Note on special periods:
+# - CARES Act (2020): Temporarily suspended 80% limitation for 2018-2020
+# - This parameter shows permanent law; temporary relief handled separately
+nol_limitation_rate_cares_act:
+  description: "NOL limitation during CARES Act relief period (100%)"
+  unit: rate
+  values:
+    # CARES Act Section 2303 suspended 80% limit for 2018-2020 losses
+    2018-01-01: 1.00
+    2019-01-01: 1.00
+    2020-01-01: 1.00
+    # Back to 80% for 2021 and after
+    2021-01-01: 0.80
+  citations:
+    - "CARES Act Section 2303(a)"
+
+# Farming loss carryback period
+farming_loss_carryback_years:
+  description: "Number of years farming losses may be carried back"
+  unit: years
+  values:
+    2018-01-01: 2
+  citations:
+    - "26 USC 172(b)(1)(B)(i): 2 taxable years preceding the taxable year"

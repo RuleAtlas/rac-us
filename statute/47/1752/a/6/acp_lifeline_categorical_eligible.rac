@@ -1,0 +1,27 @@
+# 47 USC 1752(a)(6)(A) + 47 CFR 54.409(b) - ACP Lifeline Categorical Eligibility
+#
+# Eligibility through participation in Lifeline qualifying programs:
+# - SNAP (7 USC 2011 et seq.)
+# - Medicaid (42 USC 1396 et seq.)
+# - SSI (42 USC 1381 et seq.)
+# - Federal Public Housing Assistance / Section 8 (42 USC 1437f)
+# - Veterans Pension (38 USC 1521)
+#
+# Reference: https://www.law.cornell.edu/cfr/text/47/54.409
+
+entity Household
+period Month
+dtype Boolean
+label "ACP Lifeline Categorical Eligibility"
+description "Eligible through Lifeline qualifying program participation per 47 CFR 54.409(b)"
+
+default false
+
+formula:
+  # Lifeline qualifying programs per 47 CFR 54.409(b)
+  snap = any(members.receives_snap)
+  medicaid = any(members.receives_medicaid)
+  ssi = any(members.receives_ssi)
+  section_8 = any(members.receives_section_8)
+  veterans_pension = any(members.receives_veterans_pension)
+  return snap or medicaid or ssi or section_8 or veterans_pension

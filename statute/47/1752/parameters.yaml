@@ -1,0 +1,172 @@
+# 47 USC 1752 - Affordable Connectivity Program Parameters
+#
+# Statutory Authority:
+# - Infrastructure Investment and Jobs Act of 2021, Pub. L. 117-58
+# - Codified at 47 USC 1752
+#
+# Program Status:
+# - Effective: January 1, 2022
+# - Funding Exhausted: June 1, 2024
+# - Program terminated due to lack of Congressional appropriation
+#
+# References:
+# - https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+# - https://www.fcc.gov/acp
+
+# ===========================================================================
+# BENEFIT AMOUNTS - 47 USC 1752(a)(7)
+# ===========================================================================
+
+benefit_amount:
+  standard:
+    description: "Monthly ACP benefit for non-tribal households"
+    unit: currency-USD
+    period: month
+    values:
+      2022-01-01: 30
+      2024-06-01: 0  # Program funding exhausted
+    citations:
+      - title: "47 USC 1752(a)(7)(A)"
+        text: "not more than $30"
+        href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752"
+      - title: "FCC Public Notice DA-24-418"
+        text: "Program wind-down effective June 1, 2024"
+        href: "https://docs.fcc.gov/public/attachments/DA-24-418A1.pdf"
+
+  tribal:
+    description: "Monthly ACP benefit for households on Tribal land"
+    unit: currency-USD
+    period: month
+    values:
+      2022-01-01: 75
+      2024-06-01: 0  # Program funding exhausted
+    citations:
+      - title: "47 USC 1752(a)(7)(A)"
+        text: "not more than $75"
+        href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752"
+
+# ===========================================================================
+# CONNECTED DEVICE SUBSIDY - 47 USC 1752(a)(8)
+# ===========================================================================
+
+connected_device:
+  max_reimbursement:
+    description: "Maximum provider reimbursement for connected device"
+    unit: currency-USD
+    period: once
+    values:
+      2022-01-01: 100
+      2024-06-01: 0  # Program funding exhausted
+    citations:
+      - title: "47 USC 1752(a)(8)(A)"
+        text: "up to $100"
+        href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752"
+
+  min_copay:
+    description: "Minimum household copay for connected device"
+    unit: currency-USD
+    period: once
+    values:
+      2022-01-01: 10
+    citations:
+      - title: "47 USC 1752(a)(8)(A)"
+        text: "more than $10"
+        href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752"
+
+  max_copay:
+    description: "Maximum household copay for connected device"
+    unit: currency-USD
+    period: once
+    values:
+      2022-01-01: 50
+    citations:
+      - title: "47 USC 1752(a)(8)(A)"
+        text: "less than $50"
+        href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752"
+
+  limit_per_household:
+    description: "Maximum connected devices subsidized per household"
+    unit: count
+    period: lifetime
+    values:
+      2022-01-01: 1
+    citations:
+      - title: "47 USC 1752(a)(8)(A)"
+        text: "no more than 1 connected device per eligible household"
+        href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752"
+
+# ===========================================================================
+# INCOME ELIGIBILITY - 47 USC 1752(a)(6)(A)
+# ===========================================================================
+
+income:
+  fpg_limit:
+    description: "Maximum household income as fraction of Federal Poverty Guidelines"
+    unit: ratio
+    period: year
+    values:
+      2022-01-01: 2.00
+    citations:
+      - title: "47 USC 1752(a)(6)(A)"
+        text: "income that is at or below 200 percent of the Federal poverty guidelines"
+        href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752"
+
+# ===========================================================================
+# CATEGORICAL ELIGIBILITY - 47 USC 1752(a)(6)(B)-(F)
+# ===========================================================================
+
+categorical_programs:
+  description: "Programs conferring automatic ACP eligibility"
+  values:
+    2022-01-01:
+      # 47 USC 1752(a)(6)(B) - School lunch/breakfast
+      - free_school_meals
+      - reduced_price_school_meals
+      # 47 USC 1752(a)(6)(C) - Pell Grant
+      - pell_grant
+      # 47 USC 1752(a)(6)(E) - WIC
+      - wic
+      # Also includes Lifeline categorical programs via 47 USC 1752(a)(6)(A):
+      # - SNAP (7 USC 2011 et seq.)
+      # - Medicaid (42 USC 1396 et seq.)
+      # - SSI (42 USC 1381 et seq.)
+      # - Federal Public Housing / Section 8 (42 USC 1437f)
+      # - Veterans Pension (38 USC 1521)
+      - snap
+      - medicaid
+      - ssi
+      - section_8_housing
+      - veterans_pension
+  citations:
+    - title: "47 USC 1752(a)(6)"
+      href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752"
+
+# Tribal-specific programs - 47 USC 1752(a)(6)(F)
+tribal_categorical_programs:
+  description: "Additional programs conferring ACP eligibility for tribal households"
+  values:
+    2022-01-01:
+      - fdpir  # Food Distribution Program on Indian Reservations
+      - bia_general_assistance  # Bureau of Indian Affairs General Assistance
+      - tribally_administered_tanf
+      - head_start
+  citations:
+    - title: "47 USC 1752(a)(6)(F)"
+      text: "eligible for participation in the Lifeline program as a resident of Tribal lands"
+      href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752"
+
+# ===========================================================================
+# HOUSEHOLD LIMITS - 47 USC 1752(a)(6)
+# ===========================================================================
+
+household:
+  benefit_limit:
+    description: "Maximum ACP benefits per household"
+    unit: count
+    period: month
+    values:
+      2022-01-01: 1
+    citations:
+      - title: "47 USC 1752(a)(6)"
+        text: "eligible household"
+        href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752"

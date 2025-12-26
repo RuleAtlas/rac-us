@@ -1,0 +1,30 @@
+# 47 USC 1752(a)(8)(A) - ACP Connected Device Subsidy Amount
+#
+# "...may be reimbursed up to $100 from the Affordable Connectivity
+#  Fund for such connected device, if the charge to such eligible
+#  household is more than $10 but less than $50..."
+#
+# One-time subsidy of up to $100 per eligible household.
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+imports:
+  acp_device_eligible: statute/47/1752/a/8/acp_device_eligible
+  max_reimbursement: statute/47/1752/parameters/connected_device/max_reimbursement
+
+entity Household
+period Month
+dtype Money
+unit "USD"
+label "ACP Connected Device Subsidy"
+description "One-time subsidy up to $100 for connected device per 47 USC 1752(a)(8)"
+
+default 0
+
+formula:
+  # Must be eligible for device subsidy
+  if not acp_device_eligible:
+    return 0
+
+  # Subsidy is up to $100
+  return max_reimbursement

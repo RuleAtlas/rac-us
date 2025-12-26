@@ -1,0 +1,272 @@
+# 26 USC Section 59 - Other Definitions and Special Rules Test Cases
+#
+# Tests for AMT foreign tax credit, NOL limitations, 59(e) election,
+# and child AMT exemption provisions.
+
+reference: "26 USC Section 59"
+tax_year: 2024
+
+tests:
+  # ==========================================================================
+  # SECTION 59(a) - AMT FOREIGN TAX CREDIT
+  # ==========================================================================
+
+  - name: "AMT FTC - basic calculation"
+    description: "Foreign tax credit limited based on AMT foreign source income"
+    inputs:
+      filing_status: SINGLE
+      amti: 500000
+      tentative_minimum_tax: 100000
+      foreign_source_income: 100000
+      worldwide_income: 500000
+      foreign_income_taxes_paid: 30000
+    expected:
+      # Foreign ratio: 100000/500000 = 0.20
+      amt_foreign_source_income: 100000  # 500000 * 0.20
+      # FTC limit: 100000 * 0.20 = 20000
+      amt_foreign_tax_credit_limitation: 20000
+      # Credit is lesser of taxes paid ($30,000) or limit ($20,000)
+      amt_foreign_tax_credit: 20000
+    notes: "FTC limited by foreign source ratio of AMTI"
+
+  - name: "AMT FTC - taxes less than limit"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      amti: 800000
+      tentative_minimum_tax: 180000
+      foreign_source_income: 400000
+      worldwide_income: 800000
+      foreign_income_taxes_paid: 50000
+    expected:
+      # Foreign ratio: 0.50
+      amt_foreign_source_income: 400000
+      # FTC limit: 180000 * 0.50 = 90000
+      amt_foreign_tax_credit_limitation: 90000
+      # Credit is $50,000 (taxes paid < limit)
+      amt_foreign_tax_credit: 50000
+    notes: "When foreign taxes are less than limit, full credit allowed"
+
+  - name: "AMT FTC - no foreign income"
+    inputs:
+      filing_status: SINGLE
+      amti: 300000
+      tentative_minimum_tax: 60000
+      foreign_source_income: 0
+      worldwide_income: 300000
+      foreign_income_taxes_paid: 0
+    expected:
+      amt_foreign_source_income: 0
+      amt_foreign_tax_credit_limitation: 0
+      amt_foreign_tax_credit: 0
+    notes: "No foreign income means no FTC"
+
+  - name: "AMT FTC - all foreign income"
+    inputs:
+      filing_status: SINGLE
+      amti: 200000
+      tentative_minimum_tax: 40000
+      foreign_source_income: 200000
+      worldwide_income: 200000
+      foreign_income_taxes_paid: 45000
+    expected:
+      # Foreign ratio: 1.00
+      amt_foreign_source_income: 200000
+      # FTC limit: 40000 * 1.00 = 40000
+      amt_foreign_tax_credit_limitation: 40000
+      # Credit limited to $40,000
+      amt_foreign_tax_credit: 40000
+    notes: "100% foreign income, FTC limited to TMT"
+
+  # ==========================================================================
+  # SECTION 59(e) - ELECTION TO AMORTIZE INTANGIBLES
+  # ==========================================================================
+
+  - name: "Section 59(e) election made"
+    description: "Taxpayer elects to amortize qualified expenditures"
+    inputs:
+      filing_status: SINGLE
+      section_59e_election_made: true
+      qualified_expenditures: 100000  # R&D expenditures
+    expected:
+      # 10-year amortization: 100000 / 10 = 10000 per year
+      section_59e_amortization_amount: 10000
+    notes: "Election spreads deduction over 10 years for R&D"
+
+  - name: "Section 59(e) election not made"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      section_59e_election_made: false
+      qualified_expenditures: 50000
+    expected:
+      section_59e_amortization_amount: 0
+    notes: "No election means immediate deduction (creates AMT preference)"
+
+  - name: "Section 59(e) - no qualified expenditures"
+    inputs:
+      filing_status: SINGLE
+      section_59e_election_made: true
+      qualified_expenditures: 0
+    expected:
+      section_59e_amortization_amount: 0
+    notes: "No expenditures to amortize"
+
+  # ==========================================================================
+  # SECTION 59(g) - TAX SHELTER FARM ACTIVITY
+  # ==========================================================================
+
+  - name: "Tax shelter farm activity - non-material participant"
+    inputs:
+      filing_status: SINGLE
+      has_farm_activity: true
+      is_material_participant_farming: false
+    expected:
+      has_tax_shelter_farm_activity: true
+    notes: "Non-material participation = tax shelter"
+
+  - name: "Not a tax shelter - material participant"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      has_farm_activity: true
+      is_material_participant_farming: true
+    expected:
+      has_tax_shelter_farm_activity: false
+    notes: "Material participation exempts from tax shelter rules"
+
+  - name: "No farm activity"
+    inputs:
+      filing_status: SINGLE
+      has_farm_activity: false
+      is_material_participant_farming: false
+    expected:
+      has_tax_shelter_farm_activity: false
+    notes: "No farming means no tax shelter farm activity"
+
+  # ==========================================================================
+  # SECTION 59(i) - AMT NOL DEDUCTION
+  # ==========================================================================
+
+  - name: "AMT NOL - below 90% limit"
+    description: "NOL carryforward less than 90% of AMTI"
+    inputs:
+      filing_status: SINGLE
+      amti: 200000  # After NOL is added back
+      regular_nol: 50000  # NOL deducted for regular tax
+      nol_carryforward: 30000
+    expected:
+      # AMTI before NOL: 200000 + 50000 = 250000
+      # 90% limit: 250000 * 0.90 = 225000
+      # AMT NOL: min(30000, 225000) = 30000
+      amt_nol_deduction: 30000
+    notes: "Full NOL allowed when below 90% limit"
+
+  - name: "AMT NOL - above 90% limit"
+    description: "NOL carryforward exceeds 90% of AMTI"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      amti: 100000
+      regular_nol: 20000
+      nol_carryforward: 150000
+    expected:
+      # AMTI before NOL: 100000 + 20000 = 120000
+      # 90% limit: 120000 * 0.90 = 108000
+      # AMT NOL: min(150000, 108000) = 108000
+      amt_nol_deduction: 108000
+    notes: "NOL limited to 90% of AMTI before NOL"
+
+  - name: "AMT NOL - no carryforward"
+    inputs:
+      filing_status: SINGLE
+      amti: 300000
+      regular_nol: 0
+      nol_carryforward: 0
+    expected:
+      amt_nol_deduction: 0
+    notes: "No NOL carryforward means no deduction"
+
+  - name: "AMT NOL - large carryforward, small AMTI"
+    inputs:
+      filing_status: SINGLE
+      amti: 50000
+      regular_nol: 10000
+      nol_carryforward: 500000
+    expected:
+      # AMTI before NOL: 50000 + 10000 = 60000
+      # 90% limit: 60000 * 0.90 = 54000
+      # AMT NOL: min(500000, 54000) = 54000
+      amt_nol_deduction: 54000
+    notes: "Large carryforward limited by AMTI"
+
+  # ==========================================================================
+  # SECTION 59(j) - CHILD AMT EXEMPTION
+  # ==========================================================================
+
+  - name: "Child exemption - with earned income"
+    description: "Minor child's AMT exemption includes earned income"
+    inputs:
+      filing_status: SINGLE  # Child filing own return
+      child_earned_income: 5000
+      child_amt_exemption_base: 9250  # 2024 value
+    expected:
+      # Limit: 9250 + 5000 = 14250
+      child_amt_exemption_limit: 14250
+    notes: "Earned income added to base exemption"
+
+  - name: "Child exemption - no earned income"
+    inputs:
+      filing_status: SINGLE
+      child_earned_income: 0
+      child_amt_exemption_base: 9250
+    expected:
+      # Limit: 9250 + 0 = 9250
+      child_amt_exemption_limit: 9250
+    notes: "Base exemption only when no earned income"
+
+  - name: "Child exemption - high earned income"
+    inputs:
+      filing_status: SINGLE
+      child_earned_income: 20000
+      child_amt_exemption_base: 9250
+    expected:
+      # Limit: 9250 + 20000 = 29250
+      child_amt_exemption_limit: 29250
+    notes: "High earner child gets larger exemption limit"
+
+  # ==========================================================================
+  # INTEGRATED TESTS
+  # ==========================================================================
+
+  - name: "E2E: Foreign taxpayer with NOL carryforward"
+    description: "Combined AMT FTC and NOL limitation"
+    inputs:
+      filing_status: SINGLE
+      amti: 600000
+      tentative_minimum_tax: 150000
+      foreign_source_income: 200000
+      worldwide_income: 600000
+      foreign_income_taxes_paid: 80000
+      regular_nol: 0
+      nol_carryforward: 100000
+    expected:
+      # Foreign ratio: 200000/600000 = 0.333
+      amt_foreign_source_income: 200000
+      # FTC limit: 150000 * 0.333 = 50000
+      amt_foreign_tax_credit_limitation: 50000
+      amt_foreign_tax_credit: 50000
+      # NOL: 90% of 600000 = 540000, so full 100000 allowed
+      amt_nol_deduction: 100000
+    notes: "Both FTC and NOL affect final AMT"
+
+  - name: "E2E: Tax shelter farmer with intangible election"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      has_farm_activity: true
+      is_material_participant_farming: false
+      farming_income: 0
+      farming_loss: 100000
+      section_59e_election_made: true
+      qualified_expenditures: 50000
+    expected:
+      has_tax_shelter_farm_activity: true
+      amt_farm_loss_disallowance: 100000
+      section_59e_amortization_amount: 5000
+    notes: "Tax shelter farm loss disallowed, 59(e) election reduces preference"

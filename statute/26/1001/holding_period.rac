@@ -218,21 +218,16 @@ label "Short Sale Holding Period Type"
 description "Holding period classification for short sale per Section 1233"
 
 formula:
-  if not is_short_sale:
-    if is_long_term_asset:
-      return HoldingType.LONG_TERM
-    else:
-      return HoldingType.SHORT_TERM
-
-  # Short sale rules per Section 1233(b):
-  # If substantially identical property held long-term at time of short sale,
-  # gain is short-term regardless of time short position was open
-  if held_substantially_identical_long_term:
+  # Non-short sales: classify by holding period
+  if not is_short_sale and is_long_term_asset:
+    return HoldingType.LONG_TERM
+  elif not is_short_sale:
+    return HoldingType.SHORT_TERM
+  elif held_substantially_identical_long_term:
+    # Short sale rules per Section 1233(b):
+    # If substantially identical property held long-term, gain is short-term
     return HoldingType.SHORT_TERM  # Forced short-term
-  else:
-    # Otherwise, based on how long short position was open
-    pass
-  if effective_holding_period_days > 365:
+  elif effective_holding_period_days > 365:
     return HoldingType.LONG_TERM
   else:
     return HoldingType.SHORT_TERM

@@ -1,0 +1,70 @@
+# 26 USC Section 59 - Other Definitions and Special Rules Parameters
+#
+# Parameters for various Section 59 provisions.
+
+# --- Section 59(i) - NOL Limitation Rate ---
+
+amt_nol_limitation_rate:
+  description: "Maximum percentage of AMTI that ATNOL can offset"
+  unit: rate
+  values:
+    1987-01-01: 0.90
+  citations:
+    - "Section 59(i)(1)(A): ATNOL shall not exceed 90% of AMTI"
+    - "This limitation has been in effect since AMT reform in 1987"
+
+# --- Section 59(j) - Child AMT Exemption ---
+
+child_amt_exemption_base:
+  description: "Base AMT exemption amount for minor children under Section 59(j)"
+  unit: currency-USD
+  indexing:
+    method: cpi-u
+    round_to: 50
+  values:
+    2018-01-01: 7600
+    2019-01-01: 7750
+    2020-01-01: 7900
+    2021-01-01: 7950
+    2022-01-01: 8200
+    2023-01-01: 8800
+    2024-01-01: 9250
+    2025-01-01: 9500
+  citations:
+    - "Section 59(j)(1): Child's exemption limited to earned income plus base"
+    - "Rev. Proc. 2023-34: $9,250 for 2024"
+    - "Rev. Proc. 2024-40: $9,500 for 2025"
+
+# --- Section 59(e) - Amortization Periods ---
+
+circulation_expenditure_amortization_period:
+  description: "Amortization period for circulation expenditures under Section 59(e)"
+  unit: years
+  values:
+    1987-01-01: 3
+  citations:
+    - "Section 59(e)(2)(A): 3 years for circulation expenditures"
+
+research_expenditure_amortization_period:
+  description: "Amortization period for research expenditures under Section 59(e)"
+  unit: years
+  values:
+    1987-01-01: 10
+  citations:
+    - "Section 59(e)(2)(B): 10 years for R&D expenditures"
+
+idc_amortization_period:
+  description: "Amortization period for intangible drilling costs under Section 59(e)"
+  unit: months
+  values:
+    1987-01-01: 60
+  citations:
+    - "Section 59(e)(2)(C): 60 months for intangible drilling costs"
+
+mining_exploration_amortization_period:
+  description: "Amortization period for mining exploration costs under Section 59(e)"
+  unit: years
+  values:
+    1987-01-01: 10
+  citations:
+    - "Section 59(e)(2)(D): 10 years for mining exploration costs"

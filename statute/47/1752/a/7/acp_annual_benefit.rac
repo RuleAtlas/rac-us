@@ -1,0 +1,24 @@
+# 47 USC 1752(a)(7) - ACP Annual Benefit Value
+#
+# Annualized ACP benefit for household (sum of monthly benefits).
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+imports:
+  acp_benefit: statute/47/1752/a/7/acp_benefit
+
+# Note: ACP benefit program ended April 2024. Frozen for historical reference.
+
+entity Household
+period Year
+dtype Money
+unit "USD"
+label "ACP Annual Benefit"
+description "Annualized ACP benefit for household"
+
+default 0
+
+formula:
+  # Sum monthly benefits across the year (12 months)
+  # Note: ACP benefit ended April 2024
+  return acp_benefit * 12

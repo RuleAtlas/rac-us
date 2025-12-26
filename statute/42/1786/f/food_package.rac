@@ -55,34 +55,32 @@ formula:
   # based on breastfeeding intensity and duration
 
   # 7 CFR 246.10(c)(7): Food Package VII - Fully breastfeeding women
-  # (exclusively breastfeeding, infant not receiving formula from WIC)
-  if category == "breastfeeding_woman":
-    if is_fully_breastfeeding:
-      return "VII"
-    else:
-      # Partially breastfeeding - Food Package IV
-      return "IV"
+  if category == "breastfeeding_woman" and is_fully_breastfeeding:
+    return "VII"
+  elif category == "breastfeeding_woman":
+    # Partially breastfeeding - Food Package IV
+    return "IV"
+  elif category == "postpartum_woman" and is_breastfeeding and is_fully_breastfeeding:
+    # 7 CFR 246.10(c)(6): Food Package VI - Fully breastfeeding postpartum
+    return "VI"
+  elif category == "postpartum_woman" and is_breastfeeding:
+    # Partially breastfeeding postpartum
+    return "IV"
   elif category == "postpartum_woman":
     # 7 CFR 246.10(c)(5): Food Package V - Non-breastfeeding postpartum
-    # 7 CFR 246.10(c)(6): Food Package VI - Fully breastfeeding postpartum (enhanced)
-    if is_breastfeeding and is_fully_breastfeeding:
-      return "VI"
-    elif is_breastfeeding:
-      # Partially breastfeeding postpartum
-      return "IV"
-    else:
-      # Not breastfeeding
-      return "V"
+    return "V"
+  elif category == "infant" and is_fully_breastfed:
+    # 7 CFR 246.10(c)(1): Package I - Fully breastfed infants
+    return "I"
   elif category == "infant":
-    # 7 CFR 246.10(c)(1-2): Infant packages
-    # Package I - Fully breastfed infants (no formula)
-    # Package II - Partially breastfed or formula-fed infants
-    if is_fully_breastfed:
-      return "I"
-    else:
-      return "II"
+    # 7 CFR 246.10(c)(2): Package II - Formula-fed or partially breastfed
+    return "II"
   else:
     return "none"
+
+default "none"
+
+---
 
 # =============================================================================
 # FOOD PACKAGE DESCRIPTIONS

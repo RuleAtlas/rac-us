@@ -124,13 +124,15 @@ formula:
   if depreciation_system == ads: return 0
 
   # Real property not eligible for bonus (27.5 and 39 year)
-  if property_class in [27_5_year, 39_year]:
+  if property_class == residential_rental or property_class == nonresidential:
     return 0
   else:
-    pass
+    # Apply bonus rate to cost basis
+    return cost_basis * bonus_depreciation_rate
 
-  # Apply bonus rate to cost basis
-  return cost_basis * bonus_depreciation_rate
+default 0
+
+---
 
 # Calculate regular MACRS depreciation
 entity Asset

@@ -1,0 +1,20 @@
+# 47 USC 1752(a)(6)(E) - ACP WIC Eligibility
+#
+# "(E) at least 1 member of the household receives assistance through
+#  the special supplemental nutritional program for women, infants,
+#  and children established by section 17 of the Child Nutrition
+#  Act of 1966 (42 U.S.C. 1786)"
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+entity Household
+period Month
+dtype Boolean
+label "ACP WIC Eligibility"
+description "Eligible through WIC participation per 47 USC 1752(a)(6)(E)"
+
+default false
+
+formula:
+  # At least one member receives WIC
+  return any(members.receives_wic)

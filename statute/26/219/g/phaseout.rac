@@ -63,14 +63,12 @@ formula:
   # MFS has its own very narrow range
   if filing_status == MARRIED_FILING_SEPARATELY:
     return phaseout_mfs_start
+  elif filing_status == JOINT and not is_active_retirement_plan_participant and spouse_is_active_retirement_plan_participant:
+    # 219(g)(7): Contributor not covered but spouse is covered
+    return phaseout_spouse_covered_start
   elif filing_status == JOINT:
-    # For joint filers, check participation status
-    # 219(g)(7): If contributor not covered but spouse is covered
-    if not is_active_retirement_plan_participant and spouse_is_active_retirement_plan_participant:
-      return phaseout_spouse_covered_start
-    else:
-      # Contributor is covered (or neither covered - no phase-out in that case)
-      return phaseout_joint_start
+    # Contributor is covered (or neither covered - no phase-out in that case)
+    return phaseout_joint_start
   else:
     # Single or Head of Household
     return phaseout_single_start
@@ -89,13 +87,14 @@ description "AGI where IRA deduction is fully phased out"
 formula:
   if filing_status == MARRIED_FILING_SEPARATELY:
     return phaseout_mfs_end
-
-  if filing_status == JOINT:
-    if not is_active_retirement_plan_participant and spouse_is_active_retirement_plan_participant:
-      return phaseout_spouse_covered_end
+  elif filing_status == JOINT and not is_active_retirement_plan_participant and spouse_is_active_retirement_plan_participant:
+    return phaseout_spouse_covered_end
+  elif filing_status == JOINT:
     return phaseout_joint_end
+  else:
+    return phaseout_single_end
 
-  return phaseout_single_end
+default 0
 
 ---
 
@@ -111,6 +110,8 @@ formula:
   # 219(g)(1): "If... the individual or the individual's spouse is an active participant"
   return is_active_retirement_plan_participant or spouse_is_active_retirement_plan_participant
 
+default false
+
 ---
 
 # 219(g)(2): Calculate the phase-out ratio
@@ -121,25 +122,24 @@ label "IRA Deduction Phase-out Ratio"
 description "Ratio of IRA deduction that is phased out based on income"
 
 formula:
-  # If neither spouse is an active participant, no phase-out
-  if not ira_phaseout_applies:
-    return 0
-
   agi = adjusted_gross_income
   start = ira_phaseout_start
   end = ira_phaseout_end
 
-  # Below phase-out start: full deduction
-  if agi <= start:
+  # If neither spouse is an active participant, no phase-out
+  if not ira_phaseout_applies:
     return 0
-
-  # Above phase-out end: no deduction
-  if agi >= end:
+  elif agi <= start:
+    # Below phase-out start: full deduction
+    return 0
+  elif agi >= end:
+    # Above phase-out end: no deduction
     return 1
+  else:
+    # Proportional phase-out per 219(g)(2)(A)
+    return (agi - start) / (end - start)
 
-  # Proportional phase-out
-  # 219(g)(2)(A): ratio = (AGI - start) / (end - start)
-  return (agi - start) / (end - start)
+default 0
 
 ---
 

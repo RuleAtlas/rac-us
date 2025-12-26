@@ -1,0 +1,315 @@
+# 26 USC Section 59 - Other Definitions and Special Rules
+#
+# Section 59 provides definitions and special rules for the AMT regime:
+# - Section 59(a): AMT foreign tax credit
+# - Section 59(b): Adjusted Net Minimum Tax (repealed)
+# - Section 59(c): Treatment of estates and trusts
+# - Section 59(d): Coordination of alternative minimum tax and NIIT
+# - Section 59(e): Election to amortize intangibles
+# - Section 59(f): Coordination with Section 291
+# - Section 59(g): Tax shelter defined
+# - Section 59(h): Coordination with Section 55(d)(3)
+# - Section 59(i): Net Operating Loss deduction
+# - Section 59(j): Treatment of unearned income of minor child
+
+imports:
+# Filing status
+  filing_status: statute/26/1/filing_status
+
+# Foreign tax credit components
+  foreign_income_taxes_paid: statute/26/901/foreign_income_taxes_paid
+  foreign_source_income: statute/26/904/foreign_source_income
+  worldwide_income: statute/26/61/worldwide_taxable_income
+
+# AMTI from Section 55
+  amti: statute/26/55/b/2/amti#alternative_minimum_taxable_income
+  tentative_minimum_tax: statute/26/55/a/amt#tentative_minimum_tax
+
+# Net operating loss
+  regular_nol: statute/26/172/net_operating_loss_deduction
+  nol_carryforward: statute/26/172/nol_carryforward
+
+# Net investment income tax
+  niit: statute/26/1411/a/niit#net_investment_income_tax
+
+# Intangible costs (for Section 59(e) election)
+  qualified_expenditures: statute/26/59/e/qualified_expenditures
+
+# --- Section 59(a) - Alternative Minimum Tax Foreign Tax Credit ---
+#
+# "(1) IN GENERAL.—The alternative minimum tax foreign tax credit for any
+#      taxable year shall be the credit which would be determined under
+#      section 27(a) for such taxable year if—
+#      (A) the amount of the pre-credit tentative minimum tax for such
+#          taxable year, and
+#      (B) foreign source income items were computed using the adjustments
+#          and preferences provided in this part."
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Foreign Source Income"
+description "Foreign source income computed with AMT adjustments per Section 59(a)"
+
+formula:
+  # For AMT purposes, foreign source income must be recomputed
+  # using AMT adjustments (Section 56) and preferences (Section 57)
+  #
+  # This requires recalculating the foreign source portion of AMTI
+  # rather than using regular tax foreign source income
+  #
+  # Simplified: Assume same ratio of foreign to worldwide income
+  # In practice, would need detailed AMT adjustment allocation
+
+  if worldwide_income == 0: return 0
+
+  foreign_ratio = foreign_source_income / worldwide_income
+
+  return amti * foreign_ratio
+
+default 0
+
+---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Foreign Tax Credit Limitation"
+description "Maximum AMT foreign tax credit per Section 59(a)"
+
+formula:
+  # AMT FTC is limited to:
+  # TMT * (AMT foreign source income / AMTI)
+  #
+  # This prevents the FTC from reducing AMT below the portion
+  # attributable to US source income
+
+  if amti == 0: return 0
+
+  foreign_ratio = amt_foreign_source_income / amti
+
+  return tentative_minimum_tax * foreign_ratio
+
+default 0
+
+---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Foreign Tax Credit"
+description "Foreign tax credit allowed against AMT per Section 59(a)"
+
+formula:
+  # AMT foreign tax credit is the lesser of:
+  # (1) Foreign taxes attributable to AMT foreign source income
+  # (2) The AMT FTC limitation
+
+  # Simplified calculation - assumes all foreign taxes relate to
+  # foreign source income (pro-rata allocation would apply in practice)
+  foreign_taxes = foreign_income_taxes_paid
+  limitation = amt_foreign_tax_credit_limitation
+
+  return min(foreign_taxes, limitation)
+
+default 0
+
+---
+
+# --- Section 59(e) - Election to Amortize Intangibles ---
+#
+# Section 59(e) allows taxpayers to elect to amortize certain
+# expenditures over a specified period to avoid AMT preferences.
+# This can be beneficial when the preference item would trigger AMT.
+#
+# Qualified expenditures include:
+# - Circulation expenditures (Section 173)
+# - Research and experimental expenditures (Section 174)
+# - Intangible drilling costs (Section 263(c))
+# - Mining exploration costs (Section 617)
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "Section 59(e) Election Made"
+description "Whether taxpayer elected to amortize qualified expenditures"
+
+formula:
+  # This is an election - taxpayer chooses whether to amortize
+  # certain expenditures instead of deducting them immediately
+  # The election is binding once made for each expenditure type
+  return section_59e_election_made
+
+default false
+
+---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Section 59(e) Qualified Expenditures"
+description "Expenditures eligible for Section 59(e) amortization election"
+
+formula:
+  # Qualified expenditures that can be amortized under Section 59(e):
+  # 1. Circulation expenditures (5 years) - Section 173
+  # 2. Research expenditures (10 years) - Section 174
+  # 3. Intangible drilling costs (60 months) - Section 263(c)
+  # 4. Mining exploration costs (10 years) - Section 617
+
+  return qualified_expenditures
+
+default 0
+
+---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Section 59(e) Amortization Amount"
+description "Annual amortization of elected qualified expenditures"
+
+formula:
+  # If Section 59(e) election is made, qualified expenditures
+  # are amortized over the applicable period instead of
+  # being immediately deducted
+  #
+  # This reduces the AMT preference but spreads the deduction
+  # over multiple years
+
+  if not section_59e_election_made: return 0
+
+  # Simplified: assume 10-year amortization (R&D/mining)
+  # In practice, different periods apply to different expenditure types
+  annual_amortization = qualified_expenditures / 10
+
+  return annual_amortization
+
+default 0
+
+---
+
+# --- Section 59(g) - Tax Shelter Defined ---
+#
+# Provides definition of "tax shelter" for purposes of Section 58(a)(1)
+# farm loss rules and other AMT provisions.
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "Has Tax Shelter Farm Activity"
+description "Whether taxpayer has farm activity that is a tax shelter per Section 59(g)"
+
+formula:
+  # Under Section 59(g), a tax shelter is defined as:
+  # (1) A partnership or other entity, investment plan or arrangement, or
+  # (2) Any other plan or arrangement
+  #
+  # where a significant purpose is the avoidance or evasion of federal income tax
+  #
+  # For farming, this includes:
+  # - Activities where statements about tax benefits were made for marketing
+  # - Syndicated farming arrangements
+  # - Farm activities where taxpayer does not materially participate
+
+  # Simplified: treat as tax shelter if not a material participant
+  return has_farm_activity and not is_material_participant_farming
+
+default false
+
+---
+
+# --- Section 59(i) - Net Operating Loss Deduction ---
+#
+# Special rules for NOL deduction in computing AMTI.
+# The AMTI NOL deduction is limited to 90% of AMTI (before NOL).
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT NOL Deduction"
+description "NOL deduction allowed for AMT purposes per Section 59(i)"
+
+formula:
+  # Section 59(i)(1): The ATNOL deduction for the taxable year
+  # shall not exceed 90% of AMTI (computed without the ATNOL)
+  #
+  # The alternative tax net operating loss (ATNOL) is the NOL
+  # computed with AMT adjustments
+
+  # AMTI before NOL deduction
+  amti_before_nol = amti + regular_nol  # Add back regular NOL that was deducted
+
+  # 90% limitation
+  max_amt_nol = amti_before_nol * 0.90
+
+  # AMT NOL is the lesser of the carryforward and the 90% limit
+  return min(nol_carryforward, max_amt_nol)
+
+defined_for:
+  nol_carryforward > 0
+
+default 0
+
+---
+
+# --- Section 59(j) - Treatment of Unearned Income of Minor Child ---
+#
+# For children subject to the "kiddie tax" under Section 1(g),
+# the AMT exemption is limited.
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Child AMT Exemption Limit"
+description "Limited AMT exemption for minor child under Section 59(j)"
+
+formula:
+  # Section 59(j)(1): The exemption amount for a child subject to
+  # Section 1(g) (kiddie tax) cannot exceed:
+  # The child's earned income plus $8,800 (2024, inflation-adjusted)
+  #
+  # This prevents children with substantial investment income
+  # from using the full AMT exemption
+
+  base_limit = child_amt_exemption_base
+  earned_income_addition = child_earned_income
+
+  return base_limit + earned_income_addition
+
+default 0
+
+---
+
+# --- Definitions ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Regular Tax"
+description "Regular income tax for Section 55(c) cross-reference"
+
+formula:
+  # Section 55(c): "Regular tax" means the sum of:
+  # (1) The tax imposed by Section 1 or 3 (regular income tax), plus
+  # (2) The tax imposed by Section 55(a) for any prior year
+  #     (prior year AMT)
+  #
+  # Reduced by:
+  # (1) Credits allowed under Chapter 1, other than
+  #     credits allowable under Sections 30D, 31, and 32-36
+  #
+  # This definition is used in the AMT calculation to determine
+  # if tentative minimum tax exceeds regular tax
+
+  return regular_income_tax - nonrefundable_credits
+
+default 0

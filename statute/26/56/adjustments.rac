@@ -35,6 +35,9 @@ imports:
 # Incentive stock option data (Section 422)
   iso_exercise_bargain_element: statute/26/422/b/iso_bargain_element
 
+# Section 58 loss adjustments (farm losses, mining costs)
+  section_58_adjustments: statute/26/58/denial_of_losses#total_section_58_adjustments
+
 # --- Section 56(b)(1) - Itemized Deduction Adjustments ---
 
 entity TaxUnit
@@ -158,7 +161,7 @@ period Year
 dtype Money
 unit "USD"
 label "Total AMT Adjustments"
-description "Sum of all AMT adjustments under Section 56"
+description "Sum of all AMT adjustments under Sections 56 and 58"
 
 formula:
   # All adjustments are addbacks (increase AMTI)
@@ -169,4 +172,9 @@ formula:
   exemption_addback = amt_personal_exemption_addback
   iso_adj = amt_iso_adjustment
 
-  return salt_addback + misc_addback + medical_adj + std_ded_addback + exemption_addback + iso_adj
+  # Section 58 loss adjustments (farm losses, mining costs)
+  loss_adjustments = section_58_adjustments
+
+  return salt_addback + misc_addback + medical_adj + std_ded_addback + exemption_addback + iso_adj + loss_adjustments
+
+default 0

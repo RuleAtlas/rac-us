@@ -1,0 +1,173 @@
+# 26 USC Section 58 - Denial of Certain Losses
+#
+# "For purposes of this part—"
+#
+# Section 58 limits certain losses in computing AMTI:
+# - Section 58(a): Farm losses limited for non-farmers
+# - Section 58(b): Passive activity losses (pre-1987 property)
+# - Section 58(c): Limitation on mining exploration and development costs
+#
+# These limitations prevent taxpayers from using accelerated loss
+# deductions to avoid AMT.
+
+imports:
+# Filing status for threshold lookups
+  filing_status: statute/26/1/filing_status
+
+# Farm income/loss data
+  farming_income: statute/26/61/a/farming_income
+  farming_loss: statute/26/165/farming_loss
+
+# Passive activity loss data (Section 469)
+  passive_activity_loss: statute/26/469/passive_activity_loss
+  at_risk_amount: statute/26/465/at_risk_amount
+
+# Mining exploration costs
+  mining_exploration_costs: statute/26/617/mining_exploration_deduction
+  mining_development_costs: statute/26/616/mining_development_deduction
+
+# AGI for farm loss threshold
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+
+# Parameters
+  farm_loss_threshold: parameters/statute/26/58/a/farm_loss#agi_threshold
+  farm_loss_limit: parameters/statute/26/58/a/farm_loss#farm_loss_limit
+
+# --- Section 58(a) - Farm Losses ---
+#
+# "(1) LOSS FROM FARMING.—
+#      (A) IN GENERAL.—For purposes of computing the amount of the
+#          alternative minimum taxable income for any taxable year of a
+#          taxpayer other than a corporation—
+#          (i) disallowance of farm loss.—No loss of the taxpayer for such
+#              taxable year from any tax shelter farm activity shall be
+#              allowed.
+#          (ii) farming activity.—For purposes of this subsection, the term
+#               'farming activity' means any activity involving the cultivation
+#               of land or the raising or harvesting of any agricultural or
+#               horticultural commodity."
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "Is Material Participant in Farming"
+description "Whether taxpayer materially participates in farming activity per Section 469"
+
+formula:
+  # Material participation is determined under Section 469 passive activity rules
+  # Taxpayer must work 500+ hours, be sole participant, or meet other tests
+  # This is a simplification - actual rules are in Section 469 regulations
+  # For now, we assume this is provided as an input
+  return is_material_participant_farming
+
+default false
+
+---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Farm Loss for AMT"
+description "Farm loss amount before AMT limitation per Section 58(a)"
+
+formula:
+  # Farm loss is the excess of deductions over income from farming
+  # Only applies when farming deductions exceed farming income
+  net_farming = farming_income - farming_loss
+
+  if net_farming >= 0: return 0
+
+  return abs(net_farming)
+
+default 0
+
+---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Farm Loss Disallowance"
+description "Farm loss disallowed for AMT per Section 58(a)"
+
+formula:
+  # Section 58(a)(1): Farm losses from tax shelter farm activities
+  # are disallowed for AMT purposes
+  #
+  # A "tax shelter farm activity" is any farming activity where:
+  # (1) Taxpayer does not materially participate, OR
+  # (2) Taxpayer's AGI exceeds $150,000 (adjusted for inflation)
+  #     for activities which are not farming syndicates
+  #
+  # For high-income taxpayers (AGI > threshold), farm losses beyond
+  # the $40,000/$80,000 limit are disallowed
+
+  farm_loss_amount = farm_loss_for_amt
+
+  if farm_loss_amount == 0: return 0
+
+  # If material participant, no limitation under tax shelter rules
+  # (but may still be subject to other at-risk rules)
+  if is_material_participant_farming:
+    return 0
+
+  # For non-material participants, entire farm loss is disallowed
+  # as a "tax shelter farm activity"
+  return farm_loss_amount
+
+default 0
+
+---
+
+# --- Section 58(c) - Limitation on Mining Exploration/Development Costs ---
+#
+# Mining exploration and development costs under Sections 617 and 616 are
+# treated as preference items when they exceed the amount that would be
+# deductible if capitalized and amortized.
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Mining Cost Preference for AMT"
+description "Mining exploration/development cost preference per Section 58(c)"
+
+formula:
+  # For AMT, mining exploration and development costs must be
+  # capitalized and amortized over 10 years instead of being
+  # immediately deducted
+  #
+  # The preference is the excess of immediate deduction over
+  # the 10-year amortization amount
+
+  current_year_deduction = mining_exploration_costs + mining_development_costs
+
+  # Simplified: assume straight-line amortization over 10 years
+  # In practice, would need to track capitalized costs from prior years
+  annual_amortization = current_year_deduction / 10
+
+  excess = current_year_deduction - annual_amortization
+
+  return max(0, excess)
+
+default 0
+
+---
+
+# --- Total Section 58 Adjustments ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Section 58 Loss Adjustments"
+description "Sum of all loss disallowances under Section 58"
+
+formula:
+  farm_adjustment = amt_farm_loss_disallowance
+  mining_adjustment = mining_cost_preference_for_amt
+
+  return farm_adjustment + mining_adjustment
+
+default 0

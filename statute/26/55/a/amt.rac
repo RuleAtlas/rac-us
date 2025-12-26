@@ -18,6 +18,9 @@ imports:
 # Filing status for rate/exemption lookups
   filing_status: statute/26/1/filing_status
 
+# AMT foreign tax credit from Section 59(a)
+  amt_foreign_tax_credit: statute/26/59/special_rules#amt_foreign_tax_credit
+
 # Parameters
   exemption_joint: parameters/statute/26/55/d/1/exemption#exemption_joint
   exemption_single: parameters/statute/26/55/d/1/exemption#exemption_single
@@ -121,8 +124,8 @@ entity TaxUnit
 period Year
 dtype Money
 unit "USD"
-label "Tentative Minimum Tax"
-description "TMT calculated at 26%/28% rates per Section 55(b)(1)"
+label "Tentative Minimum Tax Before FTC"
+description "TMT calculated at 26%/28% rates before foreign tax credit per Section 55(b)(1)"
 
 formula:
   taxable_excess = amt_taxable_excess
@@ -139,6 +142,29 @@ formula:
   tax_at_28 = amount_at_28_pct * amt_rate_high
 
   return tax_at_26 + tax_at_28
+
+default 0
+
+---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Tentative Minimum Tax"
+description "TMT after AMT foreign tax credit per Section 55(b)(1) and 59(a)"
+
+formula:
+  # Tentative minimum tax is reduced by the AMT foreign tax credit
+  # per Section 59(a)
+  tmt_before_ftc = tentative_minimum_tax_before_ftc
+  ftc = amt_foreign_tax_credit
+
+  return max(0, tmt_before_ftc - ftc)
+
+default 0
+
+---
 
 # --- Section 55(a) - AMT Imposed ---
 

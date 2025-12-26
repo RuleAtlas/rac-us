@@ -1,0 +1,28 @@
+# 47 USC 1752(a)(6)(F) + 47 CFR 54.409(b)(4) - ACP Tribal Program Eligibility
+#
+# "(F) at least 1 member of the household is eligible for the Lifeline
+#  program as a qualifying low-income consumer or residing on Tribal
+#  lands..."
+#
+# Tribal-specific programs per 47 CFR 54.409(b)(4):
+# - FDPIR (Food Distribution Program on Indian Reservations)
+# - Bureau of Indian Affairs General Assistance
+# - Tribally Administered TANF
+# - Head Start (income-based for tribal residents)
+#
+# Reference: https://www.law.cornell.edu/cfr/text/47/54.409
+
+entity Household
+period Month
+dtype Boolean
+label "ACP Tribal Program Eligibility"
+description "Eligible through tribal-specific programs per 47 CFR 54.409(b)(4)"
+
+default false
+
+formula:
+  fdpir = any(members.receives_fdpir)
+  bia = any(members.receives_bia_general_assistance)
+  tribal_tanf = any(members.receives_tribal_tanf)
+  head_start = any(members.receives_head_start)
+  return fdpir or bia or tribal_tanf or head_start

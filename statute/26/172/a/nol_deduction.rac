@@ -1,0 +1,127 @@
+# 26 USC Section 172(a) - Net Operating Loss Deduction Allowed
+#
+# "(a) Deduction allowed.-- There shall be allowed as a deduction for the
+#      taxable year an amount equal to--
+#      (1) the aggregate of the net operating loss carryovers to such year,
+#          plus the net operating loss carrybacks to such year, and
+#      (2) in the case of a net operating loss for a taxable year beginning
+#          after December 31, 2017, such deduction shall not exceed 80 percent
+#          of taxable income (determined without regard to the deduction
+#          allowed under this section)."
+#
+# Key rules post-TCJA (2018+):
+# - NOLs arising after 2017 can only be carried forward (no carryback)
+# - Post-2017 NOLs limited to 80% of taxable income
+# - Pre-2018 NOLs can offset 100% of taxable income (grandfathered)
+# - Exception: Farming losses can be carried back 2 years
+
+imports:
+  taxable_income: statute/26/63/a/taxable_income
+
+  # NOL carryforward components from 172(b)
+  nol_deduction_pre_2018: statute/26/172/b/carryback_carryover
+  nol_deduction_post_2017: statute/26/172/b/carryback_carryover
+  total_nol_carryforward: statute/26/172/b/carryback_carryover
+
+  # Farming loss carryback
+  farming_loss_carryback: statute/26/172/inputs
+
+# --- Main NOL Deduction ---
+
+variable nol_deduction:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Net Operating Loss Deduction"
+description "Total NOL deduction from carryforwards and carrybacks per 26 USC 172(a)"
+reference "26 USC 172(a)"
+
+formula:
+  # Aggregate of:
+  # (1) Pre-2018 NOL carryforwards (no 80% limit)
+  # (2) Post-2017 NOL carryforwards (80% limit applies)
+  # (3) Farming loss carrybacks (special 2-year carryback)
+
+  pre_2018_deduction = nol_deduction_pre_2018
+  post_2017_deduction = nol_deduction_post_2017
+
+  # Farming carryback applies to prior years, not current year deduction
+  # For current year, we only use carryforwards
+  farming_carryback = farming_loss_carryback
+
+  total = pre_2018_deduction + post_2017_deduction + farming_carryback
+
+  # Ensure deduction does not exceed taxable income
+  # (Should already be handled by component calculations)
+  return min(total, max(0, taxable_income))
+
+defined_for:
+  total_nol_carryforward > 0 or farming_loss_carryback > 0
+
+default 0
+
+---
+
+# --- NOL Deduction as Above-the-Line Adjustment ---
+# Note: NOL deduction reduces taxable income, not AGI
+# It appears on Schedule 1, line 8a as an "other income" adjustment
+
+variable nol_deduction_claimed:
+entity TaxUnit
+period Year
+dtype Boolean
+label "NOL Deduction Claimed"
+description "Whether taxpayer claims an NOL deduction in current year"
+reference "26 USC 172(a)"
+
+formula:
+  return nol_deduction > 0
+
+default false
+
+---
+
+# --- Coordination with Other Provisions ---
+# The NOL deduction affects various other calculations
+
+variable taxable_income_before_nol:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Taxable Income Before NOL Deduction"
+description "Taxable income computed without NOL deduction"
+reference "26 USC 172(a)(2)"
+
+formula:
+  # This is used for computing the 80% limitation
+  return taxable_income + nol_deduction
+
+default 0
+
+---
+
+# --- AMT NOL Deduction ---
+# NOL deduction for Alternative Minimum Tax purposes
+# Per Section 56(a)(4) and 56(d), different rules apply
+
+variable amt_nol_deduction:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT NOL Deduction"
+description "NOL deduction for AMT purposes per Section 56(d)"
+reference "26 USC 56(d)"
+
+formula:
+  # For AMT, NOL deduction generally limited to 80% of AMTI
+  # (before NOL and QBID deductions)
+  # This is similar to regular NOL limitation
+
+  # For simplicity, use regular NOL deduction
+  # Full implementation would recompute with AMTI
+  return nol_deduction
+
+default 0

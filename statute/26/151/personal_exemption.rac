@@ -1,0 +1,28 @@
+# 26 USC Section 151 - Personal Exemptions
+#
+# "(a) Allowance of deductions.-- In the case of an individual, the
+#      exemptions provided by this section shall be allowed as deductions
+#      in computing taxable income."
+#
+# Note: Personal exemptions are SUSPENDED for tax years 2018-2025 by
+# the Tax Cuts and Jobs Act (TCJA), Section 11041.
+# The exemption amount is set to $0 for these years.
+
+parameters:
+  exemption_amount: statute/26/151/parameters
+
+variable personal_exemption:
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Personal Exemption"
+description "Deduction for personal exemptions per 26 USC 151 (suspended 2018-2025)"
+reference "26 USC 151", "TCJA Section 11041"
+
+formula:
+  # Suspended 2018-2025 by TCJA Section 11041
+  # Returns 0 during suspension period
+  return exemption_amount
+
+default 0

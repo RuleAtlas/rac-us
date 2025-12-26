@@ -172,28 +172,31 @@ description "Maximum Roth IRA contribution after income phase-out"
 formula:
   # Phase-out thresholds vary by filing status
   base_limit = ira_contribution_limit
-
-  # Determine phase-out range based on filing status (using ternary for DSL compatibility)
+  agi = adjusted_gross_income
   is_single_or_hoh = (filing_status == SINGLE) or (filing_status == HEAD_OF_HOUSEHOLD)
   is_joint = filing_status == JOINT
-  is_separate = filing_status == SEPARATE
 
-  phase_out_start = roth_ira_phaseout_single.start if is_single_or_hoh else (roth_ira_phaseout_joint.start if is_joint else (roth_ira_phaseout_separate.start if is_separate else roth_ira_phaseout_single.start))
-  phase_out_end = roth_ira_phaseout_single.end if is_single_or_hoh else (roth_ira_phaseout_joint.end if is_joint else (roth_ira_phaseout_separate.end if is_separate else roth_ira_phaseout_single.end))
-
-  # Calculate phase-out
-  if adjusted_gross_income <= phase_out_start:
+  # Flat if-elif chain with single return statements
+  if is_joint and agi <= roth_ira_phaseout_joint_start:
     return base_limit
-  elif adjusted_gross_income >= phase_out_end:
+  elif is_joint and agi >= roth_ira_phaseout_joint_end:
+    return 0
+  elif is_joint:
+    return max(200, (base_limit * (1 - (agi - roth_ira_phaseout_joint_start) / (roth_ira_phaseout_joint_end - roth_ira_phaseout_joint_start)) // 10 + 1) * 10)
+  elif is_single_or_hoh and agi <= roth_ira_phaseout_single_start:
+    return base_limit
+  elif is_single_or_hoh and agi >= roth_ira_phaseout_single_end:
+    return 0
+  elif is_single_or_hoh:
+    return max(200, (base_limit * (1 - (agi - roth_ira_phaseout_single_start) / (roth_ira_phaseout_single_end - roth_ira_phaseout_single_start)) // 10 + 1) * 10)
+  elif agi <= roth_ira_phaseout_separate_start:
+    return base_limit
+  elif agi >= roth_ira_phaseout_separate_end:
     return 0
   else:
-    # Pro-rata reduction
-    phase_out_range = phase_out_end - phase_out_start
-    income_over_threshold = adjusted_gross_income - phase_out_start
-    reduction_ratio = income_over_threshold / phase_out_range
-    reduced_limit = base_limit * (1 - reduction_ratio)
-    # Round up to nearest $10 (per IRS rules)
-    return max(200, (reduced_limit // 10 + 1) * 10)  # Minimum $200 if any allowed
+    return max(200, (base_limit * (1 - (agi - roth_ira_phaseout_separate_start) / (roth_ira_phaseout_separate_end - roth_ira_phaseout_separate_start)) // 10 + 1) * 10)
+
+default 0
 
 ---
 

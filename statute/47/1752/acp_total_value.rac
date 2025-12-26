@@ -1,0 +1,28 @@
+# 47 USC 1752 - Total ACP Value
+#
+# Combined annual value of ACP benefits including both
+# monthly broadband benefit and one-time device subsidy.
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752
+
+imports:
+  acp_annual_benefit: statute/47/1752/a/7/acp_annual_benefit
+  acp_device_subsidy: statute/47/1752/a/8/acp_device_subsidy
+
+entity Household
+period Year
+dtype Money
+unit "USD"
+label "Total ACP Value"
+description "Total annual value of ACP benefits (broadband + device)"
+
+default 0
+
+formula:
+  # Annual broadband benefit
+  broadband_value = acp_annual_benefit
+
+  # One-time device subsidy (if eligible)
+  device_value = acp_device_subsidy
+
+  return broadband_value + device_value

@@ -1,0 +1,369 @@
+# 47 USC 1752 - Affordable Connectivity Program Test Cases
+#
+# Tests verify ACP eligibility determination and benefit calculation
+# per the statutory requirements.
+#
+# Test Period: 2023 (when program was active)
+# FPL 2023:
+# - 1 person: $14,580
+# - 2 person: $19,720
+# - 3 person: $24,860
+# - 4 person: $30,000
+# - Additional per person: $5,140
+#
+# 200% FPL 2023:
+# - 1 person: $29,160/year = $2,430/month
+# - 2 person: $39,440/year = $3,287/month
+# - 3 person: $49,720/year = $4,143/month
+# - 4 person: $60,000/year = $5,000/month
+
+test_cases:
+  # ===========================================================================
+  # INCOME-BASED ELIGIBILITY TESTS
+  # ===========================================================================
+
+  - name: "Single person at 150% FPL - income eligible"
+    description: "Household at 150% FPL should qualify based on income"
+    period: 2023-06
+    inputs:
+      household_size: 1
+      gross_income: 1823  # ~$21,870/year = 150% FPL
+      is_on_tribal_land: false
+      receives_snap: false
+      receives_medicaid: false
+      broadband_monthly_charge: 50
+    expected:
+      acp_income_eligible: true
+      acp_eligible: true
+      acp_max_benefit: 30
+      acp_benefit: 30
+    citation: "47 USC 1752(a)(6)(A) - income at or below 200% FPL"
+
+  - name: "Single person at 199% FPL - income eligible"
+    description: "Household just under 200% FPL should qualify"
+    period: 2023-06
+    inputs:
+      household_size: 1
+      gross_income: 2400  # ~$28,800/year = 197.5% FPL
+      is_on_tribal_land: false
+      broadband_monthly_charge: 50
+    expected:
+      acp_income_eligible: true
+      acp_eligible: true
+      acp_benefit: 30
+    citation: "47 USC 1752(a)(6)(A)"
+
+  - name: "Single person at 201% FPL - not income eligible"
+    description: "Household just over 200% FPL should not qualify on income alone"
+    period: 2023-06
+    inputs:
+      household_size: 1
+      gross_income: 2500  # ~$30,000/year = 205% FPL
+      is_on_tribal_land: false
+      receives_snap: false
+      receives_medicaid: false
+    expected:
+      acp_income_eligible: false
+      acp_categorically_eligible: false
+      acp_eligible: false
+      acp_benefit: 0
+    citation: "47 USC 1752(a)(6)(A)"
+
+  - name: "Family of 4 at 180% FPL - income eligible"
+    description: "Larger household with higher income threshold"
+    period: 2023-06
+    inputs:
+      household_size: 4
+      gross_income: 4500  # ~$54,000/year = 180% FPL for 4-person
+      is_on_tribal_land: false
+      broadband_monthly_charge: 60
+    expected:
+      acp_income_eligible: true
+      acp_eligible: true
+      acp_benefit: 30
+    citation: "47 USC 1752(a)(6)(A)"
+
+  # ===========================================================================
+  # CATEGORICAL ELIGIBILITY TESTS
+  # ===========================================================================
+
+  - name: "SNAP recipient regardless of income"
+    description: "SNAP participation confers categorical eligibility"
+    period: 2023-06
+    inputs:
+      household_size: 2
+      gross_income: 5000  # Over 200% FPL
+      receives_snap: true
+      is_on_tribal_land: false
+      broadband_monthly_charge: 40
+    expected:
+      acp_income_eligible: false
+      acp_lifeline_categorical_eligible: true
+      acp_categorically_eligible: true
+      acp_eligible: true
+      acp_benefit: 30
+    citation: "47 USC 1752(a)(6)(A), 47 CFR 54.409(b)"
+
+  - name: "Medicaid recipient"
+    description: "Medicaid participation confers categorical eligibility"
+    period: 2023-06
+    inputs:
+      household_size: 1
+      gross_income: 3000  # Over 200% FPL
+      receives_medicaid: true
+      is_on_tribal_land: false
+      broadband_monthly_charge: 25
+    expected:
+      acp_lifeline_categorical_eligible: true
+      acp_eligible: true
+      acp_benefit: 25  # Benefit limited to actual charge
+    citation: "47 USC 1752(a)(6)(A), 47 CFR 54.409(b)"
+
+  - name: "SSI recipient"
+    description: "SSI receipt confers categorical eligibility"
+    period: 2023-06
+    inputs:
+      household_size: 1
+      gross_income: 1000
+      receives_ssi: true
+      is_on_tribal_land: false
+      broadband_monthly_charge: 50
+    expected:
+      acp_lifeline_categorical_eligible: true
+      acp_eligible: true
+      acp_benefit: 30
+    citation: "47 USC 1752(a)(6)(A), 47 CFR 54.409(b)"
+
+  - name: "Pell Grant recipient"
+    description: "Federal Pell Grant receipt confers eligibility"
+    period: 2023-06
+    inputs:
+      household_size: 1
+      gross_income: 3500
+      receives_pell_grant: true
+      is_on_tribal_land: false
+      broadband_monthly_charge: 55
+    expected:
+      acp_pell_grant_eligible: true
+      acp_categorically_eligible: true
+      acp_eligible: true
+      acp_benefit: 30
+    citation: "47 USC 1752(a)(6)(C)"
+
+  - name: "Free school meal recipient"
+    description: "Free school lunch program participation confers eligibility"
+    period: 2023-06
+    inputs:
+      household_size: 3
+      gross_income: 6000
+      receives_free_school_meals: true
+      is_on_tribal_land: false
+      broadband_monthly_charge: 45
+    expected:
+      acp_school_meal_eligible: true
+      acp_categorically_eligible: true
+      acp_eligible: true
+      acp_benefit: 30
+    citation: "47 USC 1752(a)(6)(B)"
+
+  - name: "WIC recipient"
+    description: "WIC participation confers eligibility"
+    period: 2023-06
+    inputs:
+      household_size: 3
+      gross_income: 5500
+      receives_wic: true
+      is_on_tribal_land: false
+      broadband_monthly_charge: 35
+    expected:
+      acp_wic_eligible: true
+      acp_categorically_eligible: true
+      acp_eligible: true
+      acp_benefit: 30
+    citation: "47 USC 1752(a)(6)(E)"
+
+  # ===========================================================================
+  # TRIBAL LAND ENHANCED BENEFIT TESTS
+  # ===========================================================================
+
+  - name: "Tribal land - enhanced benefit"
+    description: "Household on tribal land receives $75 maximum benefit"
+    period: 2023-06
+    inputs:
+      household_size: 2
+      gross_income: 2000
+      is_on_tribal_land: true
+      broadband_monthly_charge: 80
+    expected:
+      acp_on_tribal_land: true
+      acp_max_benefit: 75
+      acp_benefit: 75
+    citation: "47 USC 1752(a)(7)"
+
+  - name: "Tribal land - benefit limited to actual charge"
+    description: "Benefit cannot exceed actual monthly charge even on tribal land"
+    period: 2023-06
+    inputs:
+      household_size: 1
+      gross_income: 1500
+      is_on_tribal_land: true
+      broadband_monthly_charge: 50
+    expected:
+      acp_on_tribal_land: true
+      acp_max_benefit: 75
+      acp_benefit: 50  # Limited to actual charge
+    citation: "47 USC 1752(a)(7)"
+
+  - name: "Tribal FDPIR recipient"
+    description: "FDPIR participation on tribal land"
+    period: 2023-06
+    inputs:
+      household_size: 4
+      gross_income: 7000
+      receives_fdpir: true
+      is_on_tribal_land: true
+      broadband_monthly_charge: 65
+    expected:
+      acp_tribal_program_eligible: true
+      acp_categorically_eligible: true
+      acp_on_tribal_land: true
+      acp_max_benefit: 75
+      acp_benefit: 65
+    citation: "47 USC 1752(a)(6)(F)"
+
+  # ===========================================================================
+  # CONNECTED DEVICE SUBSIDY TESTS
+  # ===========================================================================
+
+  - name: "Connected device - valid copay"
+    description: "Device copay between $10-$50 qualifies for subsidy"
+    period: 2023-06
+    inputs:
+      household_size: 2
+      gross_income: 2000
+      is_on_tribal_land: false
+      broadband_monthly_charge: 50
+      connected_device_copay: 25
+      has_received_acp_device: false
+    expected:
+      acp_eligible: true
+      acp_device_copay_valid: true
+      acp_device_eligible: true
+      acp_device_subsidy: 100
+    citation: "47 USC 1752(a)(8)(A)"
+
+  - name: "Connected device - copay too low"
+    description: "Device copay must be more than $10"
+    period: 2023-06
+    inputs:
+      household_size: 1
+      gross_income: 1800
+      is_on_tribal_land: false
+      broadband_monthly_charge: 40
+      connected_device_copay: 10
+      has_received_acp_device: false
+    expected:
+      acp_eligible: true
+      acp_device_copay_valid: false
+      acp_device_eligible: false
+      acp_device_subsidy: 0
+    citation: "47 USC 1752(a)(8)(A) - more than $10"
+
+  - name: "Connected device - copay too high"
+    description: "Device copay must be less than $50"
+    period: 2023-06
+    inputs:
+      household_size: 1
+      gross_income: 1800
+      is_on_tribal_land: false
+      broadband_monthly_charge: 40
+      connected_device_copay: 50
+      has_received_acp_device: false
+    expected:
+      acp_device_copay_valid: false
+      acp_device_eligible: false
+      acp_device_subsidy: 0
+    citation: "47 USC 1752(a)(8)(A) - less than $50"
+
+  - name: "Connected device - already received"
+    description: "Only one device per household lifetime"
+    period: 2023-06
+    inputs:
+      household_size: 2
+      gross_income: 2000
+      is_on_tribal_land: false
+      broadband_monthly_charge: 50
+      connected_device_copay: 30
+      has_received_acp_device: true
+    expected:
+      acp_device_eligible: false
+      acp_device_subsidy: 0
+    citation: "47 USC 1752(a)(8)(A) - no more than 1 connected device per eligible household"
+
+  # ===========================================================================
+  # ONE BENEFIT PER HOUSEHOLD TESTS
+  # ===========================================================================
+
+  - name: "Already enrolled - cannot receive additional benefit"
+    description: "Household already receiving ACP cannot enroll again"
+    period: 2023-06
+    inputs:
+      household_size: 2
+      gross_income: 2000
+      is_on_tribal_land: false
+      is_enrolled_in_acp: true
+      broadband_monthly_charge: 50
+    expected:
+      acp_eligible: true
+      acp_already_receiving: true
+      acp_enrollment_eligible: false
+    citation: "47 USC 1752(b)(3)"
+
+  # ===========================================================================
+  # PROGRAM TERMINATION TESTS
+  # ===========================================================================
+
+  - name: "After program end - no benefit"
+    description: "No benefits available after program funding exhausted"
+    period: 2024-07
+    inputs:
+      household_size: 1
+      gross_income: 1500
+      is_on_tribal_land: false
+      receives_snap: true
+      broadband_monthly_charge: 50
+    expected:
+      acp_eligible: false  # Program not active
+      acp_benefit: 0
+    citation: "FCC DA-24-418 - Program wind-down"
+
+  # ===========================================================================
+  # BENEFIT AMOUNT EDGE CASES
+  # ===========================================================================
+
+  - name: "Low broadband charge - benefit limited"
+    description: "Benefit cannot exceed actual monthly charge"
+    period: 2023-06
+    inputs:
+      household_size: 1
+      gross_income: 1800
+      is_on_tribal_land: false
+      broadband_monthly_charge: 15
+    expected:
+      acp_eligible: true
+      acp_max_benefit: 30
+      acp_benefit: 15
+    citation: "47 USC 1752(a)(7) - in an amount equal to such amount charged"
+
+  - name: "Zero broadband charge - no benefit"
+    description: "Free service receives no additional benefit"
+    period: 2023-06
+    inputs:
+      household_size: 1
+      gross_income: 1800
+      is_on_tribal_land: false
+      broadband_monthly_charge: 0
+    expected:
+      acp_eligible: true
+      acp_benefit: 0
+    citation: "47 USC 1752(a)(7)"
