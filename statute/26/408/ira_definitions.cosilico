@@ -63,11 +63,11 @@ description "Year of birth for RMD age determination"
 # RMD rules are shared with 401(k), see 402/c/rmd.cosilico
 # ============================================================================
 
+imports:
+  rmd_applicable_age: statute/26/402/c/rmd#rmd_applicable_age
+
 # Derived: RMD applicable age based on birth year
-# Per SECURE 2.0 Act:
-# - Born 1950 or earlier: 72
-# - Born 1951-1959: 73
-# - Born 1960+: 75
+# Per SECURE 2.0 Act - uses same rules as 401(k)
 entity Person
 period Year
 dtype Integer
@@ -75,13 +75,8 @@ label "IRA RMD Applicable Age"
 description "Age at which IRA required minimum distributions must begin"
 
 formula:
-  # Same rules as 401(k) - see statute/26/402/c/rmd.cosilico
-  if birth_year <= 1950:
-    return 72
-  elif birth_year <= 1959:
-    return 73
-  else:
-    return 75
+  # Same rules as 401(k) - reference 402/c/rmd for RMD age by birth year
+  return rmd_applicable_age
 
 ---
 

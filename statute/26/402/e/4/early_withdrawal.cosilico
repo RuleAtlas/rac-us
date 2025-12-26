@@ -32,6 +32,11 @@ imports:
   age: statute/26/person/age
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
 
+parameters:
+  early_withdrawal_penalty_rate: statute/26/402/parameters/early_withdrawal_penalty_rate
+  birth_adoption_distribution_limit: statute/26/402/parameters/birth_adoption_distribution_limit
+  medical_expense_threshold_rate: 0.075  # Per 72(t)(2)(B) - 7.5% of AGI
+
 # Input: Age at time of distribution
 entity Person
 period Year
@@ -177,8 +182,8 @@ label "Medical Expense Exemption"
 description "Amount of distribution exempt from penalty for medical expenses"
 
 formula:
-  # Medical expenses exceeding 7.5% of AGI are exempt
-  medical_threshold = adjusted_gross_income * 0.075
+  # Medical expenses exceeding 7.5% of AGI are exempt - 72(t)(2)(B)
+  medical_threshold = adjusted_gross_income * medical_expense_threshold_rate
   excess_medical = max(0, medical_expense_distribution - medical_threshold)
   return min(excess_medical, taxable_401k_distribution)
 
@@ -193,8 +198,8 @@ label "Birth/Adoption Exemption"
 description "Amount exempt from penalty for birth/adoption (max $5,000)"
 
 formula:
-  # SECURE Act added $5,000 per birth/adoption exemption
-  return min(birth_adoption_distribution, 5000)
+  # SECURE Act added birth/adoption exemption - 72(t)(2)(H)
+  return min(birth_adoption_distribution, birth_adoption_distribution_limit)
 
 ---
 
@@ -230,5 +235,5 @@ label "Early Withdrawal Penalty"
 description "10% additional tax on early distributions from retirement plans per 72(t)"
 
 formula:
-  # 10% of the amount subject to penalty
-  return amount_subject_to_penalty * 0.10
+  # Additional tax per 72(t)(1)
+  return amount_subject_to_penalty * early_withdrawal_penalty_rate

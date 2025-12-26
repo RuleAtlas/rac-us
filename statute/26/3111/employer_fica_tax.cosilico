@@ -1,0 +1,33 @@
+# 26 USC 3111 - Employer FICA Tax (Combined)
+#
+# Employer share of Federal Insurance Contributions Act (FICA) taxes,
+# consisting of Social Security (OASDI) and Medicare (HI) taxes.
+#
+# Key provisions:
+# - 26 USC 3111(a): Social Security (6.2%) on wages up to wage base
+# - 26 USC 3111(b): Medicare (1.45%) on all wages (no cap)
+#
+# Combined employer FICA rate: 7.65% (6.2% + 1.45%)
+# Note: Employer does NOT pay Additional Medicare Tax - that's employee-only.
+#
+# References:
+# - 26 USC 3111: Employer FICA taxes
+# - 26 USC 3121(a): Definition of wages
+# - 26 USC 3101: Employee FICA taxes (matching)
+
+imports:
+  # Component taxes
+  employer_social_security_tax: statute/26/3111/a/employer_social_security_tax
+  employer_medicare_tax: statute/26/3111/b/employer_medicare_tax
+
+# Combined Employer FICA Tax
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Employer FICA Tax"
+description "Combined employer Social Security and Medicare tax per 26 USC 3111"
+
+formula:
+  # Total employer FICA = Social Security (capped) + Medicare (uncapped)
+  return employer_social_security_tax + employer_medicare_tax

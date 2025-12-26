@@ -1,0 +1,67 @@
+# 26 USC Section 61(a)(10) - Pensions
+#
+# "(a) General definition.--Except as otherwise provided in this subtitle,
+#      gross income means all income from whatever source derived, including
+#      (but not limited to)--
+#      ...
+#      (10) Pensions;"
+#
+# This aggregates all taxable pension and retirement account income for
+# inclusion in gross income under Section 61.
+#
+# Components:
+# - Taxable 401(k)/403(b)/pension plan distributions (Section 402)
+# - Taxable traditional IRA distributions (Section 408)
+# - Taxable Roth IRA distributions (non-qualified earnings, Section 408A)
+# - Social Security benefits (Section 86) - handled separately
+#
+# Note: Qualified Roth distributions are excluded from gross income per 408A(d)(1)
+
+imports:
+  # Employer retirement plan distributions
+  taxable_401k_distribution: statute/26/402/a/distributions
+  net_taxable_distribution: statute/26/402/a/distributions
+
+  # Traditional IRA distributions
+  taxable_ira_distribution: statute/26/408/d/distributions
+
+  # Roth IRA distributions (non-qualified earnings portion)
+  taxable_roth_distribution: statute/26/408A/d/distributions
+
+# ============================================================================
+# Pension and Retirement Income Components
+# ============================================================================
+
+# Total taxable pension/retirement income from all sources
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Taxable Pension Income"
+description "Total taxable income from pensions and retirement accounts per 26 USC 61(a)(10)"
+
+formula:
+  # Employer plans (401k, 403b, pension) - net of rollovers
+  employer_plan_income = net_taxable_distribution
+
+  # Traditional IRA distributions
+  traditional_ira_income = taxable_ira_distribution
+
+  # Roth IRA non-qualified earnings (contributions come out tax-free)
+  roth_ira_income = taxable_roth_distribution
+
+  return employer_plan_income + traditional_ira_income + roth_ira_income
+
+---
+
+# Alternative: Pension income before rollover exclusion
+# Used for certain calculations that need gross distribution amount
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Gross Pension Distributions"
+description "Gross distributions before rollover exclusions"
+
+formula:
+  return taxable_401k_distribution + taxable_ira_distribution + taxable_roth_distribution

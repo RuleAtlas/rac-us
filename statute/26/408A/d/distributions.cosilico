@@ -27,6 +27,10 @@
 
 imports:
   age: statute/26/person/age
+  taxable_ira_distribution: statute/26/408/d/distributions
+
+parameters:
+  early_withdrawal_penalty_rate: statute/26/402/parameters/early_withdrawal_penalty_rate
 
 # Input: Total Roth IRA distributions
 entity Person
@@ -228,7 +232,7 @@ formula:
 
   # Penalty applies to taxable (earnings) portion only
   # Contributions always come out tax-free and penalty-free
-  return taxable_roth_distribution * 0.10
+  return taxable_roth_distribution * early_withdrawal_penalty_rate
 
 ---
 
@@ -241,10 +245,10 @@ label "Total IRA Taxable Income"
 description "Combined taxable income from all IRA distributions"
 
 formula:
-  # Import traditional IRA taxable amount
-  traditional_taxable = taxable_ira_distribution  # From 408/d/distributions
+  # Traditional IRA taxable amount from 408/d/distributions
+  traditional_taxable = taxable_ira_distribution
 
-  # Add Roth taxable amount (earnings before qualified)
+  # Roth taxable amount (earnings before qualified)
   roth_taxable = taxable_roth_distribution
 
   return traditional_taxable + roth_taxable

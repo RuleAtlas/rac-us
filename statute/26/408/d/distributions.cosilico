@@ -20,7 +20,10 @@
 imports:
   age: statute/26/person/age
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+
+parameters:
   early_withdrawal_penalty_rate: statute/26/402/parameters/early_withdrawal_penalty_rate
+  ira_first_home_exception_limit: statute/26/408/parameters/ira_first_home_exception_limit
 
 # Input: Traditional IRA distribution amount
 entity Person
@@ -146,8 +149,8 @@ label "First Home Exemption"
 description "Amount exempt from penalty for first-time homebuyer ($10,000 lifetime limit)"
 
 formula:
-  # $10,000 lifetime limit per 72(t)(2)(F)
-  return min(first_home_distribution, 10000)
+  # Lifetime limit per 72(t)(2)(F)
+  return min(first_home_distribution, ira_first_home_exception_limit)
 
 ---
 
@@ -225,4 +228,4 @@ label "IRA Early Withdrawal Penalty"
 description "10% additional tax on early IRA distributions per 72(t)"
 
 formula:
-  return ira_amount_subject_to_penalty * 0.10
+  return ira_amount_subject_to_penalty * early_withdrawal_penalty_rate

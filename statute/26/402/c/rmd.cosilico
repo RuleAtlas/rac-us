@@ -21,6 +21,9 @@
 imports:
   age: statute/26/person/age
 
+parameters:
+  rmd_applicable_age: statute/26/402/parameters/rmd_applicable_age
+
 # Input: Year of birth (for determining RMD age)
 entity Person
 period Year
@@ -74,12 +77,13 @@ label "RMD Applicable Age"
 description "Age at which required minimum distributions must begin"
 
 formula:
+  # Per SECURE 2.0 Act - age varies by birth year
   if birth_year <= 1950:
-    return 72
+    return rmd_applicable_age.born_1950_or_earlier
   elif birth_year <= 1959:
-    return 73
+    return rmd_applicable_age.born_1951_to_1959
   else:
-    return 75
+    return rmd_applicable_age.born_1960_or_later
 
 ---
 

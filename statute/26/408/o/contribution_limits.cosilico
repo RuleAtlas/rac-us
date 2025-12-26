@@ -20,6 +20,15 @@ imports:
   filing_status: statute/26/1/filing_status
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
 
+parameters:
+  ira_contribution_limit: statute/26/408/parameters/ira_contribution_limit
+  ira_catchup_contribution: statute/26/408/parameters/ira_catchup_contribution
+  ira_catchup_age: statute/26/408/parameters/ira_catchup_age
+  roth_ira_phaseout_single: statute/26/408/parameters/roth_ira_phaseout_single
+  roth_ira_phaseout_joint: statute/26/408/parameters/roth_ira_phaseout_joint
+  roth_ira_phaseout_separate: statute/26/408/parameters/roth_ira_phaseout_separate
+  excess_contribution_penalty_rate: statute/26/408/parameters/excess_contribution_penalty_rate
+
 # Input: Traditional IRA contributions during year
 entity Person
 period Year
@@ -64,8 +73,7 @@ label "IRA Base Contribution Limit"
 description "Base maximum IRA contribution limit for the year"
 
 formula:
-  # 2024: $7,000
-  return 7000
+  return ira_contribution_limit
 
 ---
 
@@ -78,8 +86,8 @@ label "IRA Catch-Up Amount"
 description "Additional catch-up contribution allowed for age 50 and older"
 
 formula:
-  if age >= 50:
-    return 1000
+  if age >= ira_catchup_age:
+    return ira_catchup_contribution
   return 0
 
 ---
@@ -148,27 +156,24 @@ label "Roth IRA Contribution Limit"
 description "Maximum Roth IRA contribution after income phase-out"
 
 formula:
-  # 2024 phase-out thresholds:
-  # Single/HoH: $146,000 - $161,000
-  # MFJ: $230,000 - $240,000
-  # MFS: $0 - $10,000
+  # Phase-out thresholds vary by filing status
 
   base_limit = ira_contribution_limit
 
   # Determine phase-out range based on filing status
   if filing_status == SINGLE or filing_status == HEAD_OF_HOUSEHOLD:
-    phase_out_start = 146000
-    phase_out_end = 161000
+    phase_out_start = roth_ira_phaseout_single.start
+    phase_out_end = roth_ira_phaseout_single.end
   elif filing_status == JOINT:
-    phase_out_start = 230000
-    phase_out_end = 240000
+    phase_out_start = roth_ira_phaseout_joint.start
+    phase_out_end = roth_ira_phaseout_joint.end
   elif filing_status == SEPARATE:
-    phase_out_start = 0
-    phase_out_end = 10000
+    phase_out_start = roth_ira_phaseout_separate.start
+    phase_out_end = roth_ira_phaseout_separate.end
   else:
     # Default to single thresholds
-    phase_out_start = 146000
-    phase_out_end = 161000
+    phase_out_start = roth_ira_phaseout_single.start
+    phase_out_end = roth_ira_phaseout_single.end
 
   # Calculate phase-out
   if adjusted_gross_income <= phase_out_start:
@@ -208,6 +213,6 @@ label "Excess Contribution Penalty"
 description "6% excise tax on excess IRA contributions left in account"
 
 formula:
-  # 6% penalty on excess contributions not withdrawn by tax filing deadline
+  # Penalty on excess contributions not withdrawn by tax filing deadline - 4973(a)
   total_excess = excess_ira_contributions
-  return total_excess * 0.06
+  return total_excess * excess_contribution_penalty_rate

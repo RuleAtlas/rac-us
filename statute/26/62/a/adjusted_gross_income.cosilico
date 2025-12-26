@@ -4,28 +4,45 @@
 # gross income' means, in the case of an individual, gross income minus
 # the deductions specified in subsection (a)."
 #
-# Simplified implementation: AGI = sum of income sources
-# Full implementation would subtract above-the-line deductions per §62(a)(1)-(21)
+# AGI = Gross Income - Above-the-Line Deductions
+#
+# Above-the-line deductions per §62(a):
+#   §62(a)(1)    - Trade and business deductions
+#   §62(a)(2)(D) - Educator expenses (up to $300)
+#   §62(a)(4)    - Self-employment tax deduction (50% of SE tax)
+#   §62(a)(7)    - IRA deduction (Section 219)
+#   §62(a)(12)   - HSA deduction (Section 223)
+#   §62(a)(17)   - Student loan interest (up to $2,500)
+#   §62(a)(23)   - Qualified tip income (Section 74A, OBBBA 2025-2028)
+#   §62(a)(24)   - Qualified overtime compensation (Section 225, OBBBA 2025-2028)
 
 imports:
-# Gross income components from §61
+  # Gross income components from §61
   wages: statute/26/61/a/1/wages
   salaries: statute/26/61/a/1/salaries
   tips: statute/26/61/a/1/tips
 
-# Self-employment income
+  # Self-employment income
   self_employment_income: statute/26/1402/a/net_earnings_self_employment
 
-# Investment income
+  # Investment income
   interest_income: statute/26/61/a/4/interest
   dividend_income: statute/26/61/a/7/dividends
   capital_gains: statute/26/61/a/3/gains_from_property
 
-# Other income
+  # Other income
   other_income: statute/26/61/a/other_income
 
-# Unemployment compensation - included per Section 85
+  # Unemployment compensation - included per Section 85
   unemployment_in_agi: statute/26/85/unemployment_in_agi
+
+  # Above-the-line deductions
+  educator_expense_deduction: statute/26/62/a/2/D/educator_expense_deduction
+  ira_deduction: statute/26/62/a/7/ira_deduction
+  hsa_deduction: statute/26/62/a/12/hsa_deduction
+  student_loan_interest_deduction: statute/26/62/a/17/student_loan_interest_deduction
+  tip_income_deduction: statute/26/62/a/23/tip_income_deduction
+  qualified_overtime_deduction: statute/26/225/a/qualified_overtime_deduction
 
 entity TaxUnit
 period Year
@@ -35,17 +52,20 @@ label "Adjusted Gross Income"
 description "Gross income minus above-the-line deductions per 26 USC §62(a)"
 
 formula:
-  # Simplified: Sum of income sources
-  # Full implementation would subtract §62(a) deductions:
-  # - Trade/business deductions (§62(a)(1))
-  # - Educator expenses (§62(a)(2)(D))
-  # - Health savings account deduction (§62(a)(16))
-  # - Self-employment tax deduction (§62(a)(4))
-  # - Student loan interest (§62(a)(17))
-  # - Qualified overtime compensation (§225, added by OBBBA 2025)
-  # - etc.
-
+  # Step 1: Calculate gross income (Section 61)
   employee_income = wages + salaries + tips
   investment_income = interest_income + dividend_income + capital_gains
+  gross_income = employee_income + self_employment_income + investment_income + other_income + unemployment_in_agi
 
-  return employee_income + self_employment_income + investment_income + other_income + unemployment_in_agi
+  # Step 2: Sum above-the-line deductions (Section 62(a))
+  above_the_line_deductions = (
+    educator_expense_deduction +       # §62(a)(2)(D)
+    ira_deduction +                    # §62(a)(7) via §219
+    hsa_deduction +                    # §62(a)(12) via §223
+    student_loan_interest_deduction +  # §62(a)(17) via §221
+    tip_income_deduction +             # §62(a)(23) via §74A (OBBBA 2025-2028)
+    qualified_overtime_deduction       # §62(a)(24) via §225 (OBBBA 2025-2028)
+  )
+
+  # Step 3: AGI = Gross Income - Above-the-Line Deductions
+  return gross_income - above_the_line_deductions

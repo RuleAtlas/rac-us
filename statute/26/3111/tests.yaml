@@ -1,0 +1,229 @@
+# 26 USC 3111 - Employer FICA Tax Tests
+#
+# Test cases for validating employer payroll tax implementation.
+# Covers:
+# - Employer Social Security tax (6.2% up to wage base)
+# - Employer Medicare tax (1.45% on all wages)
+# - Combined employer FICA tax
+#
+# Key statutes:
+# - 26 USC 3111(a): Employer Social Security tax
+# - 26 USC 3111(b): Employer Medicare tax
+# - 26 USC 3121(a): Definition of wages
+#
+# Note: Employer does NOT pay Additional Medicare Tax (employee-only per 3101(b)(2))
+
+reference: "26 USC 3111"
+tax_year: 2024
+
+# =============================================================================
+# EMPLOYER SOCIAL SECURITY TAX TESTS - 26 USC 3111(a)
+# =============================================================================
+
+tests:
+  # Test 1: Basic employer Social Security tax
+  - name: "Employer Social Security tax - typical wages"
+    description: "6.2% of wages up to wage base ($168,600 in 2024)"
+    inputs:
+      person:
+        irs_employment_income: 50000
+    expected:
+      employer_social_security_tax: 3100  # $50,000 * 6.2%
+    citations:
+      - "26 USC 3111(a): 6.2% of wages"
+
+  # Test 2: At wage base - exact limit
+  - name: "Employer Social Security tax - at wage base"
+    inputs:
+      person:
+        irs_employment_income: 168600
+    expected:
+      employer_social_security_tax: 10453.20  # $168,600 * 6.2%
+    citations:
+      - "26 USC 3111(a): tax on wages up to wage base"
+      - "Rev. Proc. 2023-34: 2024 wage base $168,600"
+
+  # Test 3: Above wage base - capped
+  - name: "Employer Social Security tax - above wage base (capped)"
+    description: "Tax only applies up to wage base, no matter how high wages are"
+    inputs:
+      person:
+        irs_employment_income: 500000
+    expected:
+      employer_social_security_tax: 10453.20  # Max = $168,600 * 6.2%
+    citations:
+      - "26 USC 3121(a): wage base limitation"
+
+# =============================================================================
+# EMPLOYER MEDICARE TAX TESTS - 26 USC 3111(b)
+# =============================================================================
+
+  # Test 4: Basic employer Medicare tax
+  - name: "Employer Medicare tax - typical wages"
+    description: "1.45% of all wages (no cap)"
+    inputs:
+      person:
+        irs_employment_income: 50000
+    expected:
+      employer_medicare_tax: 725  # $50,000 * 1.45%
+    citations:
+      - "26 USC 3111(b): 1.45% of wages"
+
+  # Test 5: High wages - no Medicare cap
+  - name: "Employer Medicare tax - high wages (no cap)"
+    description: "Unlike Social Security, Medicare has no wage base limit"
+    inputs:
+      person:
+        irs_employment_income: 500000
+    expected:
+      employer_medicare_tax: 7250  # $500,000 * 1.45%
+    citations:
+      - "26 USC 3111(b): applies to all wages"
+      - "26 USC 3121(a): no wage base limit for Medicare"
+
+  # Test 6: Very high wages - employer does NOT pay Additional Medicare Tax
+  - name: "Employer Medicare tax - no Additional Medicare Tax for employer"
+    description: "Employer pays only base 1.45%, never the additional 0.9%"
+    inputs:
+      person:
+        irs_employment_income: 1000000
+    expected:
+      employer_medicare_tax: 14500  # $1,000,000 * 1.45%
+      # Note: No additional 0.9% - that's employee-only per 3101(b)(2)
+    citations:
+      - "26 USC 3111(b): employer rate is 1.45%"
+      - "26 USC 3101(b)(2): Additional Medicare Tax is employee-only"
+
+# =============================================================================
+# COMBINED EMPLOYER FICA TAX TESTS - 26 USC 3111
+# =============================================================================
+
+  # Test 7: Combined employer FICA - below wage base
+  - name: "Combined employer FICA - typical wages"
+    description: "7.65% combined rate (6.2% SS + 1.45% Medicare)"
+    inputs:
+      person:
+        irs_employment_income: 50000
+    expected:
+      employer_social_security_tax: 3100    # $50,000 * 6.2%
+      employer_medicare_tax: 725            # $50,000 * 1.45%
+      employer_fica_tax: 3825               # $50,000 * 7.65%
+    citations:
+      - "26 USC 3111: combined employer FICA"
+
+  # Test 8: Combined employer FICA - at wage base
+  - name: "Combined employer FICA - at wage base"
+    inputs:
+      person:
+        irs_employment_income: 168600
+    expected:
+      employer_social_security_tax: 10453.20  # $168,600 * 6.2%
+      employer_medicare_tax: 2444.70          # $168,600 * 1.45%
+      employer_fica_tax: 12897.90             # Sum of both
+    citations:
+      - "26 USC 3111(a): SS at wage base"
+      - "26 USC 3111(b): Medicare on all wages"
+
+  # Test 9: Combined employer FICA - above wage base
+  - name: "Combined employer FICA - above wage base"
+    description: "SS capped, Medicare uncapped"
+    inputs:
+      person:
+        irs_employment_income: 500000
+    expected:
+      employer_social_security_tax: 10453.20  # Capped at wage base
+      employer_medicare_tax: 7250             # $500,000 * 1.45%
+      employer_fica_tax: 17703.20             # Sum: SS capped + Medicare uncapped
+    citations:
+      - "26 USC 3111: SS capped, Medicare uncapped"
+
+  # Test 10: Million dollar earner - comprehensive employer taxes
+  - name: "High earner - comprehensive employer FICA"
+    description: "$1 million wage earner"
+    inputs:
+      person:
+        irs_employment_income: 1000000
+    expected:
+      employer_social_security_tax: 10453.20  # Max (capped)
+      employer_medicare_tax: 14500            # $1M * 1.45%
+      employer_fica_tax: 24953.20             # Sum of both
+    citations:
+      - "26 USC 3111: employer FICA components"
+
+# =============================================================================
+# EDGE CASES
+# =============================================================================
+
+  # Test 11: Zero income
+  - name: "Zero income - no employer FICA"
+    inputs:
+      person:
+        irs_employment_income: 0
+    expected:
+      employer_social_security_tax: 0
+      employer_medicare_tax: 0
+      employer_fica_tax: 0
+    citations:
+      - "26 USC 3111: tax on wages paid"
+
+  # Test 12: Small wages
+  - name: "Small wages - proportional employer FICA"
+    inputs:
+      person:
+        irs_employment_income: 1000
+    expected:
+      employer_social_security_tax: 62      # $1,000 * 6.2%
+      employer_medicare_tax: 14.50          # $1,000 * 1.45%
+      employer_fica_tax: 76.50              # $1,000 * 7.65%
+    citations:
+      - "26 USC 3111: applies to all wages"
+
+  # Test 13: Just under wage base
+  - name: "Just under wage base - full SS tax"
+    inputs:
+      person:
+        irs_employment_income: 168599
+    expected:
+      employer_social_security_tax: 10453.14  # $168,599 * 6.2%
+      employer_medicare_tax: 2444.69          # $168,599 * 1.45%
+      employer_fica_tax: 12897.83
+    citations:
+      - "26 USC 3111(a): full tax under wage base"
+
+  # Test 14: Just over wage base - SS capped
+  - name: "Just over wage base - SS capped"
+    inputs:
+      person:
+        irs_employment_income: 168601
+    expected:
+      employer_social_security_tax: 10453.20  # Capped at $168,600 * 6.2%
+      employer_medicare_tax: 2444.71          # $168,601 * 1.45%
+      employer_fica_tax: 12897.91
+    citations:
+      - "26 USC 3111(a): wage base cap applies"
+
+# =============================================================================
+# COMPARISON WITH EMPLOYEE FICA
+# =============================================================================
+
+  # Test 15: Total FICA cost comparison (employee + employer)
+  - name: "Total FICA cost - employee and employer combined"
+    description: "Employer matches employee SS and base Medicare"
+    inputs:
+      person:
+        irs_employment_income: 100000
+    expected:
+      # Employee side
+      employee_social_security_tax: 6200    # $100k * 6.2%
+      employee_medicare_tax: 1450           # $100k * 1.45%
+      # Employer side (matches)
+      employer_social_security_tax: 6200
+      employer_medicare_tax: 1450
+      employer_fica_tax: 7650
+      # Combined cost
+      # Total SS: $12,400 (6.2% + 6.2% = 12.4%)
+      # Total Medicare: $2,900 (1.45% + 1.45% = 2.9%)
+      # Total FICA: $15,300 (7.65% + 7.65% = 15.3%)
+    citations:
+      - "26 USC 3101: employee FICA"
+      - "26 USC 3111: employer FICA (matching)"

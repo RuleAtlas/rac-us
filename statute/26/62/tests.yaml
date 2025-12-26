@@ -612,3 +612,181 @@ tests:
       total_above_the_line_deductions: 22300
       adjusted_gross_income: 32700  # 55000 - 22300
     notes: "Tip deduction stacks with other above-the-line deductions"
+
+  # ==========================================================================
+  # OVERTIME DEDUCTION - 62(a)(24) via Section 225 (OBBBA 2025-2028)
+  # ==========================================================================
+  # Added by One Big Beautiful Bill Act (H.R.1, signed July 4, 2025)
+  # Effective for tax years 2025-2028, sunsets after 2028.
+  # Cap: $12,500 single, $25,000 joint
+  # Phase-out: $150k/$300k MAGI, $100 per $1,000 over threshold
+  # Reference: https://www.congress.gov/bill/119th-congress/house-bill/1/text
+
+  - name: "Overtime deduction - basic case (single)"
+    tax_year: 2025
+    inputs:
+      wages: 50000
+      qualified_overtime_compensation: 3000
+      filing_status: single
+    expected:
+      qualified_overtime_deduction: 3000
+      adjusted_gross_income: 47000  # 50000 - 3000
+    notes: "Basic overtime deduction reduces AGI"
+    citations:
+      - "26 USC 62(a)(24): qualified overtime compensation deduction"
+      - "26 USC 225(a): deduction for qualified overtime compensation"
+
+  - name: "Overtime deduction - at single cap"
+    tax_year: 2025
+    inputs:
+      wages: 100000
+      qualified_overtime_compensation: 20000
+      filing_status: single
+    expected:
+      qualified_overtime_deduction: 12500  # Capped
+      adjusted_gross_income: 87500  # 100000 - 12500
+    notes: "Overtime capped at $12,500 for single filers"
+    citations:
+      - "26 USC 225(b)(1): maximum deduction $12,500"
+
+  - name: "Overtime deduction - joint filers at cap"
+    tax_year: 2025
+    inputs:
+      wages: 200000
+      qualified_overtime_compensation: 40000
+      filing_status: joint
+    expected:
+      qualified_overtime_deduction: 25000  # Joint cap
+      adjusted_gross_income: 175000  # 200000 - 25000
+    notes: "Joint filers get $25,000 cap"
+    citations:
+      - "26 USC 225(b)(1): maximum deduction $25,000 for joint return"
+
+  - name: "Overtime deduction - phase-out (single)"
+    tax_year: 2025
+    inputs:
+      wages: 170000
+      qualified_overtime_compensation: 8000
+      filing_status: single
+    expected:
+      # MAGI $170,000 exceeds $150,000 by $20,000 = 20 increments
+      # Reduction = 20 * $100 = $2,000
+      # Deduction = $8,000 - $2,000 = $6,000
+      qualified_overtime_deduction: 6000
+      adjusted_gross_income: 164000  # 170000 - 6000
+    notes: "Phase-out applies at $100 per $1,000 over threshold"
+    citations:
+      - "26 USC 225(b)(2)(A): reduced by $100 per $1,000 exceeding $150,000"
+
+  - name: "Overtime deduction - not available 2024"
+    tax_year: 2024
+    inputs:
+      wages: 50000
+      qualified_overtime_compensation: 3000
+      filing_status: single
+    expected:
+      qualified_overtime_deduction: 0
+      adjusted_gross_income: 50000  # No deduction
+    notes: "Overtime deduction not effective until 2025"
+
+  - name: "Overtime deduction - not available 2029 (sunset)"
+    tax_year: 2029
+    inputs:
+      wages: 50000
+      qualified_overtime_compensation: 3000
+      filing_status: single
+    expected:
+      qualified_overtime_deduction: 0
+      adjusted_gross_income: 50000  # No deduction after sunset
+    notes: "Overtime deduction sunsets after 2028"
+    citations:
+      - "26 USC 225(g): no deduction for taxable years after 2028"
+
+  # ==========================================================================
+  # COMBINED TIP AND OVERTIME DEDUCTIONS (OBBBA 2025-2028)
+  # ==========================================================================
+
+  - name: "Tips and overtime combined - both deductions"
+    tax_year: 2025
+    inputs:
+      wages: 40000
+      tips: 10000
+      qualified_overtime_compensation: 5000
+      filing_status: single
+    expected:
+      tip_income_deduction: 10000
+      qualified_overtime_deduction: 5000
+      gross_income: 55000  # 40000 + 10000 + 5000
+      adjusted_gross_income: 40000  # 55000 - 10000 - 5000
+    notes: "Both OBBBA deductions stack to reduce AGI"
+    citations:
+      - "26 USC 62(a)(23): tip income deduction"
+      - "26 USC 62(a)(24): overtime deduction"
+
+  - name: "Tips and overtime - service worker scenario"
+    tax_year: 2025
+    inputs:
+      wages: 35000
+      tips: 20000
+      qualified_overtime_compensation: 8000
+      filing_status: single
+    expected:
+      tip_income_deduction: 20000
+      qualified_overtime_deduction: 8000
+      gross_income: 63000
+      adjusted_gross_income: 35000  # 63000 - 20000 - 8000
+    notes: "Service industry worker with tips and overtime gets significant AGI reduction"
+
+  - name: "Tips and overtime - both at caps"
+    tax_year: 2025
+    inputs:
+      wages: 50000
+      tips: 30000
+      qualified_overtime_compensation: 20000
+      filing_status: single
+    expected:
+      tip_income_deduction: 25000  # Tip cap
+      qualified_overtime_deduction: 12500  # Overtime cap (single)
+      gross_income: 100000
+      adjusted_gross_income: 62500  # 100000 - 25000 - 12500
+    notes: "Both deductions capped, maximum combined benefit = $37,500"
+
+  - name: "Tips and overtime - joint filers max benefit"
+    tax_year: 2025
+    inputs:
+      wages: 100000
+      tips: 40000
+      qualified_overtime_compensation: 35000
+      filing_status: joint
+    expected:
+      tip_income_deduction: 25000  # Tip cap (same for all)
+      qualified_overtime_deduction: 25000  # Overtime cap (joint)
+      gross_income: 175000
+      adjusted_gross_income: 125000  # 175000 - 25000 - 25000
+    notes: "MFJ gets $50,000 combined maximum deduction"
+
+  - name: "Tips and overtime with all deductions"
+    tax_year: 2025
+    inputs:
+      wages: 60000
+      tips: 15000
+      qualified_overtime_compensation: 8000
+      is_educator: true
+      educator_expenses: 300
+      hsa_contributions: 4150
+      hsa_coverage_type: self_only
+      has_hdhp: true
+      traditional_ira_contributions: 7000
+      student_loan_interest_paid: 2500
+      filing_status: single
+    expected:
+      tip_income_deduction: 15000
+      qualified_overtime_deduction: 8000
+      educator_expense_deduction: 300
+      hsa_deduction: 4150
+      ira_deduction: 7000
+      student_loan_interest_deduction: 2500
+      gross_income: 83000  # 60000 + 15000 + 8000
+      total_above_the_line_deductions: 36950
+      adjusted_gross_income: 46050  # 83000 - 36950
+    notes: "OBBBA deductions stack with all other above-the-line deductions"

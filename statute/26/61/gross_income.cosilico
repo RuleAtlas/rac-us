@@ -38,6 +38,10 @@ imports:
 # Section 61(a)(7) - Dividends
   dividend_income: statute/26/61/a/7/dividend_income
 
+# Section 61(a)(10) - Pensions
+# Includes 401(k)/403(b) distributions (402), IRA distributions (408/408A)
+  taxable_pension_income: statute/26/61/a/10/pension_income
+
 # Other income categories (simplified aggregation)
   other_income: statute/26/61/a/other_income
 
@@ -112,10 +116,14 @@ formula:
   # Sum investment income
   total_investment = sum(members.investment_income)
 
+  # Sum pension/retirement income (Section 61(a)(10))
+  # Includes 401(k), pension, traditional IRA, and non-qualified Roth distributions
+  total_pension = sum(members.taxable_pension_income)
+
   # Sum other income
   total_other = sum(members.other_income)
 
   # Sum unemployment compensation (Section 85)
   total_unemployment = sum(members.unemployment_compensation)
 
-  return total_compensation + total_se_income + total_investment + total_other + total_unemployment
+  return total_compensation + total_se_income + total_investment + total_pension + total_other + total_unemployment

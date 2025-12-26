@@ -1,6 +1,6 @@
 # TaxSim 35 Parity Gap Analysis
 
-*Last updated: 2025-12-25*
+*Last updated: 2025-12-26*
 
 ## TaxSim Output Variables vs Cosilico Coverage
 
@@ -36,8 +36,9 @@
 |-----------|-----------------|
 | Employee Social Security (6.2%) | ✅ `employee_social_security_tax` |
 | Employer Social Security (6.2%) | ✅ `employer_social_security_tax` |
-| Employee Medicare (1.45%) | ✅ `medicare_tax` |
-| Employer Medicare (1.45%) | ❌ Missing |
+| Employee Medicare (1.45%) | ✅ `employee_medicare_tax` |
+| Employer Medicare (1.45%) | ✅ `employer_medicare_tax` |
+| Employer FICA (7.65%) | ✅ `employer_fica_tax` |
 | Additional Medicare (0.9%) | ✅ `additional_medicare_tax` |
 | Self-Employment Tax | ✅ `self_employment_tax` |
 | NIIT (3.8%) | ✅ `net_investment_income_tax` |
@@ -70,8 +71,8 @@
 | Self-Employment Tax Deduction | ✅ |
 | Self-Employed Health Insurance | ✅ |
 | Educator Expense | ✅ |
-| Tip Income Deduction (OBBBA 2025-2028) | 🔄 In Progress |
-| Overtime Deduction (OBBBA 2025-2028) | 🔄 In Progress |
+| Tip Income Deduction (OBBBA 2025-2028) | ✅ `tip_income_deduction` |
+| Overtime Deduction (OBBBA 2025-2028) | ✅ `qualified_overtime_deduction` |
 | Moving Expenses (military) | ❌ Missing |
 | Alimony (pre-2019) | ❌ Missing (historical) |
 
@@ -117,8 +118,8 @@ Signed July 4, 2025 - made TCJA permanent with additions:
 ### New Provisions (2025-2028)
 | Provision | Cap | Phaseout Start | Status |
 |-----------|-----|----------------|--------|
-| Tip Income Deduction | $25,000 | $150k/$300k | 🔄 In Progress |
-| Overtime Deduction | $12,500/$25,000 | $150k/$300k | 🔄 In Progress |
+| Tip Income Deduction | $25,000 | $150k/$300k | ✅ Complete |
+| Overtime Deduction | $12,500/$25,000 | $150k/$300k | ✅ Complete |
 
 ## Priority Gaps for TaxSim Parity
 
@@ -154,7 +155,7 @@ All P1 items have been encoded:
 
 ## Next Steps
 
-1. Complete tip/overtime deduction encoding
+1. ~~Complete tip/overtime deduction encoding~~ ✅
 2. Finish TaxSim validation infrastructure
 3. Update all parameters for 2025/2026
 4. Add pension/IRA distribution handling

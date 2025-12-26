@@ -1,0 +1,190 @@
+# Tests for 26 USC Section 61(a)(10) - Pension Income
+#
+# Tests aggregation of taxable pension/retirement income from:
+# - 401(k)/403(b)/pension plan distributions (402)
+# - Traditional IRA distributions (408)
+# - Non-qualified Roth IRA distributions (408A)
+
+tax_year: 2024
+
+test_cases:
+  # ============================================================================
+  # Individual Source Tests
+  # ============================================================================
+
+  - name: "401(k) distribution only"
+    description: "Traditional 401(k) distribution flows into pension income"
+    variable: taxable_pension_income
+    inputs:
+      age: 65
+      traditional_401k_distribution: 30000
+      traditional_ira_distribution: 0
+      roth_ira_distribution: 0
+    expected:
+      taxable_pension_income: 30000
+    citations:
+      - "26 USC 61(a)(10): Pensions are gross income"
+      - "26 USC 402(a)(1): 401(k) distributions taxable to distributee"
+
+  - name: "Traditional IRA distribution only"
+    description: "Traditional IRA distribution (no basis) flows into pension income"
+    variable: taxable_pension_income
+    inputs:
+      age: 65
+      traditional_401k_distribution: 0
+      traditional_ira_distribution: 25000
+      traditional_ira_basis: 0
+      traditional_ira_total_value: 200000
+      roth_ira_distribution: 0
+    expected:
+      taxable_ira_distribution: 25000
+      taxable_pension_income: 25000
+    citations:
+      - "26 USC 408(d)(1): IRA distributions included in gross income"
+
+  - name: "Qualified Roth IRA distribution excluded"
+    description: "Qualified Roth distribution is not included in pension income"
+    variable: taxable_pension_income
+    inputs:
+      age: 65
+      traditional_401k_distribution: 0
+      traditional_ira_distribution: 0
+      roth_ira_distribution: 20000
+      roth_ira_contribution_basis: 15000
+      roth_ira_conversion_basis: 0
+      is_roth_ira_5_year_satisfied: true
+    expected:
+      is_roth_qualified_distribution: true
+      taxable_roth_distribution: 0
+      taxable_pension_income: 0
+    citations:
+      - "26 USC 408A(d)(1): Qualified Roth distribution not includible in gross income"
+
+  # ============================================================================
+  # Combined Distribution Tests
+  # ============================================================================
+
+  - name: "Combined 401(k) and IRA distributions"
+    description: "Multiple retirement sources flow into total pension income"
+    variable: taxable_pension_income
+    inputs:
+      age: 68
+      traditional_401k_distribution: 40000
+      traditional_ira_distribution: 20000
+      traditional_ira_basis: 0
+      traditional_ira_total_value: 150000
+      roth_ira_distribution: 0
+    expected:
+      taxable_pension_income: 60000
+    citations:
+      - "26 USC 61(a)(10): Combined pension income from all sources"
+
+  - name: "All three account types"
+    description: "401(k), traditional IRA, and non-qualified Roth"
+    variable: taxable_pension_income
+    inputs:
+      age: 50
+      traditional_401k_distribution: 25000
+      traditional_ira_distribution: 15000
+      traditional_ira_basis: 0
+      traditional_ira_total_value: 100000
+      roth_ira_distribution: 10000
+      roth_ira_contribution_basis: 5000
+      roth_ira_conversion_basis: 0
+      is_roth_ira_5_year_satisfied: true
+      # Roth: 10000 distribution, 5000 basis = 5000 earnings taxable
+    expected:
+      taxable_ira_distribution: 15000
+      taxable_roth_distribution: 5000  # Earnings only (under 59.5, not qualified)
+      taxable_pension_income: 45000    # 25000 + 15000 + 5000
+    citations:
+      - "26 USC 61(a)(10): Aggregate pension income"
+      - "26 USC 408A(d)(2): Roth earnings taxable if not qualified"
+
+  # ============================================================================
+  # Rollover Exclusion Tests
+  # ============================================================================
+
+  - name: "401(k) rollover excluded from pension income"
+    description: "Direct rollover is not taxable income"
+    variable: taxable_pension_income
+    inputs:
+      age: 55
+      traditional_401k_distribution: 100000
+      is_direct_rollover: true
+      traditional_ira_distribution: 0
+      roth_ira_distribution: 0
+    expected:
+      net_taxable_distribution: 0
+      taxable_pension_income: 0
+    citations:
+      - "26 USC 402(c)(1): Rollover amounts excluded from gross income"
+
+  - name: "Partial rollover"
+    description: "Only non-rolled-over portion is pension income"
+    variable: taxable_pension_income
+    inputs:
+      age: 55
+      traditional_401k_distribution: 50000
+      rollover_amount: 30000
+      is_direct_rollover: false
+      traditional_ira_distribution: 0
+      roth_ira_distribution: 0
+    expected:
+      net_taxable_distribution: 20000
+      taxable_pension_income: 20000
+    citations:
+      - "26 USC 402(c): Rollover portion excluded"
+
+  # ============================================================================
+  # Basis Recovery Tests
+  # ============================================================================
+
+  - name: "Traditional IRA with basis - pro-rata rule"
+    description: "Distribution with nondeductible basis partially excludable"
+    variable: taxable_pension_income
+    inputs:
+      age: 65
+      traditional_401k_distribution: 0
+      traditional_ira_distribution: 20000
+      traditional_ira_basis: 40000  # 20% of total value is basis
+      traditional_ira_total_value: 180000  # After distribution: 180000 + 20000 = 200000
+      roth_ira_distribution: 0
+    expected:
+      # Non-taxable ratio: 40000 / 200000 = 0.20
+      # Taxable: 20000 * (1 - 0.20) = 16000
+      taxable_ira_distribution: 16000
+      taxable_pension_income: 16000
+    citations:
+      - "26 USC 408(d)(1): Pro-rata basis recovery"
+
+  # ============================================================================
+  # Flow to Gross Income Tests
+  # ============================================================================
+
+  - name: "Pension income flows to gross income"
+    description: "Taxable pension income becomes part of Section 61 gross income"
+    variable: gross_income
+    inputs:
+      # Person income components
+      wages: 50000
+      traditional_401k_distribution: 20000
+      traditional_ira_distribution: 10000
+      traditional_ira_basis: 0
+      traditional_ira_total_value: 100000
+      age: 70
+      # Other income at 0
+      salaries: 0
+      tips: 0
+      self_employment_income: 0
+      interest_income: 0
+      dividend_income: 0
+      capital_gains: 0
+      unemployment_compensation: 0
+    expected:
+      taxable_pension_income: 30000
+      # gross_income = wages + pension + other sources
+      # Note: actual test depends on TaxUnit aggregation
+    citations:
+      - "26 USC 61(a): Gross income includes all income from whatever source"
+      - "26 USC 61(a)(10): Pensions included in gross income"
