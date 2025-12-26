@@ -1,0 +1,161 @@
+# 7 USC Section 2017(a) - Value of Allotment
+
+text: """
+(a) Value of allotment
+
+The value of the allotment... shall be equal to the cost of the
+thrifty food plan... reduced by an amount equal to 30 per centum
+of the household's income.
+"""
+
+imports:
+  snap_eligible: statute/7/2014/a/snap_eligible
+  snap_net_income: statute/7/2014/e/snap_net_income
+  household_size: statute/7/2014/household_size
+
+parameters:
+  # Maximum allotment schedule by household size (FY2024)
+  # Index 0 = size 1, Index 1 = size 2, etc.
+  max_allotment_schedule:
+    2023-10-01: [291, 535, 766, 973, 1155, 1386, 1532, 1751]
+
+  # Maximum size in schedule (for bounds checking)
+  max_schedule_size:
+    2023-10-01: 8
+
+  # Additional amount per person beyond schedule
+  additional_per_person:
+    2023-10-01: 219
+
+  # Contribution rate (30% of net income)
+  contribution_rate:
+    1977-01-01: 0.30
+
+  # Minimum benefit (8% of 1-person max, rounded)
+  minimum_benefit:
+    2023-10-01: 23
+
+  # Maximum household size for minimum benefit
+  minimum_benefit_max_size:
+    1977-01-01: 2
+
+# =============================================================================
+# VARIABLES
+# =============================================================================
+
+variable snap_max_allotment:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Maximum Allotment"
+  description "Maximum monthly SNAP benefit based on Thrifty Food Plan"
+  formula:
+    size = household_size
+
+    # Lookup from schedule (index = size - 1)
+    if size <= max_schedule_size:
+      return max_allotment_schedule[size - 1]
+
+    # Beyond schedule: base + additional per extra member
+    base = max_allotment_schedule[max_schedule_size - 1]
+    extra_members = size - max_schedule_size
+    return base + (additional_per_person * extra_members)
+
+variable snap_expected_contribution:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Expected Contribution"
+  description "30% of net income per 7 USC 2017(a)"
+  formula:
+    return snap_net_income * contribution_rate
+
+variable snap_calculated_benefit:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Calculated Benefit"
+  description "Maximum allotment minus expected contribution"
+  formula:
+    return snap_max_allotment - snap_expected_contribution
+
+variable snap_minimum_benefit:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Minimum Benefit"
+  description "Minimum benefit for 1-2 person households"
+  formula:
+    if household_size <= minimum_benefit_max_size:
+      return minimum_benefit
+    return 0
+
+variable snap_allotment:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "SNAP Allotment"
+  description "Final monthly SNAP benefit per 7 USC 2017(a)"
+  formula:
+    if not snap_eligible:
+      return 0
+
+    calculated = snap_calculated_benefit
+    minimum = snap_minimum_benefit
+    maximum = snap_max_allotment
+
+    # Apply minimum floor, cap at maximum
+    benefit = max(calculated, minimum)
+    return max(0, min(benefit, maximum))
+
+# =============================================================================
+# EXAMPLES
+# =============================================================================
+
+examples:
+  - name: "Single person, no income"
+    inputs:
+      household:
+        household_size: 1
+        snap_net_income: 0
+        snap_eligible: true
+    outputs:
+      snap_max_allotment: 291
+      snap_expected_contribution: 0
+      snap_allotment: 291
+
+  - name: "Family of 4, $500 net income"
+    inputs:
+      household:
+        household_size: 4
+        snap_net_income: 500
+        snap_eligible: true
+    outputs:
+      snap_max_allotment: 973
+      snap_expected_contribution: 150
+      snap_allotment: 823
+
+  - name: "Single person, benefit below minimum"
+    inputs:
+      household:
+        household_size: 1
+        snap_net_income: 900
+        snap_eligible: true
+    outputs:
+      snap_calculated_benefit: 21
+      snap_minimum_benefit: 23
+      snap_allotment: 23
+
+  - name: "Not eligible"
+    inputs:
+      household:
+        household_size: 4
+        snap_net_income: 0
+        snap_eligible: false
+    outputs:
+      snap_allotment: 0
