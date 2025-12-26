@@ -147,8 +147,7 @@ formula:
 
   return SAI  # Default for 2024+
 
-formula_2023:
-  return EFC  # 2023-24 and earlier use EFC
+# Note: Prior to 2024-25, EFC methodology applied (formula_2023 removed - use parameters for temporal versioning)
 
 # Uses EFC (helper variable)
 
@@ -193,7 +192,7 @@ dtype Money
 unit "USD"
 label "Cost of Attending College"
 description "Total cost of attendance at the student's institution"
-default_value: 0
+default 0
 
 # This is typically an input from the institution, not calculated
 
@@ -210,6 +209,6 @@ dtype Integer
 unit "months"
 label "Months Enrolled in School Year"
 description "Number of months student is enrolled during the academic year"
-default_value: 9
+default 9
 
 # Input variable with default of full academic year

@@ -34,23 +34,16 @@ dtype Rate
 
 # NOTE: This is a state-level aggregate, not individual calculation
 # Tracked here for completeness but not used in individual eligibility
-documentation {
-Minimum participation rates by fiscal year:
-- FY 1997-2002: Ramped from 25% to 50%
-- FY 2003+: 50%
-
-Caseload reduction credit may reduce effective requirement.
+# Minimum participation rates by fiscal year:
+# - FY 1997-2002: Ramped from 25% to 50%
+# - FY 2003+: 50%
+# Caseload reduction credit may reduce effective requirement.
 
 # 607(a)(2): Two-parent families participation rate
 # Higher requirement for two-parent families
-entity State
-period FederalFiscalYear
-dtype Rate
-
-documentation {
-Two-parent family rates:
-- FY 1997-1999: Ramped from 75% to 90%
-- FY 2000+: 90%
+# Two-parent family rates:
+# - FY 1997-1999: Ramped from 75% to 90%
+# - FY 2000+: 90%
 
 # 607(c): Required hours of participation
 # Individual must participate in work activities for minimum hours
