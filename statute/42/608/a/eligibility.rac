@@ -17,6 +17,7 @@
 imports:
   snap_eligibility: statute/7/2014/a/categorical_eligibility
   federal_poverty_level: statute/7/2014/c/fpl_by_household_size
+  adult_age_threshold: statute/42/608/parameters.yaml#adult_age_threshold
 
 # Core definition: TANF assistance unit
 # A family unit receiving or eligible for TANF benefits
@@ -76,8 +77,8 @@ period Month
 dtype Boolean
 
 formula:
-  # Requirement applies to: minor parents under 18
-  if age >= 18 or not has_child: return true
+  # Requirement applies to: minor parents under adult age threshold
+  if age >= adult_age_threshold or not has_child: return true
 
   # Must live with parent, guardian, or adult relative
   # OR in adult-supervised supportive living arrangement
@@ -90,7 +91,7 @@ period Month
 dtype Boolean
 
 formula:
-  if age >= 18 or not has_child: return true
+  if age >= adult_age_threshold or not has_child: return true
 
   # Must be in school, GED program, or alternative education
   return in_school or in_ged_program or in_alternative_education

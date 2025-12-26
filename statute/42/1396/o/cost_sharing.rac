@@ -38,6 +38,7 @@ references:
   copayment_rate_100_150_fpl: statute/42/1396/o/parameters/copayment_rate_100_150_fpl
   copayment_rate_150_plus_fpl: statute/42/1396/o/parameters/copayment_rate_150_plus_fpl
   aggregate_cost_share_limit: statute/42/1396/o/parameters/aggregate_cost_share_limit
+  child_age_threshold: statute/42/1396/o/parameters/child_age_threshold
 
 # =============================================================================
 # EXEMPT FROM COST SHARING
@@ -54,8 +55,8 @@ variable medicaid_child_cost_share_exempt:
   reference "42 USC 1396o(b)(3)(A)"
 
   formula:
-    # Children under 18 are fully exempt
-    return age < 18
+    # Children under child_age_threshold are fully exempt
+    return age < child_age_threshold
 
   default true
 

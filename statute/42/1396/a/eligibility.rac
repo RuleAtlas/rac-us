@@ -25,6 +25,7 @@ imports:
   age_infant_max: statute/42/1396/age_thresholds/infant_max
   age_child_1_5_max: statute/42/1396/age_thresholds/child_1_5_max
   age_child_max: statute/42/1396/age_thresholds/child_max
+  age_elderly_min: statute/42/1396/age_thresholds/elderly_min
   chip_income_limit: statute/42/1396/chip/default_income_limit
 
 # =============================================================================
@@ -98,7 +99,7 @@ formula:
 
   # ACA expansion adult (42 USC 1396a(a)(10)(A)(i)(VIII))
   # Adults 19-64 not otherwise categorized
-  if age >= age_child_max and age < 65: return "expansion_adult"
+  if age >= age_child_max and age < age_elderly_min: return "expansion_adult"
 
   return "none"
 

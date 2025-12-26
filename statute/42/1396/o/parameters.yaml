@@ -16,6 +16,19 @@ period: Month
 dtype: Money
 
 # =============================================================================
+# AGE THRESHOLDS FOR COST SHARING EXEMPTIONS
+# =============================================================================
+
+child_age_threshold:
+  description: "Age below which individuals are exempt from cost sharing as children per 42 USC 1396o(b)(3)(A)"
+  unit: year
+  values:
+    2006-02-08: 18
+  citations:
+    - "42 USC 1396o(b)(3)(A): Children under 18 exempt from cost sharing"
+    - "42 CFR 447.56(a)(1)(ii)"
+
+# =============================================================================
 # NOMINAL COPAYMENT LIMITS (Below 100% FPL)
 # 42 USC 1396o(a)(3), 42 CFR 447.54
 # =============================================================================

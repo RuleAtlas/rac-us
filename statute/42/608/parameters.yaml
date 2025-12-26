@@ -206,6 +206,16 @@ child_age_limit:
     - "42 USC 619 - definitions"
     - "State TANF Plans"
 
+# Adult age threshold for TANF
+adult_age_threshold:
+  description: "Age at which an individual is considered an adult for TANF minor parent requirements"
+  unit: year
+  values:
+    1997-10-01: 18
+  citations:
+    - "42 USC 608(a)(2) - minor parent living arrangement"
+    - "42 USC 608(a)(3) - minor parent education requirement"
+
 # Deprivation requirement (for two-parent families)
 two_parent_coverage:
   description: "Whether state covers two-parent families and under what conditions"
