@@ -40,39 +40,26 @@ variable snap_max_allotment:
     "https://www.fns.usda.gov/snap/allotment/main"
   )
 
+  imports:
+    cut: statute/26/1#cut
+
+  parameters:
+    max_allotment_schedule: parameters#gov.usda.fns.snap.allotment.max_allotment_schedule
+    max_schedule_size: parameters#gov.usda.fns.snap.allotment.max_schedule_size
+    additional_per_person: parameters#gov.usda.fns.snap.allotment.max.additional_per_person
+
   formula:
     # Maximum allotments by household size (48 states + DC)
-    # Sizes 1-8 have specific amounts; beyond 8, add per-person increment
-    let max_1 = parameter(gov.usda.fns.snap.allotment.max.size_1)
-    let max_2 = parameter(gov.usda.fns.snap.allotment.max.size_2)
-    let max_3 = parameter(gov.usda.fns.snap.allotment.max.size_3)
-    let max_4 = parameter(gov.usda.fns.snap.allotment.max.size_4)
-    let max_5 = parameter(gov.usda.fns.snap.allotment.max.size_5)
-    let max_6 = parameter(gov.usda.fns.snap.allotment.max.size_6)
-    let max_7 = parameter(gov.usda.fns.snap.allotment.max.size_7)
-    let max_8 = parameter(gov.usda.fns.snap.allotment.max.size_8)
-    let additional = parameter(gov.usda.fns.snap.allotment.max.additional_per_person)
+    # Sizes 1-8 have specific amounts; beyond max_schedule_size, add per-person increment
 
-    if household_size == 1:
-      return max_1
-    else if household_size == 2:
-      return max_2
-    else if household_size == 3:
-      return max_3
-    else if household_size == 4:
-      return max_4
-    else if household_size == 5:
-      return max_5
-    else if household_size == 6:
-      return max_6
-    else if household_size == 7:
-      return max_7
-    else if household_size == 8:
-      return max_8
+    if household_size <= max_schedule_size:
+      # Look up from schedule
+      return cut(household_size, max_allotment_schedule)
     else:
-      # Beyond 8: add per-person increment
-      let extra_members = household_size - 8
-      return max_8 + (additional * extra_members)
+      # Beyond max schedule size: base amount + additional per extra member
+      let base = cut(max_schedule_size, max_allotment_schedule)
+      let extra_members = household_size - max_schedule_size
+      return base + (additional_per_person * extra_members)
 
   default 0
 
@@ -117,10 +104,14 @@ variable snap_minimum_benefit:
   description "Minimum monthly SNAP benefit for 1-2 person households"
   reference "7 USC 2017(a)"
 
+  parameters:
+    minimum_benefit_max_size: parameters#gov.usda.fns.snap.allotment.minimum_benefit_max_size
+    minimum_amount: parameters#gov.usda.fns.snap.allotment.minimum
+
   formula:
-    # Minimum benefit only applies to 1-2 person households
-    if household_size <= 2:
-      return parameter(gov.usda.fns.snap.allotment.minimum)
+    # Minimum benefit only applies to households at or below minimum_benefit_max_size
+    if household_size <= minimum_benefit_max_size:
+      return minimum_amount
     else:
       return 0
 

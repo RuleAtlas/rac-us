@@ -101,6 +101,22 @@ gov.usda.fns.snap:
         1977-01-01: 0.20
 
     # Standard deduction by household size (48 states + DC)
+    # Schedule format for use with cut(household_size, schedule)
+    standard_deduction_schedule:
+      description: "SNAP standard deduction by household size, for use with cut()"
+      unit: currency-USD
+      period: month
+      label: "Standard Deduction Schedule"
+      reference: "7 USC 2014(e)(1)"
+      # Thresholds: [0, 4, 5, 6] means: <4 gets idx 0, <5 gets idx 1, <6 gets idx 2, >=6 gets idx 3
+      thresholds: [0, 4, 5, 6]
+      amounts:
+        2024-10-01: [200, 211, 247, 283]  # 1-3, 4, 5, 6+
+        2023-10-01: [198, 208, 244, 279]
+        2022-10-01: [193, 197, 230, 263]
+        2021-10-01: [177, 184, 215, 246]
+
+    # Legacy individual parameters (for backward compatibility)
     standard:
       size_1_3:
         description: "USDA sets the SNAP standard deduction for 1-3 person households at this amount."
@@ -183,6 +199,40 @@ gov.usda.fns.snap:
   # MAXIMUM ALLOTMENTS (Section 2017(a))
   # ===========================================================================
   allotment:
+    # Schedule format for use with cut(household_size, schedule)
+    max_allotment_schedule:
+      description: "SNAP maximum allotment by household size, for use with cut()"
+      unit: currency-USD
+      period: month
+      label: "Max Allotment Schedule"
+      reference: "7 USC 2017(a)"
+      # Thresholds: [1, 2, 3, 4, 5, 6, 7, 8] - exact size matches
+      thresholds: [1, 2, 3, 4, 5, 6, 7, 8]
+      amounts:
+        2024-10-01: [292, 536, 768, 975, 1158, 1390, 1536, 1756]
+        2023-10-01: [291, 535, 766, 973, 1155, 1386, 1532, 1751]
+        2022-10-01: [281, 516, 740, 939, 1116, 1339, 1480, 1691]
+
+    # Maximum household size with specific allotment (beyond this, use additional_per_person)
+    max_schedule_size:
+      description: "Maximum household size with specific allotment in schedule"
+      unit: persons
+      period: month
+      label: "Max Schedule Size"
+      reference: "7 USC 2017(a)"
+      values:
+        1977-01-01: 8
+
+    # Minimum benefit applies to households of this size or smaller
+    minimum_benefit_max_size:
+      description: "Maximum household size eligible for minimum benefit"
+      unit: persons
+      period: month
+      label: "Minimum Benefit Max Size"
+      reference: "7 USC 2017(a)"
+      values:
+        1977-01-01: 2
+
     # Thrifty Food Plan amounts by household size (48 states + DC)
     max:
       size_1:

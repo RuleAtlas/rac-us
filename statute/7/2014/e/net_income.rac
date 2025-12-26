@@ -35,22 +35,16 @@ variable snap_standard_deduction:
   description "Monthly standard deduction based on household size"
   reference "7 USC 2014(e)(1)"
 
-  formula:
-    # Standard deduction varies by household size
-    # Sizes 1-3 get same amount, 4 gets more, 5 gets more, 6+ gets maximum
-    let std_1_3 = parameter(gov.usda.fns.snap.deductions.standard.size_1_3)
-    let std_4 = parameter(gov.usda.fns.snap.deductions.standard.size_4)
-    let std_5 = parameter(gov.usda.fns.snap.deductions.standard.size_5)
-    let std_6_plus = parameter(gov.usda.fns.snap.deductions.standard.size_6_plus)
+  imports:
+    cut: statute/26/1#cut
 
-    if household_size <= 3:
-      return std_1_3
-    else if household_size == 4:
-      return std_4
-    else if household_size == 5:
-      return std_5
-    else:
-      return std_6_plus
+  parameters:
+    standard_deduction_schedule: parameters#gov.usda.fns.snap.deductions.standard_deduction_schedule
+
+  formula:
+    # Standard deduction varies by household size: 1-3 same, 4, 5, 6+ maximum
+    # Use cut() to look up amount from schedule by household size
+    return cut(household_size, standard_deduction_schedule)
 
   default 0
 
