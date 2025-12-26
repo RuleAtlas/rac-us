@@ -60,11 +60,7 @@ imports      # Variable imports from other files
 parameters   # Parameter imports from .yaml files
 ```
 
-**NOT ALLOWED** (redundant with filepath):
-- `module` - filepath IS the module path
-- `version` - not needed
-- `jurisdiction` - implied by repo (cosilico-us)
-- `reference` - filepath IS the statute reference
+Anything not listed above will fail `scripts/validate_schema.py`.
 
 Filepath `statute/26/32/a/1/earned_income_credit.rac` implies:
 - Module: `statute.26.32.a.1`
