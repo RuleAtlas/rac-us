@@ -333,3 +333,280 @@ fpl_2024:
 
     # 100% FPL (children 6-18)
     # Family of 3: $25,820 * 1.00 = $25,820
+
+# =============================================================================
+# MEDICARE SAVINGS PROGRAMS (MSP)
+# 42 USC 1396d(p) - Help low-income Medicare beneficiaries
+# =============================================================================
+
+medicare_savings:
+  description: "Medicare Savings Programs income and resource limits"
+
+  # QMB (Qualified Medicare Beneficiary) - Full Medicare cost sharing assistance
+  qmb:
+    income_limit:
+      description: "Income limit for QMB as percentage of FPL"
+      unit: rate
+      values:
+        1988-07-01: 1.00  # 100% FPL
+      citations:
+        - "42 USC 1396d(p)(1)(A): QMB income at or below 100% FPL"
+        - "Medicare Improvements for Patients and Providers Act"
+
+    resource_limit_individual:
+      description: "Resource limit for QMB (individual)"
+      unit: currency-USD
+      values:
+        2024-01-01: 9430
+        2023-01-01: 9090
+        2022-01-01: 8400
+      citations:
+        - "SSA POMS SI 01715.015: MSP resource limits"
+
+    resource_limit_couple:
+      description: "Resource limit for QMB (couple)"
+      unit: currency-USD
+      values:
+        2024-01-01: 14130
+        2023-01-01: 13630
+        2022-01-01: 12600
+      citations:
+        - "SSA POMS SI 01715.015: MSP resource limits"
+
+  # SLMB (Specified Low-Income Medicare Beneficiary) - Part B premium only
+  slmb:
+    income_limit:
+      description: "Income limit for SLMB as percentage of FPL"
+      unit: rate
+      values:
+        1993-01-01: 1.20  # 120% FPL
+        1988-07-01: 1.10  # Originally 110% FPL
+      citations:
+        - "42 USC 1396d(p)(1)(B): SLMB income 100-120% FPL"
+
+  # QI (Qualifying Individual) - Part B premium (100% federally funded)
+  qi:
+    income_limit:
+      description: "Income limit for QI as percentage of FPL"
+      unit: rate
+      values:
+        1997-08-05: 1.35  # 135% FPL
+      citations:
+        - "42 USC 1396d(p)(1)(C): QI income 120-135% FPL"
+        - "Balanced Budget Act of 1997"
+
+# =============================================================================
+# WORKING DISABLED (MEDICAID BUY-IN)
+# Ticket to Work and Work Incentives Improvement Act (TWWIIA)
+# =============================================================================
+
+working_disabled:
+  description: "Medicaid Buy-In for working people with disabilities"
+
+  income_limit:
+    description: "Maximum income limit for working disabled as percentage of FPL"
+    unit: rate
+    values:
+      # Federal allows states to set between 250-450% FPL
+      # Using 250% as federal minimum floor
+      1999-12-17: 2.50  # TWWIIA enacted
+    citations:
+      - "42 USC 1396a(a)(10)(A)(ii)(XV): Working disabled"
+      - "Ticket to Work and Work Incentives Improvement Act"
+
+  # States may eliminate resource test for working disabled
+  resource_test_applies:
+    description: "Whether resource test applies to working disabled (state option)"
+    values:
+      1999-12-17: false  # Many states eliminate for this group
+    citations:
+      - "42 USC 1396a(a)(10)(A)(ii)(XV): State option for resources"
+
+  # States may charge premiums
+  premium_allowed:
+    description: "Whether states may charge premiums to working disabled"
+    values:
+      1999-12-17: true
+    citations:
+      - "TWWIIA Section 201: Premium authority"
+
+# =============================================================================
+# RESOURCE LIMITS - ADDITIONAL PARAMETERS
+# =============================================================================
+
+resource_limits:
+  description: "Resource limits for non-MAGI eligibility groups"
+  unit: currency-USD
+
+  individual:
+    description: "Resource limit for SSI-related Medicaid eligibility"
+    values:
+      2024-01-01: 2000
+      1989-01-01: 2000  # Has not changed since 1989
+    citations:
+      - "42 USC 1382(a)(3)(B): SSI resource limit"
+
+  couple:
+    description: "Resource limit for couples for SSI-related Medicaid eligibility"
+    values:
+      2024-01-01: 3000
+      1989-01-01: 3000  # Has not changed since 1989
+    citations:
+      - "42 USC 1382(a)(3)(B): SSI couple resource limit"
+
+  # Home equity limit for long-term care
+  home_equity_limit:
+    description: "Maximum home equity for long-term care eligibility"
+    unit: currency-USD
+    values:
+      # DRA 2005 established equity limit; states choose minimum or maximum
+      2024-01-01: 713000    # Federal minimum (adjusted annually)
+      2023-01-01: 688000
+      2022-01-01: 636000
+      2006-01-01: 500000
+    citations:
+      - "42 USC 1396p(f): Home equity limit"
+      - "DRA 2005 Section 6014"
+
+  home_equity_limit_maximum:
+    description: "Maximum home equity limit option for states"
+    unit: currency-USD
+    values:
+      2024-01-01: 1071000   # Federal maximum option
+      2023-01-01: 1033000
+      2022-01-01: 955000
+      2006-01-01: 750000
+    citations:
+      - "42 USC 1396p(f)(1)(C): State option for higher limit"
+
+  burial_fund_exemption:
+    description: "Maximum burial fund exclusion from countable resources"
+    unit: currency-USD
+    values:
+      1981-01-01: 1500  # Per person
+    citations:
+      - "42 USC 1382b(a)(2)(B)(ii): Burial fund exclusion"
+
+  life_insurance_face_limit:
+    description: "Life insurance face value threshold for resource exclusion"
+    unit: currency-USD
+    values:
+      1981-01-01: 1500  # Face value under this = excluded
+    citations:
+      - "42 USC 1382b(a)(2)(C)(ii): Life insurance exclusion"
+
+  vehicle_exemption_limit:
+    description: "Maximum vehicle equity excluded from resources"
+    unit: currency-USD
+    values:
+      2024-01-01: 4500  # If not used for work/medical
+      1989-01-01: 4500
+    citations:
+      - "42 USC 1382b(a)(2)(A): One vehicle exclusion"
+      - "20 CFR 416.1218"
+
+# =============================================================================
+# SPOUSAL IMPOVERISHMENT PROTECTIONS
+# 42 USC 1396r-5 - For institutional (nursing home) care
+# =============================================================================
+
+spousal_impoverishment:
+  description: "Community spouse resource and income protections"
+
+  csra_minimum:
+    description: "Minimum Community Spouse Resource Allowance (CSRA)"
+    unit: currency-USD
+    values:
+      2024-01-01: 30828
+      2023-01-01: 29724
+      2022-01-01: 27480
+      2014-01-01: 23844
+    citations:
+      - "42 USC 1396r-5(f)(2)(A)(i): Minimum CSRA"
+
+  csra_maximum:
+    description: "Maximum Community Spouse Resource Allowance (CSRA)"
+    unit: currency-USD
+    values:
+      2024-01-01: 154140
+      2023-01-01: 148620
+      2022-01-01: 137400
+      2014-01-01: 119220
+    citations:
+      - "42 USC 1396r-5(f)(2)(A)(ii): Maximum CSRA"
+
+  mmmna_base:
+    description: "Base Monthly Maintenance Needs Allowance for community spouse"
+    unit: currency-USD
+    values:
+      2024-01-01: 2555     # Minimum MMMNA (state may set higher)
+      2023-01-01: 2465
+      2022-01-01: 2289
+    citations:
+      - "42 USC 1396r-5(d)(3): Community spouse income allowance"
+
+  mmmna_maximum:
+    description: "Maximum Monthly Maintenance Needs Allowance"
+    unit: currency-USD
+    values:
+      2024-01-01: 3853.50
+      2023-01-01: 3715.50
+      2022-01-01: 3435.00
+    citations:
+      - "42 USC 1396r-5(d)(3)(C): Maximum MMMNA"
+
+  shelter_excess_allowance:
+    description: "Shelter standard for excess shelter cost calculation"
+    unit: currency-USD
+    values:
+      2024-01-01: 767      # 30% of MMMNA base
+      2023-01-01: 740
+      2022-01-01: 687
+    citations:
+      - "42 USC 1396r-5(d)(4): Excess shelter allowance"
+
+# =============================================================================
+# POSTPARTUM COVERAGE EXTENSION
+# American Rescue Plan Act Section 9812
+# =============================================================================
+
+postpartum:
+  description: "Extended postpartum Medicaid coverage"
+
+  coverage_months:
+    description: "Months of postpartum coverage after pregnancy ends"
+    values:
+      # ARP allowed states to extend to 12 months (optional through 2027)
+      # Consolidated Appropriations Act 2023 made permanent
+      2022-04-01: 12  # States may adopt 12-month extension
+      1965-07-30: 2   # Original 60-day (roughly 2 month) limit
+    citations:
+      - "42 USC 1396a(e)(16): 12-month postpartum coverage"
+      - "ARP Section 9812"
+      - "Consolidated Appropriations Act, 2023"
+
+  extended_coverage_adopted:
+    description: "Whether state has adopted 12-month postpartum coverage"
+    values:
+      # As of 2024, 46 states + DC have adopted
+      2022-04-01: true  # Federal default assumes adoption
+    citations:
+      - "KFF: Medicaid Postpartum Coverage Extension Tracker"
+
+# =============================================================================
+# CONTINUOUS ELIGIBILITY (CHILDREN)
+# 42 USC 1396a(e)(12)
+# =============================================================================
+
+continuous_eligibility:
+  description: "Continuous eligibility for children"
+
+  child_months:
+    description: "Months of continuous eligibility for children"
+    values:
+      # Consolidated Appropriations Act 2023 requires 12-month continuous
+      2024-01-01: 12
+      2014-01-01: 12  # ACA required for Medicaid/CHIP
+    citations:
+      - "42 USC 1396a(e)(12): 12-month continuous eligibility for children"
+      - "Consolidated Appropriations Act, 2023"

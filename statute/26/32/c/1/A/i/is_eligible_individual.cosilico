@@ -8,23 +8,14 @@
 # section shall apply only if a joint return is filed"
 
 imports:
-# From 32(c)(3) - qualifying child count
   num_qualifying_children: statute/26/32/c/3/A/num_qualifying_children
-
-# From 32(c)(1)(A)(ii) - eligibility without children
   meets_no_child_requirements: statute/26/32/c/1/A/ii/meets_no_child_requirements
-
-# Disqualifying conditions from other subsections
   is_qualifying_child_of_other: statute/26/32/c/1/B/is_qualifying_child_of_other
   has_foreign_earned_income: statute/26/32/c/1/C/has_foreign_earned_income
   is_nonresident_alien: statute/26/32/c/1/D/is_nonresident_alien
   missing_taxpayer_tin: statute/26/32/c/1/E/i/missing_taxpayer_tin
   missing_spouse_tin: statute/26/32/c/1/E/ii/missing_spouse_tin
-
-# Investment income disqualification from 32(i)
   has_excessive_investment_income: statute/26/32/i/1/has_excessive_investment_income
-
-# Filing status restriction from 32(d)
   is_mfs_filing_status: statute/26/32/d/is_mfs_filing_status
 
 entity TaxUnit

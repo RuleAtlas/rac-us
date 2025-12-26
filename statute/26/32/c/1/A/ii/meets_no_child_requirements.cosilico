@@ -13,10 +13,12 @@
 # Note: For 2021 only, the age requirements were expanded to 19-65 (age 24
 # for specified students) under the American Rescue Plan Act.
 
-parameters:
-# Age thresholds for childless EITC
-  min_age: gov.irs.eitc.childless.min_age  # 25
-  max_age: gov.irs.eitc.childless.max_age  # 65
+imports:
+  min_age: params/eitc/childless#min_age
+  max_age: params/eitc/childless#max_age
+  age: inputs/age
+  is_dependent_of_another: inputs/is_dependent_of_another
+  has_us_principal_abode: inputs/has_us_principal_abode
 
 entity TaxUnit
 period Year

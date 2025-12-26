@@ -1,0 +1,405 @@
+# 42 USC 1396a(a)(10)(A)(i)(II) - Disabled Medicaid Eligibility
+#
+# Medicaid covers blind and disabled individuals through pathways similar to aged:
+#
+# 1. SSI recipients (automatic in 1634 states)
+#    - SSI recipients are categorically eligible
+#    - Disability determination by SSA
+#
+# 2. SSI-related (meet SSI criteria but not receiving SSI)
+#    - May have income from SSDI or other sources
+#    - Must meet SSI resource limits
+#    - Must meet SSA disability definition
+#
+# 3. Working disabled (Ticket to Work, Medicaid Buy-In)
+#    - Higher income limits for working disabled
+#    - May pay premiums
+#    - Designed to remove Medicaid as barrier to work
+#
+# 4. Medically needy (spend-down)
+#    - Income above SSI limits
+#    - Medical expenses reduce effective income
+#
+# Disability definition (42 USC 1382c):
+# - Unable to engage in substantial gainful activity (SGA)
+# - Due to medically determinable impairment
+# - Expected to last 12+ months or result in death
+#
+# Reference: https://www.medicaid.gov/medicaid/eligibility/index.html
+
+module statute.42.1396.a.disabled
+version "2025.1"
+jurisdiction us
+
+references {
+  # SSI eligibility
+  is_ssi_eligible: statute/42/1382/ssi/is_ssi_eligible
+  ssi_countable_income: statute/42/1382a/income_exclusions/ssi_countable_income
+  federal_benefit_rate: statute/42/1382/b/federal_benefit_rate/federal_benefit_rate
+
+  # Resource eligibility
+  medicaid_resource_eligible: statute/42/1396/a/resources/resource_test/medicaid_resource_eligible
+
+  # Age thresholds
+  age_elderly_min: statute/42/1396/age_thresholds/elderly_min
+  age_child_max: statute/42/1396/age_thresholds/child_max
+
+  # Working disabled parameters
+  working_disabled_income_limit: statute/42/1396/a/disabled/parameters/working_disabled_income_limit
+}
+
+# =============================================================================
+# DISABILITY DETERMINATION
+# 42 USC 1382c(a)(3) - SSA Disability Definition
+# =============================================================================
+
+# Is disabled (SSA definition)
+variable medicaid_is_disabled {
+  entity Person
+  period Month
+  dtype Boolean
+  label "Is disabled"
+  description "Individual meets SSA disability definition per 42 USC 1382c(a)(3)"
+  reference "42 USC 1382c(a)(3)"
+
+  formula {
+    # Disability determined by SSA
+    # Unable to engage in SGA due to impairment lasting 12+ months
+    return is_disabled
+  }
+
+  default false
+}
+
+# Is blind (SSA definition)
+variable medicaid_is_blind {
+  entity Person
+  period Month
+  dtype Boolean
+  label "Is blind"
+  description "Individual meets SSA blindness definition per 42 USC 1382c(a)(2)"
+  reference "42 USC 1382c(a)(2)"
+
+  formula {
+    # Central visual acuity of 20/200 or less in better eye with glasses
+    # Or visual field of 20 degrees or less
+    return is_blind
+  }
+
+  default false
+}
+
+# Is blind or disabled
+variable medicaid_is_blind_or_disabled {
+  entity Person
+  period Month
+  dtype Boolean
+  label "Is blind or disabled"
+  description "Individual is blind or disabled per SSA definitions"
+  reference (
+    "42 USC 1382c(a)(2)",
+    "42 USC 1382c(a)(3)"
+  )
+
+  formula {
+    return medicaid_is_disabled or medicaid_is_blind
+  }
+
+  default false
+}
+
+# =============================================================================
+# SSI-BASED DISABILITY ELIGIBILITY
+# 42 USC 1396a(a)(10)(A)(i)(II)
+# =============================================================================
+
+# SSI recipient (categorical eligibility)
+variable medicaid_disabled_ssi_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+  label "Disabled SSI Medicaid eligible"
+  description "Disabled SSI recipient categorically eligible for Medicaid"
+  reference (
+    "42 USC 1396a(a)(10)(A)(i)(II)",
+    "Section 1634 agreement"
+  )
+
+  formula {
+    # Must be blind or disabled
+    if not medicaid_is_blind_or_disabled then
+      return false
+
+    # SSI recipients are automatically Medicaid eligible in 1634 states
+    return receives_ssi
+  }
+
+  default false
+}
+
+# SSI-related eligibility (meets SSI criteria but not receiving SSI)
+variable medicaid_disabled_ssi_related_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+  label "Disabled SSI-related Medicaid eligible"
+  description "Disabled individual meeting SSI criteria but not receiving SSI"
+  reference "42 USC 1396a(a)(10)(A)(i)(II)"
+
+  formula {
+    # Must be blind or disabled
+    if not medicaid_is_blind_or_disabled then
+      return false
+
+    # Already getting SSI: use categorical pathway
+    if receives_ssi then
+      return false
+
+    # Must meet SSI income test (countable income <= FBR)
+    income = ssi_countable_income
+    income_limit = federal_benefit_rate
+
+    if income > income_limit then
+      return false
+
+    # Must meet resource test
+    if not medicaid_resource_eligible then
+      return false
+
+    return true
+  }
+
+  default false
+}
+
+# =============================================================================
+# DISABLED ADULT CHILD (DAC)
+# 42 USC 1396a(m) - Adult children disabled before age 22
+# =============================================================================
+
+# Disabled adult child (receives SSDI based on parent's record)
+variable medicaid_dac_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+  label "Disabled Adult Child eligible"
+  description "Adult disabled before 22, eligible via parent's work record"
+  reference "42 USC 1396a(m)"
+
+  formula {
+    # Must be disabled
+    if not medicaid_is_disabled then
+      return false
+
+    # Disability onset before age 22
+    if disability_onset_age >= 22 then
+      return false
+
+    # Receives SSDI as adult child (not SSI)
+    if not receives_ssdi_as_adult_child then
+      return false
+
+    # DACs may have SSDI above SSI limits but still qualify for Medicaid
+    # if they would have been SSI eligible but for the SSDI increase
+
+    return true
+  }
+
+  default false
+}
+
+# =============================================================================
+# WORKING DISABLED (MEDICAID BUY-IN)
+# 42 USC 1396a(a)(10)(A)(ii)(XIII-XV), Ticket to Work
+# =============================================================================
+
+# Working disabled basic eligibility
+variable medicaid_working_disabled_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+  label "Working disabled eligible"
+  description "Disabled worker eligible for Medicaid Buy-In program"
+  reference (
+    "42 USC 1396a(a)(10)(A)(ii)(XIII)",
+    "Ticket to Work and Work Incentives Improvement Act"
+  )
+
+  formula {
+    # Must be blind or disabled
+    if not medicaid_is_blind_or_disabled then
+      return false
+
+    # Must be working (employed, earning income)
+    if not is_employed then
+      return false
+
+    # Income limit higher than regular SSI (state-specific, often 250%+ FPL)
+    income_pct_fpl = earned_income_pct_fpl + unearned_income_pct_fpl
+
+    if income_pct_fpl > working_disabled_income_limit then
+      return false
+
+    # Resource limits may be higher or eliminated for working disabled
+    # State-specific implementation
+
+    return true
+  }
+
+  default false
+}
+
+# =============================================================================
+# DISABLED CHILDREN
+# Special rules for children with disabilities
+# =============================================================================
+
+# Disabled child TEFRA option (Katie Beckett waiver)
+# 42 USC 1396a(e)(3) - Allows coverage without counting parental income
+variable medicaid_tefra_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+  label "TEFRA/Katie Beckett eligible"
+  description "Disabled child eligible without parental income/resources"
+  reference (
+    "42 USC 1396a(e)(3)",
+    "TEFRA Section 134"
+  )
+
+  formula {
+    # Must be a child (under 19)
+    if age >= age_child_max then
+      return false
+
+    # Must be disabled
+    if not medicaid_is_disabled then
+      return false
+
+    # Child would require institutional level of care
+    if not requires_institutional_care then
+      return false
+
+    # Child can be cared for at home
+    if not can_be_home_cared then
+      return false
+
+    # TEFRA: Only child's own income/resources count, not parents'
+    # State option - not all states offer TEFRA
+    child_income = ssi_countable_income
+    child_resources = medicaid_countable_resources
+
+    # Apply child-only limits
+    return child_income <= federal_benefit_rate and
+           child_resources <= ssi_resource_limit_individual
+  }
+
+  default false
+}
+
+# =============================================================================
+# MEDICALLY NEEDY (SPEND-DOWN)
+# 42 USC 1396a(a)(10)(C)
+# =============================================================================
+
+# Medically needy pathway for disabled
+variable medicaid_disabled_medically_needy_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+  label "Disabled medically needy eligible"
+  description "Disabled individual eligible through medically needy spend-down"
+  reference "42 USC 1396a(a)(10)(C)"
+
+  formula {
+    # Must be blind or disabled
+    if not medicaid_is_blind_or_disabled then
+      return false
+
+    # Must not be eligible through other pathways
+    if medicaid_disabled_ssi_eligible then
+      return false
+    if medicaid_disabled_ssi_related_eligible then
+      return false
+    if medicaid_working_disabled_eligible then
+      return false
+
+    # Must meet resource test
+    if not medicaid_resource_eligible then
+      return false
+
+    # Medically needy: income minus medical expenses <= MN income standard
+    net_income = income - medical_expenses
+    mn_standard = medically_needy_income_standard
+
+    return net_income <= mn_standard
+  }
+
+  default false
+}
+
+# =============================================================================
+# OVERALL DISABLED MEDICAID ELIGIBILITY
+# =============================================================================
+
+# Main disabled Medicaid eligibility (any pathway)
+variable medicaid_disabled_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+  label "Disabled Medicaid eligible"
+  description "Disabled individual eligible for Medicaid through any pathway"
+  reference "42 USC 1396a(a)(10)(A)(i)(II)"
+
+  formula {
+    # Must be blind or disabled
+    if not medicaid_is_blind_or_disabled then
+      return false
+
+    # Any pathway qualifies
+    return medicaid_disabled_ssi_eligible
+        or medicaid_disabled_ssi_related_eligible
+        or medicaid_dac_eligible
+        or medicaid_working_disabled_eligible
+        or medicaid_tefra_eligible
+        or medicaid_disabled_medically_needy_eligible
+  }
+
+  default false
+}
+
+# Disabled eligibility pathway (for tracking/reporting)
+variable medicaid_disabled_eligibility_pathway {
+  entity Person
+  period Month
+  dtype Category  # ssi_recipient, ssi_related, dac, working_disabled, tefra, medically_needy, none
+  label "Disabled eligibility pathway"
+  description "Pathway through which disabled individual is Medicaid eligible"
+
+  formula {
+    if not medicaid_is_blind_or_disabled then
+      return "none"
+
+    if medicaid_disabled_ssi_eligible then
+      return "ssi_recipient"
+
+    if medicaid_disabled_ssi_related_eligible then
+      return "ssi_related"
+
+    if medicaid_dac_eligible then
+      return "dac"
+
+    if medicaid_working_disabled_eligible then
+      return "working_disabled"
+
+    if medicaid_tefra_eligible then
+      return "tefra"
+
+    if medicaid_disabled_medically_needy_eligible then
+      return "medically_needy"
+
+    return "none"
+  }
+
+  default "none"
+}

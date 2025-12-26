@@ -9,15 +9,10 @@
 #        to the taxpayer by section 164(f)."
 
 imports:
-# Wage income from §61
   wages: statute/26/61/a/1/wages
   salaries: statute/26/61/a/1/salaries
   tips: statute/26/61/a/1/tips
-
-# Self-employment income from §1402
   net_earnings_self_employment: statute/26/1402/a/net_earnings_self_employment
-
-# Deduction for self-employment tax from §164(f)
   se_tax_deduction: statute/26/164/f/se_tax_deduction
 
 entity TaxUnit

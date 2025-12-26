@@ -1,0 +1,385 @@
+# TANF Test Cases
+#
+# These test cases validate the TANF federal framework implementation.
+# Note: TANF is highly state-specific, so these tests use default parameters.
+# State-specific tests should be in state override files.
+#
+# Test case structure follows cosilico-us conventions.
+
+# =============================================================================
+# ELIGIBILITY TESTS
+# =============================================================================
+
+- name: "Basic TANF eligibility - single parent with child"
+  period: 2024-01
+  input:
+    tanf_units:
+      unit1:
+        members: [parent, child]
+    persons:
+      parent:
+        age: 30
+        is_us_citizen: true
+        earned_income: 500
+        unearned_income: 0
+      child:
+        age: 5
+        is_enrolled_in_secondary_school: false
+  output:
+    tanf_units:
+      unit1:
+        is_tanf_eligible_child:
+          parent: false
+          child: true
+        tanf_unit_size: 2
+
+- name: "Child age limit - 18 year old not in school"
+  period: 2024-01
+  input:
+    persons:
+      teen:
+        age: 18
+        is_enrolled_in_secondary_school: false
+  output:
+    persons:
+      teen:
+        is_tanf_eligible_child: false
+
+- name: "Child age limit - 18 year old in secondary school"
+  period: 2024-01
+  input:
+    persons:
+      teen:
+        age: 18
+        is_enrolled_in_secondary_school: true
+  output:
+    persons:
+      teen:
+        is_tanf_eligible_child: true
+
+- name: "Noncitizen 5-year bar - under 5 years"
+  period: 2024-01
+  input:
+    persons:
+      adult:
+        age: 35
+        is_us_citizen: false
+        is_qualified_alien: true
+        years_since_qualified_entry: 3
+        is_refugee: false
+        is_asylee: false
+  output:
+    persons:
+      adult:
+        tanf_citizen_eligible: false
+
+- name: "Noncitizen 5-year bar - over 5 years"
+  period: 2024-01
+  input:
+    persons:
+      adult:
+        age: 35
+        is_us_citizen: false
+        is_qualified_alien: true
+        years_since_qualified_entry: 6
+  output:
+    persons:
+      adult:
+        tanf_citizen_eligible: true
+
+- name: "Refugee exempt from 5-year bar"
+  period: 2024-01
+  input:
+    persons:
+      adult:
+        age: 35
+        is_us_citizen: false
+        is_refugee: true
+        years_since_qualified_entry: 1
+  output:
+    persons:
+      adult:
+        tanf_citizen_eligible: true
+
+# =============================================================================
+# WORK REQUIREMENTS TESTS
+# =============================================================================
+
+- name: "Work hours - single parent with young child"
+  period: 2024-01
+  input:
+    persons:
+      parent:
+        age: 25
+        is_tanf_single_parent: true
+        has_child_under_age_6: true
+        tanf_work_requirement_exempt: false
+  output:
+    persons:
+      parent:
+        tanf_required_work_hours_weekly: 20
+
+- name: "Work hours - single parent no young child"
+  period: 2024-01
+  input:
+    persons:
+      parent:
+        age: 30
+        is_tanf_single_parent: true
+        has_child_under_age_6: false
+        tanf_work_requirement_exempt: false
+  output:
+    persons:
+      parent:
+        tanf_required_work_hours_weekly: 30
+
+- name: "Work hours - two parent family"
+  period: 2024-01
+  input:
+    persons:
+      parent:
+        age: 30
+        is_tanf_single_parent: false
+        is_tanf_two_parent_family: true
+        receives_federal_childcare_assistance: false
+        tanf_work_requirement_exempt: false
+  output:
+    persons:
+      parent:
+        tanf_required_work_hours_weekly: 35
+
+- name: "Teen parent education requirement"
+  period: 2024-01
+  input:
+    persons:
+      teen:
+        age: 17
+        has_minor_child: true
+        has_high_school_diploma: false
+  output:
+    persons:
+      teen:
+        tanf_teen_parent_education_required: true
+
+# =============================================================================
+# TIME LIMIT TESTS
+# =============================================================================
+
+- name: "Under 60-month time limit"
+  period: 2024-01
+  input:
+    persons:
+      adult:
+        age: 30
+        tanf_months_received: 24
+  output:
+    persons:
+      adult:
+        tanf_time_limit_eligible: true
+
+- name: "Exceeded 60-month time limit"
+  period: 2024-01
+  input:
+    persons:
+      adult:
+        age: 30
+        tanf_months_received: 65
+        tanf_hardship_exemption: false
+  output:
+    persons:
+      adult:
+        tanf_time_limit_eligible: false
+
+- name: "Child exempt from time limit"
+  period: 2024-01
+  input:
+    persons:
+      child:
+        age: 10
+        tanf_months_received: 100
+  output:
+    persons:
+      child:
+        tanf_time_limit_eligible: true
+
+# =============================================================================
+# INCOME CALCULATION TESTS (using default parameters)
+# =============================================================================
+
+- name: "Earned income disregard calculation"
+  period: 2024-01
+  input:
+    tanf_units:
+      unit1:
+        members: [parent, child]
+    persons:
+      parent:
+        earned_income: 1000
+      child:
+        earned_income: 0
+  output:
+    tanf_units:
+      unit1:
+        tanf_gross_earned_income: 1000
+        # Default: $120 flat + 50% of remainder = $120 + $440 = $560 disregard
+        tanf_earned_income_disregard: 560
+        tanf_countable_earned_income: 440
+
+- name: "No earned income - zero disregard"
+  period: 2024-01
+  input:
+    tanf_units:
+      unit1:
+        members: [parent, child]
+    persons:
+      parent:
+        earned_income: 0
+        unearned_income: 500
+      child:
+        earned_income: 0
+  output:
+    tanf_units:
+      unit1:
+        tanf_gross_earned_income: 0
+        tanf_earned_income_disregard: 0
+        tanf_countable_earned_income: 0
+
+# =============================================================================
+# BENEFIT CALCULATION TESTS (using default parameters)
+# =============================================================================
+
+- name: "Basic benefit calculation - family of 3"
+  description: "Test benefit = payment standard - countable income"
+  period: 2024-01
+  input:
+    tanf_units:
+      unit1:
+        members: [parent, child1, child2]
+        tanf_eligible: true
+    persons:
+      parent:
+        age: 30
+        earned_income: 0
+        unearned_income: 0
+      child1:
+        age: 8
+      child2:
+        age: 5
+  output:
+    tanf_units:
+      unit1:
+        tanf_unit_size: 3
+        tanf_countable_income: 0
+        # Payment standard for 3: $420 (default)
+        tanf_calculated_benefit: 420
+        tanf_benefit: 420
+
+- name: "Benefit with income - partial benefit"
+  period: 2024-01
+  input:
+    tanf_units:
+      unit1:
+        members: [parent, child]
+        tanf_eligible: true
+    persons:
+      parent:
+        age: 30
+        earned_income: 0
+        unearned_income: 200
+      child:
+        age: 5
+  output:
+    tanf_units:
+      unit1:
+        tanf_countable_income: 200
+        # Payment standard $330 - $200 countable = $130
+        tanf_calculated_benefit: 130
+
+# =============================================================================
+# SANCTION TESTS
+# =============================================================================
+
+- name: "Child support non-cooperation sanction"
+  period: 2024-01
+  input:
+    tanf_units:
+      unit1:
+        tanf_child_support_cooperation_met: false
+        tanf_child_support_good_cause_exemption: false
+        tanf_benefit_amount: 400
+  output:
+    tanf_units:
+      unit1:
+        # 25% minimum sanction
+        tanf_child_support_sanction_amount: 100
+
+- name: "Good cause exemption - no sanction"
+  period: 2024-01
+  input:
+    tanf_units:
+      unit1:
+        tanf_child_support_cooperation_met: false
+        tanf_child_support_good_cause_exemption: true
+        tanf_benefit_amount: 400
+  output:
+    tanf_units:
+      unit1:
+        tanf_child_support_sanction_amount: 0
+
+# =============================================================================
+# CHILD-ONLY CASE TESTS
+# =============================================================================
+
+- name: "Child-only case - parent is SSI recipient"
+  period: 2024-01
+  input:
+    tanf_units:
+      unit1:
+        members: [parent, child]
+        parent_is_ssi_recipient: true
+    persons:
+      parent:
+        age: 35
+        is_ssi_recipient: true
+      child:
+        age: 8
+  output:
+    tanf_units:
+      unit1:
+        tanf_child_only_case: true
+
+# =============================================================================
+# EDGE CASES
+# =============================================================================
+
+- name: "Not eligible - no benefit"
+  period: 2024-01
+  input:
+    tanf_units:
+      unit1:
+        tanf_eligible: false
+  output:
+    tanf_units:
+      unit1:
+        tanf_benefit: 0
+        tanf: 0
+
+- name: "Income exceeds need - zero benefit"
+  period: 2024-01
+  input:
+    tanf_units:
+      unit1:
+        members: [parent, child]
+        tanf_eligible: true
+    persons:
+      parent:
+        age: 30
+        earned_income: 2000
+        unearned_income: 0
+      child:
+        age: 5
+  output:
+    tanf_units:
+      unit1:
+        # High income results in zero benefit
+        tanf_calculated_benefit: 0

@@ -1,0 +1,170 @@
+# Title 42, Subchapter IV, Part A - TANF (Temporary Assistance for Needy Families)
+#
+# The Personal Responsibility and Work Opportunity Reconciliation Act of 1996
+# (PRWORA, Pub. L. 104-193) replaced the Aid to Families with Dependent Children
+# (AFDC) program with TANF, a block grant program giving states flexibility
+# in designing their cash assistance programs.
+#
+# TANF is fundamentally different from other federal programs:
+# - No federal benefit formula (states set amounts)
+# - No federal income/resource limits (states set criteria)
+# - Federal law provides framework and requirements, not calculations
+#
+# Key statutory sections:
+# - 601: Purpose of TANF
+# - 602: Eligible states, state plans
+# - 603: Block grant funding
+# - 607: Work participation requirements
+# - 608: Prohibitions, requirements, sanctions
+# - 609: Penalties and enforcement
+# - 619: Definitions
+#
+# Reference: https://uscode.house.gov/view.xhtml?path=/prelim@title42/chapter7/subchapterIV/partA
+
+module statute.42.601-619.tanf
+version "2025.1"
+jurisdiction us
+
+references {
+  # Eligibility components
+  tanf_eligible: statute/42/601-619/tanf_eligibility/tanf_eligible
+  tanf_individual_eligible: statute/42/601-619/tanf_eligibility/tanf_individual_eligible
+  tanf_financial_eligible: statute/42/601-619/tanf_eligibility/tanf_financial_eligible
+  tanf_income_eligible: statute/42/601-619/tanf_eligibility/tanf_income_eligible
+  tanf_resource_eligible: statute/42/601-619/tanf_eligibility/tanf_resource_eligible
+  tanf_citizen_eligible: statute/42/601-619/tanf_eligibility/tanf_citizen_eligible
+  tanf_time_limit_eligible: statute/42/601-619/tanf_eligibility/tanf_time_limit_eligible
+
+  # Benefit calculation
+  tanf_benefit: statute/42/601-619/tanf_benefits/tanf_benefit
+  tanf_calculated_benefit: statute/42/601-619/tanf_benefits/tanf_calculated_benefit
+  tanf_countable_income: statute/42/601-619/tanf_benefits/tanf_countable_income
+  tanf_need_standard: statute/42/601-619/tanf_benefits/tanf_need_standard
+  tanf_payment_standard: statute/42/601-619/tanf_benefits/tanf_payment_standard
+
+  # Work requirements
+  tanf_work_requirement_met: statute/42/601-619/607/work_requirements/tanf_work_requirement_met
+  tanf_required_work_hours_weekly: statute/42/601-619/607/work_requirements/tanf_required_work_hours_weekly
+
+  # Sanctions
+  tanf_total_sanction_amount: statute/42/601-619/608/sanctions/tanf_total_sanction_amount
+  tanf_benefit_after_sanctions: statute/42/601-619/608/sanctions/tanf_benefit_after_sanctions
+}
+
+# =============================================================================
+# 42 USC 601 - PURPOSE
+# =============================================================================
+
+# The four purposes of TANF per 42 USC 601(a):
+#
+# (1) Provide assistance to needy families so that children may be cared for
+#     in their own homes or in the homes of relatives;
+#
+# (2) End the dependence of needy parents on government benefits by promoting
+#     job preparation, work, and marriage;
+#
+# (3) Prevent and reduce the incidence of out-of-wedlock pregnancies and
+#     establish annual numerical goals for preventing and reducing the
+#     incidence of these pregnancies;
+#
+# (4) Encourage the formation and maintenance of two-parent families.
+
+# =============================================================================
+# MAIN TANF VARIABLE - Re-export at module level
+# =============================================================================
+
+variable tanf {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Benefits"
+  description "Monthly Temporary Assistance for Needy Families cash benefit"
+  reference (
+    "42 USC 601-619",
+    "https://www.acf.hhs.gov/ofa/programs/tanf"
+  )
+
+  formula {
+    return tanf_benefit
+  }
+
+  default 0
+}
+
+# =============================================================================
+# SUMMARY VARIABLES
+# =============================================================================
+
+# Household TANF receipt indicator
+variable receives_tanf {
+  entity TanfUnit
+  period Month
+  dtype Bool
+  label "Receives TANF"
+  description "Whether household receives TANF benefits"
+  reference "42 USC 601-619"
+
+  formula {
+    return tanf > 0
+  }
+
+  default false
+}
+
+# Annual TANF benefit
+variable tanf_annual {
+  entity TanfUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Annual TANF Benefits"
+  description "Total annual TANF cash benefits"
+  reference "42 USC 601-619"
+
+  formula {
+    return sum(tanf for month in year_months)
+  }
+
+  default 0
+}
+
+# =============================================================================
+# SIMULATION NOTES
+# =============================================================================
+
+# CRITICAL LIMITATIONS for microsimulation:
+#
+# 1. STATE VARIATION
+#    TANF is extremely state-specific. The federal framework encoded here
+#    provides structure, but accurate simulation requires state-specific
+#    parameter files with:
+#    - Need standards by family size
+#    - Payment standards by family size
+#    - Earned income disregards
+#    - Resource limits (if any)
+#    - Work requirement exemptions
+#    - Sanction policies
+#
+# 2. TIME LIMITS
+#    The 60-month federal time limit cannot be enforced in point-in-time
+#    simulation. The variable `tanf_months_received` must be provided as
+#    input data (e.g., from survey questions about TANF receipt duration).
+#
+# 3. WORK REQUIREMENTS
+#    Tracking actual work hours and activities over time is required for
+#    accurate work requirement determination. Simulation can identify who
+#    is SUBJECT to requirements but not whether they have MET them over time.
+#
+# 4. SANCTIONS
+#    Progressive sanctions require tracking non-compliance history.
+#    Simulation can model sanction amounts but not escalation over time.
+#
+# 5. DYNAMIC ELIGIBILITY
+#    TANF eligibility can change month-to-month based on employment,
+#    income changes, family composition, etc. Static simulation provides
+#    a point-in-time snapshot.
+#
+# For state-specific implementations, see:
+# - states/california/calworks/
+# - states/[state]/tanf/

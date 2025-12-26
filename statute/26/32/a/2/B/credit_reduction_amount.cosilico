@@ -7,19 +7,12 @@
 # of the taxpayer for the taxable year as exceeds the phaseout amount."
 
 imports:
-# Inputs
   earned_income: statute/26/32/c/2/A/earned_income
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
   filing_status: statute/26/1/filing_status
-
-# Phaseout percentage from §32(b)(1) - fixed, not inflation-adjusted
   phaseout_percentage: statute/26/32/b/1/phaseout_percentage
-
-# Amounts from statute - engine resolves IRS override automatically
   phaseout_amount: statute/26/32/b/2/A/base_amounts#phaseout_amount
   joint_return_adjustment: statute/26/32/b/2/B/base_joint_return_adjustment#joint_return_adjustment
-
-# Number of qualifying children
   num_qualifying_children: statute/26/32/c/3/A/num_qualifying_children
 
 entity TaxUnit

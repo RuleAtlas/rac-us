@@ -8,10 +8,7 @@
 # row of the §32(b) table applies.
 
 imports:
-# Qualifying child definition from §152(c)
   is_qualifying_child: statute/26/152/c/is_qualifying_child
-
-# EITC-specific exclusions
   child_is_married_filing_joint: statute/26/32/c/3/B/child_is_married_filing_joint
   child_meets_place_of_abode: statute/26/32/c/3/C/child_meets_place_of_abode
   child_has_valid_tin: statute/26/32/c/3/D/i/child_has_valid_tin
