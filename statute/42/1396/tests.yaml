@@ -1,0 +1,475 @@
+# 42 USC 1396 - Medicaid/CHIP Eligibility Tests
+#
+# Test cases for validating Medicaid and CHIP eligibility based on
+# MAGI income methodology (ACA expansion) and categorical eligibility.
+#
+# Key rules:
+# - Income limits vary by categorical group (% of FPL)
+# - 5% FPL income disregard applies to MAGI-based eligibility
+# - CHIP covers children above Medicaid limits
+# - Income limits vary by state (parameters allow state overrides)
+#
+# Using 2024 FPL: $15,060 for 1 person, $5,280 per additional person
+# Monthly FPL: $1,255 for 1 person, $440 per additional
+
+variable: medicaid_eligible
+fiscal_year: 2024
+
+# =============================================================================
+# CHILDREN UNDER 19 (42 USC 1396a(l))
+# Federal minimum: 138% FPL for children 0-18
+# Many states cover children at higher income levels
+# =============================================================================
+
+test_cases:
+  # --- Infants (age 0-1) ---
+  - name: "Infant at 185% FPL - eligible under federal minimum"
+    description: "Infants must be covered to at least 185% FPL per 42 USC 1396a(l)(2)(A)"
+    inputs:
+      household_size: 3
+      persons:
+        - age: 0
+          is_applicant: true
+        - age: 28
+          is_parent: true
+        - age: 30
+          is_parent: true
+      magi_income: 3600  # ~175% FPL for family of 3 ($2,135/mo * 1.75 = $3,736)
+      state: "US"  # Federal baseline
+    expected:
+      medicaid_eligible: true
+      medicaid_category: "infant"
+    citations:
+      - "42 USC 1396a(l)(2)(A): infants up to 185% FPL"
+
+  - name: "Infant at 200% FPL - ineligible for Medicaid, eligible for CHIP"
+    description: "Infant above 185% FPL in non-expansion state"
+    inputs:
+      household_size: 3
+      persons:
+        - age: 0
+          is_applicant: true
+        - age: 28
+          is_parent: true
+        - age: 30
+          is_parent: true
+      magi_income: 4400  # ~206% FPL for family of 3
+      state: "US"  # Federal baseline
+    expected:
+      medicaid_eligible: false
+      chip_eligible: true
+    citations:
+      - "42 USC 1396a(l)(2)(A): infants up to 185% FPL"
+      - "42 USC 1397aa: CHIP covers above Medicaid limits"
+
+  # --- Children 1-5 years ---
+  - name: "Child age 3 at 133% FPL - eligible under federal minimum"
+    description: "Children 1-5 must be covered to at least 133% FPL"
+    inputs:
+      household_size: 3
+      persons:
+        - age: 3
+          is_applicant: true
+        - age: 28
+          is_parent: true
+        - age: 30
+          is_parent: true
+      magi_income: 2700  # ~126% FPL for family of 3
+      state: "US"
+    expected:
+      medicaid_eligible: true
+      medicaid_category: "child_1_5"
+    citations:
+      - "42 USC 1396a(l)(2)(B): children 1-5 up to 133% FPL"
+
+  - name: "Child age 3 at 145% FPL - ineligible for Medicaid"
+    description: "Child 1-5 above 133% FPL at federal baseline"
+    inputs:
+      household_size: 3
+      persons:
+        - age: 3
+          is_applicant: true
+        - age: 28
+          is_parent: true
+        - age: 30
+          is_parent: true
+      magi_income: 3200  # ~150% FPL for family of 3
+      state: "US"
+    expected:
+      medicaid_eligible: false
+      chip_eligible: true
+    citations:
+      - "42 USC 1396a(l)(2)(B): children 1-5 only up to 133% FPL"
+
+  # --- Children 6-18 years ---
+  - name: "Child age 10 at 100% FPL - eligible"
+    description: "Children 6-18 must be covered to at least 100% FPL"
+    inputs:
+      household_size: 4
+      persons:
+        - age: 10
+          is_applicant: true
+        - age: 8
+        - age: 35
+          is_parent: true
+        - age: 35
+          is_parent: true
+      magi_income: 2500  # ~97% FPL for family of 4 ($2,575/mo)
+      state: "US"
+    expected:
+      medicaid_eligible: true
+      medicaid_category: "child_6_18"
+    citations:
+      - "42 USC 1396a(l)(2)(C): children 6-18 up to 100% FPL"
+
+  - name: "Child age 15 at 110% FPL - ineligible at federal baseline"
+    description: "Older child above 100% FPL without expansion"
+    inputs:
+      household_size: 3
+      persons:
+        - age: 15
+          is_applicant: true
+        - age: 40
+          is_parent: true
+        - age: 42
+          is_parent: true
+      magi_income: 2400  # ~112% FPL for family of 3
+      state: "US"
+    expected:
+      medicaid_eligible: false
+      chip_eligible: true
+    citations:
+      - "42 USC 1396a(l)(2)(C): children 6-18 only up to 100% FPL"
+
+# =============================================================================
+# PREGNANT WOMEN (42 USC 1396a(a)(10)(A)(i)(III))
+# Federal minimum: 133% FPL
+# =============================================================================
+
+  - name: "Pregnant woman at 130% FPL - eligible"
+    description: "Pregnant women covered to at least 133% FPL"
+    inputs:
+      household_size: 2  # Woman + unborn child counted
+      persons:
+        - age: 25
+          is_applicant: true
+          is_pregnant: true
+        - age: 30
+      magi_income: 2100  # ~124% FPL for family of 2
+      state: "US"
+    expected:
+      medicaid_eligible: true
+      medicaid_category: "pregnant"
+    citations:
+      - "42 USC 1396a(a)(10)(A)(i)(III): pregnant women up to 133% FPL"
+
+  - name: "Pregnant woman at 150% FPL - ineligible at federal baseline"
+    description: "Pregnant woman above 133% FPL"
+    inputs:
+      household_size: 2
+      persons:
+        - age: 25
+          is_applicant: true
+          is_pregnant: true
+        - age: 30
+      magi_income: 2550  # ~150% FPL for family of 2
+      state: "US"
+    expected:
+      medicaid_eligible: false
+    citations:
+      - "42 USC 1396a(a)(10)(A)(i)(III): pregnant women only up to 133% FPL"
+
+# =============================================================================
+# PARENTS/CARETAKER RELATIVES (42 USC 1396a(a)(10)(A)(ii)(I))
+# Section 1931 pathway - varies significantly by state
+# ACA expansion: 133% FPL (effective 138% with 5% disregard)
+# =============================================================================
+
+  - name: "Parent in ACA expansion state at 130% FPL - eligible"
+    description: "Parent with dependent child in expansion state"
+    inputs:
+      household_size: 3
+      persons:
+        - age: 35
+          is_applicant: true
+          is_parent: true
+        - age: 37
+          is_parent: true
+        - age: 5
+      magi_income: 2800  # ~131% FPL for family of 3
+      state: "US"  # Using federal expansion baseline
+      aca_expansion: true
+    expected:
+      medicaid_eligible: true
+      medicaid_category: "parent_caretaker"
+    citations:
+      - "42 USC 1396a(a)(10)(A)(i)(VIII): ACA expansion to 133% FPL"
+
+  - name: "Parent in non-expansion state at 50% FPL - depends on state"
+    description: "Parent eligibility in non-expansion states varies widely"
+    inputs:
+      household_size: 3
+      persons:
+        - age: 30
+          is_applicant: true
+          is_parent: true
+        - age: 32
+          is_parent: true
+        - age: 7
+      magi_income: 1100  # ~52% FPL for family of 3
+      state: "US"  # Federal baseline (no expansion)
+      aca_expansion: false
+    expected:
+      # Without ACA expansion, parent eligibility is extremely limited
+      # Many non-expansion states have limits as low as 17-44% FPL
+      medicaid_eligible: false
+    citations:
+      - "42 USC 1396u-1: Section 1931 parent coverage"
+      - "Note: Pre-ACA parent eligibility varied 17-100% FPL by state"
+
+# =============================================================================
+# ACA EXPANSION ADULTS (42 USC 1396a(a)(10)(A)(i)(VIII))
+# Adults 19-64 not otherwise eligible, in expansion states: 133% FPL
+# (Effective 138% FPL with 5% income disregard)
+# =============================================================================
+
+  - name: "Childless adult at 130% FPL in expansion state - eligible"
+    description: "ACA expansion covers adults up to 138% FPL (133% + 5% disregard)"
+    inputs:
+      household_size: 1
+      persons:
+        - age: 45
+          is_applicant: true
+      magi_income: 1600  # ~127% FPL for individual ($1,255/mo * 1.27 = $1,594)
+      state: "US"
+      aca_expansion: true
+    expected:
+      medicaid_eligible: true
+      medicaid_category: "expansion_adult"
+    citations:
+      - "42 USC 1396a(a)(10)(A)(i)(VIII): adults up to 133% FPL in expansion states"
+      - "42 CFR 435.603(d)(4): 5% FPL income disregard"
+
+  - name: "Childless adult at 140% FPL in expansion state - ineligible"
+    description: "Above 138% FPL (133% + 5% disregard) even in expansion state"
+    inputs:
+      household_size: 1
+      persons:
+        - age: 45
+          is_applicant: true
+      magi_income: 1800  # ~143% FPL for individual
+      state: "US"
+      aca_expansion: true
+    expected:
+      medicaid_eligible: false
+    citations:
+      - "42 USC 1396a(a)(10)(A)(i)(VIII): 133% FPL limit (138% effective)"
+
+  - name: "Childless adult in non-expansion state - ineligible"
+    description: "Non-expansion states do not cover childless adults"
+    inputs:
+      household_size: 1
+      persons:
+        - age: 45
+          is_applicant: true
+      magi_income: 500  # Only 40% FPL
+      state: "US"
+      aca_expansion: false
+    expected:
+      medicaid_eligible: false
+    citations:
+      - "Without ACA expansion, childless adults have no pathway to Medicaid"
+
+# =============================================================================
+# 5% FPL INCOME DISREGARD (42 CFR 435.603(d)(4))
+# Applied to all MAGI-based eligibility determinations
+# =============================================================================
+
+  - name: "5% disregard enables eligibility for adult at 136% FPL"
+    description: "Income at 136% FPL is below 138% threshold after 5% disregard"
+    inputs:
+      household_size: 1
+      persons:
+        - age: 40
+          is_applicant: true
+      magi_income: 1707  # 136% FPL ($1,255 * 1.36 = $1,707)
+      state: "US"
+      aca_expansion: true
+    expected:
+      medicaid_eligible: true
+      medicaid_category: "expansion_adult"
+      # Effective income after disregard: 136% - 5% = 131% < 133%
+    citations:
+      - "42 CFR 435.603(d)(4): 5% FPL disregard"
+
+  - name: "Infant at exactly 185% FPL with disregard - eligible"
+    description: "185% FPL threshold for infants with 5% disregard = 190% effective"
+    inputs:
+      household_size: 3
+      persons:
+        - age: 0
+          is_applicant: true
+        - age: 28
+          is_parent: true
+        - age: 30
+          is_parent: true
+      magi_income: 4012  # 188% FPL for family of 3, within 190% with disregard
+      state: "US"
+    expected:
+      medicaid_eligible: true
+      medicaid_category: "infant"
+    citations:
+      - "42 USC 1396a(l)(2)(A): infants up to 185% FPL"
+      - "42 CFR 435.603(d)(4): 5% FPL disregard makes effective limit 190%"
+
+# =============================================================================
+# CHIP ELIGIBILITY (42 USC 1397aa et seq.)
+# Children above Medicaid limits but below CHIP ceiling (varies by state)
+# Federal floor: states must cover some children above Medicaid
+# =============================================================================
+
+  - name: "Child at 200% FPL - eligible for CHIP"
+    description: "Child above Medicaid limit but within typical CHIP range"
+    inputs:
+      household_size: 3
+      persons:
+        - age: 8
+          is_applicant: true
+        - age: 35
+          is_parent: true
+        - age: 35
+          is_parent: true
+      magi_income: 4200  # ~197% FPL for family of 3
+      state: "US"
+      chip_income_limit_pct: 2.00  # 200% FPL - typical state CHIP limit
+    expected:
+      medicaid_eligible: false
+      chip_eligible: true
+    citations:
+      - "42 USC 1397aa: CHIP for uninsured children"
+      - "42 USC 1397bb(b)(1)(B): income limits set by states"
+
+  - name: "Child at 250% FPL - depends on state CHIP limit"
+    description: "Some states cover up to 300%+ FPL, others cap lower"
+    inputs:
+      household_size: 3
+      persons:
+        - age: 12
+          is_applicant: true
+        - age: 40
+          is_parent: true
+        - age: 40
+          is_parent: true
+      magi_income: 5300  # ~248% FPL for family of 3
+      state: "US"
+      chip_income_limit_pct: 2.55  # 255% FPL (approximate median)
+    expected:
+      medicaid_eligible: false
+      chip_eligible: true
+    citations:
+      - "42 USC 1397bb: state-set CHIP income limits"
+
+  - name: "Child at 300% FPL with 255% CHIP limit - ineligible"
+    description: "Child above both Medicaid and CHIP income limits"
+    inputs:
+      household_size: 3
+      persons:
+        - age: 10
+          is_applicant: true
+        - age: 38
+          is_parent: true
+        - age: 38
+          is_parent: true
+      magi_income: 6400  # ~300% FPL for family of 3
+      state: "US"
+      chip_income_limit_pct: 2.55
+    expected:
+      medicaid_eligible: false
+      chip_eligible: false
+    citations:
+      - "42 USC 1397bb: above state CHIP income limit"
+
+# =============================================================================
+# ELDERLY AND DISABLED (SSI-based)
+# Automatic Medicaid eligibility for SSI recipients in most states
+# =============================================================================
+
+  - name: "SSI recipient - categorically eligible for Medicaid"
+    description: "SSI recipients are automatically Medicaid eligible in 1634 states"
+    inputs:
+      household_size: 1
+      persons:
+        - age: 72
+          is_applicant: true
+          receives_ssi: true
+      magi_income: 943  # SSI FBR - would be over 75% FPL
+      state: "US"
+    expected:
+      medicaid_eligible: true
+      medicaid_category: "ssi_recipient"
+    citations:
+      - "42 USC 1396a(a)(10)(A)(i)(II): SSI recipient eligibility"
+      - "Section 1634 agreement states provide automatic coverage"
+
+  - name: "Disabled adult receiving SSDI above income limit - may still qualify"
+    description: "SSDI alone does not confer categorical eligibility"
+    inputs:
+      household_size: 1
+      persons:
+        - age: 50
+          is_applicant: true
+          is_disabled: true
+          receives_ssdi: true
+      magi_income: 2000  # ~159% FPL
+      state: "US"
+      aca_expansion: false
+    expected:
+      # Without SSI or ACA expansion, disabled adults may fall into coverage gap
+      # Medically needy pathways exist but are complex
+      medicaid_eligible: false
+    citations:
+      - "SSDI recipients not automatically Medicaid eligible"
+      - "May qualify through SSI, medically needy, or other pathways"
+
+# =============================================================================
+# HOUSEHOLD SIZE AND MAGI CALCULATION
+# =============================================================================
+
+  - name: "Pregnant woman counts unborn child in household size"
+    description: "Household size includes expected children"
+    inputs:
+      household_size: 2  # Pregnant woman + unborn
+      persons:
+        - age: 22
+          is_applicant: true
+          is_pregnant: true
+      magi_income: 2000  # ~118% FPL for household of 2
+      state: "US"
+    expected:
+      medicaid_eligible: true
+      medicaid_category: "pregnant"
+      # Without counting unborn: 159% FPL (single person) - might be ineligible
+      # With unborn counted: 118% FPL (2-person) - eligible
+    citations:
+      - "42 CFR 435.603(b): household size includes expected children"
+
+  - name: "Child filing taxes counted in own household"
+    description: "Dependent children who file taxes use parent household"
+    inputs:
+      household_size: 4
+      persons:
+        - age: 17
+          is_applicant: true
+          files_taxes: true
+        - age: 45
+          is_parent: true
+        - age: 43
+          is_parent: true
+        - age: 10
+      magi_income: 2400  # ~93% FPL for family of 4
+      state: "US"
+    expected:
+      medicaid_eligible: true
+      medicaid_category: "child_6_18"
+    citations:
+      - "42 CFR 435.603(f): tax dependent rules"

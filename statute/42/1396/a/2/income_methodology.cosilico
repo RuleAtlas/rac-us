@@ -1,0 +1,214 @@
+# 42 USC 1396a(e)(14) - Modified Adjusted Gross Income (MAGI)
+#
+# "(14) INCOME DETERMINED USING MODIFIED ADJUSTED GROSS INCOME.--
+#  (A) In general.-- ...the State shall determine income eligibility
+#  for medical assistance... using modified adjusted gross income..."
+#
+# MAGI is used for:
+# - Children
+# - Pregnant women
+# - Parents and caretaker relatives
+# - ACA expansion adults
+#
+# MAGI is NOT used for:
+# - Aged (65+), blind, or disabled individuals
+# - Medicare beneficiaries
+# - Medically needy
+# - Long-term care recipients
+#
+# MAGI = AGI + tax-exempt interest + untaxed foreign income + non-taxable Social Security
+# Per 26 USC 36B(d)(2)(B)
+
+references {
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  tax_exempt_interest: statute/26/103/tax_exempt_interest
+  social_security_benefits: statute/26/86/social_security_benefits
+  taxable_social_security: statute/26/86/taxable_social_security
+}
+
+# =============================================================================
+# MAGI CALCULATION
+# 42 CFR 435.603(e) - Financial methodologies
+# =============================================================================
+
+# Modified Adjusted Gross Income
+# Per 26 USC 36B(d)(2)(B), referenced by 42 USC 1396a(e)(14)
+variable magi {
+  entity TaxUnit
+  period Year
+  dtype Money
+
+  formula {
+    # Start with AGI (26 USC 62)
+    let agi = adjusted_gross_income
+
+    # Add tax-exempt interest (26 USC 103)
+    let exempt_interest = tax_exempt_interest
+
+    # Add non-taxable Social Security benefits
+    let total_ss = social_security_benefits
+    let taxable_ss = taxable_social_security
+    let nontaxable_ss = max(0, total_ss - taxable_ss)
+
+    # Foreign earned income exclusion (26 USC 911)
+    # TODO: Add foreign_earned_income_exclusion when implemented
+
+    return agi + exempt_interest + nontaxable_ss
+  }
+}
+
+# Monthly MAGI (for Medicaid determination)
+variable magi_monthly {
+  entity TaxUnit
+  period Month
+  dtype Money
+
+  formula {
+    # Medicaid uses monthly income, but MAGI is annual
+    # Convert annual MAGI to monthly
+    return magi / 12
+  }
+}
+
+# =============================================================================
+# HOUSEHOLD INCOME AGGREGATION
+# 42 CFR 435.603(d) - Whose income to count
+# =============================================================================
+
+# Household MAGI income (for Medicaid purposes)
+# Different from tax unit - uses Medicaid household rules
+variable magi_income {
+  entity Household
+  period Month
+  dtype Money
+
+  formula {
+    # For MAGI-based eligibility, count MAGI of all tax filers
+    # and those required to file in the household
+    # Simplified: sum all tax unit MAGI in household
+
+    # In practice, MAGI household composition rules are complex:
+    # - Tax filers: counted separately with their tax household
+    # - Tax dependents: generally use parent's household
+    # - Non-filers: use their expected filing household
+
+    # Summing all individual MAGI in household as approximation
+    return sum(members.tax_unit.magi_monthly)
+  }
+}
+
+# =============================================================================
+# INCOME TYPES INCLUDED IN MAGI
+# 42 CFR 435.603(e)
+# =============================================================================
+
+# Current monthly income (point-in-time determination)
+# Medicaid uses current income, not prior year taxes
+variable current_monthly_income {
+  entity Person
+  period Month
+  dtype Money
+
+  formula {
+    # For ongoing eligibility, use current month income
+    # At application, may use prior months as verification
+
+    let wages = employment_income
+    let self_emp = self_employment_income
+    let interest = interest_income
+    let dividends = dividend_income
+    let rental = rental_income
+    let retirement = retirement_income
+    let social_security = social_security_benefits
+    let alimony = alimony_received  # Only if divorce before 2019
+
+    return wages + self_emp + interest + dividends + rental + retirement + social_security + alimony
+  }
+}
+
+# =============================================================================
+# INCOME EXCLUSIONS UNDER MAGI
+# 42 CFR 435.603(e) - Certain income NOT counted
+# =============================================================================
+
+# Income excluded from MAGI determination
+# These are already excluded by AGI calculation, but noted for clarity
+variable magi_excluded_income {
+  entity Person
+  period Month
+  dtype Money
+
+  formula {
+    # The following are NOT counted under MAGI:
+    # - Child support received (not taxable income)
+    # - TANF/welfare payments (not taxable income)
+    # - SSI benefits (not taxable income)
+    # - Workers' compensation (not taxable income)
+    # - Veterans benefits (not taxable income)
+    # - Gifts and inheritances (not taxable income)
+    # - Scholarships for tuition (not taxable income)
+
+    let child_support = child_support_received
+    let tanf = tanf_benefits
+    let ssi = ssi_benefits
+    let workers_comp = workers_compensation
+    let va_benefits = veterans_benefits
+
+    return child_support + tanf + ssi + workers_comp + va_benefits
+  }
+}
+
+# =============================================================================
+# SPECIAL INCOME RULES
+# =============================================================================
+
+# Lump sum income treatment
+# 42 CFR 435.603(h)
+variable lump_sum_income_monthly {
+  entity Person
+  period Month
+  dtype Money
+
+  formula {
+    # Lump sums (lottery, inheritance, etc.) counted only in month received
+    # NOT prorated over time under MAGI rules
+    # This differs from pre-MAGI Medicaid rules
+
+    return lump_sum_income
+  }
+}
+
+# Self-employment income
+# Uses net earnings (after business expenses)
+variable self_employment_income_net {
+  entity Person
+  period Month
+  dtype Money
+
+  formula {
+    # MAGI uses net self-employment income
+    # Same as tax treatment
+    let gross = self_employment_gross_income
+    let expenses = self_employment_expenses
+
+    return max(0, gross - expenses)
+  }
+}
+
+# Scholarship and fellowship income
+# 42 CFR 435.603(e)(3)
+variable scholarship_income_countable {
+  entity Person
+  period Month
+  dtype Money
+
+  formula {
+    # Scholarships for tuition/fees: NOT counted
+    # Scholarships for room/board/stipend: counted as income
+
+    let total_scholarship = scholarship_income
+    let tuition_portion = scholarship_tuition_amount
+
+    return max(0, total_scholarship - tuition_portion)
+  }
+}

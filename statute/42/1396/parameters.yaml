@@ -1,0 +1,241 @@
+# 42 USC 1396 - Medicaid Eligibility Parameters
+#
+# MAGI-based income eligibility thresholds (as % of FPL)
+# These are FEDERAL MINIMUM thresholds. States may (and often do)
+# set higher limits.
+#
+# Key ACA provisions:
+# - 42 USC 1396a(a)(10)(A)(i)(VIII): ACA expansion to 133% FPL for adults
+# - 42 CFR 435.603(d)(4): 5% FPL income disregard
+#
+# Federal Poverty Level values are in statute/7/2014/c/income_limits.yaml
+
+variable: medicaid
+entity: Person
+period: Month
+dtype: Boolean
+
+# =============================================================================
+# INCOME THRESHOLDS BY CATEGORY (% of FPL)
+# Federal minimums - states can set higher limits
+# =============================================================================
+
+income_limits:
+  description: "Federal minimum income limits for Medicaid eligibility as percentage of FPL per 42 USC 1396a"
+  unit: rate
+
+  # Infants (age 0-1)
+  # 42 USC 1396a(l)(2)(A)
+  infant:
+    description: "Income limit for infants (under age 1) per 42 USC 1396a(l)(2)(A)"
+    unit: rate
+    values:
+      1989-04-01: 1.85  # OBRA '89 established 185% FPL
+    citations:
+      - "42 USC 1396a(l)(2)(A): infants up to age 1"
+      - "P.L. 101-239 OBRA 1989"
+
+  # Children ages 1-5
+  # 42 USC 1396a(l)(2)(B)
+  child_1_5:
+    description: "Income limit for children ages 1-5 per 42 USC 1396a(l)(2)(B)"
+    unit: rate
+    values:
+      1991-07-01: 1.33  # OBRA '90 established 133% FPL
+    citations:
+      - "42 USC 1396a(l)(2)(B): children ages 1 through 5"
+      - "P.L. 101-508 OBRA 1990"
+
+  # Children ages 6-18
+  # 42 USC 1396a(l)(2)(C)
+  child_6_18:
+    description: "Income limit for children ages 6-18 per 42 USC 1396a(l)(2)(C)"
+    unit: rate
+    values:
+      2002-10-01: 1.00  # BBA '97 phased in through 2002
+    citations:
+      - "42 USC 1396a(l)(2)(C): children ages 6 through 18"
+      - "P.L. 105-33 BBA 1997"
+
+  # Pregnant women
+  # 42 USC 1396a(a)(10)(A)(i)(III)
+  pregnant:
+    description: "Income limit for pregnant women per 42 USC 1396a(a)(10)(A)(i)(III)"
+    unit: rate
+    values:
+      1990-04-01: 1.33  # OBRA '89 established 133% FPL
+    citations:
+      - "42 USC 1396a(a)(10)(A)(i)(III): pregnant women"
+      - "P.L. 101-239 OBRA 1989"
+
+  # ACA expansion adults (19-64, not otherwise eligible)
+  # 42 USC 1396a(a)(10)(A)(i)(VIII)
+  expansion_adult:
+    description: "Income limit for ACA expansion adults per 42 USC 1396a(a)(10)(A)(i)(VIII)"
+    unit: rate
+    values:
+      2014-01-01: 1.33  # ACA expansion
+      2013-12-31: 0.00  # Not available before ACA
+    citations:
+      - "42 USC 1396a(a)(10)(A)(i)(VIII): ACA expansion group"
+      - "P.L. 111-148 Patient Protection and Affordable Care Act"
+
+  # Parents/Caretaker Relatives (Section 1931)
+  # 42 USC 1396u-1
+  # Before ACA: varied by state (typically 17-100% FPL)
+  # With ACA expansion: 133% FPL in expansion states
+  parent_caretaker:
+    description: "Income limit for parents/caretaker relatives per 42 USC 1396u-1"
+    unit: rate
+    values:
+      # Pre-ACA: This was state-specific and often very low
+      # Setting 0 as federal baseline (no federal minimum for parents pre-ACA)
+      # States used Section 1931 tied to old AFDC levels
+      1996-08-22: 0.00  # PRWORA created Section 1931
+      2014-01-01: 1.33  # ACA expansion states only
+    citations:
+      - "42 USC 1396u-1: Section 1931 parent/caretaker eligibility"
+      - "Note: Pre-ACA parent eligibility varied widely by state"
+
+# =============================================================================
+# MAGI INCOME DISREGARD
+# 42 CFR 435.603(d)(4)
+# =============================================================================
+
+magi_disregard:
+  description: "Income disregard for MAGI-based eligibility per 42 CFR 435.603(d)(4)"
+  unit: rate
+  values:
+    2014-01-01: 0.05  # 5% of FPL disregard
+  citations:
+    - "42 CFR 435.603(d)(4): 5 percentage point disregard"
+    - "CMS Medicaid Eligibility Handbook"
+
+# =============================================================================
+# AGE THRESHOLDS
+# =============================================================================
+
+age_thresholds:
+  description: "Age boundaries for Medicaid categorical groups"
+  unit: year
+
+  infant_max:
+    description: "Maximum age for infant category (under this age)"
+    values:
+      1989-04-01: 1
+    citations:
+      - "42 USC 1396a(l)(2)(A): under 1 year of age"
+
+  child_1_5_max:
+    description: "Maximum age for ages 1-5 category (under this age)"
+    values:
+      1991-07-01: 6
+    citations:
+      - "42 USC 1396a(l)(2)(B): at least 1 but under 6"
+
+  child_max:
+    description: "Maximum age for child Medicaid (under this age)"
+    values:
+      2002-10-01: 19
+    citations:
+      - "42 USC 1396a(l)(2)(C): under 19 years of age"
+
+  elderly_min:
+    description: "Minimum age for elderly category (at or above)"
+    values:
+      1965-07-30: 65
+    citations:
+      - "42 USC 1396a(a)(10)(A)(i)(I): aged individuals"
+
+# =============================================================================
+# CHIP PARAMETERS (42 USC 1397aa et seq.)
+# State Children's Health Insurance Program
+# =============================================================================
+
+chip:
+  description: "CHIP income limits and parameters per 42 USC 1397aa"
+
+  # Federal matching rate ceiling
+  # States cannot receive enhanced CHIP match above 300% FPL
+  fmap_ceiling:
+    description: "Maximum income for enhanced CHIP federal matching per 42 USC 1397ee(c)(7)"
+    unit: rate
+    values:
+      1997-08-05: 3.00  # 300% FPL
+    citations:
+      - "42 USC 1397ee(c)(7): no enhanced match above 300% FPL"
+      - "P.L. 105-33 BBA 1997"
+
+  # Default CHIP income limit (state-overridable)
+  # Most states set between 200-300% FPL
+  default_income_limit:
+    description: "Default CHIP upper income limit (states may set lower)"
+    unit: rate
+    values:
+      2024-01-01: 2.55  # Approximate median across states
+      2009-02-04: 2.00  # CHIPRA reauthorization baseline
+    citations:
+      - "42 USC 1397bb(b)(1)(B): state-set income limits"
+      - "MACPAC: State CHIP Income Eligibility Levels"
+
+# =============================================================================
+# SSI-BASED ELIGIBILITY
+# 42 USC 1396a(a)(10)(A)(i)(II)
+# =============================================================================
+
+ssi_eligibility:
+  description: "SSI-based Medicaid eligibility parameters"
+
+  # In 1634 states (32 states + DC), SSI recipients are automatically Medicaid eligible
+  # In 209(b) states (11 states), states use more restrictive criteria
+  section_1634:
+    description: "Whether state has Section 1634 agreement for automatic SSI Medicaid coverage"
+    values:
+      # This is state-specific. Federal default assumes 1634 agreement.
+      1974-01-01: true
+    citations:
+      - "Section 1634 of Social Security Act"
+      - "42 USC 1383c: optional state agreements"
+
+# =============================================================================
+# RESOURCE LIMITS (NON-MAGI GROUPS)
+# For aged, blind, disabled - MAGI groups have no resource test
+# =============================================================================
+
+resource_limits:
+  description: "Resource limits for non-MAGI eligibility groups per 42 USC 1396a"
+  unit: currency-USD
+
+  individual:
+    description: "Resource limit for SSI-related Medicaid eligibility"
+    values:
+      # Aligned with SSI resource limits in most states
+      2024-01-01: 2000
+    citations:
+      - "42 USC 1382(a)(3)(B): SSI resource limit"
+
+  couple:
+    description: "Resource limit for couples for SSI-related Medicaid eligibility"
+    values:
+      2024-01-01: 3000
+    citations:
+      - "42 USC 1382(a)(3)(B): SSI couple resource limit"
+
+# =============================================================================
+# MEDICALLY NEEDY PROGRAM (OPTIONAL)
+# 42 USC 1396a(a)(10)(C)
+# =============================================================================
+
+medically_needy:
+  description: "Medically needy spend-down program parameters (optional state program)"
+
+  # Income standard cannot exceed 133 1/3% of the maximum AFDC payment
+  # for a family of the same size
+  income_standard_limit:
+    description: "Maximum medically needy income standard per 42 USC 1396a(a)(17)"
+    unit: rate
+    values:
+      1981-08-13: 1.3333  # 133 1/3% of AFDC standard (state-specific)
+    citations:
+      - "42 USC 1396a(a)(17): medically needy income standard"
+      - "OBRA 1981"

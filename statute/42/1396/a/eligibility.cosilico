@@ -1,0 +1,292 @@
+# 42 USC 1396a - Medicaid State Plans: Eligibility
+#
+# "(a) A State plan for medical assistance must--
+#  (10)(A) provide for making medical assistance available...
+#  (i) to all individuals receiving...supplemental security income...
+#  (ii) to all qualified pregnant women and children..."
+#
+# This file implements MAGI-based Medicaid eligibility for:
+# - Children (infants, 1-5, 6-18)
+# - Pregnant women
+# - Parents/caretaker relatives
+# - ACA expansion adults (19-64)
+#
+# Non-MAGI groups (SSI recipients, aged/blind/disabled) handled separately.
+
+references {
+  fpl_by_household_size: statute/7/2014/c/fpl_by_household_size
+  income_limit_infant: statute/42/1396/income_limits/infant
+  income_limit_child_1_5: statute/42/1396/income_limits/child_1_5
+  income_limit_child_6_18: statute/42/1396/income_limits/child_6_18
+  income_limit_pregnant: statute/42/1396/income_limits/pregnant
+  income_limit_expansion_adult: statute/42/1396/income_limits/expansion_adult
+  income_limit_parent: statute/42/1396/income_limits/parent_caretaker
+  magi_disregard: statute/42/1396/magi_disregard
+  age_infant_max: statute/42/1396/age_thresholds/infant_max
+  age_child_1_5_max: statute/42/1396/age_thresholds/child_1_5_max
+  age_child_max: statute/42/1396/age_thresholds/child_max
+  chip_income_limit: statute/42/1396/chip/default_income_limit
+}
+
+# =============================================================================
+# HOUSEHOLD SIZE AND INCOME CALCULATION (42 CFR 435.603)
+# =============================================================================
+
+# Calculate monthly FPL for household
+variable medicaid_fpl_monthly {
+  entity Household
+  period Month
+  dtype Money
+
+  formula {
+    # FPL = base for 1 person + additional per person beyond 1
+    let base = fpl_by_household_size[1]
+    let additional = fpl_by_household_size["additional_per_person"]
+
+    # Pregnant women count expected children in household size
+    let extra_for_pregnancy = sum(members.is_pregnant)
+    let effective_size = household_size + extra_for_pregnancy
+    let extra_members = max(0, effective_size - 1)
+
+    return base + (additional * extra_members)
+  }
+}
+
+# Income as percentage of FPL
+variable magi_income_pct_fpl {
+  entity Household
+  period Month
+  dtype Rate
+
+  formula {
+    if medicaid_fpl_monthly <= 0 then
+      return 0
+
+    return magi_income / medicaid_fpl_monthly
+  }
+}
+
+# Effective income after 5% FPL disregard
+# 42 CFR 435.603(d)(4)
+variable magi_income_pct_fpl_after_disregard {
+  entity Household
+  period Month
+  dtype Rate
+
+  formula {
+    # The 5% disregard is subtracted from income as % of FPL
+    return max(0, magi_income_pct_fpl - magi_disregard)
+  }
+}
+
+# =============================================================================
+# CATEGORICAL DETERMINATION
+# Determine which eligibility category applies to each person
+# =============================================================================
+
+variable medicaid_category {
+  entity Person
+  period Month
+  dtype Category  # infant, child_1_5, child_6_18, pregnant, parent_caretaker, expansion_adult, ssi_recipient, none
+
+  formula {
+    # SSI recipients get categorical eligibility (42 USC 1396a(a)(10)(A)(i)(II))
+    if receives_ssi then
+      return "ssi_recipient"
+
+    # Pregnant women (42 USC 1396a(a)(10)(A)(i)(III))
+    if is_pregnant then
+      return "pregnant"
+
+    # Infants under age 1 (42 USC 1396a(l)(2)(A))
+    if age < age_infant_max then
+      return "infant"
+
+    # Children ages 1-5 (42 USC 1396a(l)(2)(B))
+    if age >= age_infant_max and age < age_child_1_5_max then
+      return "child_1_5"
+
+    # Children ages 6-18 (42 USC 1396a(l)(2)(C))
+    if age >= age_child_1_5_max and age < age_child_max then
+      return "child_6_18"
+
+    # Check if parent/caretaker relative (42 USC 1396u-1)
+    if is_parent and has_dependent_child then
+      return "parent_caretaker"
+
+    # ACA expansion adult (42 USC 1396a(a)(10)(A)(i)(VIII))
+    # Adults 19-64 not otherwise categorized
+    if age >= age_child_max and age < 65 then
+      return "expansion_adult"
+
+    return "none"
+  }
+}
+
+# Get income limit for person's category
+variable medicaid_income_limit_pct {
+  entity Person
+  period Month
+  dtype Rate
+
+  formula {
+    let category = medicaid_category
+
+    switch category {
+      "infant" => return income_limit_infant
+      "child_1_5" => return income_limit_child_1_5
+      "child_6_18" => return income_limit_child_6_18
+      "pregnant" => return income_limit_pregnant
+      "parent_caretaker" => return income_limit_parent
+      "expansion_adult" => return income_limit_expansion_adult
+      "ssi_recipient" => return 999.99  # No income limit for SSI categorical
+      default => return 0
+    }
+  }
+}
+
+# =============================================================================
+# ELIGIBILITY DETERMINATION
+# =============================================================================
+
+# Income eligibility (MAGI-based)
+variable medicaid_income_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # SSI recipients are categorically eligible regardless of MAGI
+    if receives_ssi then
+      return true
+
+    # Get household income as % FPL after 5% disregard
+    let income_pct = household.magi_income_pct_fpl_after_disregard
+
+    # Compare to income limit for this category
+    let limit = medicaid_income_limit_pct
+
+    # If no category (limit = 0), not eligible through MAGI pathway
+    if limit <= 0 then
+      return false
+
+    return income_pct <= limit
+  }
+}
+
+# ACA expansion status check
+# In non-expansion states, expansion_adult category has 0% limit
+variable medicaid_aca_expansion_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    let category = medicaid_category
+
+    # Only relevant for expansion adults
+    if category != "expansion_adult" then
+      return true  # Not restricted by expansion
+
+    # Check if expansion is available
+    # income_limit_expansion_adult is 0 before 2014 and in non-expansion states
+    return income_limit_expansion_adult > 0
+  }
+}
+
+# Main Medicaid eligibility
+variable medicaid_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # Must have a valid category
+    let category = medicaid_category
+    if category == "none" then
+      return false
+
+    # SSI recipients are categorically eligible
+    if category == "ssi_recipient" then
+      return true
+
+    # Must pass income test for MAGI-based categories
+    if not medicaid_income_eligible then
+      return false
+
+    # Check ACA expansion availability
+    if not medicaid_aca_expansion_eligible then
+      return false
+
+    return true
+  }
+}
+
+# =============================================================================
+# CHIP ELIGIBILITY (42 USC 1397aa et seq.)
+# Children above Medicaid limits but below CHIP ceiling
+# =============================================================================
+
+# CHIP income eligibility
+variable chip_income_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # CHIP is only for children (under 19)
+    if age >= age_child_max then
+      return false
+
+    # Must be above Medicaid limit
+    if medicaid_eligible then
+      return false
+
+    # Get household income as % FPL after disregard
+    let income_pct = household.magi_income_pct_fpl_after_disregard
+
+    # Compare to CHIP income limit
+    return income_pct <= chip_income_limit
+  }
+}
+
+# Main CHIP eligibility
+variable chip_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # Must be a child
+    if age >= age_child_max then
+      return false
+
+    # Must not be eligible for Medicaid
+    if medicaid_eligible then
+      return false
+
+    # Must pass CHIP income test
+    if not chip_income_eligible then
+      return false
+
+    # Additional requirements: uninsured (not modeled here)
+    # CHIP has enrollment periods and other administrative requirements
+
+    return true
+  }
+}
+
+# =============================================================================
+# COMBINED COVERAGE CHECK
+# =============================================================================
+
+# Eligible for any public coverage (Medicaid or CHIP)
+variable medicaid_or_chip_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    return medicaid_eligible or chip_eligible
+  }
+}
