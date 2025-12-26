@@ -29,6 +29,17 @@
 # 4. Emergency services cannot be denied for inability to pay
 
 # =============================================================================
+# PARAMETERS
+# =============================================================================
+
+parameters:
+  cost_sharing_exempt_threshold: statute/42/1397aa-1397mm/parameters.yaml#cost_sharing.cost_sharing_exempt_threshold
+  premium_exempt_threshold: statute/42/1397aa-1397mm/parameters.yaml#cost_sharing.premium_exempt_threshold
+  max_out_of_pocket_rate: statute/42/1397aa-1397mm/parameters.yaml#cost_sharing.max_out_of_pocket_rate
+  nominal_cost_sharing_cap: statute/42/1397aa-1397mm/parameters.yaml#cost_sharing.nominal_cost_sharing_cap
+  limited_tier_threshold: statute/42/1397aa-1397mm/parameters.yaml#cost_sharing.limited_tier_threshold
+
+# =============================================================================
 # COST-SHARING EXEMPTION STATUS
 # 42 USC 1397cc(e)(3)(A): Children below 150% FPL have restricted cost-sharing
 # =============================================================================
@@ -98,7 +109,7 @@ formula:
   if is_chip_cost_sharing_exempt:
     # Medicaid nominal amounts are very low ($0-$4 per service typically)
     # Return approximate annual cap for nominal cost-sharing
-    return 100  # Approximate cap under Medicaid nominal rules
+    return nominal_cost_sharing_cap  # Approximate cap under Medicaid nominal rules
 
   # For others: 5% of family income
   # Use household income as proxy for family income
@@ -163,7 +174,7 @@ formula:
     return CostSharingTier.EXEMPT
 
   # 150-200% FPL: Limited tier (some states apply reduced cost-sharing)
-  if income_pct_fpl <= 2.0:
+  if income_pct_fpl <= limited_tier_threshold:
     return CostSharingTier.LIMITED
 
   # Above 200% FPL: Standard tier (up to 5% of income)

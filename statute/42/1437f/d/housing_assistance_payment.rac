@@ -21,6 +21,12 @@ module statute.42.1437f.d
 version "2025.1"
 jurisdiction us
 
+parameters:
+  head_spouse_bedrooms: statute/42/1437f/parameters.yaml#subsidy_standards.bedroom_allocation.head_of_household
+  persons_per_bedroom: statute/42/1437f/parameters.yaml#subsidy_standards.bedroom_allocation.per_two_persons
+  rent_reasonableness_threshold: statute/42/1437f/parameters.yaml#rent_reasonableness.threshold
+  base_voucher_bedroom_count: statute/42/1437f/parameters.yaml#subsidy_standards.bedroom_allocation.base_voucher_bedroom_count
+
 references:
   # Payment standards from parameters
   payment_standards: statute/42/1437f/payment_standards
@@ -58,14 +64,14 @@ variable hcv_voucher_size:
     # - Children of opposite sex may share until certain age
 
     # Simplified formula for modeling:
-    # Bedrooms = 1 (head/spouse) + ceiling((members - 2) / 2)
+    # Bedrooms = head_spouse_bedrooms + ceiling((members - base_voucher_bedroom_count) / persons_per_bedroom)
 
-    if household_size <= 2:
-      return 1
+    if household_size <= base_voucher_bedroom_count:
+      return head_spouse_bedrooms
 
-    let additional_members = household_size - 2
-    let additional_bedrooms = ceil(additional_members / 2)
-    return 1 + additional_bedrooms
+    let additional_members = household_size - base_voucher_bedroom_count
+    let additional_bedrooms = ceil(additional_members / persons_per_bedroom)
+    return head_spouse_bedrooms + additional_bedrooms
 
   default 1
 
@@ -186,9 +192,9 @@ variable hcv_rent_reasonable:
   formula:
     # Rent reasonableness is determined by PHA comparison
     # to comparable market units. For modeling, we assume
-    # rent is reasonable if within 120% of payment standard.
-    let reasonableness_threshold = hcv_payment_standard * 1.20
-    return hcv_gross_rent <= reasonableness_threshold
+    # rent is reasonable if within the reasonableness threshold of payment standard.
+    let reasonableness_limit = hcv_payment_standard * rent_reasonableness_threshold
+    return hcv_gross_rent <= reasonableness_limit
 
   default true
 

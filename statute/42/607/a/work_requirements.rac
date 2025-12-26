@@ -14,6 +14,13 @@
 # require tracking employment history, participation hours, and sanctions.
 # This encoding captures the RULES, not enforcement.
 
+parameters:
+  work_activities_hours_reduced: statute/42/607/parameters.yaml#work_activities_hours_reduced
+  work_activities_hours_single_parent: statute/42/607/parameters.yaml#work_activities_hours_single_parent
+  work_activities_hours_two_parent: statute/42/607/parameters.yaml#work_activities_hours_two_parent
+  child_under_age_threshold: statute/42/607/parameters.yaml#child_under_age_threshold
+  teen_parent_max_age: statute/42/607/parameters.yaml#teen_parent_max_age
+
 imports:
   work_rate: statute/42/607/parameters/minimum_participation_rate
   hours_per_week: statute/42/607/parameters/hours_per_week
@@ -52,8 +59,9 @@ period Week
 dtype Integer
 
 formula:
-  # 607(c)(1)(A): Single parent or head of household with child under 6
-  if tanf_head_of_household and has_child_under_6: return work_activities_hours_reduced  # 20 hours/week
+  # 607(c)(1)(A): Single parent or head of household with child under threshold age
+  let has_young_child = any(children, child.age < child_under_age_threshold)
+  if tanf_head_of_household and has_young_child: return work_activities_hours_reduced  # 20 hours/week
 
   # 607(c)(1)(B): General requirement - single parent families
   if tanf_head_of_household: return work_activities_hours_single_parent  # 30 hours/week
@@ -70,7 +78,7 @@ period Month
 dtype Boolean
 
 formula:
-  return age < 20 and has_child and not has_high_school_diploma
+  return age < teen_parent_max_age and has_child and not has_high_school_diploma
 
 # 607(c)(2)(C): Child care exemption for two-parent families
 # Exemption from increased hours if child care unavailable
@@ -79,4 +87,5 @@ period Month
 dtype Boolean
 
 formula:
-  return has_child_under_6 and child_care_unavailable
+  let has_young_child = any(children, child.age < child_under_age_threshold)
+  return has_young_child and child_care_unavailable

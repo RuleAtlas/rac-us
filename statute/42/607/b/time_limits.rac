@@ -16,6 +16,11 @@
 # This encodes the RULE structure for reference. Actual enforcement requires
 # tracking benefit receipt history over 60+ months.
 
+parameters:
+  federal_time_limit_months: statute/42/607/parameters.yaml#federal_time_limit
+  hardship_exemption_pct: statute/42/607/parameters.yaml#hardship_exemption_rate
+  minor_child_age_threshold: statute/42/608/parameters.yaml#child_age_limit.general
+
 imports:
   federal_time_limit_months: statute/42/607/parameters/federal_time_limit
   hardship_exemption_pct: statute/42/607/parameters/hardship_exemption_rate
@@ -52,7 +57,7 @@ period Month
 dtype Boolean
 
 formula:
-  return age < 18
+  return age < minor_child_age_threshold
 
 # 608(a)(7)(E): Domestic violence waiver (Family Violence Option)
 # States may temporarily waive time limits for DV victims

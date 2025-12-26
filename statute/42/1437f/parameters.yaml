@@ -242,13 +242,49 @@ subsidy_standards:
 
   # Minimum standards (PHAs may be more generous)
   bedroom_allocation:
-    head_of_household: 1  # Head and spouse/partner share 1 bedroom
-    per_two_persons: 1    # Generally 2 persons per bedroom
-    # Children of opposite sex generally need separate rooms after age specified by PHA
+    head_of_household:
+      description: "Number of bedrooms allocated for head of household and spouse/partner"
+      unit: bedrooms
+      values:
+        1937-01-01: 1
+      citations:
+        - "24 CFR 982.402 - Subsidy standards"
+
+    per_two_persons:
+      description: "Number of additional persons per additional bedroom"
+      unit: persons
+      values:
+        1937-01-01: 2
+      citations:
+        - "24 CFR 982.402 - Generally 2 persons per bedroom"
+
+    base_voucher_bedroom_count:
+      description: "Maximum household size covered by base bedroom allocation (head+spouse)"
+      unit: persons
+      values:
+        1937-01-01: 2
+      citations:
+        - "24 CFR 982.402 - Head and spouse/partner share 1 bedroom"
 
   # Age thresholds (PHA-determined, using common standard)
   child_sharing:
     opposite_sex_sharing_max_age: 5  # Children of opposite sex may share until this age
+
+# ============================================================
+# RENT REASONABLENESS - 24 CFR 982.507
+# ============================================================
+
+rent_reasonableness:
+  description: "Rent reasonableness comparison parameters per 24 CFR 982.507"
+
+  threshold:
+    description: "Maximum ratio of gross rent to payment standard for reasonableness (1.20 = 120%)"
+    unit: rate
+    values:
+      1937-01-01: 1.20
+    citations:
+      - "24 CFR 982.507 - Rent must be reasonable compared to comparable units"
+      - "HUD Guidebook 7420.10G - Rent reasonableness determination"
 
 # ============================================================
 # UTILITY ALLOWANCES - 24 CFR 982.517

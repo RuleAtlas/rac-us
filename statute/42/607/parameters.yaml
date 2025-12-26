@@ -34,6 +34,25 @@ minimum_participation_rate_two_parent:
   citations:
     - "42 USC 607(a)(2) - Two-parent participation rate"
 
+# 607(c)(1)(A): Child under age threshold for reduced hours
+child_under_age_threshold:
+  description: "Age threshold for 'child under 6' determination per 42 USC 607(c)(1)(A)(i)"
+  unit: year
+  values:
+    1997-10-01: 6
+  citations:
+    - "42 USC 607(c)(1)(A)(i) - 'individual who is the single custodial parent caring for a child who has not attained 6 years of age'"
+
+# Teen parent school attendance age threshold
+teen_parent_max_age:
+  description: "Maximum age for teen parent education requirement per 42 USC 607(c)(1)(A)(ii)"
+  unit: year
+  values:
+    1997-10-01: 20
+  citations:
+    - "42 USC 607(c)(1)(A)(ii) - Minor custodial parents under 20"
+    - "45 CFR 261.32(b) - Teen parent education requirement"
+
 # 607(c)(1)(A): Hours per week - reduced (parent with child under 6)
 work_activities_hours_reduced:
   description: "Weekly work hours required for single parent with child under 6 per 42 USC 607(c)(1)(A)(i)"

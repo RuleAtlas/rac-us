@@ -473,6 +473,26 @@ cost_sharing:
       - "42 USC 1397cc(e)(3)(B): no premiums below 150% FPL"
       - "P.L. 111-3 CHIPRA Section 504"
 
+  # Limited tier threshold (150-200% FPL)
+  limited_tier_threshold:
+    description: "Upper income threshold for limited cost-sharing tier (fraction of FPL)"
+    unit: rate
+    values:
+      1997-08-05: 2.00  # 200% FPL
+    citations:
+      - "42 USC 1397cc(e): Cost-sharing tiered by income"
+      - "State CHIP cost-sharing structures typically use 200% FPL tier"
+
+  # Nominal cost-sharing annual cap (for those below 150% FPL)
+  nominal_cost_sharing_cap:
+    description: "Approximate annual cap on nominal cost-sharing for exempt individuals (USD)"
+    unit: currency-USD
+    values:
+      1997-08-05: 100  # Approximate based on Medicaid nominal rules
+    citations:
+      - "42 USC 1397cc(e)(3)(B): Medicaid-level cost-sharing for those below 150% FPL"
+      - "42 CFR 447.52-56: Medicaid nominal cost-sharing rules"
+
 # =============================================================================
 # WAITING PERIOD - 42 USC 1397bb(b)(1)(B)(ii)
 # States may impose waiting period for children with prior coverage
