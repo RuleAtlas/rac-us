@@ -23,13 +23,15 @@ ALLOWED_ATTRIBUTES = {
     "parameters",
     "exports",
     "examples",
-    # Multi-variable file constructs
+    # Multi-variable file constructs (followed by identifier)
     "variable",
     "input",
     "enum",
     "values",
-    # Helper functions
+    # Helper functions (followed by identifier)
     "function",
+    # Raw statute text
+    "text",
 }
 
 # Keywords that can appear in formula/function bodies (not attributes)
@@ -45,8 +47,19 @@ def validate_file(filepath: Path) -> list[str]:
     lines = content.split('\n')
 
     in_code_section = False  # Inside formula/function/defined_for
+    in_multiline_string = False  # Inside """ block
 
     for lineno, line in enumerate(lines, 1):
+        # Handle multiline strings (text: """ blocks)
+        if '"""' in line:
+            count = line.count('"""')
+            if count == 1:
+                in_multiline_string = not in_multiline_string
+            # If count == 2, it opens and closes on same line
+            continue
+        if in_multiline_string:
+            continue
+
         # Skip empty lines
         if not line.strip():
             continue
@@ -61,6 +74,16 @@ def validate_file(filepath: Path) -> list[str]:
 
         # Only check lines with no indentation (top-level declarations)
         if indent > 0:
+            continue
+
+        # Check for named variable/input/function pattern: "variable name:" or "function name(...):"
+        named_match = re.match(r'^(variable|input|function|enum)\s+([a-z_][a-z0-9_]*)', stripped)
+        if named_match:
+            attr = named_match.group(1)
+            if attr == "function":
+                in_code_section = True
+            if attr not in ALLOWED_ATTRIBUTES:
+                errors.append(f"{filepath}:{lineno}: forbidden attribute '{attr}'")
             continue
 
         # Check for attribute pattern: word followed by space, colon, or end of line

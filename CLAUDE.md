@@ -13,62 +13,111 @@ cosilico-us/
 ├── statute/               # All enacted statutes
 │   ├── 26/               # Title 26 (IRC)
 │   │   ├── 24/          # § 24 - Child Tax Credit
-│   │   │   ├── a/credit.rac
-│   │   │   ├── b/2/phaseout.rac
-│   │   │   └── d/1/B/refundable_credit.rac
 │   │   ├── 32/          # § 32 - EITC
-│   │   │   ├── a/1/earned_income_credit.rac
-│   │   │   └── c/2/A/earned_income.rac
+│   │   ├── 36B/         # § 36B - Premium Tax Credit
 │   │   ├── 62/          # § 62 - AGI
-│   │   │   └── a/adjusted_gross_income.rac
 │   │   └── 63/          # § 63 - Standard Deduction
-│   │       └── c/standard_deduction.rac
 │   │
 │   └── 7/               # Title 7 (Agriculture)
-│       └── 2017/a/      # § 2017(a) - SNAP Allotment
-│           └── allotment.rac
+│       └── 2017/        # § 2017 - SNAP
 │
 ├── irs/                   # IRS guidance (Rev. Procs, etc.)
-│   └── rev-proc-2023-34/
-│       └── parameters.yaml
-│
 └── usda/fns/              # USDA Food & Nutrition Service guidance
-    └── snap-fy2024-cola/
-        └── parameters.yaml
 ```
 
-## .rac Variable Schema
+## Filepath = Citation
 
-Variables in .rac files use ONLY these attributes:
+The filepath IS the legal citation. No redundant reference fields.
 
 ```
-# REQUIRED
+statute/26/32/c/2/A.rac  →  26 USC § 32(c)(2)(A)
+statute/7/2017/a.rac     →  7 USC § 2017(a)
+```
+
+## .rac File Format
+
+Self-contained files with statute text, parameters, variables, and tests:
+
+```yaml
+# 26 USC Section 62(a)(7) - IRA Deduction
+
+text: """
+(7) Retirement savings.—The deduction allowed by section 219...
+"""
+
+imports:
+  filing_status: statute/26/1/filing_status
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+
+parameters:
+  contribution_limit:
+    2024-01-01: 7000
+  catch_up_amount:
+    2024-01-01: 1000
+
+input traditional_ira_contributions:
+  entity Person
+  period Year
+  dtype Money
+  default 0
+
+variable ira_deduction:
+  entity Person
+  period Year
+  dtype Money
+  formula:
+    return min(traditional_ira_contributions, contribution_limit)
+
+examples:
+  - name: "Full contribution"
+    inputs:
+      person:
+        traditional_ira_contributions: 7000
+    outputs:
+      ira_deduction: 7000
+```
+
+## Schema Whitelist
+
+Only these top-level attributes are allowed:
+
+```
+# REQUIRED for variables
 entity    # Person, TaxUnit, Household, State, Family
 period    # Year, Month, Week, Day, FederalFiscalYear
 dtype     # Money, Rate, Boolean, Integer, Enum[...]
 
-# OPTIONAL
+# OPTIONAL for variables
 unit         # "USD", "months", "weeks", etc.
 label        # Short human-readable name
 description  # Longer explanation
 formula      # Calculation block
-default      # Default value (not default_value)
+default      # Default value
 defined_for  # Filter condition block
 
-# BLOCKS (for cross-file dependencies)
+# BLOCKS
 imports      # Variable imports from other files
-parameters   # Parameter imports from .yaml files
+parameters   # Parameter values (inline or from .yaml)
+exports      # Exported variable names
+examples     # Test cases
+
+# NAMED CONSTRUCTS (followed by identifier)
+variable     # variable name:
+input        # input name:
+function     # function name(...):
+enum         # enum name:
+values       # values name:
+
+# RAW STATUTE TEXT
+text         # text: """ ... """
 ```
 
-Anything not listed above will fail `scripts/validate_schema.py`.
-
-Filepath `statute/26/32/a/1/earned_income_credit.rac` implies:
-- Module: `statute.26.32.a.1`
-- Reference: 26 USC § 32(a)(1)
+Anything not listed fails `scripts/validate_schema.py`.
 
 ## Formula Rules
 
-**No numeric literals in formulas** (except 0, 1, -1):
+**Allowed literals**: only -1, 0, 1, 2, 3
+
 ```python
 # BAD - hardcoded values
 if age >= 65: ...
@@ -79,13 +128,16 @@ if age >= elderly_age_threshold: ...
 threshold = income * medical_expense_threshold_rate
 ```
 
-All policy values come from `parameters.yaml` files with legal citations.
+**Allowed code keywords**: `if`, `else`, `return`, `for`, `break`, `and`, `or`, `not`, `in`
 
-## File Types
+All policy values come from `parameters:` blocks.
 
-- `.rac` - Executable formulas (compile to Python/JS/WASM)
-- `parameters.yaml` - Time-varying values (rates, thresholds, brackets)
-- `tests.yaml` - Validation test cases
+## Validation
+
+```bash
+python scripts/validate_schema.py      # Whitelist enforcement
+python scripts/validate_no_literals.py # No hardcoded values
+```
 
 ## Related Repos
 
