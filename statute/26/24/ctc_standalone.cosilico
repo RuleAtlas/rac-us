@@ -1,0 +1,203 @@
+# 26 USC Section 24 - Child Tax Credit (Standalone Validation Version)
+#
+# Self-contained encoding for validation against PolicyEngine and other calculators.
+# Takes pre-computed inputs directly and applies Section 24 formula inline.
+#
+# INPUTS (expected as pre-computed from external source):
+#   - num_qualifying_children: Integer, qualifying children under Section 24(c)
+#   - filing_status: Enum (SINGLE, JOINT, SEPARATE, HEAD_OF_HOUSEHOLD, SURVIVING_SPOUSE)
+#   - adjusted_gross_income: Money, AGI per Section 62
+#   - earned_income: Money, earned income per Section 32(c)(2)
+#   - tax_liability_before_credits: Money, tax liability per Section 26(a)
+#
+# 2024 PARAMETERS (from Rev. Proc. 2023-34):
+#   - Credit per child: $2,000 (Section 24(h)(2) TCJA)
+#   - ACTC cap per child: $1,700 (Section 24(h)(5) indexed)
+#   - Phaseout threshold single: $200,000 (Section 24(b)(1)(B))
+#   - Phaseout threshold joint: $400,000 (Section 24(b)(1)(A))
+#   - Phaseout rate: $50 per $1,000 (Section 24(b)(2))
+#   - Earned income threshold: $2,500 (Section 24(d)(1)(B)(i))
+#   - ACTC rate: 15% (Section 24(d)(1)(B)(i))
+
+# Filing status values per Section 1
+enum FilingStatus {
+SINGLE
+JOINT
+SEPARATE
+HEAD_OF_HOUSEHOLD
+SURVIVING_SPOUSE
+
+# --- 2024 Parameters (inline) ---
+# These are hardcoded for 2024 to enable standalone validation.
+# For production use, reference the YAML parameter files.
+
+# Section 24(h)(2): $2,000 credit per qualifying child (TCJA 2018-2025)
+CREDIT_PER_CHILD = 2000
+
+# Section 24(b)(1): Phaseout thresholds
+PHASEOUT_THRESHOLD_JOINT = 400000
+PHASEOUT_THRESHOLD_SINGLE = 200000
+
+# Section 24(b)(2): $50 reduction per $1,000 over threshold
+PHASEOUT_RATE = 50
+PHASEOUT_INCREMENT = 1000
+
+# Section 24(h)(5): Maximum refundable amount per child (2024)
+REFUNDABLE_MAX_PER_CHILD = 1700
+
+# Section 24(d)(1)(B)(i): ACTC earned income parameters
+EARNED_INCOME_THRESHOLD = 2500
+REFUNDABLE_RATE = 0.15
+
+
+# --- Step 1: Determine Phaseout Threshold ---
+# Section 24(b)(1): Joint returns and surviving spouses use $400k threshold
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "CTC Phaseout Threshold"
+description "Income threshold where phaseout begins per Section 24(b)(1)"
+
+formula:
+  return match filing_status {
+    case JOINT => PHASEOUT_THRESHOLD_JOINT
+    case SURVIVING_SPOUSE => PHASEOUT_THRESHOLD_JOINT
+    else => PHASEOUT_THRESHOLD_SINGLE
+
+
+# --- Step 2: Calculate Base Credit ---
+# Section 24(a)(1) as modified by Section 24(h)(2)
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "CTC Before Phaseout"
+description "Total credit for all qualifying children before phaseout per Section 24(a)"
+
+formula:
+  return num_qualifying_children * CREDIT_PER_CHILD
+
+
+# --- Step 3: Calculate Phaseout Reduction ---
+# Section 24(b)(2): $50 for each $1,000 (or fraction thereof) over threshold
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "CTC Phaseout Reduction"
+description "Credit reduction based on income exceeding threshold per Section 24(b)(2)"
+
+formula:
+  excess = adjusted_gross_income - ctc_phaseout_threshold
+
+  if excess <= 0 then
+    return 0
+
+  # $50 reduction for each $1,000 (or fraction thereof) over threshold
+  # ceiling() ensures any fraction counts as a full $1,000 increment
+  increments = ceiling(excess / PHASEOUT_INCREMENT)
+  return increments * PHASEOUT_RATE
+
+
+# --- Step 4: Calculate Tentative Credit ---
+# Section 24(a): Base credit minus phaseout reduction
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Tentative CTC"
+description "Credit after phaseout, before tax liability limit per Section 24(a)"
+
+formula:
+  return max(0, ctc_before_phaseout - ctc_phaseout_reduction)
+
+
+# --- Step 5: Calculate Nonrefundable CTC ---
+# Section 26(a): Credit limited to tax liability before refundable credits
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Child Tax Credit (Nonrefundable)"
+description "Nonrefundable CTC limited by tax liability per Section 24 and Section 26(a)"
+
+formula:
+  # The nonrefundable portion is the lesser of:
+  # (1) The tentative credit (after phaseout), or
+  # (2) The taxpayer's tax liability before credits
+  return min(tentative_ctc, tax_liability_before_credits)
+
+
+# --- Step 6: Additional Child Tax Credit (ACTC) ---
+# Section 24(d): Refundable portion of the credit
+
+# Section 24(d)(1)(B)(i): 15% of earned income over $2,500
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "ACTC Earned Income Amount"
+description "15% of earned income exceeding $2,500 per Section 24(d)(1)(B)(i)"
+
+formula:
+  excess_earned = max(0, earned_income - EARNED_INCOME_THRESHOLD)
+  return REFUNDABLE_RATE * excess_earned
+
+
+# Section 24(h)(5): Maximum refundable amount per child
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "ACTC Per-Child Cap"
+description "Maximum refundable amount based on number of children per Section 24(h)(5)"
+
+formula:
+  return num_qualifying_children * REFUNDABLE_MAX_PER_CHILD
+
+
+# Section 24(d)(1)(A): Unused credit that can become refundable
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Additional Child Tax Credit (Refundable)"
+description "Refundable ACTC per 26 USC Section 24(d)"
+
+formula:
+  # Unused credit = tentative credit minus what was applied to tax liability
+  unused_credit = tentative_ctc - child_tax_credit
+
+  if unused_credit <= 0 then
+    return 0
+
+  # ACTC is the lesser of:
+  # (A) The unused credit per Section 24(d)(1)(A)
+  # (B) The earned income amount per Section 24(d)(1)(B)(i)
+  # Also capped by the per-child maximum per Section 24(h)(5)
+
+  earned_income_limit = actc_earned_income_amount
+  per_child_limit = actc_per_child_cap
+
+  # The refundable amount is the minimum of all three limits
+  return min(unused_credit, min(earned_income_limit, per_child_limit))
+
+
+# --- Final Output: Total Child Tax Credit ---
+# Sum of nonrefundable CTC and refundable ACTC
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Child Tax Credit"
+description "Sum of nonrefundable CTC and refundable ACTC per 26 USC Section 24"
+
+formula:
+  return child_tax_credit + additional_child_tax_credit

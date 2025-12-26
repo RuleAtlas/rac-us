@@ -1,0 +1,272 @@
+# 20 USC 1070a - Expected Family Contribution (EFC) Calculation
+#
+# The EFC determines the family's expected contribution toward education costs.
+# Calculation varies by formula type (A, B, or C) based on dependency status.
+#
+# Key components:
+# 1. Parent/Head Contribution (from income and assets)
+# 2. Student/Dependent Contribution (for dependent students)
+# 3. Number of family members in college (for Formula A/C)
+#
+# References:
+# - THE EFC FORMULA Guide (annual publication from ED)
+# - https://fsapartners.ed.gov/knowledge-center/fsa-handbook
+
+imports:
+  # Formula determination
+  pell_grant_formula: statute/20/1070a/eligibility#pell_grant_formula
+
+  # Income and assets
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  total_assets: statute/20/1091/student_assets
+
+  # Parameters
+  efc_params: statute/20/1070a/parameters#efc
+  head_params: statute/20/1070a/parameters#head
+  dependent_params: statute/20/1070a/parameters#dependent
+
+  # Allowances (would be separate calculations in full implementation)
+  head_allowances: statute/20/1070a/head_allowances
+  dependent_allowances: statute/20/1070a/dependent_allowances
+
+  # Family in college
+  dependents_in_college: statute/20/1091/dependents_in_college
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Expected Family Contribution"
+description "Family's expected contribution toward education costs per EFC formula"
+
+formula:
+  formula_type = pell_grant_formula
+
+  # Get parameters for current formula type
+  income_rate = head_params.income_assessment_rate[formula_type]
+  asset_rate = head_params.asset_assessment_rate[formula_type]
+
+  # Calculate head contribution
+  head_contribution = compute_head_contribution(
+    formula_type,
+    adjusted_gross_income,
+    total_assets,
+    head_allowances,
+    income_rate,
+    asset_rate,
+    head_params.marginal_rate,
+    head_params.negative_rate,
+    head_params.min_contribution,
+    dependents_in_college
+  )
+
+  # Calculate dependent contribution (only for Formula A)
+  dependent_contribution = compute_dependent_contribution(
+    formula_type,
+    dependent_params
+  )
+
+  # Check for automatic zero EFC
+  qualifies_auto_zero = adjusted_gross_income <= efc_params.automatic_zero
+
+  # Final EFC calculation
+  raw_efc = select(
+    [formula_type == A,
+     formula_type == B,
+     formula_type == C],
+    [head_contribution + dependent_contribution,  # A: Parent + student
+     head_contribution,                           # B: Independent only
+     head_contribution],                          # C: Independent only
+    default=head_contribution
+  )
+
+  # Apply automatic zero if eligible
+  return where(
+    qualifies_auto_zero & (formula_type != B),  # Formula B never gets auto-zero
+    0,
+    max(0, raw_efc)
+  )
+
+# =============================================================================
+# HEAD CONTRIBUTION (Parent/Independent Student)
+# =============================================================================
+
+---
+# Parent or Independent Student Contribution
+#
+# Calculated from:
+# 1. Available income (total income minus allowances)
+# 2. Contribution from assets (if not using simplified formula)
+# 3. Adjusted by number of family members in college
+
+imports:
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  total_assets: statute/20/1091/head_assets
+  head_allowances: statute/20/1070a/head_allowances
+  pell_grant_formula: statute/20/1070a/eligibility#pell_grant_formula
+  simplified_formula_applies: statute/20/1070a/simplified_applies
+  dependents_in_college: statute/20/1091/dependents_in_college
+
+  # Parameters
+  head_params: statute/20/1070a/parameters#head
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Head Contribution to EFC"
+description "Parent or independent student contribution based on income and assets"
+
+formula:
+  formula_type = pell_grant_formula
+  income = adjusted_gross_income
+  assets = total_assets
+  allowances = head_allowances
+  in_college = max(1, dependents_in_college)  # Avoid division by zero
+
+  # Step 1: Calculate available income
+  income_rate = head_params.income_assessment_rate[formula_type]
+  available_income = (income - allowances) * income_rate
+
+  # Step 2: Calculate asset contribution (skip if simplified formula)
+  asset_rate = head_params.asset_assessment_rate[formula_type]
+  asset_contribution = where(
+    simplified_formula_applies,
+    0,
+    assets * asset_rate
+  )
+
+  # Step 3: Adjusted Available Income (AAI)
+  aai = available_income + asset_contribution
+
+  # Step 4: Calculate contribution using marginal rate schedule
+  positive_contribution = head_params.marginal_rate.calc(aai)
+
+  # Step 5: Handle negative AAI
+  negative_contribution = max(
+    aai * head_params.negative_rate,
+    head_params.min_contribution
+  )
+
+  # Step 6: Select based on AAI sign
+  total_contribution = where(
+    aai >= 0,
+    positive_contribution,
+    negative_contribution
+  )
+
+  # Step 7: For Formula A and C, divide by number in college
+  # For Formula B (independent without dependents), return total
+  amount_per_student = where(
+    formula_type == B,
+    aai,  # Formula B uses AAI directly
+    total_contribution / in_college
+  )
+
+  return amount_per_student
+
+# =============================================================================
+# DEPENDENT STUDENT CONTRIBUTION (Formula A only)
+# =============================================================================
+
+---
+# Dependent Student Contribution
+#
+# For dependent students (Formula A), the student's own income and assets
+# also contribute to the EFC.
+
+imports:
+  student_income: statute/20/1091/student_income
+  student_assets: statute/20/1091/student_assets
+  pell_grant_formula: statute/20/1070a/eligibility#pell_grant_formula
+  simplified_formula_applies: statute/20/1070a/simplified_applies
+  head_available_income: statute/20/1070a/efc#head_available_income
+  dependent_other_allowances: statute/20/1070a/dependent_other_allowances
+
+  # Parameters
+  dependent_params: statute/20/1070a/parameters#dependent
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Dependent Student Contribution"
+description "Dependent student's contribution from income and assets for Formula A"
+
+formula:
+  formula_type = pell_grant_formula
+
+  # Only applies to Formula A (dependent students)
+  applies = (formula_type == A)
+
+  # Income Protection Allowance
+  ipa = dependent_params.ipa
+
+  # Additional allowance from negative parent available income
+  parent_income_allowance = max(0, -head_available_income)
+
+  # Total allowances
+  total_allowances = ipa + parent_income_allowance + dependent_other_allowances
+
+  # Available income calculation
+  income = student_income
+  available_income = (income - total_allowances) * dependent_params.income_assessment_rate
+
+  # Asset contribution (skip if simplified formula)
+  assets = student_assets
+  asset_contribution = where(
+    simplified_formula_applies,
+    0,
+    assets * dependent_params.asset_assessment_rate
+  )
+
+  # Total contribution
+  contribution = available_income + asset_contribution
+
+  # Only return for Formula A
+  return where(applies, contribution, 0)
+
+# =============================================================================
+# SIMPLIFIED FORMULA ELIGIBILITY
+# =============================================================================
+
+---
+# Simplified EFC Formula Eligibility
+#
+# Families with income below threshold who receive certain means-tested
+# benefits may use simplified formula (assets excluded).
+
+imports:
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  receives_ssi: statute/42/1382/receives_ssi
+  receives_snap: statute/7/2013/receives_snap
+  receives_tanf: statute/42/601/receives_tanf
+  receives_free_lunch: statute/42/1758/receives_free_lunch
+  receives_medicaid: statute/42/1396/receives_medicaid
+
+  # Parameters
+  simplified_params: statute/20/1070a/parameters#efc.simplified
+
+entity Person
+period Year
+dtype Boolean
+label "Simplified EFC Formula Applies"
+description "Whether family qualifies for simplified EFC formula (assets excluded)"
+
+formula:
+  # Income eligibility
+  income_eligible = adjusted_gross_income < simplified_params.income_limit
+
+  # Benefit receipt (any qualifying benefit)
+  receives_benefits = (
+    receives_ssi |
+    receives_snap |
+    receives_tanf |
+    receives_free_lunch |
+    receives_medicaid
+  )
+
+  # Formula availability (phased out 2024+)
+  formula_available = simplified_params.applies
+
+  return income_eligible & receives_benefits & formula_available

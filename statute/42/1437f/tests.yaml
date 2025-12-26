@@ -1,7 +1,7 @@
 # 42 USC 1437f - Section 8 Housing Choice Voucher Tests
 #
 # Test cases for validating HCV implementation against known values.
-# Uses 2024 fiscal year parameters.
+# Includes tests for FY 2024 and FY 2025 parameters.
 #
 # Key program rules:
 # - Income eligibility: 50% of Area Median Income (AMI)
@@ -11,111 +11,190 @@
 # - Housing Assistance Payment (HAP): Payment standard - tenant contribution
 
 reference: "42 USC 1437f"
-fiscal_year: 2024
 
 # ============================================================
-# INCOME ELIGIBILITY TESTS - 42 USC 1437f(a) and 24 CFR 5.609
+# FY 2025 INCOME ELIGIBILITY TESTS - 42 USC 1437f(a) and 24 CFR 5.609
 # ============================================================
 
 tests:
-  # Test 1: Family clearly below 50% AMI - eligible
-  - name: "4-person family below 50% AMI - eligible"
-    description: "Family with $35,000 annual income, 50% AMI limit for 4-person is $51,050"
+  # Test 1: Family clearly below 50% AMI (FY 2025) - eligible
+  - name: "4-person family below 50% AMI (FY 2025) - eligible"
+    description: "Family with $35,000 annual income, 50% AMI limit for 4-person is $53,000"
+    fiscal_year: 2025
     inputs:
       household_size: 4
       annual_income: 35000
-      metro_area: "national_median"  # Using national median as default
+      metro_area: "national_median"
+      has_eligible_citizen_or_immigrant: true
     expected:
       hcv_income_eligible: true
-      hcv_extremely_low_income: true  # Below 30% AMI ($30,630)
+      hcv_extremely_low_income: true  # Below 30% AMI ($31,800)
     citations:
       - "42 USC 1437f(a): income eligibility at 50% AMI"
       - "24 CFR 5.603: Definitions of very low income family"
 
-  # Test 2: Family at exactly 50% AMI threshold
-  - name: "4-person family at 50% AMI threshold"
+  # Test 2: Family at exactly 50% AMI threshold (FY 2025)
+  - name: "4-person family at 50% AMI threshold (FY 2025)"
+    fiscal_year: 2025
     inputs:
       household_size: 4
-      annual_income: 51050
+      annual_income: 53000
       metro_area: "national_median"
+      has_eligible_citizen_or_immigrant: true
     expected:
       hcv_income_eligible: true
       hcv_extremely_low_income: false
     citations:
       - "42 USC 1437f(a): at-threshold eligibility"
 
-  # Test 3: Family above 50% AMI - ineligible
-  - name: "4-person family above 50% AMI - ineligible"
+  # Test 3: Family above 50% AMI (FY 2025) - ineligible
+  - name: "4-person family above 50% AMI (FY 2025) - ineligible"
+    fiscal_year: 2025
     inputs:
       household_size: 4
       annual_income: 60000
       metro_area: "national_median"
+      has_eligible_citizen_or_immigrant: true
     expected:
       hcv_income_eligible: false
     citations:
       - "42 USC 1437f(a): income ceiling"
 
-  # Test 4: Single person eligibility
-  - name: "Single person below 50% AMI"
+  # Test 4: Single person eligibility (FY 2025)
+  - name: "Single person below 50% AMI (FY 2025)"
+    fiscal_year: 2025
     inputs:
       household_size: 1
       annual_income: 25000
-      metro_area: "national_median"  # 50% AMI for 1-person: $35,750
+      metro_area: "national_median"  # 50% AMI for 1-person: $37,100
+      has_eligible_citizen_or_immigrant: true
     expected:
       hcv_income_eligible: true
-      hcv_extremely_low_income: true  # Below 30% AMI ($21,450)
+      hcv_extremely_low_income: true  # Below 30% AMI ($22,250)
     citations:
       - "24 CFR 5.603: Income limits vary by family size"
+
+  # Test 5: Large household (9 persons) income limit (FY 2025)
+  - name: "9-person household income limit calculation (FY 2025)"
+    description: "Tests the additional_per_person calculation for households > 8"
+    fiscal_year: 2025
+    inputs:
+      household_size: 9
+      annual_income: 72000  # Below 8-person limit ($70,000) + $4,250 = $74,250
+      metro_area: "national_median"
+      has_eligible_citizen_or_immigrant: true
+    expected:
+      hcv_very_low_income_limit: 74250  # $70,000 + $4,250
+      hcv_income_eligible: true
+    citations:
+      - "24 CFR 5.603: Additional per-person amount for households over 8"
+
+# ============================================================
+# FY 2024 INCOME ELIGIBILITY TESTS (backward compatibility)
+# ============================================================
+
+  # Test 6: FY 2024 4-person family eligibility
+  - name: "4-person family below 50% AMI (FY 2024) - eligible"
+    fiscal_year: 2024
+    inputs:
+      household_size: 4
+      annual_income: 35000
+      metro_area: "national_median"
+      has_eligible_citizen_or_immigrant: true
+    expected:
+      hcv_income_eligible: true
+      hcv_extremely_low_income: true  # Below 30% AMI ($30,630)
+    citations:
+      - "42 USC 1437f(a): income eligibility at 50% AMI"
+
+  # Test 7: FY 2024 at 50% AMI threshold
+  - name: "4-person family at 50% AMI threshold (FY 2024)"
+    fiscal_year: 2024
+    inputs:
+      household_size: 4
+      annual_income: 51050
+      metro_area: "national_median"
+      has_eligible_citizen_or_immigrant: true
+    expected:
+      hcv_income_eligible: true
+      hcv_extremely_low_income: false
+    citations:
+      - "42 USC 1437f(a): at-threshold eligibility"
 
 # ============================================================
 # INCOME DEDUCTION TESTS - 24 CFR 5.611
 # ============================================================
 
-  # Test 5: Dependent deduction
+  # Test 8: Dependent deduction
   - name: "Family with 2 dependents - deduction calculation"
     description: "$480 per dependent, per 24 CFR 5.611(a)(1)"
+    fiscal_year: 2025
     inputs:
       household_size: 4
       annual_income: 40000
       num_dependents: 2
       has_elderly_disabled: false
+      has_eligible_citizen_or_immigrant: true
     expected:
       hcv_dependent_deduction: 960  # 2 * $480
     citations:
       - "24 CFR 5.611(a)(1): $480 per dependent"
 
-  # Test 6: Elderly/disabled deduction
+  # Test 9: Elderly/disabled deduction
   - name: "Elderly household head - deduction applies"
+    fiscal_year: 2025
     inputs:
       household_size: 2
       annual_income: 30000
       num_dependents: 0
       has_elderly_disabled: true
+      has_eligible_citizen_or_immigrant: true
     expected:
       hcv_elderly_disabled_deduction: 400
     citations:
       - "24 CFR 5.611(a)(2): $400 elderly/disabled deduction"
 
-  # Test 7: Child care deduction
+  # Test 10: Child care deduction
   - name: "Working family with child care expenses"
+    fiscal_year: 2025
     inputs:
       household_size: 3
       annual_income: 45000
       num_dependents: 1
       childcare_expense: 6000  # Annual childcare
       employment_income: 45000
+      has_elderly_disabled: false
+      has_eligible_citizen_or_immigrant: true
     expected:
       hcv_childcare_deduction: 6000  # Actual expense, up to income earned
     citations:
       - "24 CFR 5.611(a)(3): Reasonable childcare enabling work"
 
-  # Test 8: Medical expense deduction (elderly/disabled only)
+  # Test 11: Child care deduction capped by income
+  - name: "Child care deduction limited by employment income"
+    fiscal_year: 2025
+    inputs:
+      household_size: 3
+      annual_income: 35000
+      num_dependents: 1
+      childcare_expense: 12000  # High childcare
+      employment_income: 8000   # Part-time work
+      has_elderly_disabled: false
+      has_eligible_citizen_or_immigrant: true
+    expected:
+      hcv_childcare_deduction: 8000  # Capped at employment income
+    citations:
+      - "24 CFR 5.611(a)(3): Cannot exceed income earned"
+
+  # Test 12: Medical expense deduction (elderly/disabled only)
   - name: "Elderly with medical expenses over threshold"
+    fiscal_year: 2025
     inputs:
       household_size: 1
       annual_income: 25000
       has_elderly_disabled: true
       medical_expense: 1500  # Annual medical expenses
+      has_eligible_citizen_or_immigrant: true
     expected:
       # Medical deduction = expenses exceeding 3% of annual income
       # $1,500 - ($25,000 * 0.03) = $1,500 - $750 = $750
@@ -123,13 +202,15 @@ tests:
     citations:
       - "24 CFR 5.611(a)(4): Medical expenses exceeding 3% of income"
 
-  # Test 9: Non-elderly household - no medical deduction
+  # Test 13: Non-elderly household - no medical deduction
   - name: "Non-elderly with medical expenses - no deduction"
+    fiscal_year: 2025
     inputs:
       household_size: 3
       annual_income: 35000
       has_elderly_disabled: false
       medical_expense: 2000
+      has_eligible_citizen_or_immigrant: true
     expected:
       hcv_medical_deduction: 0
     citations:
@@ -139,8 +220,9 @@ tests:
 # ADJUSTED INCOME & TENANT CONTRIBUTION - 24 CFR 5.628
 # ============================================================
 
-  # Test 10: Basic adjusted income calculation
+  # Test 14: Basic adjusted income calculation
   - name: "Adjusted income with all deductions"
+    fiscal_year: 2025
     inputs:
       household_size: 4
       annual_income: 36000
@@ -148,6 +230,8 @@ tests:
       has_elderly_disabled: true
       childcare_expense: 4800
       medical_expense: 1500
+      employment_income: 36000
+      has_eligible_citizen_or_immigrant: true
     expected:
       # Annual income: $36,000
       # Less: Dependent deduction (2 * $480) = $960
@@ -162,13 +246,15 @@ tests:
       - "24 CFR 5.611: Income deductions"
       - "24 CFR 5.628(a): TTP = 30% adjusted monthly income"
 
-  # Test 11: Tenant contribution - simple case
+  # Test 15: Tenant contribution - simple case
   - name: "Basic tenant contribution - 30% of adjusted income"
+    fiscal_year: 2025
     inputs:
       household_size: 2
       annual_income: 24000
       num_dependents: 0
       has_elderly_disabled: false
+      has_eligible_citizen_or_immigrant: true
     expected:
       hcv_annual_adjusted_income: 24000  # No deductions
       # Monthly = $24,000 / 12 = $2,000
@@ -178,119 +264,142 @@ tests:
       - "42 USC 1437f(o)(2): tenant contribution of 30%"
       - "24 CFR 5.628: Total tenant payment calculation"
 
-  # Test 12: Minimum rent
-  - name: "Very low income - minimum rent applies"
+  # Test 16: Very low income - minimum rent check
+  - name: "Very low income - 30% TTP calculation"
+    fiscal_year: 2025
     inputs:
       household_size: 1
       annual_income: 2400  # $200/month
       num_dependents: 0
       has_elderly_disabled: false
+      has_eligible_citizen_or_immigrant: true
     expected:
-      # 30% of $200 = $60, but many PHAs have $0-$50 minimum rent
-      # Using $50 as typical minimum
-      hcv_total_tenant_payment: 60  # 30% of $200
+      # 30% of $200/month = $60
+      # Minimum rent is $50, but 30% calc is $60, so TTP = max($60, $50) = $60
+      hcv_total_tenant_payment: 60
     citations:
+      - "24 CFR 5.628: TTP is greatest of 30% adjusted, 10% gross, or minimum"
       - "24 CFR 5.630: Minimum rent provisions"
 
 # ============================================================
 # HOUSING ASSISTANCE PAYMENT - 42 USC 1437f(o)
 # ============================================================
 
-  # Test 13: Basic HAP calculation
-  - name: "Standard HAP calculation"
+  # Test 17: Basic HAP calculation (FY 2025 payment standards)
+  - name: "Standard HAP calculation (FY 2025)"
     description: "HAP = Payment standard - TTP"
+    fiscal_year: 2025
     inputs:
       household_size: 3
       annual_income: 30000
       num_dependents: 1
       has_elderly_disabled: false
-      payment_standard: 1800  # 3BR payment standard for metro area
+      payment_standard: 1950  # 3BR FY 2025 FMR
+      contract_rent: 1700
+      utility_allowance: 150
+      has_eligible_citizen_or_immigrant: true
     expected:
       # Adjusted income = $30,000 - $480 = $29,520
       # Monthly adjusted = $2,460
       # TTP = 30% * $2,460 = $738
       hcv_total_tenant_payment: 738
-      # HAP = Payment standard - TTP = $1,800 - $738 = $1,062
-      hcv_housing_assistance_payment: 1062
+      # Gross rent = $1,700 + $150 = $1,850
+      hcv_gross_rent: 1850
+      # HAP = min(payment_standard, gross_rent) - TTP
+      # HAP = min($1,950, $1,850) - $738 = $1,850 - $738 = $1,112
+      hcv_housing_assistance_payment: 1112
     citations:
       - "42 USC 1437f(o)(2): Assistance payment calculation"
       - "24 CFR 982.505: Payment standard and HAP"
 
-  # Test 14: HAP with unit rent below payment standard
+  # Test 18: HAP with unit rent below payment standard
   - name: "Unit rent below payment standard"
     description: "HAP limited by gross rent"
+    fiscal_year: 2025
     inputs:
       household_size: 2
       annual_income: 20000
       payment_standard: 1500
-      gross_rent: 1200  # Unit rent below payment standard
+      contract_rent: 1000
+      utility_allowance: 200
+      has_elderly_disabled: false
+      num_dependents: 0
+      has_eligible_citizen_or_immigrant: true
     expected:
       # TTP = 30% of ($20,000/12) = $500
+      # Gross rent = $1,000 + $200 = $1,200
       # HAP = min(payment_standard, gross_rent) - TTP
       # HAP = min($1,500, $1,200) - $500 = $700
       hcv_housing_assistance_payment: 700
     citations:
       - "24 CFR 982.505(b): HAP limited to gross rent minus TTP"
 
-  # Test 15: Zero HAP when income too high
+  # Test 19: Zero HAP when income too high relative to rent
   - name: "Income results in zero HAP"
+    fiscal_year: 2025
     inputs:
       household_size: 2
       annual_income: 60000
       payment_standard: 1400
+      contract_rent: 1200
+      utility_allowance: 200
+      has_elderly_disabled: false
+      num_dependents: 0
+      has_eligible_citizen_or_immigrant: true
     expected:
       # TTP = 30% of $5,000/month = $1,500
-      # HAP = $1,400 - $1,500 = negative, so 0
+      # Gross rent = $1,200 + $200 = $1,400
+      # HAP = min($1,400, $1,400) - $1,500 = negative, so 0
       hcv_housing_assistance_payment: 0
     citations:
       - "24 CFR 982.505: HAP cannot be negative"
 
 # ============================================================
-# BEDROOM SIZE / SUBSIDY STANDARDS - 24 CFR 982.402
+# VOUCHER SIZE / SUBSIDY STANDARDS - 24 CFR 982.402
 # ============================================================
 
-  # Test 16: Bedroom standard determination
-  - name: "Family composition determines bedroom standard"
+  # Test 20: Voucher size determination - small family
+  - name: "2-person household voucher size"
+    fiscal_year: 2025
+    inputs:
+      household_size: 2
+      has_eligible_citizen_or_immigrant: true
+    expected:
+      hcv_voucher_size: 1
+    citations:
+      - "24 CFR 982.402: Subsidy standards"
+
+  # Test 21: Voucher size determination - larger family
+  - name: "5-person household voucher size"
+    fiscal_year: 2025
     inputs:
       household_size: 5
-      family_composition:
-        - head: true
-          age: 35
-        - spouse: true
-          age: 33
-        - child:
-            age: 10
-            sex: male
-        - child:
-            age: 8
-            sex: female
-        - child:
-            age: 3
-            sex: male
+      has_eligible_citizen_or_immigrant: true
     expected:
-      # Head/spouse: 1 BR
-      # Children: 10M + 3M can share, 8F separate = 2 BR
-      # Total: 3 BR
+      # 1 BR for head/spouse + ceil(3/2) = 1 + 2 = 3 BR
       hcv_voucher_size: 3
     citations:
       - "24 CFR 982.402: Subsidy standards"
-      - "24 CFR 982.401: PHA policies on bedroom standards"
 
 # ============================================================
 # INTEGRATION TESTS - Full eligibility and benefit
 # ============================================================
 
-  # Test 17: Full eligibility and benefit calculation
-  - name: "Complete HCV benefit - typical family"
+  # Test 22: Full eligibility and benefit calculation (FY 2025)
+  - name: "Complete HCV benefit - typical family (FY 2025)"
+    fiscal_year: 2025
     inputs:
       household_size: 4
       annual_income: 32000
       num_dependents: 2
       has_elderly_disabled: false
       childcare_expense: 3600
+      employment_income: 32000
       metro_area: "national_median"
-      payment_standard: 2000  # 4BR equivalent
-      gross_rent: 1900
+      payment_standard: 2193  # 4BR FY 2025 FMR
+      contract_rent: 1900
+      utility_allowance: 200
+      has_eligible_citizen_or_immigrant: true
     expected:
       hcv_income_eligible: true
       # Deductions: 2 * $480 = $960 + $3,600 childcare = $4,560
@@ -298,34 +407,46 @@ tests:
       hcv_annual_adjusted_income: 27440
       # TTP = 30% * ($27,440 / 12) = 30% * $2,286.67 = $686
       hcv_total_tenant_payment: 686
-      # HAP = min($2,000, $1,900) - $686 = $1,214
-      hcv_housing_assistance_payment: 1214
+      # Gross rent = $1,900 + $200 = $2,100
+      hcv_gross_rent: 2100
+      # HAP = min($2,193, $2,100) - $686 = $1,414
+      hcv_housing_assistance_payment: 1414
       hcv_eligible: true
     citations:
       - "42 USC 1437f: Complete HCV calculation"
 
-  # Test 18: Zero income family
+  # Test 23: Zero income family - maximum assistance
   - name: "Zero income family - maximum assistance"
+    fiscal_year: 2025
     inputs:
       household_size: 2
       annual_income: 0
-      payment_standard: 1400
-      gross_rent: 1300
+      payment_standard: 1483  # 2BR FY 2025 FMR
+      contract_rent: 1200
+      utility_allowance: 100
+      has_elderly_disabled: false
+      num_dependents: 0
+      has_eligible_citizen_or_immigrant: true
     expected:
       hcv_income_eligible: true
-      hcv_total_tenant_payment: 0  # Or minimum rent
-      # HAP = gross rent (capped by payment standard)
-      hcv_housing_assistance_payment: 1300
+      # TTP = max(30% of 0, 10% of 0, minimum $50) = $50
+      hcv_total_tenant_payment: 50
+      # Gross rent = $1,200 + $100 = $1,300
+      hcv_gross_rent: 1300
+      # HAP = min($1,483, $1,300) - $50 = $1,250
+      hcv_housing_assistance_payment: 1250
     citations:
-      - "24 CFR 5.628: Zero income TTP"
-      - "24 CFR 982.505: Maximum HAP equals gross rent"
+      - "24 CFR 5.628: Zero income TTP equals minimum rent"
+      - "24 CFR 982.505: HAP calculation"
 
-  # Test 19: Ineligible - over income
-  - name: "Over-income family - not eligible"
+  # Test 24: Ineligible - over income (FY 2025)
+  - name: "Over-income family - not eligible (FY 2025)"
+    fiscal_year: 2025
     inputs:
       household_size: 3
       annual_income: 80000
-      metro_area: "national_median"  # 50% AMI for 3-person: $45,850
+      metro_area: "national_median"  # 50% AMI for 3-person: $47,700
+      has_eligible_citizen_or_immigrant: true
     expected:
       hcv_income_eligible: false
       hcv_eligible: false
@@ -333,24 +454,101 @@ tests:
     citations:
       - "42 USC 1437f(a): Income eligibility requirement"
 
-  # Test 20: Utility allowance impact
+  # Test 25: Utility allowance impact on HAP
   - name: "HAP with utility allowance"
-    description: "When tenant pays utilities, utility allowance affects TTP"
+    description: "When tenant pays utilities, utility allowance affects gross rent"
+    fiscal_year: 2025
     inputs:
       household_size: 3
       annual_income: 28000
-      payment_standard: 1600
-      gross_rent: 1200
-      utility_allowance: 200
+      payment_standard: 1950  # 3BR
+      contract_rent: 1400
+      utility_allowance: 250  # Significant utility costs
+      has_elderly_disabled: false
+      num_dependents: 1
+      has_eligible_citizen_or_immigrant: true
     expected:
-      # TTP = 30% of adjusted monthly income
-      # Adjusted monthly = $28,000 / 12 = $2,333
-      # TTP = 30% * $2,333 = $700
-      # Gross rent to owner = contract rent
-      # HAP = payment standard - TTP (or gross rent - TTP)
-      hcv_total_tenant_payment: 700
-      # HAP = min($1,600, $1,200 + $200) - $700 = $1,400 - $700 = $700
-      hcv_housing_assistance_payment: 700
+      # Adjusted = $28,000 - $480 = $27,520
+      # TTP = 30% of $2,293 = $688
+      hcv_total_tenant_payment: 688
+      # Gross rent = $1,400 + $250 = $1,650
+      hcv_gross_rent: 1650
+      # HAP = min($1,950, $1,650) - $688 = $962
+      hcv_housing_assistance_payment: 962
     citations:
       - "24 CFR 982.517: Utility allowance"
       - "24 CFR 5.611: Utility allowance affects gross rent"
+
+  # Test 26: Utility reimbursement scenario
+  - name: "Utility reimbursement when UA exceeds TTP"
+    fiscal_year: 2025
+    inputs:
+      household_size: 1
+      annual_income: 3600  # Very low income
+      payment_standard: 1216  # 1BR FY 2025
+      contract_rent: 800
+      utility_allowance: 200  # High relative to income
+      has_elderly_disabled: false
+      num_dependents: 0
+      has_eligible_citizen_or_immigrant: true
+    expected:
+      # TTP = 30% of $300/month = $90, but minimum is $50
+      # Actually 30% of 300 = 90 > 50, so TTP = $90
+      hcv_total_tenant_payment: 90
+      # Utility reimbursement = $200 - $90 = $110
+      hcv_utility_reimbursement: 110
+    citations:
+      - "24 CFR 982.514(b): Utility reimbursement"
+
+# ============================================================
+# AFFORDABILITY CHECK TESTS - 24 CFR 982.508
+# ============================================================
+
+  # Test 27: Initial affordability check passes
+  - name: "Initial lease affordability - passes 40% test"
+    fiscal_year: 2025
+    inputs:
+      household_size: 3
+      annual_income: 30000
+      num_dependents: 1
+      has_elderly_disabled: false
+      payment_standard: 1800
+      contract_rent: 1600
+      utility_allowance: 150
+      has_eligible_citizen_or_immigrant: true
+    expected:
+      # Monthly adjusted = ($30,000 - $480) / 12 = $2,460
+      # Family share = gross_rent - HAP
+      # Gross rent = $1,750
+      # TTP = $738
+      # HAP = min($1,800, $1,750) - $738 = $1,012
+      # Family share = $1,750 - $1,012 = $738
+      # 40% of $2,460 = $984
+      # $738 <= $984, so affordable
+      hcv_initial_affordability_check: true
+    citations:
+      - "24 CFR 982.508: Maximum family share at initial occupancy"
+
+  # Test 28: Initial affordability check fails
+  - name: "Initial lease affordability - fails 40% test"
+    fiscal_year: 2025
+    inputs:
+      household_size: 2
+      annual_income: 24000
+      num_dependents: 0
+      has_elderly_disabled: false
+      payment_standard: 1200
+      contract_rent: 1800  # High rent relative to payment standard
+      utility_allowance: 150
+      has_eligible_citizen_or_immigrant: true
+    expected:
+      # Monthly adjusted = $24,000 / 12 = $2,000
+      # TTP = $600
+      # Gross rent = $1,950
+      # HAP = min($1,200, $1,950) - $600 = $600
+      # Family share = $1,950 - $600 = $1,350
+      # 40% of $2,000 = $800
+      # $1,350 > $800, so NOT affordable at initial lease
+      hcv_initial_affordability_check: false
+    citations:
+      - "24 CFR 982.508: Family share cannot exceed 40% at move-in"

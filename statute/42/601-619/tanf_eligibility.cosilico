@@ -1,0 +1,605 @@
+# 42 USC 601-619 - TANF Eligibility
+#
+# Temporary Assistance for Needy Families establishes a federal framework
+# with state flexibility for eligibility. This encodes:
+#
+# - 608(a): Federal eligibility prohibitions and requirements
+# - 602(a): State plan requirements (structure)
+# - 619: Definitions
+#
+# TANF differs from SNAP/SSI in that states define:
+# - Income limits (need standards)
+# - Resource limits
+# - Income disregards
+# - Most categorical requirements beyond federal minimums
+#
+# This file encodes federal framework; state files override specific values.
+#
+# Reference: https://uscode.house.gov/view.xhtml?path=/prelim@title42/chapter7/subchapterIV/partA
+
+module statute.42.601-619.tanf_eligibility
+version "2025.1"
+jurisdiction us
+
+references {
+  # Age limits
+  child_max_age: statute/42/601-619/parameters/age_limits/child_max_age
+  child_max_age_in_school: statute/42/601-619/parameters/age_limits/child_max_age_in_school
+  minor_parent_age: statute/42/601-619/parameters/age_limits/minor_parent_age
+
+  # Time limits
+  federal_time_limit_months: statute/42/601-619/parameters/time_limits/federal_months
+
+  # Noncitizen eligibility
+  noncitizen_waiting_years: statute/42/601-619/parameters/noncitizen_eligibility/waiting_period_years
+
+  # Default state parameters
+  resource_limit: statute/42/601-619/parameters/default_state/resource_limit
+  gross_income_limit_rate: statute/42/601-619/parameters/default_state/gross_income_limit_rate
+  need_standard: statute/42/601-619/parameters/default_state/need_standard
+}
+
+# =============================================================================
+# 619 - DEFINITIONS
+# =============================================================================
+
+# Definition of minor child for TANF purposes
+variable is_tanf_eligible_child {
+  entity Person
+  period Month
+  dtype Bool
+  label "TANF Eligible Child"
+  description "Whether person is an eligible minor child for TANF purposes"
+  reference "42 USC 619"
+
+  formula {
+    let max_age = parameter(gov.hhs.acf.tanf.age.child_max_age)
+    let max_age_school = parameter(gov.hhs.acf.tanf.age.child_max_age_in_school)
+
+    # Under 18, or under 19 if in secondary school
+    if age < max_age then
+      return true
+
+    if age < max_age_school and is_enrolled_in_secondary_school then
+      return true
+
+    return false
+  }
+
+  default false
+}
+
+# TANF assistance unit composition
+variable tanf_assistance_unit_members {
+  entity TanfUnit
+  period Month
+  dtype PersonList
+  label "TANF Assistance Unit Members"
+  description "Members included in TANF assistance unit"
+  reference "42 USC 608(a)(1)"
+
+  formula {
+    # Unit includes:
+    # - Eligible minor children
+    # - Parents/caretaker relatives of those children
+    # - Spouse of parent/caretaker
+
+    # Excludes:
+    # - SSI recipients (usually)
+    # - Ineligible noncitizens
+    # - Foster children receiving foster care payments
+
+    return filter(household_members,
+                  is_tanf_eligible_child or
+                  is_parent_of_tanf_child or
+                  is_spouse_of_tanf_parent) and
+                  not is_ssi_recipient and
+                  not is_foster_child_with_payments
+  }
+
+  default []
+}
+
+# Assistance unit size
+variable tanf_unit_size {
+  entity TanfUnit
+  period Month
+  dtype Integer
+  label "TANF Unit Size"
+  description "Number of persons in TANF assistance unit"
+  reference "42 USC 608"
+
+  formula {
+    return count(tanf_assistance_unit_members)
+  }
+
+  default 0
+}
+
+# =============================================================================
+# 608(a)(1) - NEEDY FAMILY REQUIREMENT
+# =============================================================================
+
+# Whether family meets state's income eligibility criteria
+variable tanf_income_eligible {
+  entity TanfUnit
+  period Month
+  dtype Bool
+  label "TANF Income Eligible"
+  description "Whether TANF unit meets income eligibility requirements"
+  reference "42 USC 608(a)(1)"
+
+  formula {
+    # States typically use:
+    # 1. Gross income test (e.g., 185% of need standard)
+    # 2. Net income test (countable income <= need standard)
+
+    return tanf_gross_income_eligible and tanf_net_income_eligible
+  }
+
+  default false
+}
+
+# Gross income eligibility test
+variable tanf_gross_income_eligible {
+  entity TanfUnit
+  period Month
+  dtype Bool
+  label "TANF Gross Income Eligible"
+  description "Whether unit passes gross income test"
+  reference "42 USC 608(a)(1)"
+
+  formula {
+    let limit_rate = parameter(gov.hhs.acf.tanf.default.gross_income_limit_rate)
+    let gross_limit = tanf_need_standard * limit_rate
+
+    return tanf_gross_income <= gross_limit
+  }
+
+  default false
+}
+
+# Net income eligibility test
+variable tanf_net_income_eligible {
+  entity TanfUnit
+  period Month
+  dtype Bool
+  label "TANF Net Income Eligible"
+  description "Whether unit passes net income test (countable income <= need standard)"
+  reference "42 USC 608(a)(1)"
+
+  formula {
+    return tanf_countable_income <= tanf_need_standard
+  }
+
+  default false
+}
+
+# Resource/asset eligibility test
+variable tanf_resource_eligible {
+  entity TanfUnit
+  period Month
+  dtype Bool
+  label "TANF Resource Eligible"
+  description "Whether unit meets resource/asset test"
+  reference "42 USC 608(a)(1)"
+
+  formula {
+    # Many states have eliminated or relaxed resource tests
+    # This uses default parameters; states override
+
+    let limit = parameter(gov.hhs.acf.tanf.default.resource_limit)
+
+    # Check if state has eliminated asset test
+    if tanf_state_no_asset_test then
+      return true
+
+    return tanf_countable_resources <= limit
+  }
+
+  default false
+}
+
+# Combined financial eligibility
+variable tanf_financial_eligible {
+  entity TanfUnit
+  period Month
+  dtype Bool
+  label "TANF Financial Eligible"
+  description "Whether unit meets all financial eligibility tests"
+  reference "42 USC 608(a)(1)"
+
+  formula {
+    return tanf_income_eligible and tanf_resource_eligible
+  }
+
+  default false
+}
+
+# =============================================================================
+# 608(a)(1)(B) - DEPRIVATION REQUIREMENT
+# =============================================================================
+
+# Whether deprivation requirement met (varies by state)
+variable tanf_deprivation_requirement_met {
+  entity TanfUnit
+  period Month
+  dtype Bool
+  label "TANF Deprivation Requirement Met"
+  description "Whether child is deprived of parental support"
+  reference "42 USC 608(a)(1)(B)"
+
+  formula {
+    # Under AFDC, deprivation was required. States now have more flexibility.
+    # Common bases for deprivation:
+    # - Continued absence of parent
+    # - Death of parent
+    # - Physical/mental incapacity of parent
+    # - Unemployment of principal earner (two-parent families)
+
+    # Many states now cover two-parent families without unemployment
+    if tanf_state_covers_two_parent_without_deprivation then
+      return true
+
+    return parent_absent or parent_deceased or parent_incapacitated or
+           (is_two_parent_family and principal_earner_unemployed)
+  }
+
+  default true
+}
+
+# =============================================================================
+# 608(a)(2) - MINOR PARENT LIVING ARRANGEMENT
+# =============================================================================
+
+variable tanf_minor_parent_living_arrangement_met {
+  entity Person
+  period Month
+  dtype Bool
+  label "TANF Minor Parent Living Arrangement Met"
+  description "Whether minor parent lives in adult-supervised setting"
+  reference "42 USC 608(a)(2)"
+
+  formula {
+    let minor_age = parameter(gov.hhs.acf.tanf.age.minor_parent_age)
+
+    # Applies only to minor parents
+    if age >= minor_age or not has_minor_child then
+      return true
+
+    # Must live with parent, guardian, relative, or adult-supervised setting
+    # Exceptions:
+    # - No appropriate setting available
+    # - Living independently is in best interest of child
+
+    if tanf_minor_parent_exception_applies then
+      return true
+
+    return lives_with_parent or lives_with_guardian or
+           lives_with_adult_relative or in_adult_supervised_living
+  }
+
+  default true
+}
+
+# =============================================================================
+# 608(a)(3) - MINOR PARENT EDUCATION REQUIREMENT
+# =============================================================================
+
+variable tanf_minor_parent_education_met {
+  entity Person
+  period Month
+  dtype Bool
+  label "TANF Minor Parent Education Met"
+  description "Whether minor parent meets education/training requirement"
+  reference "42 USC 608(a)(3)"
+
+  formula {
+    let minor_age = parameter(gov.hhs.acf.tanf.age.minor_parent_age)
+
+    if age >= minor_age or not has_minor_child then
+      return true
+
+    # Minor parent must be enrolled in:
+    # - High school
+    # - Equivalent program (GED)
+    # - Alternative education
+    # - Training program
+
+    return has_high_school_diploma or is_enrolled_in_school or
+           is_enrolled_in_ged_program or is_enrolled_in_training
+  }
+
+  default true
+}
+
+# =============================================================================
+# 608(a)(4) - CHILD SUPPORT COOPERATION
+# =============================================================================
+
+variable tanf_child_support_cooperation_met {
+  entity TanfUnit
+  period Month
+  dtype Bool
+  label "TANF Child Support Cooperation Met"
+  description "Whether unit cooperates with child support enforcement"
+  reference "42 USC 608(a)(4)"
+
+  formula {
+    # Good cause exemptions:
+    # - Domestic violence risk
+    # - Best interest of child
+    # - Conception from assault
+
+    if tanf_child_support_good_cause then
+      return true
+
+    return cooperating_with_child_support
+  }
+
+  default true
+}
+
+# =============================================================================
+# 608(a)(5) - NONCITIZEN ELIGIBILITY
+# =============================================================================
+
+variable tanf_citizen_eligible {
+  entity Person
+  period Month
+  dtype Bool
+  label "TANF Citizen/Immigration Eligible"
+  description "Whether person meets citizenship/immigration requirements"
+  reference (
+    "42 USC 608(a)(5)",
+    "8 USC 1612-1613"
+  )
+
+  formula {
+    # US citizens always eligible
+    if is_us_citizen then
+      return true
+
+    let waiting_years = parameter(gov.hhs.acf.tanf.noncitizen.waiting_period_years)
+
+    # Exempt qualified aliens (no 5-year bar):
+    # - Refugees
+    # - Asylees
+    # - Cuban/Haitian entrants
+    # - Certain veterans and active military
+    # - Victims of trafficking
+    # - Amerasian immigrants
+
+    if is_refugee or is_asylee or is_cuban_haitian_entrant or
+       is_qualified_veteran or is_trafficking_victim or is_amerasian then
+      return true
+
+    # Other qualified aliens after 5-year waiting period
+    if is_qualified_alien and years_since_qualified_entry >= waiting_years then
+      return true
+
+    # States may use state funds to cover others
+    if tanf_state_covers_barred_aliens then
+      return is_qualified_alien
+
+    return false
+  }
+
+  default false
+}
+
+# =============================================================================
+# 608(a)(6) - FLEEING FELON PROHIBITION
+# =============================================================================
+
+variable tanf_fleeing_felon_eligible {
+  entity Person
+  period Month
+  dtype Bool
+  label "TANF Fleeing Felon Eligible"
+  description "Whether person is not a fleeing felon or probation violator"
+  reference "42 USC 608(a)(6)"
+
+  formula {
+    # Ineligible if:
+    # - Fleeing to avoid prosecution/custody for felony
+    # - Fleeing to avoid custody for crime punishable by 1+ year
+    # - Violating probation or parole
+
+    return not is_fleeing_felon and not is_probation_parole_violator
+  }
+
+  default true
+}
+
+# =============================================================================
+# 608(a)(7) - TIME LIMIT
+# =============================================================================
+
+variable tanf_time_limit_eligible {
+  entity Person
+  period Month
+  dtype Bool
+  label "TANF Time Limit Eligible"
+  description "Whether person has not exceeded 60-month time limit"
+  reference "42 USC 608(a)(7)"
+
+  formula {
+    let limit_months = parameter(gov.hhs.acf.tanf.time.federal_months)
+
+    # Time limit applies only to adults
+    if age < 18 then
+      return true
+
+    # Hardship exemption (state may exempt up to 20%)
+    if tanf_hardship_exemption then
+      return true
+
+    # Domestic violence exemption
+    if tanf_domestic_violence_exemption then
+      return true
+
+    # NOTE: Cannot track actual months in point-in-time simulation
+    # tanf_months_received must be input data
+    return tanf_months_received < limit_months
+  }
+
+  default true
+}
+
+# =============================================================================
+# 608(a)(8) - DRUG FELON BAN (with state opt-out)
+# =============================================================================
+
+variable tanf_drug_felon_eligible {
+  entity Person
+  period Month
+  dtype Bool
+  label "TANF Drug Felon Eligible"
+  description "Whether person passes drug felon eligibility check"
+  reference "42 USC 608(a)(9)"
+
+  formula {
+    # Federal law bans drug felons; states may opt out
+    # As of 2024, no states enforce full permanent ban
+    # 37+ states have fully opted out
+
+    if tanf_state_opted_out_drug_felon_ban then
+      return true
+
+    if tanf_state_modified_drug_felon_ban then
+      # State-specific conditions (e.g., time since conviction)
+      return tanf_drug_felon_state_eligible
+
+    # Full federal ban (no states currently apply)
+    return not is_drug_felon
+  }
+
+  default true
+}
+
+# =============================================================================
+# 608(a)(10) - FRAUDULENT RESIDENCE
+# =============================================================================
+
+variable tanf_no_fraudulent_residence {
+  entity Person
+  period Month
+  dtype Bool
+  label "TANF No Fraudulent Residence"
+  description "Whether person has not been convicted of fraudulent residence"
+  reference "42 USC 608(a)(10)"
+
+  formula {
+    let penalty_years = parameter(gov.hhs.acf.tanf.noncitizen.fraud_ineligibility_years)
+
+    # Ineligible for 10 years if convicted of fraudulent residence
+    # representation to receive benefits in multiple states
+
+    if is_convicted_fraudulent_residence then
+      return years_since_fraud_conviction >= penalty_years
+
+    return true
+  }
+
+  default true
+}
+
+# =============================================================================
+# COMBINED INDIVIDUAL ELIGIBILITY
+# =============================================================================
+
+# All individual-level eligibility requirements
+variable tanf_individual_eligible {
+  entity Person
+  period Month
+  dtype Bool
+  label "TANF Individual Eligible"
+  description "Whether person meets all individual eligibility requirements"
+  reference "42 USC 608(a)"
+
+  formula {
+    return tanf_citizen_eligible and
+           tanf_fleeing_felon_eligible and
+           tanf_drug_felon_eligible and
+           tanf_no_fraudulent_residence and
+           tanf_minor_parent_living_arrangement_met and
+           tanf_minor_parent_education_met and
+           tanf_time_limit_eligible
+  }
+
+  default false
+}
+
+# =============================================================================
+# COMBINED UNIT ELIGIBILITY
+# =============================================================================
+
+# Complete TANF eligibility determination
+variable tanf_eligible {
+  entity TanfUnit
+  period Month
+  dtype Bool
+  label "TANF Eligible"
+  description "Complete TANF eligibility determination for assistance unit"
+  reference "42 USC 608"
+
+  formula {
+    # Must have at least one eligible child
+    if not any(is_tanf_eligible_child for person in tanf_assistance_unit_members) then
+      return false
+
+    # Financial eligibility (income and resources)
+    if not tanf_financial_eligible then
+      return false
+
+    # Deprivation requirement (if applicable in state)
+    if not tanf_deprivation_requirement_met then
+      return false
+
+    # Child support cooperation
+    if not tanf_child_support_cooperation_met then
+      return false
+
+    # All adults must meet individual requirements
+    if not all(tanf_individual_eligible for adult in tanf_unit_adults) then
+      return false
+
+    # Work requirements (if applicable - may result in sanction rather than ineligibility)
+    # Most states sanction rather than terminate for work non-compliance
+    # Included here for states with full-family ineligibility
+
+    return true
+  }
+
+  default false
+}
+
+# =============================================================================
+# CATEGORICAL ELIGIBILITY
+# =============================================================================
+
+# Some households may be categorically eligible for TANF-funded services
+# (e.g., child-only cases where adult is SSI recipient)
+variable tanf_child_only_case {
+  entity TanfUnit
+  period Month
+  dtype Bool
+  label "TANF Child-Only Case"
+  description "Whether case is child-only (no included adult)"
+  reference "42 USC 608"
+
+  formula {
+    # Child-only cases include:
+    # - Children living with non-parent caretaker
+    # - Children of SSI recipient parents
+    # - Children of ineligible noncitizen parents
+
+    let has_child = any(is_tanf_eligible_child for person in household_members)
+    let parent_excluded = parent_is_ssi_recipient or parent_is_ineligible_noncitizen
+
+    return has_child and parent_excluded
+  }
+
+  default false
+}

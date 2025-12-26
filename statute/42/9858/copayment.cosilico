@@ -1,0 +1,156 @@
+# 42 USC 9858c(c)(4)(A) - CCDF Copayment (Sliding Fee Scale)
+#
+# States must establish a sliding fee scale for family copayments that:
+# - Provides for cost sharing by eligible families
+# - Takes into account family income and size
+# - May waive fees for families at or below poverty level
+# - Should not exceed 7% of family income (federal guidance)
+#
+# Key provisions:
+# - 42 USC 9858c(c)(4)(A) - Sliding fee scale requirement
+# - 42 USC 9858c(c)(4)(A)(i) - Poverty level waiver
+# - 45 CFR 98.45(k) - Affordability (7% guideline)
+#
+# Copayment calculation is highly state-specific. This encoding
+# provides a federal framework; states implement their own formulas.
+
+parameters: parameters.yaml
+
+# =============================================================================
+# COPAYMENT CALCULATION
+# =============================================================================
+
+# Family Copayment Amount (SPMUnit-level)
+# 42 USC 9858c(c)(4)(A) - Sliding fee scale based on income
+entity SPMUnit
+period Year
+dtype Money
+unit "USD"
+label "CCDF Family Copayment"
+description "Annual family copayment for CCDF child care per 42 USC 9858c(c)(4)(A)"
+reference "42 USC 9858c(c)(4)(A)"
+
+formula:
+  # Get family income and poverty level
+  family_income = this.ccdf_income
+  poverty_level = this.spm_unit_fpg
+
+  # Families at or below poverty level should have copay waived
+  # per 42 USC 9858c(c)(4)(A)(i)
+  if family_income <= poverty_level then
+    return 0
+
+  # Income in excess of poverty level
+  income_above_fpl = max(family_income - poverty_level, 0)
+
+  # Federal maximum copay guidance: 7% of family income
+  max_copay_rate = parameters.copayment.maximum_percent_of_income
+
+  # Calculate copay as percentage of income above FPL
+  # This is a simplified federal framework
+  # States typically use more complex sliding scales with brackets
+  #
+  # Common state approaches:
+  # - Flat percentage of income above FPL (e.g., 10-35%)
+  # - Bracketed schedules based on income ranges
+  # - Per-child fees based on income level
+
+  # Using income-based sliding scale (simplified)
+  # Higher income = higher copay percentage
+  income_to_smi = this.ccdf_income_to_smi_ratio
+
+  # Graduated copay rate based on income level
+  # (States set their own rates; this is illustrative)
+  copay_rate = match income_to_smi {
+    case r where r <= 0.50 => 0.05   # 50% SMI or below: 5%
+    case r where r <= 0.65 => 0.10   # 51-65% SMI: 10%
+    case r where r <= 0.75 => 0.15   # 66-75% SMI: 15%
+    case r where r <= 0.85 => 0.20   # 76-85% SMI: 20%
+    else => 0.25                      # Above 85% SMI: 25%
+  }
+
+  # Annual copay based on income above FPL
+  calculated_copay = income_above_fpl * copay_rate
+
+  # Apply maximum copay cap (7% of total income per federal guidance)
+  max_copay = family_income * max_copay_rate
+
+  # Ensure minimum fee ($1/week = $52/year typical)
+  min_weekly_fee = parameters.copayment.minimum_weekly_fee
+  min_annual_fee = min_weekly_fee * 52
+
+  # Copay is minimum of calculated and max, but at least the minimum fee
+  copay_before_floor = min(calculated_copay, max_copay)
+
+  return max(copay_before_floor, min_annual_fee)
+
+
+# Weekly Copayment (for reporting purposes)
+entity SPMUnit
+period Year
+dtype Money
+unit "USD"
+label "CCDF Weekly Copayment"
+description "Weekly family copayment for CCDF child care"
+
+formula:
+  annual_copay = this.ccdf_family_copayment
+  return annual_copay / 52
+
+
+# =============================================================================
+# COPAY WAIVER ELIGIBILITY
+# =============================================================================
+
+# Copayment Waiver Eligible (SPMUnit-level)
+# 42 USC 9858c(c)(4)(A)(i) - Families at or below poverty may be waived
+entity SPMUnit
+period Year
+dtype Boolean
+label "CCDF Copay Waiver Eligible"
+description "Family qualifies for copayment waiver per 42 USC 9858c(c)(4)(A)(i)"
+reference "42 USC 9858c(c)(4)(A)(i)"
+
+formula:
+  family_income = this.ccdf_income
+  poverty_level = this.spm_unit_fpg
+
+  # Families at or below 100% FPL qualify for waiver
+  return family_income <= poverty_level
+
+
+# =============================================================================
+# COPAY AS PERCENTAGE OF INCOME
+# =============================================================================
+
+# Copayment Burden (percentage of income)
+# Used to assess affordability relative to 7% guideline
+entity SPMUnit
+period Year
+dtype Rate
+label "CCDF Copay as Percent of Income"
+description "Family copayment as percentage of income (7% max is federal guideline)"
+reference "45 CFR 98.45(k)"
+
+formula:
+  copay = this.ccdf_family_copayment
+  income = this.ccdf_income
+
+  return if income > 0 then
+    copay / income
+  else
+    0
+
+
+# Copayment Exceeds Affordability Standard
+entity SPMUnit
+period Year
+dtype Boolean
+label "CCDF Copay Exceeds 7% Affordability Standard"
+description "Copayment exceeds 7% of income affordability guideline"
+
+formula:
+  copay_percent = this.ccdf_copay_as_percent_of_income
+  max_rate = parameters.copayment.maximum_percent_of_income
+
+  return copay_percent > max_rate

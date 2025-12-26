@@ -1,0 +1,24 @@
+# Used Clean Vehicle Input Variables
+#
+# These are user-provided inputs describing used clean vehicle purchases
+# for use with 26 USC 25E (Previously-Owned Clean Vehicles Credit).
+
+# --- Purchase Flag ---
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "Purchased Used Clean Vehicle"
+description "Whether taxpayer purchased a qualifying previously-owned clean vehicle during the tax year"
+input true
+
+# --- Vehicle Characteristics ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Used Clean Vehicle Sale Price"
+description "Actual sale price of the previously-owned clean vehicle"
+input true
+default 0

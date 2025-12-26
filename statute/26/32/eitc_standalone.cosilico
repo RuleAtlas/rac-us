@@ -1,0 +1,95 @@
+# 26 USC 32 - Earned Income Credit (Standalone Validation Version)
+#
+# Standalone encoding for validation against PolicyEngine.
+# Uses PE's pre-computed eligibility and child count as inputs,
+# then applies the 32(a) formula to compute the credit amount.
+#
+# 2024 parameters from Rev. Proc. 2023-34 (inflation adjustments)
+
+imports:
+  earned_income: inputs/earned_income
+  adjusted_gross_income: inputs/adjusted_gross_income
+  filing_status: inputs/filing_status
+  num_qualifying_children: inputs/num_qualifying_children
+  is_eligible_individual: inputs/is_eligible_individual
+  credit_rate_0: params/eitc/2024#credit_rate_0
+  credit_rate_1: params/eitc/2024#credit_rate_1
+  credit_rate_2: params/eitc/2024#credit_rate_2
+  credit_rate_3: params/eitc/2024#credit_rate_3
+  phaseout_rate_0: params/eitc/2024#phaseout_rate_0
+  phaseout_rate_1: params/eitc/2024#phaseout_rate_1
+  phaseout_rate_2: params/eitc/2024#phaseout_rate_2
+  earned_income_cap_0: params/eitc/2024#earned_income_cap_0
+  earned_income_cap_1: params/eitc/2024#earned_income_cap_1
+  earned_income_cap_2: params/eitc/2024#earned_income_cap_2
+  phaseout_start_0: params/eitc/2024#phaseout_start_0
+  phaseout_start_1: params/eitc/2024#phaseout_start_1
+  joint_adjustment: params/eitc/2024#joint_adjustment
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Earned Income Tax Credit"
+description "Refundable credit for low-to-moderate income working individuals per 26 USC 32(a)(1)"
+
+formula:
+  # Check eligibility first
+  if not is_eligible_individual then
+    return 0
+
+  # Compute phase-in amount per 32(a)(2)(A)
+  # Credit = rate * min(earned_income, cap)
+  n_children = min(num_qualifying_children, 3)
+
+  # Get credit rate based on number of children
+  credit_rate = if n_children == 0 then
+    credit_rate_0
+  else if n_children == 1 then
+    credit_rate_1
+  else if n_children == 2 then
+    credit_rate_2
+  else
+    credit_rate_3
+
+  # Get earned income cap based on number of children
+  earned_income_cap = if n_children == 0 then
+    earned_income_cap_0
+  else if n_children == 1 then
+    earned_income_cap_1
+  else
+    earned_income_cap_2
+
+  phase_in_amount = credit_rate * min(earned_income, earned_income_cap)
+
+  # Compute phase-out reduction per 32(a)(2)(B)
+  # Use greater of AGI or earned income
+  income = max(adjusted_gross_income, earned_income)
+
+  # Get phaseout rate based on number of children
+  phaseout_rate = if n_children == 0 then
+    phaseout_rate_0
+  else if n_children == 1 then
+    phaseout_rate_1
+  else
+    phaseout_rate_2
+
+  # Get phaseout threshold (single/HoH)
+  phaseout_threshold = if n_children == 0 then
+    phaseout_start_0
+  else
+    phaseout_start_1
+
+  # Joint filers get higher threshold per 32(b)(2)(B)
+  adjusted_threshold = if filing_status == JOINT then
+    phaseout_threshold + joint_adjustment
+  else
+    phaseout_threshold
+
+  # Reduction = rate * (income - threshold), but not below zero
+  phase_out_amount = max(0, phaseout_rate * (income - adjusted_threshold))
+
+  # Final credit = phase-in minus phase-out, but not below zero
+  return max(0, phase_in_amount - phase_out_amount)
+
+default 0

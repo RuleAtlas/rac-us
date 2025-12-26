@@ -1,0 +1,232 @@
+# 42 USC 1758(b) - Categorical Eligibility for School Meals
+#
+# Certain children are automatically eligible for FREE meals without
+# income verification through "categorical eligibility" (direct certification).
+#
+# 42 USC 1758(b)(2)(C)(ii): Benefit program participation
+# "(ii) A child... is a member of a household receiving assistance under
+# the supplemental nutrition assistance program authorized under the Food
+# and Nutrition Act of 2008... shall be considered automatically eligible
+# for free lunches and free breakfasts"
+#
+# 42 USC 1758(b)(5): Foster children
+# "(5) A child who is a member of a household... who is a foster child
+# whose care and placement is the responsibility of an agency that
+# administers a State plan under part B or E of title IV of the
+# Social Security Act"
+#
+# 42 USC 1758(b)(12)(A): Homeless, runaway, and migrant children
+# "(12)(A) A child who is a member of a household that receives assistance
+# under a program funded by the McKinney-Vento Homeless Assistance Act...
+# a runaway child... or a migratory child..."
+#
+# Head Start: Section 9(b)(2)(A) of the Richard B. Russell NSLA
+# Children enrolled in Head Start are deemed to meet income eligibility.
+#
+# References:
+# - https://www.law.cornell.edu/uscode/text/42/1758#b_2
+# - https://www.law.cornell.edu/uscode/text/42/1758#b_5
+# - https://www.law.cornell.edu/uscode/text/42/1758#b_12
+# - https://www.law.cornell.edu/cfr/text/7/245.2
+
+# ------------------------------------------------------------------------------
+# school_meal_snap_categorically_eligible
+# 42 USC 1758(b)(2)(C)(ii)(I): SNAP categorical eligibility
+# "(I) the supplemental nutrition assistance program authorized under
+# the Food and Nutrition Act of 2008 (7 U.S.C. 2011 et seq.)"
+# ------------------------------------------------------------------------------
+
+variable school_meal_snap_categorically_eligible
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  # Household receives SNAP benefits
+  return household.receives_snap
+
+# ------------------------------------------------------------------------------
+# school_meal_tanf_categorically_eligible
+# 42 USC 1758(b)(2)(C)(ii)(II): TANF categorical eligibility
+# "(II) a State program funded under the program of block grants to States
+# for temporary assistance for needy families"
+# ------------------------------------------------------------------------------
+
+variable school_meal_tanf_categorically_eligible
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  # Household receives TANF benefits
+  return household.receives_tanf
+
+# ------------------------------------------------------------------------------
+# school_meal_fdpir_categorically_eligible
+# 42 USC 1758(b)(2)(C)(ii)(III): FDPIR categorical eligibility
+# "(III) the food distribution program on Indian reservations established
+# under section 2013(b) of title 7"
+# ------------------------------------------------------------------------------
+
+variable school_meal_fdpir_categorically_eligible
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  # Household receives FDPIR (Food Distribution Program on Indian Reservations)
+  return household.receives_fdpir
+
+# ------------------------------------------------------------------------------
+# school_meal_foster_categorically_eligible
+# 42 USC 1758(b)(5): Foster child categorical eligibility
+# "a foster child whose care and placement is the responsibility of an
+# agency that administers a State plan under part B or E of title IV
+# of the Social Security Act"
+# ------------------------------------------------------------------------------
+
+variable school_meal_foster_categorically_eligible
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  return is_foster_child
+
+# ------------------------------------------------------------------------------
+# school_meal_homeless_categorically_eligible
+# 42 USC 1758(b)(12)(A)(i): Homeless child categorical eligibility
+# "a child who is a member of a household that receives assistance under
+# a program funded by the McKinney-Vento Homeless Assistance Act"
+# ------------------------------------------------------------------------------
+
+variable school_meal_homeless_categorically_eligible
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  return is_homeless
+
+# ------------------------------------------------------------------------------
+# school_meal_runaway_categorically_eligible
+# 42 USC 1758(b)(12)(A)(ii): Runaway child categorical eligibility
+# "a runaway child who is served by a program under the Runaway and
+# Homeless Youth Act"
+# ------------------------------------------------------------------------------
+
+variable school_meal_runaway_categorically_eligible
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  return is_runaway_child
+
+# ------------------------------------------------------------------------------
+# school_meal_migrant_categorically_eligible
+# 42 USC 1758(b)(12)(A)(iii): Migrant child categorical eligibility
+# "a migratory child (as defined in section 6399 of title 20)"
+# ------------------------------------------------------------------------------
+
+variable school_meal_migrant_categorically_eligible
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  return is_migratory_child
+
+# ------------------------------------------------------------------------------
+# school_meal_head_start_categorically_eligible
+# Section 9(b)(2)(A) of the Richard B. Russell National School Lunch Act
+# Children enrolled in Head Start are categorically eligible for free meals
+# ------------------------------------------------------------------------------
+
+variable school_meal_head_start_categorically_eligible
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  return is_head_start_eligible
+
+# ------------------------------------------------------------------------------
+# school_meal_categorically_eligible
+# Combined categorical eligibility from all qualifying programs
+# Any of these pathways qualifies for FREE school meals
+# ------------------------------------------------------------------------------
+
+variable school_meal_categorically_eligible
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  # 42 USC 1758(b)(2)(C)(ii) - Program participation
+  snap_eligible = school_meal_snap_categorically_eligible
+  tanf_eligible = school_meal_tanf_categorically_eligible
+  fdpir_eligible = school_meal_fdpir_categorically_eligible
+
+  # 42 USC 1758(b)(5) - Foster children
+  foster_eligible = school_meal_foster_categorically_eligible
+
+  # 42 USC 1758(b)(12)(A) - Homeless, runaway, migrant
+  homeless_eligible = school_meal_homeless_categorically_eligible
+  runaway_eligible = school_meal_runaway_categorically_eligible
+  migrant_eligible = school_meal_migrant_categorically_eligible
+
+  # Section 9(b)(2)(A) - Head Start
+  head_start_eligible = school_meal_head_start_categorically_eligible
+
+  # Any categorical pathway qualifies
+  return snap_eligible or
+         tanf_eligible or
+         fdpir_eligible or
+         foster_eligible or
+         homeless_eligible or
+         runaway_eligible or
+         migrant_eligible or
+         head_start_eligible
+
+# ------------------------------------------------------------------------------
+# school_meal_cep_eligible
+# Community Eligibility Provision eligibility
+# 42 USC 1758(b)(1)(A): Schools with high percentages of directly certified
+# students may provide free meals to all students
+# ------------------------------------------------------------------------------
+
+variable school_meal_cep_eligible
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  # Student attends a school participating in Community Eligibility Provision
+  return attends_cep_school
+
+# ------------------------------------------------------------------------------
+# school_meal_directly_certified
+# Whether student is directly certified (automatically eligible without application)
+# This is the set of students counted in Identified Student Percentage (ISP)
+# for Community Eligibility Provision calculations
+# ------------------------------------------------------------------------------
+
+variable school_meal_directly_certified
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  # Direct certification includes categorical eligibility pathways
+  # that can be verified through data matching (SNAP, TANF, FDPIR, foster, homeless, migrant)
+  # but NOT Head Start (which requires separate documentation)
+
+  snap = school_meal_snap_categorically_eligible
+  tanf = school_meal_tanf_categorically_eligible
+  fdpir = school_meal_fdpir_categorically_eligible
+  foster = school_meal_foster_categorically_eligible
+  homeless = school_meal_homeless_categorically_eligible
+  migrant = school_meal_migrant_categorically_eligible
+
+  return snap or tanf or fdpir or foster or homeless or migrant

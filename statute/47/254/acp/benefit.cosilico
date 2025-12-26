@@ -1,0 +1,91 @@
+# 47 USC § 1752(a)(7) - ACP Benefit Amount
+#
+# "(7) Benefit; Reimbursement
+#  (A) the amount of the benefit... is—
+#      (i) subject to clause (ii), not more than $30 per month; and
+#      (ii) for a household on Tribal land, not more than $75 per month"
+#
+# The benefit equals the lesser of:
+# - The maximum monthly support amount ($30 standard, $75 tribal)
+# - Actual broadband costs after Lifeline
+#
+# Note: ACP funding expired May 2024, benefit = $0 after June 2024 per FCC.
+
+imports:
+  # Eligibility
+  is_acp_eligible: statute/47/254/acp/eligibility/is_acp_eligible
+
+  # Tribal status
+  is_on_tribal_land: inputs/household/is_on_tribal_land
+
+  # Broadband costs (after Lifeline is applied)
+  broadband_cost: inputs/expenses/broadband_cost
+  lifeline: statute/47/254/lifeline/benefit/lifeline
+
+# ---------------------------------------------------------------------------
+# Broadband Cost After Lifeline
+# ---------------------------------------------------------------------------
+
+variable broadband_cost_after_lifeline:
+  entity Household
+  period Year
+  dtype Money
+  unit "USD"
+  label "Broadband Cost After Lifeline"
+  description "Remaining broadband cost after applying Lifeline benefit"
+
+  formula:
+    # ACP applies to broadband costs remaining after Lifeline
+    # Lifeline can apply to phone or broadband, so we assume it applies
+    # proportionally or to broadband first
+    remaining = broadband_cost - lifeline
+    return max(0, remaining)
+
+# ---------------------------------------------------------------------------
+# ACP Monthly Maximum (47 USC § 1752(a)(7))
+# ---------------------------------------------------------------------------
+
+variable acp_monthly_max:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "Maximum Monthly ACP Benefit"
+  description "Maximum monthly ACP support per 47 USC § 1752(a)(7)"
+
+  formula:
+    # Standard: $30/month, Tribal: $75/month
+    if is_on_tribal_land then
+      return parameters.acp.amount.tribal
+    else
+      return parameters.acp.amount.standard
+
+# ---------------------------------------------------------------------------
+# ACP Benefit (47 USC § 1752(a)(7))
+# ---------------------------------------------------------------------------
+
+variable acp:
+  entity Household
+  period Year
+  dtype Money
+  unit "USD"
+  label "Affordable Connectivity Program Benefit"
+  description "Annual ACP broadband subsidy per 47 USC § 1752(a)(7)"
+
+  formula:
+    if not is_acp_eligible then
+      return 0
+
+    # Maximum annual benefit = monthly amount * 12
+    # Note: After June 2024, monthly amount = $0 per parameter
+    max_annual = acp_monthly_max * 12
+
+    # Benefit capped at remaining broadband costs after Lifeline
+    remaining_broadband = broadband_cost_after_lifeline
+
+    return min(max_annual, remaining_broadband)
+
+  defined_for:
+    is_acp_eligible
+
+  default 0

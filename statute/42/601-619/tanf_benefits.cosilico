@@ -1,0 +1,633 @@
+# 42 USC 601-619 - TANF Benefit Calculation
+#
+# Unlike SSI or SNAP, TANF has no federally-specified benefit formula.
+# States set their own:
+# - Need standards (maximum recognizable need)
+# - Payment standards (maximum payment, often lower than need standard)
+# - Income disregards and deductions
+# - Benefit calculation methodology
+#
+# Federal law provides only:
+# - Block grant funding limits (42 USC 603)
+# - Prohibition on using federal funds for certain purposes
+# - Maintenance of effort requirements (42 USC 609)
+#
+# This file encodes the GENERAL STRUCTURE of TANF benefits that most states
+# follow. Actual amounts come from state-specific parameters.
+#
+# Reference: https://uscode.house.gov/view.xhtml?path=/prelim@title42/chapter7/subchapterIV/partA
+
+module statute.42.601-619.tanf_benefits
+version "2025.1"
+jurisdiction us
+
+references {
+  # Default state parameters
+  earned_income_disregard_flat: statute/42/601-619/parameters/default_state/earned_income_disregard_flat
+  earned_income_disregard_rate: statute/42/601-619/parameters/default_state/earned_income_disregard_rate
+  need_standard: statute/42/601-619/parameters/default_state/need_standard
+  payment_standard: statute/42/601-619/parameters/default_state/payment_standard
+  payment_to_need_ratio: statute/42/601-619/parameters/default_state/payment_to_need_ratio
+}
+
+# =============================================================================
+# INCOME CALCULATION
+# =============================================================================
+
+# Gross earned income of assistance unit
+variable tanf_gross_earned_income {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Gross Earned Income"
+  description "Total monthly earned income of TANF assistance unit members"
+  reference "42 USC 602(a)"
+
+  formula {
+    return sum(earned_income for person in tanf_assistance_unit_members)
+  }
+
+  default 0
+}
+
+# Gross unearned income of assistance unit
+variable tanf_gross_unearned_income {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Gross Unearned Income"
+  description "Total monthly unearned income of TANF assistance unit members"
+  reference "42 USC 602(a)"
+
+  formula {
+    # Typically includes:
+    # - Child support received
+    # - Social Security (non-SSI)
+    # - Unemployment compensation
+    # - Workers' compensation
+    # - Other periodic income
+
+    return sum(unearned_income for person in tanf_assistance_unit_members) -
+           tanf_unearned_income_exclusions
+  }
+
+  default 0
+}
+
+# Total gross income
+variable tanf_gross_income {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Gross Income"
+  description "Total gross income of TANF assistance unit"
+  reference "42 USC 602(a)"
+
+  formula {
+    return tanf_gross_earned_income + tanf_gross_unearned_income
+  }
+
+  default 0
+}
+
+# =============================================================================
+# INCOME EXCLUSIONS
+# =============================================================================
+
+# Unearned income exclusions
+variable tanf_unearned_income_exclusions {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Unearned Income Exclusions"
+  description "Unearned income amounts excluded from TANF calculation"
+  reference "State TANF Plans"
+
+  formula {
+    # Common state exclusions:
+    # - SSI income (SSI recipients usually not in unit)
+    # - Infrequent/irregular income below threshold
+    # - Energy assistance (LIHEAP)
+    # - Education grants and loans
+    # - EITC and tax credits
+    # - Certain housing assistance
+
+    return ssi_income_exclusion + energy_assistance_exclusion +
+           education_assistance_exclusion + tax_credit_exclusion +
+           infrequent_income_exclusion
+  }
+
+  default 0
+}
+
+# =============================================================================
+# EARNED INCOME DISREGARDS
+# =============================================================================
+
+# Flat earned income disregard
+variable tanf_earned_income_disregard_flat {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Flat Earned Income Disregard"
+  description "Flat dollar amount disregarded from earned income"
+  reference "State TANF Plans"
+
+  formula {
+    # Historical AFDC work expense deduction was $90
+    # States now use various amounts or have eliminated
+
+    let flat_disregard = parameter(gov.hhs.acf.tanf.default.earned_income_disregard_flat)
+    return min(flat_disregard, tanf_gross_earned_income)
+  }
+
+  default 0
+}
+
+# Percentage earned income disregard
+variable tanf_earned_income_disregard_percent {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Percentage Earned Income Disregard"
+  description "Percentage of earned income disregarded after flat disregard"
+  reference "State TANF Plans"
+
+  formula {
+    let rate = parameter(gov.hhs.acf.tanf.default.earned_income_disregard_rate)
+    let after_flat = tanf_gross_earned_income - tanf_earned_income_disregard_flat
+
+    return max(0, after_flat * rate)
+  }
+
+  default 0
+}
+
+# Total earned income disregard
+variable tanf_earned_income_disregard {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Total Earned Income Disregard"
+  description "Combined earned income disregards"
+  reference "State TANF Plans"
+
+  formula {
+    return tanf_earned_income_disregard_flat + tanf_earned_income_disregard_percent
+  }
+
+  default 0
+}
+
+# Countable earned income
+variable tanf_countable_earned_income {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Countable Earned Income"
+  description "Earned income counted after applying disregards"
+  reference "State TANF Plans"
+
+  formula {
+    return max(0, tanf_gross_earned_income - tanf_earned_income_disregard)
+  }
+
+  default 0
+}
+
+# Total countable income
+variable tanf_countable_income {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Countable Income"
+  description "Total income counted for TANF eligibility and benefit calculation"
+  reference "42 USC 602(a)"
+
+  formula {
+    return tanf_countable_earned_income + tanf_gross_unearned_income
+  }
+
+  default 0
+}
+
+# =============================================================================
+# RESOURCE CALCULATION
+# =============================================================================
+
+# Total resources of unit
+variable tanf_gross_resources {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Gross Resources"
+  description "Total resources/assets of TANF unit members"
+  reference "State TANF Plans"
+
+  formula {
+    return sum(total_resources for person in tanf_assistance_unit_members)
+  }
+
+  default 0
+}
+
+# Resource exclusions
+variable tanf_resource_exclusions {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Resource Exclusions"
+  description "Resources excluded from TANF asset test"
+  reference "State TANF Plans"
+
+  formula {
+    # Common exclusions (most states use SSI-like rules):
+    # - Primary residence
+    # - One vehicle (up to limit or full exclusion)
+    # - Personal effects and household goods
+    # - Burial plots and funds (up to limit)
+    # - Retirement accounts (many states)
+    # - Life insurance (face value limits)
+
+    let vehicle_exclusion = parameter(gov.hhs.acf.tanf.default.vehicle_exclusion)
+
+    return home_value + min(vehicle_value, vehicle_exclusion) +
+           personal_effects_value + burial_exclusion + retirement_accounts
+  }
+
+  default 0
+}
+
+# Countable resources
+variable tanf_countable_resources {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Countable Resources"
+  description "Resources counted for TANF asset test"
+  reference "State TANF Plans"
+
+  formula {
+    return max(0, tanf_gross_resources - tanf_resource_exclusions)
+  }
+
+  default 0
+}
+
+# =============================================================================
+# NEED AND PAYMENT STANDARDS
+# =============================================================================
+
+# Need standard by unit size
+variable tanf_need_standard {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Need Standard"
+  description "Maximum recognizable need for TANF unit based on size"
+  reference "State TANF Plans per 42 USC 602(a)"
+
+  formula {
+    # Need standard varies by unit size
+    # State parameters define amounts
+    let size = tanf_unit_size
+    let standards = parameter(gov.hhs.acf.tanf.default.need_standard)
+
+    if size <= 6 then
+      return standards[size]
+    else
+      # Additional amount per person beyond 6
+      return standards[6] + (standards.additional * (size - 6))
+  }
+
+  default 0
+}
+
+# Payment standard by unit size
+variable tanf_payment_standard {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Payment Standard"
+  description "Maximum monthly payment for TANF unit based on size"
+  reference "State TANF Plans per 42 USC 602(a)"
+
+  formula {
+    # Payment standard often lower than need standard
+    # May be expressed as percentage of need or fixed amounts
+    let size = tanf_unit_size
+    let standards = parameter(gov.hhs.acf.tanf.default.payment_standard)
+
+    if size <= 6 then
+      return standards[size]
+    else
+      return standards[6] + (standards.additional * (size - 6))
+  }
+
+  default 0
+}
+
+# Gross income limit (for initial eligibility)
+variable tanf_gross_income_limit {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Gross Income Limit"
+  description "Maximum gross income for TANF eligibility"
+  reference "State TANF Plans"
+
+  formula {
+    let rate = parameter(gov.hhs.acf.tanf.default.gross_income_limit_rate)
+    return tanf_need_standard * rate
+  }
+
+  default 0
+}
+
+# =============================================================================
+# BENEFIT CALCULATION
+# =============================================================================
+
+# Calculated benefit (before minimums/maximums)
+variable tanf_calculated_benefit {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Calculated Benefit"
+  description "TANF benefit calculated as payment standard minus countable income"
+  reference "State TANF Plans"
+
+  formula {
+    if not tanf_eligible then
+      return 0
+
+    # Basic formula: Payment Standard - Countable Income
+    # Some states use different formulas (e.g., ratable reduction)
+
+    let benefit = tanf_payment_standard - tanf_countable_income
+    return max(0, benefit)
+  }
+
+  default 0
+}
+
+# Minimum benefit (if state has one)
+variable tanf_minimum_benefit {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Minimum Benefit"
+  description "Minimum monthly benefit if eligible (most states have none)"
+  reference "State TANF Plans"
+
+  formula {
+    # Most states do not have minimum benefits
+    # Those that do typically have small amounts ($10-$50)
+    return tanf_minimum_benefit_amount  # State parameter, often 0
+  }
+
+  default 0
+}
+
+# Benefit before sanctions
+variable tanf_benefit_before_sanctions {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Benefit Before Sanctions"
+  description "TANF benefit amount before applying any sanctions"
+  reference "42 USC 602(a)"
+
+  formula {
+    if not tanf_eligible then
+      return 0
+
+    let calculated = tanf_calculated_benefit
+    let minimum = tanf_minimum_benefit
+
+    # Apply minimum benefit floor
+    if calculated > 0 and calculated < minimum then
+      return minimum
+
+    return calculated
+  }
+
+  default 0
+}
+
+# Final TANF benefit
+variable tanf_benefit {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Benefit"
+  description "Final monthly TANF cash benefit after all calculations"
+  reference (
+    "42 USC 601-619",
+    "State TANF Plans per 42 USC 602(a)"
+  )
+
+  formula {
+    if not tanf_eligible then
+      return 0
+
+    let before_sanctions = tanf_benefit_before_sanctions
+    let sanctions = tanf_total_sanction_amount
+
+    # Apply sanctions
+    let after_sanctions = max(0, before_sanctions - sanctions)
+
+    # State supplements (if any)
+    let with_supplements = after_sanctions + tanf_state_supplement
+
+    return with_supplements
+  }
+
+  default 0
+}
+
+# =============================================================================
+# ALTERNATIVE BENEFIT CALCULATION METHODS
+# =============================================================================
+
+# Ratable reduction method (used by some states)
+variable tanf_benefit_ratable_reduction {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Ratable Reduction Benefit"
+  description "Benefit using ratable reduction methodology"
+  reference "State TANF Plans"
+
+  formula {
+    # Some states pay a percentage of need standard
+    # regardless of actual countable income
+    # (as long as income is below need standard)
+
+    if not tanf_net_income_eligible then
+      return 0
+
+    let ratio = parameter(gov.hhs.acf.tanf.default.payment_to_need_ratio)
+    return tanf_need_standard * ratio
+  }
+
+  default 0
+}
+
+# Deficit method (need minus income)
+variable tanf_benefit_deficit_method {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Deficit Method Benefit"
+  description "Benefit using need minus income methodology"
+  reference "State TANF Plans"
+
+  formula {
+    if not tanf_eligible then
+      return 0
+
+    # Payment = Need Standard - Countable Income
+    # (capped at payment standard)
+    let deficit = tanf_need_standard - tanf_countable_income
+    return min(max(0, deficit), tanf_payment_standard)
+  }
+
+  default 0
+}
+
+# =============================================================================
+# STATE SUPPLEMENTS
+# =============================================================================
+
+# State-funded supplement (some states provide additional assistance)
+variable tanf_state_supplement {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF State Supplement"
+  description "Additional state-funded TANF assistance"
+  reference "State TANF Plans"
+
+  formula {
+    # Some states provide supplements for:
+    # - Special needs (disability, pregnancy)
+    # - Housing/utility costs
+    # - High cost-of-living areas
+    # - Other state-specific reasons
+
+    return tanf_special_needs_supplement + tanf_housing_supplement +
+           tanf_other_state_supplements
+  }
+
+  default 0
+}
+
+# =============================================================================
+# TRANSITIONAL BENEFITS
+# =============================================================================
+
+# Transitional benefit eligibility (when leaving TANF for work)
+variable tanf_transitional_benefit_eligible {
+  entity TanfUnit
+  period Month
+  dtype Bool
+  label "TANF Transitional Benefit Eligible"
+  description "Whether unit is eligible for transitional benefits"
+  reference "State TANF Plans"
+
+  formula {
+    # Many states provide transitional benefits to families leaving TANF
+    # for employment, including:
+    # - Transitional child care
+    # - Transitional Medicaid
+    # - Earned income disregards for initial months of employment
+
+    return was_tanf_recipient_prior_month and now_employed and
+           months_since_tanf_exit <= tanf_transitional_period_months
+  }
+
+  default false
+}
+
+# =============================================================================
+# CHILD-ONLY CASES
+# =============================================================================
+
+# Child-only benefit (when adult not included in grant)
+variable tanf_child_only_benefit {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Child-Only Benefit"
+  description "Benefit for child-only cases (no included adult)"
+  reference "State TANF Plans"
+
+  formula {
+    if not tanf_child_only_case then
+      return 0
+
+    # Child-only cases:
+    # - No work requirements for caretaker
+    # - No time limit
+    # - Benefit based on children only
+
+    let child_count = count(is_tanf_eligible_child for person in household_members)
+
+    # Use payment standards for child count only
+    let standards = parameter(gov.hhs.acf.tanf.default.payment_standard)
+    return standards[child_count]
+  }
+
+  default 0
+}
+
+# =============================================================================
+# MAIN EXPORT: TANF BENEFIT
+# =============================================================================
+
+variable tanf {
+  entity TanfUnit
+  period Month
+  dtype Money
+  unit "USD"
+  label "TANF Cash Assistance"
+  description "Monthly Temporary Assistance for Needy Families benefit"
+  reference (
+    "42 USC 601-619",
+    "https://www.acf.hhs.gov/ofa/programs/tanf"
+  )
+
+  formula {
+    # Child-only cases use separate calculation
+    if tanf_child_only_case then
+      return tanf_child_only_benefit
+
+    return tanf_benefit
+  }
+
+  default 0
+}

@@ -1,169 +1,392 @@
-# 26 USC § 24 - Child Tax Credit (Validation Version)
+# 26 USC Section 24 - Child Tax Credit (Validation Version)
 #
 # Standalone encoding for validation against PolicyEngine and other calculators.
 # Uses pre-computed inputs (num_qualifying_children, filing_status, etc.)
-# and applies the § 24 formula to compute the credit amount.
+# and applies the Section 24 formula to compute the credit amount.
 #
-# 2024 parameters:
+# Inlined 2024 parameters (from Rev. Proc. 2023-34):
 # - Credit per child: $2,000 (TCJA)
 # - Refundable (ACTC) cap: $1,700 per child
 # - Phase-out thresholds: $200k single, $400k joint
 # - Phase-out rate: $50 per $1,000 over threshold
+# - Earned income threshold: $2,500
+# - Refundable rate: 15%
 
-imports:
-# Parameter lookups - engine resolves to YAML files
-  credit_amount: statute/26/24/h/2/credit_amount#credit_amount
-  phaseout_threshold_joint: statute/26/24/b/1/threshold#phaseout_threshold_joint
-  phaseout_threshold_single: statute/26/24/b/1/threshold#phaseout_threshold_single
-  phaseout_rate: statute/26/24/b/2/phaseout_rate#phaseout_rate
-  refundable_maximum: statute/26/24/h/5/refundable_maximum#refundable_maximum
-  earned_income_threshold: statute/26/24/d/1/B/parameters#earned_income_threshold
-  refundable_rate: statute/26/24/d/1/B/parameters#refundable_rate
-
-# Filing status values per §1
+# Filing status enum per Section 1
 enum FilingStatus {
-SINGLE
-JOINT
-SEPARATE
-HEAD_OF_HOUSEHOLD
-SURVIVING_SPOUSE
+  SINGLE
+  JOINT
+  SEPARATE
+  HEAD_OF_HOUSEHOLD
+  SURVIVING_SPOUSE
+}
 
-# --- Credit Calculations ---
+# === External Inputs (provided by simulation) ===
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "CTC Phase-Out Threshold"
-description "Income threshold where phase-out begins per § 24(b)(1)"
+# 26 USC Section 24(c)
+variable num_qualifying_children {
+  entity TaxUnit
+  period Year
+  dtype Count
+  label "Number of CTC Qualifying Children"
+  description "Count of children qualifying for Child Tax Credit per Section 24(c)"
+  default 0
+}
 
-formula:
-  return match filing_status {
-  case JOINT => phaseout_threshold_joint
-  case SURVIVING_SPOUSE => phaseout_threshold_joint
-  else => phaseout_threshold_single
+# 26 USC Section 24(h)(4)
+variable num_other_dependents {
+  entity TaxUnit
+  period Year
+  dtype Count
+  label "Number of Other Dependents"
+  description "Count of other dependents qualifying for $500 credit per Section 24(h)(4)"
+  default 0
+}
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "CTC Before Phase-Out"
-description "Total credit for all qualifying children before phase-out"
+# 26 USC Section 62
+variable adjusted_gross_income {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Adjusted Gross Income"
+  description "AGI per Section 62"
+  default 0
+}
 
-formula:
-  return num_qualifying_children * credit_amount
+# 26 USC Section 24(d)(1)(B)
+variable earned_income {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Earned Income"
+  description "Earned income for ACTC calculation per Section 24(d)(1)(B)"
+  default 0
+}
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "CTC Phase-Out Reduction"
-description "Credit reduction based on income exceeding threshold per § 24(b)(2)"
+# 26 USC Section 26(a)
+variable tax_liability_before_credits {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Tax Liability Before Credits"
+  description "Income tax before nonrefundable credits per Section 26(a)"
+  default 0
+}
 
-formula:
-  excess = adjusted_gross_income - ctc_phaseout_threshold
+# 26 USC Section 24(d)(1)(B)(ii)
+variable social_security_taxes {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Social Security Taxes"
+  description "Employee portion of FICA taxes for ACTC calculation"
+  default 0
+}
 
-  if excess <= 0 then
-  return 0
+# 26 USC Section 32
+variable earned_income_credit {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Earned Income Credit"
+  description "EITC amount for ACTC calculation with 3+ children"
+  default 0
+}
 
-  # $50 reduction for each $1,000 (or fraction thereof)
-  increments = ceiling(excess / 1000)
-  return increments * phaseout_rate
+# 26 USC Section 1
+variable filing_status {
+  entity TaxUnit
+  period Year
+  dtype Enum(FilingStatus)
+  label "Filing Status"
+  description "Federal income tax filing status per Section 1"
+  default SINGLE
+}
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Tentative CTC"
-description "Credit after phase-out, before tax liability limit"
+# === Inlined Parameters (2024 values) ===
 
-formula:
-  return max(0, ctc_before_phaseout - ctc_phaseout_reduction)
+# 26 USC Section 24(h)(2)
+variable ctc_credit_amount {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "CTC Credit Amount Per Child"
+  description "Credit amount per qualifying child - $2,000 under TCJA"
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Child Tax Credit (Nonrefundable)"
-description "Nonrefundable CTC limited by tax liability per § 24 and § 26(a)"
+  formula {
+    return 2000
+  }
+}
 
-formula:
-  # Limited to tax liability per § 26(a)
-  return min(tentative_ctc, tax_liability_before_credits)
+# 26 USC Section 24(h)(4)
+variable ctc_other_dependent_amount {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Other Dependent Credit Amount"
+  description "Credit amount per other dependent - $500 under TCJA"
 
-# --- Additional Child Tax Credit (Refundable) per § 24(d) ---
+  formula {
+    return 500
+  }
+}
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "ACTC Earned Income Amount"
-description "15% of earned income exceeding $2,500 per § 24(d)(1)(B)(i)"
+# 26 USC Section 24(b)(1)(A)
+variable ctc_phaseout_threshold_joint {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "CTC Phase-Out Threshold (Joint)"
+  description "AGI threshold for joint filers - $400,000 under TCJA"
 
-formula:
-  excess = max(0, earned_income - earned_income_threshold)
-  return refundable_rate * excess
+  formula {
+    return 400000
+  }
+}
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "ACTC Social Security Amount"
-description "Social security taxes minus EITC per § 24(d)(1)(B)(ii) - for 3+ children only"
+# 26 USC Section 24(b)(1)(B)
+variable ctc_phaseout_threshold_single {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "CTC Phase-Out Threshold (Single)"
+  description "AGI threshold for non-joint filers - $200,000 under TCJA"
 
-formula:
-  # Only for taxpayers with 3+ qualifying children
-  if num_qualifying_children < 3 then
-  return 0
+  formula {
+    return 200000
+  }
+}
 
-  return max(0, social_security_taxes - earned_income_credit)
+# 26 USC Section 24(b)(2)
+variable ctc_phaseout_rate {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "CTC Phase-Out Rate"
+  description "Credit reduction per $1,000 over threshold - $50"
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "ACTC Limit Amount"
-description "Greater of earned income or social security amount per § 24(d)(1)(B)"
+  formula {
+    return 50
+  }
+}
 
-formula:
-  return max(actc_earned_income_amount, actc_social_security_amount)
+# 26 USC Section 24(h)(5), Rev. Proc. 2023-34
+variable actc_refundable_maximum {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "ACTC Refundable Maximum Per Child"
+  description "Maximum refundable amount per child - $1,700 for 2024"
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "ACTC Per-Child Cap"
-description "Maximum refundable amount based on number of children per § 24(h)(5)"
+  formula {
+    return 1700
+  }
+}
 
-formula:
-  return num_qualifying_children * refundable_maximum
+# 26 USC Section 24(d)(1)(B)(i)
+variable actc_earned_income_threshold {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "ACTC Earned Income Threshold"
+  description "Earned income floor for refundable credit - $2,500"
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Additional Child Tax Credit (Refundable)"
-description "Refundable ACTC per 26 USC § 24(d)"
+  formula {
+    return 2500
+  }
+}
 
-formula:
-  # Unused credit (tentative minus what was applied to tax)
-  unused = tentative_ctc - child_tax_credit
+# 26 USC Section 24(d)(1)(B)(i)
+variable actc_refundable_rate {
+  entity TaxUnit
+  period Year
+  dtype Rate
+  label "ACTC Refundable Rate"
+  description "Percentage of earned income above threshold - 15%"
 
-  if unused <= 0 then
-  return 0
+  formula {
+    return 0.15
+  }
+}
 
-  # ACTC is the lesser of:
-  # (A) Unused credit (§ 24(d)(1)(A))
-  # (B) Earned income/social security limit (§ 24(d)(1)(B))
-  # Also capped by per-child maximum (§ 24(h)(5))
-  return min(unused, min(actc_limit_amount, actc_per_child_cap))
+# === Credit Calculations ===
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Total Child Tax Credit"
-description "Sum of nonrefundable CTC and refundable ACTC per 26 USC § 24"
+# 26 USC Section 24(b)(1)
+variable ctc_phaseout_threshold {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "CTC Phase-Out Threshold"
+  description "Income threshold where phase-out begins per Section 24(b)(1)"
 
-formula:
-  return child_tax_credit + additional_child_tax_credit
+  formula {
+    return match filing_status {
+      case JOINT => ctc_phaseout_threshold_joint
+      case SURVIVING_SPOUSE => ctc_phaseout_threshold_joint
+      else => ctc_phaseout_threshold_single
+    }
+  }
+}
+
+# 26 USC Section 24(a)
+variable ctc_before_phaseout {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "CTC Before Phase-Out"
+  description "Total credit for all qualifying children and other dependents before phase-out"
+
+  formula {
+    let child_credit = num_qualifying_children * ctc_credit_amount
+    let other_credit = num_other_dependents * ctc_other_dependent_amount
+    return child_credit + other_credit
+  }
+}
+
+# 26 USC Section 24(b)(2)
+variable ctc_phaseout_reduction {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "CTC Phase-Out Reduction"
+  description "Credit reduction based on income exceeding threshold per Section 24(b)(2)"
+
+  formula {
+    let excess = adjusted_gross_income - ctc_phaseout_threshold
+    if excess <= 0 then 0
+    else ceil(excess / 1000) * ctc_phaseout_rate
+  }
+}
+
+# 26 USC Section 24(a)
+variable tentative_ctc {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Tentative CTC"
+  description "Credit after phase-out, before tax liability limit"
+
+  formula {
+    return max(0, ctc_before_phaseout - ctc_phaseout_reduction)
+  }
+}
+
+# 26 USC Section 24
+variable child_tax_credit {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Child Tax Credit (Nonrefundable)"
+  description "Nonrefundable CTC limited by tax liability per Section 24 and Section 26(a)"
+
+  formula {
+    return min(tentative_ctc, tax_liability_before_credits)
+  }
+}
+
+# === Additional Child Tax Credit (Refundable) per Section 24(d) ===
+
+# 26 USC Section 24(d)(1)(B)(i)
+variable actc_earned_income_amount {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "ACTC Earned Income Amount"
+  description "15% of earned income exceeding $2,500 per Section 24(d)(1)(B)(i)"
+
+  formula {
+    let excess = max(0, earned_income - actc_earned_income_threshold)
+    return actc_refundable_rate * excess
+  }
+}
+
+# 26 USC Section 24(d)(1)(B)(ii)
+variable actc_social_security_amount {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "ACTC Social Security Amount"
+  description "Social security taxes minus EITC per Section 24(d)(1)(B)(ii) - for 3+ children only"
+
+  formula {
+    if num_qualifying_children < 3 then 0
+    else max(0, social_security_taxes - earned_income_credit)
+  }
+}
+
+# 26 USC Section 24(d)(1)(B)
+variable actc_limit_amount {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "ACTC Limit Amount"
+  description "Greater of earned income or social security amount per Section 24(d)(1)(B)"
+
+  formula {
+    return max(actc_earned_income_amount, actc_social_security_amount)
+  }
+}
+
+# 26 USC Section 24(h)(5)
+variable actc_per_child_cap {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "ACTC Per-Child Cap"
+  description "Maximum refundable amount based on number of children per Section 24(h)(5)"
+
+  formula {
+    return num_qualifying_children * actc_refundable_maximum
+  }
+}
+
+# 26 USC Section 24(d)
+variable additional_child_tax_credit {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Additional Child Tax Credit (Refundable)"
+  description "Refundable ACTC per 26 USC Section 24(d)"
+
+  formula {
+    let unused = tentative_ctc - child_tax_credit
+    if unused <= 0 then 0
+    else min(unused, min(actc_limit_amount, actc_per_child_cap))
+  }
+}
+
+# 26 USC Section 24
+variable total_child_tax_credit {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Total Child Tax Credit"
+  description "Sum of nonrefundable CTC and refundable ACTC per 26 USC Section 24"
+
+  formula {
+    return child_tax_credit + additional_child_tax_credit
+  }
+}

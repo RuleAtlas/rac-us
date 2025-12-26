@@ -1,0 +1,242 @@
+# 20 USC 1070a - Pell Grant Award Calculation
+#
+# "The amount of the Federal Pell Grant for a student...shall be—
+#   (A) the cost of attendance..., minus
+#   (B) the expected family contribution..."
+#
+# Award is prorated by:
+# - Enrollment intensity (full-time, 3/4-time, half-time, less-than-half-time)
+# - Months enrolled in academic year
+#
+# References:
+# - 20 USC 1070a(b)(2) - Award calculation
+# - 34 CFR 690 - Pell Grant regulations
+
+imports:
+  # Eligibility and contribution
+  pell_grant_eligible: statute/20/1070a/eligibility#pell_grant_eligible
+  pell_grant_efc: statute/20/1070a/efc#pell_grant_efc
+  pell_grant_sai: statute/20/1070a/sai#pell_grant_sai
+  pell_grant_eligibility_type: statute/20/1070a/eligibility#pell_grant_eligibility_type
+  uses_efc: statute/20/1070a/calculation_method#uses_efc
+  uses_sai: statute/20/1070a/calculation_method#uses_sai
+
+  # Institutional information
+  cost_of_attendance: statute/20/1070a/inputs#cost_of_attendance
+  months_in_school: statute/20/1070a/inputs#months_in_school
+
+  # Parameters
+  amount_params: statute/20/1070a/parameters#amount
+  enrollment_params: statute/20/1070a/parameters#enrollment
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Pell Grant"
+description "Federal Pell Grant award amount per 20 USC 1070a"
+
+formula:
+  coa = cost_of_attendance
+  months = months_in_school
+  efc = pell_grant_efc
+  sai = pell_grant_sai
+  eligibility_type = pell_grant_eligibility_type
+
+  # Determine which contribution methodology applies
+  use_efc = uses_efc
+  use_sai = uses_sai
+
+  # Select applicable contribution
+  contribution = select(
+    [use_efc, use_sai],
+    [efc, sai]
+  )
+
+  # Calculate raw award (COA minus contribution)
+  raw_award = coa - contribution
+
+  # Apply minimum threshold: if below min, no award
+  min_award = amount_params.min
+  max_award = amount_params.max
+  months_in_year = enrollment_params.months_in_school_year
+
+  # Award must be at least minimum to be disbursed
+  above_minimum = raw_award >= min_award
+
+  # EFC methodology: prorate by months and cap
+  efc_award = where(
+    above_minimum,
+    raw_award * (months / months_in_year),
+    0
+  )
+
+  # SAI methodology: Use eligibility type
+  sai_award = select(
+    [eligibility_type == INELIGIBLE,
+     eligibility_type == MAXIMUM,
+     eligibility_type == MINIMUM],
+    [0,
+     max_award,
+     where(above_minimum, raw_award, 0)],
+    default=where(above_minimum, raw_award, 0)  # CALCULATED
+  )
+
+  # Select final award based on methodology
+  uncapped_award = select(
+    [use_efc, use_sai],
+    [efc_award, sai_award]
+  )
+
+  # Cap at maximum and COA
+  final_cap = min(coa, max_award)
+
+  return min(final_cap, max(0, uncapped_award))
+
+# =============================================================================
+# STUDENT AID INDEX (SAI) - 2024+ Methodology
+# =============================================================================
+
+---
+# 20 USC 1070a - Student Aid Index (SAI)
+#
+# Under FAFSA Simplification Act (effective 2024-25), the SAI replaces EFC.
+# Key differences:
+# - SAI can be negative (minimum -$1,500)
+# - Eligibility determined by AGI as fraction of FPG
+# - Simplified calculation compared to EFC
+
+imports:
+  head_contribution: statute/20/1070a/efc#head_contribution
+  dependent_contribution: statute/20/1070a/efc#dependent_contribution
+  pell_grant_formula: statute/20/1070a/eligibility#pell_grant_formula
+  pell_grant_eligibility_type: statute/20/1070a/eligibility#pell_grant_eligibility_type
+
+  # Parameters
+  sai_limits: statute/20/1070a/parameters#sai.limits
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Student Aid Index"
+description "Student Aid Index replacing EFC under FAFSA Simplification (2024+)"
+
+formula:
+  formula_type = pell_grant_formula
+  eligibility = pell_grant_eligibility_type
+
+  head = head_contribution
+  dependent = dependent_contribution
+
+  # Dependent contribution only applies for Formula A
+  applies_dependent = (formula_type == A)
+  total_dependent = where(applies_dependent, dependent, 0)
+
+  # Raw SAI before bounds
+  raw_sai = head + total_dependent
+
+  # Apply bounds
+  min_sai = sai_limits.min_sai
+  max_sai = where(
+    eligibility == MAXIMUM,
+    0,  # Maximum eligibility = SAI capped at 0
+    sai_limits.max_sai
+  )
+
+  # Bound the SAI
+  bounded_sai = min(raw_sai, max_sai)
+  return max(bounded_sai, min_sai)
+
+# =============================================================================
+# CALCULATION METHOD (EFC vs SAI)
+# =============================================================================
+
+---
+# Pell Grant Calculation Method
+#
+# Determines whether EFC (pre-2024) or SAI (2024+) methodology applies.
+
+entity TaxUnit
+period Year
+dtype Enum["EFC", "SAI"]
+label "Pell Grant Calculation Method"
+description "Whether EFC or SAI methodology applies for the award year"
+
+formula:
+  # SAI takes effect for 2024-25 award year (July 2024)
+  # Before July 2024: Use EFC
+  # July 2024 and after: Use SAI
+
+  return SAI  # Default for 2024+
+
+formula_2023:
+  return EFC  # 2023-24 and earlier use EFC
+
+---
+# Uses EFC (helper variable)
+
+imports:
+  calculation_method: statute/20/1070a/award#calculation_method
+
+entity Person
+period Year
+dtype Boolean
+label "Uses EFC Methodology"
+
+formula:
+  method = calculation_method
+  return method == EFC
+
+---
+# Uses SAI (helper variable)
+
+imports:
+  calculation_method: statute/20/1070a/award#calculation_method
+
+entity Person
+period Year
+dtype Boolean
+label "Uses SAI Methodology"
+
+formula:
+  method = calculation_method
+  return method == SAI
+
+# =============================================================================
+# INPUT VARIABLES
+# =============================================================================
+
+---
+# Cost of Attending College
+#
+# Institutional COA includes tuition, fees, room, board, books,
+# supplies, transportation, and personal expenses.
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Cost of Attending College"
+description "Total cost of attendance at the student's institution"
+default_value: 0
+
+# This is typically an input from the institution, not calculated
+
+---
+# Months in School
+#
+# Number of months student is enrolled in the academic year.
+
+imports:
+  months_in_year: statute/20/1070a/parameters#enrollment.months_in_school_year
+
+entity Person
+period Year
+dtype Integer
+unit "months"
+label "Months Enrolled in School Year"
+description "Number of months student is enrolled during the academic year"
+default_value: 9
+
+# Input variable with default of full academic year

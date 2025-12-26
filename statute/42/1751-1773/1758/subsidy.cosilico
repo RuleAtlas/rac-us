@@ -1,0 +1,192 @@
+# 42 USC 1751 et seq. - School Meal Subsidy Calculation
+#
+# This file calculates the annual value of school meal subsidies
+# for the National School Lunch Program (NSLP) and School Breakfast
+# Program (SBP).
+#
+# The subsidy value depends on:
+# 1. Eligibility tier (Free, Reduced, Paid)
+# 2. Geographic location (Contiguous US, Alaska, Hawaii)
+# 3. Number of school days (typically 180/year)
+# 4. Number of children in school
+#
+# NSLP established: 42 USC 1751 (National School Lunch Act)
+# SBP established: 42 USC 1773 (School Breakfast Program)
+#
+# Reimbursement rates published annually by USDA FNS in Federal Register
+#
+# References:
+# - https://www.law.cornell.edu/uscode/text/42/1751
+# - https://www.law.cornell.edu/uscode/text/42/1773
+# - https://www.fns.usda.gov/cn/child-nutrition-programs-income-eligibility-guidelines
+
+imports:
+  nslp: statute/42/1751-1773/nslp
+  sbp: statute/42/1751-1773/sbp
+  school_days: statute/42/1751-1773/school_days
+  school_meal_tier: statute/42/1751-1773/1758/tier
+
+# ------------------------------------------------------------------------------
+# school_meal_daily_subsidy
+# Daily reimbursement value per child based on tier and location
+# Combines NSLP (lunch) and SBP (breakfast) rates
+# ------------------------------------------------------------------------------
+
+variable school_meal_daily_subsidy
+entity Household
+period Year
+dtype Money
+
+formula:
+  # Get state group for rate lookup (AK, HI, or contiguous US)
+  state = household.state
+
+  # Get tier for household (assumes all children same tier)
+  # In reality this is per-person, but simplifying to household level
+  tier = household.school_meal_tier
+
+  # Look up NSLP and SBP rates based on state and tier
+  if state == "AK" then
+    nslp_rate = select(tier,
+      SchoolMealTier.FREE: nslp.alaska.free,
+      SchoolMealTier.REDUCED: nslp.alaska.reduced,
+      SchoolMealTier.PAID: nslp.alaska.paid
+    )
+    sbp_rate = select(tier,
+      SchoolMealTier.FREE: sbp.alaska.free,
+      SchoolMealTier.REDUCED: sbp.alaska.reduced,
+      SchoolMealTier.PAID: sbp.alaska.paid
+    )
+  else if state == "HI" then
+    nslp_rate = select(tier,
+      SchoolMealTier.FREE: nslp.hawaii.free,
+      SchoolMealTier.REDUCED: nslp.hawaii.reduced,
+      SchoolMealTier.PAID: nslp.hawaii.paid
+    )
+    sbp_rate = select(tier,
+      SchoolMealTier.FREE: sbp.hawaii.free,
+      SchoolMealTier.REDUCED: sbp.hawaii.reduced,
+      SchoolMealTier.PAID: sbp.hawaii.paid
+    )
+  else
+    # Contiguous US (48 states + DC)
+    nslp_rate = select(tier,
+      SchoolMealTier.FREE: nslp.contiguous_us.free,
+      SchoolMealTier.REDUCED: nslp.contiguous_us.reduced,
+      SchoolMealTier.PAID: nslp.contiguous_us.paid
+    )
+    sbp_rate = select(tier,
+      SchoolMealTier.FREE: sbp.contiguous_us.free,
+      SchoolMealTier.REDUCED: sbp.contiguous_us.reduced,
+      SchoolMealTier.PAID: sbp.contiguous_us.paid
+    )
+
+  return nslp_rate + sbp_rate
+
+# ------------------------------------------------------------------------------
+# school_meal_paid_daily_subsidy
+# Daily reimbursement value for PAID tier (baseline)
+# Used to calculate NET subsidy (tier rate - paid rate)
+# ------------------------------------------------------------------------------
+
+variable school_meal_paid_daily_subsidy
+entity Household
+period Year
+dtype Money
+
+formula:
+  # Get state group for rate lookup
+  state = household.state
+
+  # Look up PAID tier rates
+  if state == "AK" then
+    nslp_paid = nslp.alaska.paid
+    sbp_paid = sbp.alaska.paid
+  else if state == "HI" then
+    nslp_paid = nslp.hawaii.paid
+    sbp_paid = sbp.hawaii.paid
+  else
+    nslp_paid = nslp.contiguous_us.paid
+    sbp_paid = sbp.contiguous_us.paid
+
+  return nslp_paid + sbp_paid
+
+# ------------------------------------------------------------------------------
+# school_meal_net_daily_subsidy
+# Net daily subsidy = tier subsidy - paid baseline
+# This is the additional value from being in free/reduced tier
+# ------------------------------------------------------------------------------
+
+variable school_meal_net_daily_subsidy
+entity Household
+period Year
+dtype Money
+
+formula:
+  gross_subsidy = school_meal_daily_subsidy
+  paid_baseline = school_meal_paid_daily_subsidy
+
+  return max(gross_subsidy - paid_baseline, 0)
+
+# ------------------------------------------------------------------------------
+# school_meal_annual_subsidy
+# Annual value of school meal subsidies for household
+# = (daily net subsidy) * (school days) * (number of K-12 children)
+# ------------------------------------------------------------------------------
+
+variable school_meal_annual_subsidy
+entity Household
+period Year
+dtype Money
+
+formula:
+  # Net daily subsidy per child
+  daily_subsidy = school_meal_net_daily_subsidy
+
+  # Number of school days per year
+  days = school_days
+
+  # Count children in K-12 school in household
+  children_in_school = sum(household.members.is_in_k12_school)
+
+  return daily_subsidy * days * children_in_school
+
+# ------------------------------------------------------------------------------
+# free_school_meals
+# Annual value of FREE school meals for household
+# Only counts if household is in FREE tier
+# ------------------------------------------------------------------------------
+
+variable free_school_meals
+entity Household
+period Year
+dtype Money
+
+formula:
+  tier = household.school_meal_tier
+  is_free = tier == SchoolMealTier.FREE
+
+  if is_free then
+    return school_meal_annual_subsidy
+  else
+    return 0
+
+# ------------------------------------------------------------------------------
+# reduced_price_school_meals
+# Annual value of REDUCED-PRICE school meals for household
+# Only counts if household is in REDUCED tier
+# ------------------------------------------------------------------------------
+
+variable reduced_price_school_meals
+entity Household
+period Year
+dtype Money
+
+formula:
+  tier = household.school_meal_tier
+  is_reduced = tier == SchoolMealTier.REDUCED
+
+  if is_reduced then
+    return school_meal_annual_subsidy
+  else
+    return 0

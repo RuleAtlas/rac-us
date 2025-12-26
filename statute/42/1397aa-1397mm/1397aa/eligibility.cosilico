@@ -1,0 +1,365 @@
+# 42 USC 1397aa-1397jj - CHIP Eligibility
+#
+# Title XXI of the Social Security Act establishes the State Children's
+# Health Insurance Program (CHIP). Key definitions are in section 2110
+# (42 USC 1397jj).
+#
+# "SEC. 2110. [42 U.S.C. 1397jj] DEFINITIONS.
+#   (a) CHILD.--
+#      (1) IN GENERAL.--Subject to paragraph (2), the term 'child' means an
+#          individual under 19 years of age.
+#   (b) TARGETED LOW-INCOME CHILD.--The term 'targeted low-income child' means
+#       a child--
+#      (1) who has been determined eligible by the State for child health
+#          assistance under the State child health plan;
+#      (2)(A) who is a low-income child, or
+#         (B) is a child--
+#            (i) whose family income... exceeds the medicaid applicable income
+#                level..., but
+#            (ii) does not exceed 50 percentage points above the medicaid
+#                 applicable income level...;
+#      (3) who is not found to be eligible for medical assistance under
+#          title XIX or... under a waiver...;
+#      (4) who is not covered under a group health plan or under health
+#          insurance coverage..."
+#
+# Note: Many CHIP provisions are state-specific. This file implements federal
+# baseline eligibility logic that states build upon.
+
+imports:
+  # Age parameters
+  max_age: statute/42/1397aa-1397mm/age/max_age
+
+  # Income limits by state and category
+  child_income_limit: statute/42/1397aa-1397mm/income/child
+  pregnant_income_limit: statute/42/1397aa-1397mm/income/pregnant
+  fcep_income_limit: statute/42/1397aa-1397mm/income/fcep
+
+  # Federal matching ceiling
+  fmap_ceiling: statute/42/1397aa-1397mm/income/fmap_ceiling
+
+  # Immigration requirements
+  requires_lawful_presence: statute/42/1397aa-1397mm/immigration/requires_lawful_presence
+
+# =============================================================================
+# CHIP CATEGORIES
+# 42 USC 1397jj - Definition of targeted low-income child
+# =============================================================================
+
+# Enumeration of CHIP eligibility categories
+enum CHIPCategory {
+  CHILD,              # Standard child coverage (under 19)
+  PREGNANT_STANDARD,  # Pregnant woman (standard CHIP pathway)
+  PREGNANT_FCEP,      # Pregnant woman (From-Conception-to-End-of-Pregnancy)
+  NONE                # Not eligible
+}
+
+# =============================================================================
+# AGE ELIGIBILITY
+# 42 USC 1397jj(c)(1): "Child" means individual under 19 years of age
+# =============================================================================
+
+# Check if person meets CHIP age requirement (child category)
+entity Person
+period Year
+dtype Boolean
+label "Meets CHIP Age Requirement"
+description "Under 19 years of age per 42 USC 1397jj(c)(1)"
+
+formula:
+  return age < max_age
+
+# =============================================================================
+# IMMIGRATION ELIGIBILITY
+# 42 USC 1397jj(b)(2): Targeted low-income child requirements
+# Generally requires lawful presence; undocumented immigrants excluded
+# =============================================================================
+
+entity Person
+period Year
+dtype Boolean
+label "CHIP Immigration Eligible"
+description "Meets immigration status requirements for CHIP"
+
+formula:
+  # Undocumented immigrants are not eligible for CHIP
+  # 8 USC 1611 excludes undocumented aliens from federal public benefits
+  if requires_lawful_presence then
+    # Check if person has lawful immigration status
+    # Undocumented status disqualifies
+    return not is_undocumented_immigrant
+  else
+    return true
+
+# =============================================================================
+# INCOME ELIGIBILITY
+# 42 USC 1397jj(b)(2): Income above Medicaid but below CHIP threshold
+# =============================================================================
+
+# Get income limit applicable to this person based on state and category
+entity Person
+period Year
+dtype Rate
+label "CHIP Income Limit"
+description "Upper income limit as fraction of FPL for person's CHIP category"
+
+formula:
+  state = household.state_code
+
+  # Pregnant women: check FCEP first (more states offer it), then standard
+  if is_pregnant then
+    fcep_limit = fcep_income_limit[state]
+    pregnant_limit = pregnant_income_limit[state]
+
+    # Return highest applicable limit (state may offer both pathways)
+    if fcep_limit > 0 then
+      return fcep_limit
+    if pregnant_limit > 0 then
+      return pregnant_limit
+    return 0  # No pregnant coverage in this state
+
+  # Children: use child income limit
+  if age < max_age then
+    return child_income_limit[state]
+
+  # Not eligible (over age, not pregnant)
+  return 0
+
+# Check income eligibility
+entity Person
+period Year
+dtype Boolean
+label "CHIP Income Eligible"
+description "Income is above Medicaid limit but below CHIP limit"
+
+formula:
+  # Get person's income as percentage of FPL
+  # Uses MAGI-based methodology same as Medicaid
+  income_pct_fpl = medicaid_income_level
+
+  # Get CHIP income limit for this person's state and category
+  limit = chip_income_limit
+
+  # State must offer CHIP coverage (limit > 0)
+  # Negative infinity (-.inf) indicates no separate CHIP program
+  if limit <= 0 then
+    return false
+
+  # Income must be at or below the limit
+  return income_pct_fpl <= limit
+
+# =============================================================================
+# MEDICAID SCREEN
+# 42 USC 1397jj(b)(3): Not eligible if found eligible for Medicaid
+# CHIP is for children who earn too much for Medicaid
+# =============================================================================
+
+entity Person
+period Year
+dtype Boolean
+label "Not Medicaid Eligible (CHIP Screen)"
+description "Person is not eligible for Medicaid (required for CHIP)"
+
+formula:
+  # CHIP is only for those NOT eligible for Medicaid
+  # If Medicaid-eligible, must enroll in Medicaid instead
+  return not is_medicaid_eligible
+
+# =============================================================================
+# CATEGORY DETERMINATION
+# Determine which CHIP pathway applies to each person
+# =============================================================================
+
+entity Person
+period Year
+dtype CHIPCategory
+label "CHIP Category"
+description "Category under which person may be eligible for CHIP"
+
+formula:
+  state = household.state_code
+
+  # Check child eligibility first (primary CHIP population)
+  if age < max_age then
+    child_limit = child_income_limit[state]
+    if child_limit > 0 then
+      return CHIPCategory.CHILD
+
+  # Check pregnant woman eligibility
+  if is_pregnant then
+    # FCEP pathway (unborn child coverage)
+    fcep_limit = fcep_income_limit[state]
+    if fcep_limit > 0 then
+      return CHIPCategory.PREGNANT_FCEP
+
+    # Standard pregnant pathway
+    pregnant_limit = pregnant_income_limit[state]
+    if pregnant_limit > 0 then
+      return CHIPCategory.PREGNANT_STANDARD
+
+  return CHIPCategory.NONE
+
+# =============================================================================
+# CHILD ELIGIBILITY
+# 42 USC 1397jj(b): Targeted low-income child
+# =============================================================================
+
+entity Person
+period Year
+dtype Boolean
+label "Child Eligible for CHIP"
+description "Child meets all CHIP eligibility requirements"
+
+formula:
+  state = household.state_code
+
+  # (1) Age eligibility: under 19
+  if not is_chip_age_eligible then
+    return false
+
+  # (2) State offers CHIP for children
+  child_limit = child_income_limit[state]
+  if child_limit <= 0 then
+    return false
+
+  # (3) Immigration eligibility
+  if not is_chip_immigration_eligible then
+    return false
+
+  # (4) Not Medicaid eligible (CHIP is for those above Medicaid limits)
+  if is_medicaid_eligible then
+    return false
+
+  # (5) Income eligibility: at or below state CHIP limit
+  income_pct_fpl = medicaid_income_level
+  if income_pct_fpl > child_limit then
+    return false
+
+  return true
+
+# =============================================================================
+# PREGNANT WOMAN ELIGIBILITY - STANDARD PATHWAY
+# State option to cover pregnant women through standard CHIP
+# =============================================================================
+
+entity Person
+period Year
+dtype Boolean
+label "Pregnant Woman Eligible for Standard CHIP"
+description "Pregnant woman meets standard CHIP eligibility requirements"
+
+formula:
+  state = household.state_code
+
+  # (1) Must be pregnant
+  if not is_pregnant then
+    return false
+
+  # (2) State offers standard pregnant coverage
+  pregnant_limit = pregnant_income_limit[state]
+  if pregnant_limit <= 0 then
+    return false
+
+  # (3) Immigration eligibility
+  if not is_chip_immigration_eligible then
+    return false
+
+  # (4) Not Medicaid eligible
+  if is_medicaid_eligible then
+    return false
+
+  # (5) Income eligibility
+  income_pct_fpl = medicaid_income_level
+  if income_pct_fpl > pregnant_limit then
+    return false
+
+  return true
+
+# =============================================================================
+# PREGNANT WOMAN ELIGIBILITY - FCEP PATHWAY
+# From-Conception-to-End-of-Pregnancy (unborn child) coverage
+# =============================================================================
+
+entity Person
+period Year
+dtype Boolean
+label "Pregnant Woman Eligible for CHIP FCEP"
+description "Pregnant woman meets FCEP (unborn child) eligibility requirements"
+
+formula:
+  state = household.state_code
+
+  # (1) Must be pregnant
+  if not is_pregnant then
+    return false
+
+  # (2) State offers FCEP coverage
+  fcep_limit = fcep_income_limit[state]
+  if fcep_limit <= 0 then
+    return false
+
+  # (3) Immigration eligibility
+  if not is_chip_immigration_eligible then
+    return false
+
+  # (4) Not Medicaid eligible
+  if is_medicaid_eligible then
+    return false
+
+  # (5) Income eligibility
+  income_pct_fpl = medicaid_income_level
+  if income_pct_fpl > fcep_limit then
+    return false
+
+  return true
+
+# =============================================================================
+# PREGNANT WOMAN ELIGIBILITY - ANY PATHWAY
+# Eligible through either standard or FCEP pathway
+# =============================================================================
+
+entity Person
+period Year
+dtype Boolean
+label "Pregnant Woman Eligible for CHIP"
+description "Pregnant woman eligible through standard or FCEP CHIP pathway"
+
+formula:
+  return is_chip_eligible_standard_pregnant or is_chip_eligible_fcep_pregnant
+
+# =============================================================================
+# MAIN ELIGIBILITY DETERMINATION
+# Combined eligibility across all CHIP categories
+# =============================================================================
+
+entity Person
+period Year
+dtype Boolean
+label "CHIP Eligible"
+description "Person is eligible for Children's Health Insurance Program"
+
+formula:
+  # Get person's CHIP category
+  category = chip_category
+
+  # If no applicable category, not eligible
+  if category == CHIPCategory.NONE then
+    return false
+
+  # Check eligibility based on category
+  switch category {
+    CHIPCategory.CHILD => return is_chip_eligible_child
+    CHIPCategory.PREGNANT_STANDARD => return is_chip_eligible_standard_pregnant
+    CHIPCategory.PREGNANT_FCEP => return is_chip_eligible_fcep_pregnant
+    default => return false
+  }
+
+# Alternative simplified eligibility (any pathway)
+entity Person
+period Year
+dtype Boolean
+label "CHIP Eligible (Any Pathway)"
+description "Person eligible through any CHIP pathway"
+
+formula:
+  return is_chip_eligible_child or is_chip_eligible_pregnant

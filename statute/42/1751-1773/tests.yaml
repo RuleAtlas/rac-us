@@ -1,0 +1,349 @@
+# Test cases for National School Lunch Act (42 USC 1751-1773)
+# School Meals Programs: NSLP and SBP
+#
+# These tests verify:
+# 1. Income eligibility thresholds (130% FPL for free, 185% FPL for reduced)
+# 2. Categorical eligibility (SNAP, TANF, FDPIR, foster, homeless, etc.)
+# 3. Tier determination logic
+# 4. Subsidy calculations
+#
+# Reference: https://www.law.cornell.edu/uscode/text/42/1758
+
+# ==============================================================================
+# Income Eligibility Tests
+# 42 USC 1758(b)(1)(A): Income thresholds
+# ==============================================================================
+
+- name: "Free meal eligibility - income at 100% FPL (below 130% threshold)"
+  period: 2024
+  input:
+    household:
+      size: 4
+      gross_income: 32150  # 100% FPL for family of 4 in 2025
+      state: "CA"
+    persons:
+      - age: 10
+        is_student: true
+  output:
+    school_meal_tier: "FREE"
+    school_meal_income_eligible_free: true
+    school_meal_income_eligible_reduced: false
+
+- name: "Free meal eligibility - income at exactly 130% FPL"
+  period: 2024
+  input:
+    household:
+      size: 4
+      gross_income: 41795  # 130% of 32150
+      state: "TX"
+    persons:
+      - age: 8
+        is_student: true
+  output:
+    school_meal_tier: "FREE"
+    school_meal_income_eligible_free: true
+
+- name: "Reduced meal eligibility - income at 150% FPL (between 130-185%)"
+  period: 2024
+  input:
+    household:
+      size: 4
+      gross_income: 48225  # 150% of 32150
+      state: "NY"
+    persons:
+      - age: 12
+        is_student: true
+  output:
+    school_meal_tier: "REDUCED"
+    school_meal_income_eligible_free: false
+    school_meal_income_eligible_reduced: true
+
+- name: "Reduced meal eligibility - income at exactly 185% FPL"
+  period: 2024
+  input:
+    household:
+      size: 4
+      gross_income: 59477  # 185% of 32150
+      state: "FL"
+    persons:
+      - age: 14
+        is_student: true
+  output:
+    school_meal_tier: "REDUCED"
+    school_meal_income_eligible_reduced: true
+
+- name: "Paid meal tier - income above 185% FPL"
+  period: 2024
+  input:
+    household:
+      size: 4
+      gross_income: 75000  # Above 185% FPL
+      state: "WA"
+    persons:
+      - age: 16
+        is_student: true
+  output:
+    school_meal_tier: "PAID"
+    school_meal_income_eligible_free: false
+    school_meal_income_eligible_reduced: false
+
+# ==============================================================================
+# Categorical Eligibility Tests
+# 42 USC 1758(b)(2), (b)(5), (b)(12)
+# ==============================================================================
+
+- name: "SNAP categorical eligibility - qualifies for free regardless of income"
+  period: 2024
+  input:
+    household:
+      size: 4
+      gross_income: 60000  # Above 185% FPL but SNAP overrides
+      state: "IL"
+      receives_snap: true
+    persons:
+      - age: 9
+        is_student: true
+  output:
+    school_meal_tier: "FREE"
+    school_meal_snap_categorically_eligible: true
+    school_meal_categorically_eligible: true
+
+- name: "TANF categorical eligibility"
+  period: 2024
+  input:
+    household:
+      size: 3
+      gross_income: 50000
+      state: "CA"
+      receives_tanf: true
+    persons:
+      - age: 7
+        is_student: true
+  output:
+    school_meal_tier: "FREE"
+    school_meal_tanf_categorically_eligible: true
+    school_meal_categorically_eligible: true
+
+- name: "FDPIR categorical eligibility"
+  period: 2024
+  input:
+    household:
+      size: 5
+      gross_income: 80000
+      state: "AZ"
+      receives_fdpir: true
+    persons:
+      - age: 11
+        is_student: true
+  output:
+    school_meal_tier: "FREE"
+    school_meal_fdpir_categorically_eligible: true
+    school_meal_categorically_eligible: true
+
+- name: "Foster child categorical eligibility"
+  period: 2024
+  input:
+    household:
+      size: 4
+      gross_income: 100000
+      state: "OH"
+    persons:
+      - age: 13
+        is_student: true
+        is_foster_child: true
+  output:
+    school_meal_tier: "FREE"
+    school_meal_foster_categorically_eligible: true
+
+- name: "Homeless child categorical eligibility"
+  period: 2024
+  input:
+    household:
+      size: 2
+      gross_income: 0
+      state: "NV"
+    persons:
+      - age: 6
+        is_student: true
+        is_homeless: true
+  output:
+    school_meal_tier: "FREE"
+    school_meal_homeless_categorically_eligible: true
+
+- name: "Migrant child categorical eligibility"
+  period: 2024
+  input:
+    household:
+      size: 6
+      gross_income: 40000
+      state: "CA"
+    persons:
+      - age: 10
+        is_student: true
+        is_migratory_child: true
+  output:
+    school_meal_tier: "FREE"
+    school_meal_migrant_categorically_eligible: true
+
+- name: "Head Start categorical eligibility"
+  period: 2024
+  input:
+    household:
+      size: 3
+      gross_income: 45000
+      state: "TX"
+    persons:
+      - age: 4
+        is_head_start_eligible: true
+  output:
+    school_meal_tier: "FREE"
+    school_meal_head_start_categorically_eligible: true
+
+# ==============================================================================
+# Community Eligibility Provision (CEP) Tests
+# 42 USC 1758(b)(1)(A)
+# ==============================================================================
+
+- name: "CEP school - all students get free meals regardless of income"
+  period: 2024
+  input:
+    household:
+      size: 4
+      gross_income: 200000  # Very high income
+      state: "MI"
+    persons:
+      - age: 15
+        is_student: true
+        attends_cep_school: true
+  output:
+    school_meal_tier: "FREE"
+    school_meal_cep_eligible: true
+
+# ==============================================================================
+# Household Size Tests
+# Income limits vary by household size
+# ==============================================================================
+
+- name: "Single person household - free eligibility threshold"
+  period: 2024
+  input:
+    household:
+      size: 1
+      gross_income: 20000  # Just below 130% of $15,650
+      state: "CO"
+    persons:
+      - age: 17
+        is_student: true
+  output:
+    school_meal_tier: "FREE"
+
+- name: "Large household (8 persons) - free eligibility threshold"
+  period: 2024
+  input:
+    household:
+      size: 8
+      gross_income: 70000  # Near 130% of $54,150
+      state: "GA"
+    persons:
+      - age: 8
+        is_student: true
+      - age: 10
+        is_student: true
+      - age: 12
+        is_student: true
+  output:
+    school_meal_tier: "FREE"
+
+# ==============================================================================
+# Geographic Rate Tests
+# Alaska and Hawaii have higher reimbursement rates
+# ==============================================================================
+
+- name: "Alaska - higher NSLP/SBP rates"
+  period: 2024
+  input:
+    household:
+      size: 4
+      gross_income: 30000
+      state: "AK"
+    persons:
+      - age: 9
+        is_student: true
+  output:
+    school_meal_tier: "FREE"
+    # Alaska free rates: NSLP $7.18 + SBP $3.80 = $10.98/day
+    # vs Contiguous US: NSLP $4.43 + SBP $2.37 = $6.80/day
+
+- name: "Hawaii - higher NSLP/SBP rates"
+  period: 2024
+  input:
+    household:
+      size: 4
+      gross_income: 30000
+      state: "HI"
+    persons:
+      - age: 11
+        is_student: true
+  output:
+    school_meal_tier: "FREE"
+    # Hawaii free rates: NSLP $5.76 + SBP $3.06 = $8.82/day
+
+# ==============================================================================
+# Non-Student Tests
+# Children not in K-12 school do not qualify
+# ==============================================================================
+
+- name: "Preschool child (age 4, not in K-12) - not eligible"
+  period: 2024
+  input:
+    household:
+      size: 4
+      gross_income: 25000
+      state: "MA"
+    persons:
+      - age: 4
+        is_student: false
+        is_head_start_eligible: false
+  output:
+    is_in_k12_school: false
+    # School meal subsidy would be 0 for this child
+
+- name: "Adult (age 19) - not eligible"
+  period: 2024
+  input:
+    household:
+      size: 2
+      gross_income: 20000
+      state: "PA"
+    persons:
+      - age: 19
+        is_student: true
+  output:
+    is_in_k12_school: false
+
+# ==============================================================================
+# Multiple Children Tests
+# Subsidy scales with number of K-12 children
+# ==============================================================================
+
+- name: "Multiple children in household - subsidy multiplied"
+  period: 2024
+  input:
+    household:
+      size: 5
+      gross_income: 35000
+      state: "NC"
+    persons:
+      - age: 35  # Parent
+        is_student: false
+      - age: 33  # Parent
+        is_student: false
+      - age: 8
+        is_student: true
+      - age: 11
+        is_student: true
+      - age: 14
+        is_student: true
+  output:
+    school_meal_tier: "FREE"
+    # 3 K-12 children * 180 days * net daily rate

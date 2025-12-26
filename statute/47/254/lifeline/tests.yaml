@@ -1,0 +1,263 @@
+# 47 CFR § 54.403, § 54.409 - Lifeline Program Tests
+#
+# Test cases for Lifeline eligibility and benefit calculations.
+# Based on 2024 parameters: $9.25/month standard, $25/month tribal supplement
+
+# ===========================================================================
+# Income Eligibility Tests (47 CFR § 54.409(a)(1))
+# ===========================================================================
+
+- name: income_eligible_single_below_threshold
+  description: "Single person below 135% FPL qualifies"
+  period: 2024
+  inputs:
+    household_size: 1
+    gross_income: 19000  # ~125% of FPL ($15,060 * 1.25)
+    is_on_tribal_land: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    phone_cost: 480  # $40/month
+    broadband_cost: 600  # $50/month
+  outputs:
+    fcc_fpg_ratio: 1.26  # 19000 / 15060 = 1.26
+    is_lifeline_income_eligible: true
+    is_lifeline_eligible: true
+    lifeline: 111  # min(9.25*12, 480+600) = min(111, 1080) = 111
+
+- name: income_ineligible_above_threshold
+  description: "Family of 4 above 135% FPL does not qualify on income alone"
+  period: 2024
+  inputs:
+    household_size: 4
+    gross_income: 50000  # ~155% of FPL ($31,200 * 1.55)
+    is_on_tribal_land: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    phone_cost: 480
+    broadband_cost: 600
+  outputs:
+    fcc_fpg_ratio: 1.60  # 50000 / 31200 = 1.60
+    is_lifeline_income_eligible: false
+    is_lifeline_eligible: false
+    lifeline: 0
+
+# ===========================================================================
+# Categorical Eligibility Tests (47 CFR § 54.409(b))
+# ===========================================================================
+
+- name: categorical_medicaid_eligible
+  description: "Medicaid recipient qualifies regardless of income"
+  period: 2024
+  inputs:
+    household_size: 2
+    gross_income: 60000  # Above 135% FPL
+    is_on_tribal_land: false
+    receives_medicaid: true
+    receives_snap: false
+    receives_ssi: false
+    phone_cost: 480
+    broadband_cost: 600
+  outputs:
+    is_lifeline_income_eligible: false
+    is_lifeline_categorically_eligible: true
+    is_lifeline_eligible: true
+    lifeline: 111
+
+- name: categorical_snap_eligible
+  description: "SNAP recipient qualifies"
+  period: 2024
+  inputs:
+    household_size: 3
+    gross_income: 55000
+    is_on_tribal_land: false
+    receives_medicaid: false
+    receives_snap: true
+    receives_ssi: false
+    phone_cost: 480
+    broadband_cost: 600
+  outputs:
+    is_lifeline_categorically_eligible: true
+    is_lifeline_eligible: true
+
+- name: categorical_ssi_eligible
+  description: "SSI recipient qualifies"
+  period: 2024
+  inputs:
+    household_size: 1
+    gross_income: 45000
+    is_on_tribal_land: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: true
+    phone_cost: 480
+    broadband_cost: 600
+  outputs:
+    is_lifeline_categorically_eligible: true
+    is_lifeline_eligible: true
+
+# ===========================================================================
+# Tribal Categorical Eligibility Tests (47 CFR § 54.409(b))
+# ===========================================================================
+
+- name: tribal_head_start_eligible
+  description: "Head Start participant on tribal land qualifies"
+  period: 2024
+  inputs:
+    household_size: 4
+    gross_income: 60000
+    is_on_tribal_land: true
+    is_rural: true
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    receives_head_start: true
+    receives_fdpir: false
+    receives_tanf: false
+    phone_cost: 480
+    broadband_cost: 600
+  outputs:
+    is_lifeline_categorically_eligible_tribal: true
+    is_lifeline_eligible: true
+    # Rural tribal: $9.25 + $25 = $34.25/month
+    lifeline_monthly_max: 34.25
+    lifeline: 411  # 34.25 * 12 = 411
+
+- name: tribal_fdpir_eligible
+  description: "FDPIR participant on tribal land qualifies"
+  period: 2024
+  inputs:
+    household_size: 3
+    gross_income: 50000
+    is_on_tribal_land: true
+    is_rural: true
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    receives_head_start: false
+    receives_fdpir: true
+    receives_tanf: false
+    phone_cost: 480
+    broadband_cost: 600
+  outputs:
+    is_lifeline_categorically_eligible_tribal: true
+    is_lifeline_eligible: true
+    lifeline_monthly_max: 34.25
+
+# ===========================================================================
+# Benefit Calculation Tests (47 CFR § 54.403)
+# ===========================================================================
+
+- name: benefit_capped_at_costs
+  description: "Benefit cannot exceed actual phone/broadband costs"
+  period: 2024
+  inputs:
+    household_size: 1
+    gross_income: 15000
+    is_on_tribal_land: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    phone_cost: 60  # Only $5/month
+    broadband_cost: 0
+  outputs:
+    is_lifeline_eligible: true
+    lifeline: 60  # min(111, 60) = 60 (capped at costs)
+
+- name: benefit_standard_amount
+  description: "Standard household gets $9.25/month = $111/year"
+  period: 2024
+  inputs:
+    household_size: 2
+    gross_income: 20000
+    is_on_tribal_land: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    phone_cost: 600
+    broadband_cost: 600
+  outputs:
+    is_lifeline_eligible: true
+    lifeline_monthly_max: 9.25
+    lifeline: 111
+
+- name: benefit_rural_tribal_enhanced
+  description: "Rural tribal household gets enhanced $34.25/month"
+  period: 2024
+  inputs:
+    household_size: 3
+    gross_income: 25000
+    is_on_tribal_land: true
+    is_rural: true
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    receives_head_start: false
+    receives_fdpir: false
+    receives_tanf: false
+    phone_cost: 600
+    broadband_cost: 600
+  outputs:
+    is_lifeline_eligible: true
+    lifeline_monthly_max: 34.25
+    lifeline: 411  # 34.25 * 12 = 411
+
+- name: tribal_non_rural_no_supplement
+  description: "Non-rural tribal household gets standard amount only"
+  period: 2024
+  inputs:
+    household_size: 2
+    gross_income: 20000
+    is_on_tribal_land: true
+    is_rural: false  # Not rural - no supplement
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    receives_head_start: false
+    receives_fdpir: false
+    receives_tanf: false
+    phone_cost: 600
+    broadband_cost: 600
+  outputs:
+    is_lifeline_eligible: true
+    lifeline_monthly_max: 9.25  # No supplement if not rural
+    lifeline: 111
+
+# ===========================================================================
+# Edge Cases
+# ===========================================================================
+
+- name: no_eligibility_path
+  description: "Household with no qualifying factor is ineligible"
+  period: 2024
+  inputs:
+    household_size: 4
+    gross_income: 100000  # Way above 135% FPL
+    is_on_tribal_land: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    phone_cost: 1200
+    broadband_cost: 1200
+  outputs:
+    is_lifeline_income_eligible: false
+    is_lifeline_categorically_eligible: false
+    is_lifeline_eligible: false
+    lifeline: 0
+
+- name: zero_telecom_costs
+  description: "Zero benefit if no phone/broadband costs"
+  period: 2024
+  inputs:
+    household_size: 1
+    gross_income: 15000
+    is_on_tribal_land: false
+    receives_medicaid: false
+    receives_snap: true  # Categorically eligible
+    receives_ssi: false
+    phone_cost: 0
+    broadband_cost: 0
+  outputs:
+    is_lifeline_eligible: true
+    lifeline: 0  # min(111, 0) = 0

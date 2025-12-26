@@ -1,0 +1,223 @@
+# 42 USC 9858 - Child Care and Development Fund (CCDF) Eligibility
+#
+# CCDF provides federal funding to states to subsidize child care for
+# low-income working families. Eligibility is determined at both the
+# child level (age) and family/unit level (income, activity).
+#
+# Key provisions:
+# - 42 USC 9858n(4) - Eligible child definition
+# - 42 USC 9858c(a)(2)(B) - Income eligibility (85% SMI cap)
+# - 42 USC 9858c(c)(2)(F) - Work/training/education activity requirement
+# - 42 USC 9858n(4)(B) - Protective services eligibility
+#
+# States administer CCDF with significant flexibility within federal limits.
+# This encoding represents the federal minimum requirements; states may
+# have more restrictive or more generous rules.
+
+parameters: parameters.yaml
+
+# =============================================================================
+# CHILD-LEVEL ELIGIBILITY
+# =============================================================================
+
+# Age Eligibility (Person-level)
+# 42 USC 9858n(4)(A)(i) - Under 13 years of age
+entity Person
+period Year
+dtype Boolean
+label "CCDF Age Eligible"
+description "Child meets age requirements for CCDF per 42 USC 9858n(4)(A)"
+reference "42 USC 9858n(4)(A)(i)"
+
+formula:
+  age = this.age
+
+  # Standard age limit: under 13
+  standard_limit = parameters.age_limits.maximum_age
+
+  # Extended limit for children with disabilities: under 19
+  disability_limit = parameters.age_limits.maximum_age_with_disability
+
+  # Check if child has a disability
+  has_disability = this.is_disabled
+
+  # Age eligible if under standard limit, or under disability limit with disability
+  age_limit = if has_disability then disability_limit else standard_limit
+
+  return age < age_limit
+
+
+# =============================================================================
+# UNIT-LEVEL ELIGIBILITY
+# =============================================================================
+
+# Income Eligibility (SPMUnit-level)
+# 42 USC 9858c(a)(2)(B) - Income must not exceed 85% of State Median Income
+entity SPMUnit
+period Year
+dtype Boolean
+label "CCDF Income Eligible"
+description "Family meets income requirements for CCDF per 42 USC 9858c(a)(2)(B)"
+reference "42 USC 9858c(a)(2)(B)"
+
+formula:
+  # Family income for CCDF purposes
+  # States define "income" but typically use gross income
+  family_income = this.ccdf_income
+
+  # State Median Income for this family size
+  # States use HHS-published SMI or their own calculations
+  state_median_income = this.hhs_smi
+
+  # Income as percentage of SMI
+  income_to_smi_ratio = if state_median_income > 0 then
+    family_income / state_median_income
+  else
+    0
+
+  # Federal maximum income limit (85% SMI for initial eligibility)
+  income_limit_smi = parameters.income_eligibility.initial_limit_smi
+
+  return income_to_smi_ratio <= income_limit_smi
+
+
+# Income to SMI Ratio (for use in copayment calculation)
+entity SPMUnit
+period Year
+dtype Rate
+label "CCDF Income to SMI Ratio"
+description "Family income as percentage of State Median Income for CCDF"
+reference "42 USC 9858c(a)(2)(B)"
+
+formula:
+  family_income = this.ccdf_income
+  state_median_income = this.hhs_smi
+
+  return if state_median_income > 0 then
+    family_income / state_median_income
+  else
+    0
+
+
+# CCDF Countable Income (SPMUnit-level)
+# States define what income counts, typically gross market income
+entity SPMUnit
+period Year
+dtype Money
+unit "USD"
+label "CCDF Countable Income"
+description "Income counted for CCDF eligibility determination"
+reference "45 CFR 98.20(a)(2)"
+
+formula:
+  # Most states use gross market income (earned + unearned)
+  # Excludes means-tested benefits
+  return this.market_income
+
+
+# Asset Eligibility (SPMUnit-level)
+# Federal CCDF does not mandate asset tests, but states may impose them
+entity SPMUnit
+period Year
+dtype Boolean
+label "CCDF Asset Eligible"
+description "Family meets asset/resource requirements for CCDF"
+reference "42 USC 9858c(a)(2)"
+
+formula:
+  family_assets = this.spm_unit_assets
+
+  # Federal default is effectively no asset limit
+  # (States may set stricter limits)
+  asset_limit = parameters.asset_limits.federal_default
+
+  return family_assets <= asset_limit
+
+
+# Activity Test (SPMUnit-level)
+# 42 USC 9858c(c)(2)(F) - Parents must be working, training, or in education
+entity SPMUnit
+period Year
+dtype Boolean
+label "CCDF Activity Test Met"
+description "Parent(s) meet activity requirements for CCDF per 42 USC 9858c(c)(2)(F)"
+reference "42 USC 9858c(c)(2)(F)"
+
+formula:
+  # Check if any parent/caretaker in the unit is:
+  # - Employed
+  # - In job training
+  # - In education
+  # - Actively searching for work
+  #
+  # This is an input variable set based on household characteristics
+  # as CCDF activity verification is state-administered
+
+  return this.meets_ccdf_activity_test
+
+
+# =============================================================================
+# CHILD REASON FOR CARE ELIGIBILITY
+# =============================================================================
+
+# Reason for Care Eligibility (Person-level)
+# Child qualifies if parents meet activity test OR child needs protective services
+# 42 USC 9858n(4)(B) - Protective services eligibility pathway
+entity Person
+period Year
+dtype Boolean
+label "CCDF Reason for Care Eligible"
+description "Child qualifies for CCDF due to parent activity or protective services need"
+reference "42 USC 9858n(4)(B)"
+
+formula:
+  # Parents in the unit meet activity requirements
+  parents_meet_activity_test = this.spm_unit.meets_ccdf_activity_test
+
+  # Child receives or needs protective services
+  # This provides an alternative eligibility pathway
+  needs_protective_services = this.receives_or_needs_protective_services
+
+  return parents_meet_activity_test or needs_protective_services
+
+
+# =============================================================================
+# OVERALL ELIGIBILITY
+# =============================================================================
+
+# Overall CCDF Eligibility (Person-level)
+# Combines all eligibility factors for a child
+entity Person
+period Year
+dtype Boolean
+label "CCDF Eligible"
+description "Child is eligible for CCDF child care subsidy per 42 USC 9858"
+reference "42 USC 9858c, 42 USC 9858n(4)"
+
+formula:
+  # Child-level: age eligibility
+  age_eligible = this.is_ccdf_age_eligible
+
+  # Unit-level: income eligibility
+  income_eligible = this.spm_unit.is_ccdf_income_eligible
+
+  # Unit-level: asset eligibility
+  asset_eligible = this.spm_unit.is_ccdf_asset_eligible
+
+  # Person-level: reason for care (activity OR protective services)
+  reason_for_care_eligible = this.is_ccdf_reason_for_care_eligible
+
+  # All conditions must be met
+  return age_eligible and income_eligible and asset_eligible and reason_for_care_eligible
+
+
+# Number of CCDF-Eligible Children in Unit
+entity SPMUnit
+period Year
+dtype Integer
+label "Number of CCDF Eligible Children"
+description "Count of children eligible for CCDF in the assistance unit"
+
+formula:
+  # Count persons in unit who are CCDF eligible
+  return sum(this.members.is_ccdf_eligible)

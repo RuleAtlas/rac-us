@@ -1,0 +1,273 @@
+# 42 USC 9858c(c)(4) - CCDF Benefit (Child Care Subsidy)
+#
+# CCDF subsidizes child care costs for eligible families by paying
+# providers based on market rates, with families responsible for copayments.
+#
+# Key provisions:
+# - 42 USC 9858c(c)(4)(B) - Payment rates based on market surveys
+# - 42 USC 9858c(c)(4)(C) - Equal access to care
+# - 45 CFR 98.45 - Payment rate requirements (75th percentile target)
+#
+# Benefit = Market Rate (for eligible children) - Family Copayment
+#
+# Market rates vary by:
+# - Child age group (infant, toddler, preschool, school-age)
+# - Provider type (center-based, family home, group home)
+# - Duration of care (weekly, daily, part-day, hourly)
+# - Geographic area (county/region clusters)
+
+parameters: parameters.yaml
+
+# =============================================================================
+# MARKET RATE CALCULATION
+# =============================================================================
+
+# Child Age Group for CCDF Rate Determination
+# Different rates apply to different age groups
+entity Person
+period Year
+dtype Enum
+label "CCDF Age Group"
+description "Age group for CCDF market rate determination"
+reference "45 CFR 98.45"
+
+enum CCDFAgeGroup {
+  INFANT       # Under 18 months (or 24 months for home-based)
+  TODDLER      # 18-23 months (or 24-35 months for home-based)
+  PRESCHOOLER  # 3-5 years
+  SCHOOL_AGE   # 6-12 years
+}
+
+formula:
+  age = this.age
+  is_home_based = this.is_ccdf_home_based
+
+  # Age thresholds vary by provider type
+  # Home-based care typically has different age group cutoffs
+  return match true {
+    # Infant: under 18 months (center) or under 24 months (home)
+    case _ where (age < 1.5 and not is_home_based) or (age < 2 and is_home_based) =>
+      CCDFAgeGroup.INFANT
+
+    # Toddler: 18-23 months (center) or 24-35 months (home)
+    case _ where (age < 2 and not is_home_based) or (age < 3 and is_home_based) =>
+      CCDFAgeGroup.TODDLER
+
+    # Preschooler: 2/3-5 years
+    case _ where age < 6 =>
+      CCDFAgeGroup.PRESCHOOLER
+
+    # School-age: 6-12 years
+    else =>
+      CCDFAgeGroup.SCHOOL_AGE
+  }
+
+
+# Duration of Care Category
+# Rates vary by hours of care
+entity Person
+period Year
+dtype Enum
+label "CCDF Duration of Care"
+description "Care duration category for CCDF rate determination"
+reference "45 CFR 98.45"
+
+enum CCDFDurationOfCare {
+  WEEKLY    # 30+ hours per week
+  DAILY     # 6+ hours per day, fewer than 30 hours per week
+  PART_DAY  # 3-5 hours per day
+  HOURLY    # Less than 3 hours per day
+}
+
+formula:
+  hours_per_day = this.childcare_hours_per_day
+  days_per_week = this.childcare_days_per_week
+  hours_per_week = hours_per_day * days_per_week
+
+  return match true {
+    # Weekly rate: 30+ hours per week
+    case _ where hours_per_week >= 30 =>
+      CCDFDurationOfCare.WEEKLY
+
+    # Daily rate: 6+ hours per day
+    case _ where hours_per_day >= 6 =>
+      CCDFDurationOfCare.DAILY
+
+    # Part-day rate: 3-5 hours per day
+    case _ where hours_per_day >= 3 =>
+      CCDFDurationOfCare.PART_DAY
+
+    # Hourly rate: under 3 hours per day
+    else =>
+      CCDFDurationOfCare.HOURLY
+  }
+
+
+# Market Rate for Child's Care
+# 42 USC 9858c(c)(4)(B) - Payment based on market rate surveys
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "CCDF Market Rate"
+description "Annual market rate for child care based on age, provider, duration, and location"
+reference "42 USC 9858c(c)(4)(B)"
+
+formula:
+  # Get rate factors
+  age_group = this.ccdf_age_group
+  duration = this.ccdf_duration_of_care
+  provider_type = this.childcare_provider_type_group
+  county_cluster = this.household.ccdf_county_cluster
+
+  # Look up rate per period from state-specific rate schedule
+  # This references the state's market rate survey data
+  # Rate schedule is indexed by: county_cluster > provider_type > duration > age_group
+  rate_per_period = parameters.market_rates[county_cluster][provider_type][duration][age_group]
+
+  # Convert to annual rate based on duration category
+  hours_per_day = this.childcare_hours_per_day
+  days_per_week = this.childcare_days_per_week
+  hours_per_week = hours_per_day * days_per_week
+  weeks_per_year = 52
+
+  # Periods per week depends on duration category
+  periods_per_week = match duration {
+    case CCDFDurationOfCare.WEEKLY => 1
+    case CCDFDurationOfCare.DAILY => days_per_week
+    case CCDFDurationOfCare.PART_DAY => days_per_week
+    case CCDFDurationOfCare.HOURLY => hours_per_week
+  }
+
+  return rate_per_period * periods_per_week * weeks_per_year
+
+
+# =============================================================================
+# SUBSIDY CALCULATION
+# =============================================================================
+
+# Total Market Rate for Eligible Children
+entity SPMUnit
+period Year
+dtype Money
+unit "USD"
+label "CCDF Total Market Rate"
+description "Total annual market rate for all CCDF-eligible children in unit"
+
+formula:
+  # Sum market rates only for eligible children
+  return sum(
+    for child in this.members:
+      if child.is_ccdf_eligible then
+        child.ccdf_market_rate
+      else
+        0
+  )
+
+
+# CCDF Subsidy Amount (SPMUnit-level)
+# Subsidy = Market Rate - Copayment
+entity SPMUnit
+period Year
+dtype Money
+unit "USD"
+label "CCDF Subsidy"
+description "Annual CCDF child care subsidy per 42 USC 9858"
+reference "42 USC 9858c(c)(4)"
+
+formula:
+  # Total market rate for all eligible children
+  total_market_rate = this.ccdf_total_market_rate
+
+  # Family copayment (based on income)
+  family_copay = this.ccdf_family_copayment
+
+  # Subsidy is market rate minus copay, but not negative
+  return max(total_market_rate - family_copay, 0)
+
+
+# Monthly CCDF Subsidy (for reporting)
+entity SPMUnit
+period Year
+dtype Money
+unit "USD"
+label "CCDF Monthly Subsidy"
+description "Average monthly CCDF child care subsidy"
+
+formula:
+  annual_subsidy = this.ccdf_subsidy
+  return annual_subsidy / 12
+
+
+# =============================================================================
+# INDIVIDUAL CHILD SUBSIDY
+# =============================================================================
+
+# Subsidy Amount Per Child
+# Pro-rated subsidy for each eligible child
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "CCDF Child Subsidy"
+description "CCDF subsidy allocated to this child"
+
+formula:
+  # Only eligible children receive subsidy
+  if not this.is_ccdf_eligible then
+    return 0
+
+  # Get unit-level totals
+  unit_total_rate = this.spm_unit.ccdf_total_market_rate
+  unit_subsidy = this.spm_unit.ccdf_subsidy
+
+  # This child's market rate
+  child_rate = this.ccdf_market_rate
+
+  # Pro-rate subsidy based on share of total market rate
+  if unit_total_rate > 0 then
+    return unit_subsidy * (child_rate / unit_total_rate)
+  else
+    return 0
+
+
+# =============================================================================
+# EQUAL ACCESS CHECK
+# =============================================================================
+
+# Payment Rate as Percent of Market
+# 42 USC 9858c(c)(4)(C) - Check if rates provide equal access
+entity Person
+period Year
+dtype Rate
+label "CCDF Payment Rate Percentile"
+description "Payment rate as percentage of market rate for equal access assessment"
+reference "42 USC 9858c(c)(4)(C)"
+
+formula:
+  # Target percentile for payment rates (75th percentile recommended)
+  target = parameters.payment_rates.target_percentile
+
+  # Actual rate versus full market rate
+  # (Would require actual market rate data for comparison)
+  # This is a placeholder for equal access monitoring
+  return target
+
+
+# =============================================================================
+# BENEFIT SUMMARY
+# =============================================================================
+
+# CCDF Benefit (Final Output)
+# Annual child care subsidy for the family
+entity SPMUnit
+period Year
+dtype Money
+unit "USD"
+label "CCDF Benefit"
+description "Total annual CCDF child care benefit per 42 USC 9858"
+
+formula:
+  return this.ccdf_subsidy
+
+default 0

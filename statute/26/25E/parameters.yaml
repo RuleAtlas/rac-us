@@ -1,0 +1,98 @@
+# 26 USC 25E - Previously-Owned Clean Vehicles Credit Parameters
+# Added by the Inflation Reduction Act of 2022 (Section 13402)
+#
+# References:
+#   - 26 USC 25E: https://www.law.cornell.edu/uscode/text/26/25E
+#   - IRA 2022: https://www.democrats.senate.gov/imo/media/doc/inflation_reduction_act_of_2022.pdf#page=386
+
+variable: used_clean_vehicle_credit_parameters
+entity: TaxUnit
+period: Year
+
+# --- Eligibility Parameters ---
+
+eligibility:
+  # MAGI limits by filing status - Section 25E(b)(1)(B)
+  income_limit:
+    description: "Maximum modified AGI to qualify for used clean vehicle credit."
+    breakdown:
+      - filing_status
+    values:
+      JOINT:
+        0000-01-01: .inf
+        2023-01-01: 150_000
+      SURVIVING_SPOUSE:
+        0000-01-01: .inf
+        2023-01-01: 150_000
+      HEAD_OF_HOUSEHOLD:
+        0000-01-01: .inf
+        2023-01-01: 112_500
+      SINGLE:
+        0000-01-01: .inf
+        2023-01-01: 75_000
+      SEPARATE:
+        0000-01-01: .inf
+        2023-01-01: 75_000
+    metadata:
+      unit: currency-USD
+      period: year
+      label: "Income limit for used clean vehicle credit"
+      reference:
+        - title: "Inflation Reduction Act 13402(b)(1)(B)"
+          href: "https://www.democrats.senate.gov/imo/media/doc/inflation_reduction_act_of_2022.pdf#page=395"
+
+  # Maximum sale price - Section 25E(c)(1)(D)
+  sale_price_limit:
+    description: "Maximum sale price for vehicle to qualify for used clean vehicle credit."
+    values:
+      0000-01-01: 0
+      2023-01-01: 25_000
+    metadata:
+      unit: currency-USD
+      label: "Sale price limit for used clean vehicle credit"
+      reference:
+        - title: "Inflation Reduction Act 13402(c)(1)(D)"
+          href: "https://www.democrats.senate.gov/imo/media/doc/inflation_reduction_act_of_2022.pdf#page=390"
+
+  # Minimum model year requirement - Section 25E(c)(1)(B)
+  # Vehicle must be at least 2 model years older than year of sale
+  min_model_year_age:
+    description: "Minimum age in model years for vehicle to qualify."
+    values:
+      2023-01-01: 2
+    metadata:
+      unit: year
+      label: "Minimum model year age"
+      reference:
+        - title: "26 USC 25E(c)(1)(B)"
+          href: "https://www.law.cornell.edu/uscode/text/26/25E#c_1_B"
+
+# --- Credit Amount Parameters ---
+
+amount:
+  # Percentage of sale price - Section 25E(a)(1)
+  percent_of_sale_price:
+    description: "Credit equals this percentage of the vehicle sale price."
+    values:
+      0000-01-01: 0
+      2023-01-01: 0.30
+    metadata:
+      unit: /1
+      label: "Credit as percent of sale price"
+      reference:
+        - title: "Inflation Reduction Act 13402(a)(1)"
+          href: "https://www.democrats.senate.gov/imo/media/doc/inflation_reduction_act_of_2022.pdf#page=387"
+
+  # Maximum credit - Section 25E(a)(2)
+  max:
+    description: "Maximum credit amount for used clean vehicles."
+    values:
+      0000-01-01: 0
+      2023-01-01: 4_000
+    metadata:
+      unit: currency-USD
+      period: year
+      label: "Maximum used clean vehicle credit"
+      reference:
+        - title: "Inflation Reduction Act 13402(a)(2)"
+          href: "https://www.democrats.senate.gov/imo/media/doc/inflation_reduction_act_of_2022.pdf#page=387"

@@ -1,0 +1,221 @@
+# 42 USC 1397cc - Coverage Requirements for CHIP: Cost Sharing
+#
+# "SEC. 2103. [42 U.S.C. 1397cc] COVERAGE REQUIREMENTS FOR CHILDREN'S HEALTH
+#  INSURANCE.
+#  ...
+#  (e) COST-SHARING.--
+#     (1) DESCRIPTION; GENERAL CONDITIONS.--
+#        (A) DESCRIPTION.--A State child health plan shall include a
+#            description, consistent with this subsection, of the amount
+#            (if any) of premiums, deductibles, coinsurance, and other
+#            cost sharing imposed under the plan.
+#     ...
+#     (3) LIMITATIONS ON COST SHARING.--
+#        (A) CHILDREN IN FAMILIES WITH INCOME BELOW 150 PERCENT OF
+#            POVERTY LINE.--In the case of children in a family... at or
+#            below 150 percent of the poverty line... the State child
+#            health plan may only impose premiums... that are not in
+#            excess of the amounts of... premiums... permitted...
+#            under section 1916...
+#        (B) OTHER CHILDREN.--For children not described in subparagraph
+#            (A), the State child health plan may not impose any form of
+#            cost sharing... the cumulative amount of which exceeds
+#            5 percent of a family's income for the year involved."
+#
+# Key cost-sharing rules:
+# 1. Below 150% FPL: Very limited cost-sharing (Medicaid nominal rules)
+# 2. Above 150% FPL: Max 5% of family income in aggregate
+# 3. No cost-sharing for preventive care for children
+# 4. Emergency services cannot be denied for inability to pay
+
+imports:
+  # Cost-sharing parameters
+  max_out_of_pocket_rate: statute/42/1397aa-1397mm/cost_sharing/max_out_of_pocket_rate
+  cost_sharing_exempt_threshold: statute/42/1397aa-1397mm/cost_sharing/cost_sharing_exempt_threshold
+  premium_exempt_threshold: statute/42/1397aa-1397mm/cost_sharing/premium_exempt_threshold
+
+  # Eligibility
+  is_chip_eligible: statute/42/1397aa-1397mm/1397aa/is_chip_eligible
+
+# =============================================================================
+# COST-SHARING EXEMPTION STATUS
+# 42 USC 1397cc(e)(3)(A): Children below 150% FPL have restricted cost-sharing
+# =============================================================================
+
+# Determine if person is exempt from most cost-sharing
+entity Person
+period Year
+dtype Boolean
+label "CHIP Cost-Sharing Exempt"
+description "Income below 150% FPL - limited to Medicaid-level cost-sharing"
+
+formula:
+  # Only applicable to CHIP-eligible persons
+  if not is_chip_eligible then
+    return false
+
+  # Check income against cost-sharing exemption threshold
+  income_pct_fpl = medicaid_income_level
+
+  # Below 150% FPL: exempt from most cost-sharing
+  return income_pct_fpl <= cost_sharing_exempt_threshold
+
+# =============================================================================
+# PREMIUM ELIGIBILITY
+# 42 USC 1397cc(e)(3)(B): Premiums restricted below 150% FPL
+# =============================================================================
+
+# Determine if premiums can be charged
+entity Person
+period Year
+dtype Boolean
+label "CHIP Premium May Be Charged"
+description "Person is above threshold where premiums may be charged"
+
+formula:
+  # Only applicable to CHIP-eligible persons
+  if not is_chip_eligible then
+    return false
+
+  # Check income against premium exemption threshold
+  income_pct_fpl = medicaid_income_level
+
+  # At or below 150% FPL: no premiums allowed per CHIPRA
+  # Above 150% FPL: state may charge premiums
+  return income_pct_fpl > premium_exempt_threshold
+
+# =============================================================================
+# MAXIMUM ANNUAL OUT-OF-POCKET
+# 42 USC 1397cc(e)(3)(B): 5% of family income cap
+# =============================================================================
+
+# Calculate maximum annual out-of-pocket for CHIP enrollee
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "CHIP Maximum Out-of-Pocket"
+description "Maximum annual cost-sharing for CHIP enrollee (5% of family income)"
+
+formula:
+  # Only applicable to CHIP-eligible persons
+  if not is_chip_eligible then
+    return 0
+
+  # For cost-sharing exempt individuals (below 150% FPL):
+  # Only nominal amounts allowed per Medicaid rules
+  if is_chip_cost_sharing_exempt then
+    # Medicaid nominal amounts are very low ($0-$4 per service typically)
+    # Return approximate annual cap for nominal cost-sharing
+    return 100  # Approximate cap under Medicaid nominal rules
+
+  # For others: 5% of family income
+  # Use household income as proxy for family income
+  family_income = household.total_income
+
+  # Maximum out-of-pocket = 5% of annual income
+  return family_income * max_out_of_pocket_rate
+
+# =============================================================================
+# PROHIBITED COST-SHARING
+# 42 USC 1397cc(e)(2): Certain services exempt from cost-sharing
+# =============================================================================
+
+# Note: The following services cannot have cost-sharing imposed:
+#
+# 1. PREVENTIVE SERVICES (42 USC 1397cc(e)(2)(A))
+#    - Well-baby and well-child care
+#    - Age-appropriate immunizations
+#    - Routine physical examinations
+#
+# 2. EMERGENCY SERVICES (42 USC 1397cc(e)(2)(B))
+#    - Emergency room visits (cannot deny for inability to pay)
+#
+# 3. PREGNANCY-RELATED SERVICES (42 USC 1397cc(e)(2)(C))
+#    - Pregnancy-related assistance for targeted low-income pregnant women
+
+entity Person
+period Year
+dtype Boolean
+label "CHIP Preventive Care Cost-Sharing Exempt"
+description "Preventive care services are exempt from cost-sharing under CHIP"
+
+formula:
+  # All CHIP enrollees are exempt from cost-sharing for preventive care
+  return is_chip_eligible
+
+# =============================================================================
+# COST-SHARING TIER DETERMINATION
+# Categorize cost-sharing level by income tier
+# =============================================================================
+
+enum CostSharingTier {
+  EXEMPT,         # Below 150% FPL - Medicaid nominal rules
+  LIMITED,        # 150-200% FPL - moderate cost-sharing
+  STANDARD        # Above 200% FPL - up to 5% of income
+}
+
+entity Person
+period Year
+dtype CostSharingTier
+label "CHIP Cost-Sharing Tier"
+description "Cost-sharing tier based on family income"
+
+formula:
+  # Not applicable if not CHIP eligible
+  if not is_chip_eligible then
+    return CostSharingTier.EXEMPT  # Default (not applicable)
+
+  income_pct_fpl = medicaid_income_level
+
+  # Below 150% FPL: Exempt tier (Medicaid-level nominal cost-sharing)
+  if income_pct_fpl <= cost_sharing_exempt_threshold then
+    return CostSharingTier.EXEMPT
+
+  # 150-200% FPL: Limited tier (some states apply reduced cost-sharing)
+  if income_pct_fpl <= 2.0 then
+    return CostSharingTier.LIMITED
+
+  # Above 200% FPL: Standard tier (up to 5% of income)
+  return CostSharingTier.STANDARD
+
+# =============================================================================
+# PREMIUM DISENROLLMENT PROTECTION
+# 42 USC 1397cc(e)(3)(D): 90-day grace period before disenrollment
+# =============================================================================
+
+# Note: States that charge premiums must provide:
+# - At least 90-day grace period for non-payment
+# - Written notice before disenrollment
+# - Opportunity to demonstrate inability to pay
+#
+# These administrative requirements cannot be modeled computationally
+# but are important protections for CHIP enrollees.
+
+# =============================================================================
+# AFFORDABILITY CHECK
+# Whether CHIP cost-sharing is affordable for family
+# =============================================================================
+
+entity Household
+period Year
+dtype Boolean
+label "CHIP Affordable"
+description "CHIP cost-sharing is within 5% of household income"
+
+formula:
+  # Get maximum potential out-of-pocket for all CHIP enrollees
+  total_max_oop = sum(members.chip_max_out_of_pocket)
+
+  # Compare to income
+  income = household.total_income
+
+  # If no income, check if any cost-sharing would apply
+  if income <= 0 then
+    return true  # Exempt from cost-sharing
+
+  # Cost-sharing rate for household
+  cost_sharing_rate = total_max_oop / income
+
+  # CHIP by statute limits to 5% of income
+  return cost_sharing_rate <= max_out_of_pocket_rate

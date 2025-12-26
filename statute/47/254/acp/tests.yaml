@@ -1,0 +1,310 @@
+# 47 USC § 1752 - Affordable Connectivity Program Tests
+#
+# Test cases for ACP eligibility and benefit calculations.
+# 2022-May 2024 parameters: $30/month standard, $75/month tribal
+# After June 2024: $0/month (program expired)
+
+# ===========================================================================
+# Income Eligibility Tests (47 USC § 1752(a)(6)(A))
+# ===========================================================================
+
+- name: income_eligible_below_200_fpl
+  description: "Family below 200% FPL qualifies"
+  period: 2023
+  inputs:
+    household_size: 4
+    gross_income: 55000  # ~177% of FPL ($31,200 * 1.77)
+    is_on_tribal_land: false
+    receives_free_school_meals: false
+    receives_reduced_price_school_meals: false
+    receives_pell_grant: false
+    receives_wic: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    broadband_cost: 720  # $60/month
+    lifeline: 0  # Not on Lifeline
+  outputs:
+    fcc_fpg_ratio: 1.76  # 55000 / 31200 = 1.76
+    is_acp_income_eligible: true
+    is_acp_eligible: true
+    acp: 360  # min(30*12, 720) = min(360, 720) = 360
+
+- name: income_ineligible_above_200_fpl
+  description: "Family above 200% FPL does not qualify on income alone"
+  period: 2023
+  inputs:
+    household_size: 2
+    gross_income: 60000  # ~268% of FPL ($22,380 * 2.68)
+    is_on_tribal_land: false
+    receives_free_school_meals: false
+    receives_reduced_price_school_meals: false
+    receives_pell_grant: false
+    receives_wic: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    broadband_cost: 720
+    lifeline: 0
+  outputs:
+    fcc_fpg_ratio: 2.68
+    is_acp_income_eligible: false
+    is_acp_eligible: false
+    acp: 0
+
+# ===========================================================================
+# Categorical Eligibility Tests (47 USC § 1752(a)(6)(B)-(F))
+# ===========================================================================
+
+- name: categorical_free_lunch_eligible
+  description: "Free lunch recipient qualifies per 47 USC 1752(a)(6)(B)"
+  period: 2023
+  inputs:
+    household_size: 4
+    gross_income: 80000  # Above 200% FPL
+    is_on_tribal_land: false
+    receives_free_school_meals: true
+    receives_reduced_price_school_meals: false
+    receives_pell_grant: false
+    receives_wic: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    broadband_cost: 720
+    lifeline: 0
+  outputs:
+    is_acp_income_eligible: false
+    is_acp_categorically_eligible: true
+    is_acp_eligible: true
+    acp: 360
+
+- name: categorical_reduced_lunch_eligible
+  description: "Reduced price lunch recipient qualifies"
+  period: 2023
+  inputs:
+    household_size: 3
+    gross_income: 70000
+    is_on_tribal_land: false
+    receives_free_school_meals: false
+    receives_reduced_price_school_meals: true
+    receives_pell_grant: false
+    receives_wic: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    broadband_cost: 720
+    lifeline: 0
+  outputs:
+    is_acp_categorically_eligible: true
+    is_acp_eligible: true
+
+- name: categorical_pell_grant_eligible
+  description: "Pell Grant recipient qualifies per 47 USC 1752(a)(6)(C)"
+  period: 2023
+  inputs:
+    household_size: 1
+    gross_income: 50000
+    is_on_tribal_land: false
+    receives_free_school_meals: false
+    receives_reduced_price_school_meals: false
+    receives_pell_grant: true
+    receives_wic: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    broadband_cost: 720
+    lifeline: 0
+  outputs:
+    is_acp_categorically_eligible: true
+    is_acp_eligible: true
+
+- name: categorical_wic_eligible
+  description: "WIC recipient qualifies per 47 USC 1752(a)(6)(E)"
+  period: 2023
+  inputs:
+    household_size: 3
+    gross_income: 65000
+    is_on_tribal_land: false
+    receives_free_school_meals: false
+    receives_reduced_price_school_meals: false
+    receives_pell_grant: false
+    receives_wic: true
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    broadband_cost: 720
+    lifeline: 0
+  outputs:
+    is_acp_categorically_eligible: true
+    is_acp_eligible: true
+
+- name: categorical_lifeline_eligible
+  description: "Lifeline categorical programs also qualify for ACP"
+  period: 2023
+  inputs:
+    household_size: 2
+    gross_income: 70000  # Above both 135% and 200% FPL
+    is_on_tribal_land: false
+    receives_free_school_meals: false
+    receives_reduced_price_school_meals: false
+    receives_pell_grant: false
+    receives_wic: false
+    receives_medicaid: true  # Lifeline categorical
+    receives_snap: false
+    receives_ssi: false
+    broadband_cost: 720
+    lifeline: 0
+  outputs:
+    is_lifeline_categorically_eligible: true
+    is_acp_categorically_eligible: true
+    is_acp_eligible: true
+
+# ===========================================================================
+# Tribal Enhanced Benefit Tests (47 USC § 1752(a)(7)(A)(ii))
+# ===========================================================================
+
+- name: tribal_enhanced_benefit
+  description: "Tribal household gets $75/month = $900/year"
+  period: 2023
+  inputs:
+    household_size: 4
+    gross_income: 40000  # Below 200% FPL
+    is_on_tribal_land: true
+    receives_free_school_meals: false
+    receives_reduced_price_school_meals: false
+    receives_pell_grant: false
+    receives_wic: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    broadband_cost: 1200  # $100/month
+    lifeline: 411  # Getting tribal Lifeline
+  outputs:
+    is_acp_eligible: true
+    acp_monthly_max: 75
+    broadband_cost_after_lifeline: 789  # 1200 - 411
+    acp: 789  # min(900, 789) = 789 (capped at remaining cost)
+
+# ===========================================================================
+# Program Expiration Tests (June 2024)
+# ===========================================================================
+
+- name: acp_expired_after_june_2024
+  description: "ACP benefit is $0 after program funding expired"
+  period: 2025
+  inputs:
+    household_size: 2
+    gross_income: 30000  # Below 200% FPL
+    is_on_tribal_land: false
+    receives_free_school_meals: false
+    receives_reduced_price_school_meals: false
+    receives_pell_grant: false
+    receives_wic: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    broadband_cost: 720
+    lifeline: 0
+  outputs:
+    is_acp_eligible: true  # Still technically eligible
+    acp_monthly_max: 0  # But benefit is $0 per parameter
+    acp: 0
+
+# ===========================================================================
+# Benefit Calculation Tests
+# ===========================================================================
+
+- name: benefit_capped_at_remaining_costs
+  description: "Benefit cannot exceed broadband costs after Lifeline"
+  period: 2023
+  inputs:
+    household_size: 1
+    gross_income: 20000
+    is_on_tribal_land: false
+    receives_free_school_meals: false
+    receives_reduced_price_school_meals: false
+    receives_pell_grant: false
+    receives_wic: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    broadband_cost: 240  # Only $20/month
+    lifeline: 111  # Getting Lifeline
+  outputs:
+    is_acp_eligible: true
+    broadband_cost_after_lifeline: 129  # 240 - 111
+    acp: 129  # min(360, 129) = 129
+
+- name: no_acp_if_lifeline_covers_all
+  description: "Zero ACP if Lifeline covers all broadband costs"
+  period: 2023
+  inputs:
+    household_size: 1
+    gross_income: 15000
+    is_on_tribal_land: false
+    receives_free_school_meals: false
+    receives_reduced_price_school_meals: false
+    receives_pell_grant: false
+    receives_wic: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    broadband_cost: 100  # Only $8.33/month
+    lifeline: 100  # Lifeline covers it all
+  outputs:
+    is_acp_eligible: true
+    broadband_cost_after_lifeline: 0
+    acp: 0
+
+# ===========================================================================
+# EBB Exclusion Tests
+# ===========================================================================
+
+- name: ebb_exclusion
+  description: "Cannot receive ACP if enrolled in EBB"
+  period: 2023
+  inputs:
+    household_size: 2
+    gross_income: 30000
+    is_on_tribal_land: false
+    receives_free_school_meals: false
+    receives_reduced_price_school_meals: false
+    receives_pell_grant: false
+    receives_wic: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    broadband_cost: 720
+    lifeline: 0
+    ebb_amount: 600  # Already on EBB
+  outputs:
+    is_acp_income_eligible: true
+    is_enrolled_in_ebb: true
+    is_acp_eligible: false  # Excluded due to EBB
+    acp: 0
+
+# ===========================================================================
+# Edge Cases
+# ===========================================================================
+
+- name: no_eligibility_path
+  description: "Household with no qualifying factor is ineligible"
+  period: 2023
+  inputs:
+    household_size: 4
+    gross_income: 150000  # Way above 200% FPL
+    is_on_tribal_land: false
+    receives_free_school_meals: false
+    receives_reduced_price_school_meals: false
+    receives_pell_grant: false
+    receives_wic: false
+    receives_medicaid: false
+    receives_snap: false
+    receives_ssi: false
+    broadband_cost: 1200
+    lifeline: 0
+  outputs:
+    is_acp_income_eligible: false
+    is_acp_categorically_eligible: false
+    is_acp_eligible: false
+    acp: 0

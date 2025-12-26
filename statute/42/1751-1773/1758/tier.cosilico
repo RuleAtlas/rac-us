@@ -1,0 +1,121 @@
+# 42 USC 1758(b)(1) - School Meal Tier Determination
+#
+# The tier determines the level of subsidy a student receives:
+# - FREE: No charge (categorical OR income <= 130% FPL OR CEP school)
+# - REDUCED: Reduced price (130% < income <= 185% FPL, max $0.40 lunch, $0.30 breakfast)
+# - PAID: Full price (income > 185% FPL)
+#
+# Tier precedence:
+# 1. Categorical eligibility or CEP -> FREE (highest priority)
+# 2. Income <= 130% FPL -> FREE
+# 3. 130% < Income <= 185% FPL -> REDUCED
+# 4. Income > 185% FPL -> PAID
+#
+# Reference: https://www.law.cornell.edu/uscode/text/42/1758#b_1
+
+imports:
+  free_meal_limit_pct_fpl: statute/42/1751-1773/income/free_meal_limit_pct_fpl
+  reduced_price_limit_pct_fpl: statute/42/1751-1773/income/reduced_price_limit_pct_fpl
+  categorically_eligible: statute/42/1751-1773/1758/categorical
+  federal_poverty_level: statute/hhs/poverty_guidelines/fpl
+
+# ------------------------------------------------------------------------------
+# SchoolMealTier
+# Enumeration of possible school meal eligibility tiers
+# ------------------------------------------------------------------------------
+
+enum SchoolMealTier:
+  FREE = "Free"
+  REDUCED = "Reduced price"
+  PAID = "Paid"
+
+# ------------------------------------------------------------------------------
+# school_meal_tier
+# Determines the school meal program tier for a person
+# Categorical/CEP takes precedence, then income determines tier
+# ------------------------------------------------------------------------------
+
+variable school_meal_tier
+entity Person
+period Year
+dtype SchoolMealTier
+
+formula:
+  # Get household income ratio to FPL
+  household_income = household.gross_income
+  household_size = household.size
+  fpl = federal_poverty_level(household_size)
+  income_ratio = household_income / fpl
+
+  # Check categorical and CEP eligibility (provides free meals)
+  categorical = categorically_eligible
+  cep_school = attends_cep_school
+
+  # Tier determination with precedence
+  # 1. Categorical/CEP -> FREE
+  if categorical or cep_school then
+    return SchoolMealTier.FREE
+
+  # 2. Income <= 130% FPL -> FREE
+  if income_ratio <= free_meal_limit_pct_fpl then
+    return SchoolMealTier.FREE
+
+  # 3. 130% < Income <= 185% FPL -> REDUCED
+  if income_ratio <= reduced_price_limit_pct_fpl then
+    return SchoolMealTier.REDUCED
+
+  # 4. Income > 185% FPL -> PAID
+  return SchoolMealTier.PAID
+
+# ------------------------------------------------------------------------------
+# school_meal_tier_is_free
+# Boolean helper: is this person in the free tier?
+# ------------------------------------------------------------------------------
+
+variable school_meal_tier_is_free
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  return school_meal_tier == SchoolMealTier.FREE
+
+# ------------------------------------------------------------------------------
+# school_meal_tier_is_reduced
+# Boolean helper: is this person in the reduced-price tier?
+# ------------------------------------------------------------------------------
+
+variable school_meal_tier_is_reduced
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  return school_meal_tier == SchoolMealTier.REDUCED
+
+# ------------------------------------------------------------------------------
+# school_meal_tier_is_paid
+# Boolean helper: is this person in the paid tier?
+# ------------------------------------------------------------------------------
+
+variable school_meal_tier_is_paid
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  return school_meal_tier == SchoolMealTier.PAID
+
+# ------------------------------------------------------------------------------
+# school_meal_tier_is_subsidized
+# Boolean helper: is this person in a subsidized tier (free or reduced)?
+# ------------------------------------------------------------------------------
+
+variable school_meal_tier_is_subsidized
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  tier = school_meal_tier
+  return tier == SchoolMealTier.FREE or tier == SchoolMealTier.REDUCED

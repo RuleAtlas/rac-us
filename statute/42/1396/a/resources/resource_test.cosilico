@@ -1,0 +1,422 @@
+# 42 USC 1396a(r)(2) - Medicaid Resource Tests for Non-MAGI Groups
+#
+# Resource (asset) tests apply ONLY to non-MAGI eligibility pathways:
+# - Aged (65+) individuals
+# - Blind individuals
+# - Disabled individuals (SSI-related)
+# - Medically needy spend-down
+# - Long-term care (nursing home) applicants
+#
+# MAGI-based eligibility groups have NO resource test:
+# - Children
+# - Pregnant women
+# - Parents/caretaker relatives
+# - ACA expansion adults
+#
+# Resource limits generally follow SSI standards (42 USC 1382(a)(3)(B)):
+# - Individual: $2,000
+# - Couple: $3,000
+#
+# States using 209(b) option may apply more restrictive criteria.
+#
+# Countable resources include:
+# - Cash, bank accounts, investments
+# - Non-exempt real property
+# - Vehicles (with exemptions)
+# - Life insurance (cash value over $1,500)
+#
+# Exempt resources include:
+# - Primary residence (with equity limits for long-term care)
+# - One vehicle (for work/medical)
+# - Household goods
+# - Burial funds (up to $1,500)
+# - Life insurance (face value under $1,500)
+#
+# Reference: https://www.ssa.gov/OP_Home/ssact/title19/1917.htm
+
+module statute.42.1396.a.resources
+version "2025.1"
+jurisdiction us
+
+references {
+  # Resource parameters
+  resource_limit_individual: statute/42/1396/resource_limits/individual
+  resource_limit_couple: statute/42/1396/resource_limits/couple
+  home_equity_limit: statute/42/1396/resource_limits/home_equity_limit
+  burial_fund_exemption: statute/42/1396/resource_limits/burial_fund_exemption
+  life_insurance_face_limit: statute/42/1396/resource_limits/life_insurance_face_limit
+  vehicle_exemption_limit: statute/42/1396/resource_limits/vehicle_exemption_limit
+
+  # SSI resource rules (42 USC 1382b)
+  ssi_resource_limit_individual: statute/42/1382/a/resource_test/ssi_resource_limit_individual
+  ssi_resource_limit_couple: statute/42/1382/a/resource_test/ssi_resource_limit_couple
+}
+
+# =============================================================================
+# MAGI GROUPS - NO RESOURCE TEST
+# 42 USC 1396a(e)(14)(I)
+# =============================================================================
+
+# MAGI group indicator (no resource test applies)
+variable medicaid_magi_group {
+  entity Person
+  period Month
+  dtype Boolean
+  label "MAGI eligibility group"
+  description "Individual in MAGI-based group (no resource test)"
+  reference "42 USC 1396a(e)(14)(I)"
+
+  formula {
+    category = medicaid_category
+
+    # MAGI groups have no resource test
+    if category == "infant" then return true
+    if category == "child_1_5" then return true
+    if category == "child_6_18" then return true
+    if category == "pregnant" then return true
+    if category == "parent_caretaker" then return true
+    if category == "expansion_adult" then return true
+
+    # Non-MAGI groups: SSI recipients, aged, blind, disabled
+    return false
+  }
+
+  default false
+}
+
+# =============================================================================
+# COUNTABLE RESOURCES
+# 42 USC 1382b (SSI resource counting rules applied to Medicaid)
+# =============================================================================
+
+# Total financial resources
+variable medicaid_total_resources {
+  entity Person
+  period Month
+  dtype Money
+  unit "USD"
+  label "Total resources"
+  description "Total financial resources before exclusions"
+
+  formula {
+    # Sum all resource types
+    cash = cash_on_hand
+    bank = bank_accounts
+    investments = investment_accounts
+    retirement = retirement_accounts  # May have special rules
+    property = real_property_value
+    vehicles = vehicle_value
+    life_ins_cv = life_insurance_cash_value
+
+    return cash + bank + investments + property + vehicles + life_ins_cv
+  }
+
+  default 0
+}
+
+# Primary residence exclusion
+variable medicaid_home_exempt {
+  entity Person
+  period Month
+  dtype Boolean
+  label "Primary home exempt"
+  description "Primary residence excluded from countable resources"
+  reference "42 USC 1382b(a)(1)"
+
+  formula {
+    # Primary residence is generally exempt if applicant or spouse lives there
+    # For long-term care, equity limits apply (state-specific $688k-$1,033k)
+    if not owns_primary_residence then
+      return false
+
+    # Must be living in home (or intend to return)
+    if is_institutionalized then
+      # Check intent to return or spouse in home
+      return intends_to_return_home or spouse_living_in_home
+
+    return true
+  }
+
+  default false
+}
+
+# Home equity limit for long-term care
+variable medicaid_home_equity_countable {
+  entity Person
+  period Month
+  dtype Money
+  unit "USD"
+  label "Countable home equity"
+  description "Home equity above exempt limit for long-term care"
+  reference "42 USC 1396p(f)"
+
+  formula {
+    if medicaid_home_exempt then
+      return 0
+
+    if not owns_primary_residence then
+      return 0
+
+    # For institutionalized individuals, equity above limit is countable
+    if not is_institutionalized then
+      return 0
+
+    equity = primary_residence_equity
+    limit = home_equity_limit
+
+    if equity <= limit then
+      return 0
+
+    # Spouse or dependent living in home: no equity limit
+    if spouse_living_in_home or dependent_living_in_home then
+      return 0
+
+    return equity - limit
+  }
+
+  default 0
+}
+
+# Vehicle exclusion
+variable medicaid_vehicle_exempt_value {
+  entity Person
+  period Month
+  dtype Money
+  unit "USD"
+  label "Exempt vehicle value"
+  description "Value of exempt vehicles"
+  reference "42 USC 1382b(a)(2)(A)"
+
+  formula {
+    # One vehicle per household is exempt if:
+    # - Used for transportation to work/medical
+    # - Modified for disability
+    # - Value under certain limit
+
+    primary_vehicle = primary_vehicle_value
+
+    # Fully exempt if used for medical/work
+    if vehicle_used_for_medical_transport then
+      return primary_vehicle
+
+    if vehicle_used_for_work then
+      return primary_vehicle
+
+    # Otherwise exempt up to limit
+    exempt = min(primary_vehicle, vehicle_exemption_limit)
+    return exempt
+  }
+
+  default 0
+}
+
+# Burial funds exclusion
+variable medicaid_burial_exempt {
+  entity Person
+  period Month
+  dtype Money
+  unit "USD"
+  label "Exempt burial funds"
+  description "Burial funds excluded from countable resources"
+  reference "42 USC 1382b(a)(2)(B)"
+
+  formula {
+    burial = burial_funds
+    exempt = min(burial, burial_fund_exemption)
+    return exempt
+  }
+
+  default 0
+}
+
+# Life insurance exclusion
+variable medicaid_life_insurance_exempt {
+  entity Person
+  period Month
+  dtype Boolean
+  label "Life insurance exempt"
+  description "Life insurance cash value excluded"
+  reference "42 USC 1382b(a)(2)(C)"
+
+  formula {
+    face_value = life_insurance_face_value
+
+    # Face value under limit: fully exempt
+    if face_value <= life_insurance_face_limit then
+      return true
+
+    # Term life (no cash value): exempt regardless of face value
+    if life_insurance_is_term_only then
+      return true
+
+    return false
+  }
+
+  default false
+}
+
+# Countable life insurance (cash value if not exempt)
+variable medicaid_life_insurance_countable {
+  entity Person
+  period Month
+  dtype Money
+  unit "USD"
+  label "Countable life insurance"
+  description "Life insurance cash value counted as resource"
+  reference "42 USC 1382b(a)(2)(C)"
+
+  formula {
+    if medicaid_life_insurance_exempt then
+      return 0
+
+    return life_insurance_cash_value
+  }
+
+  default 0
+}
+
+# =============================================================================
+# COUNTABLE RESOURCES CALCULATION
+# =============================================================================
+
+# Total excluded resources
+variable medicaid_excluded_resources {
+  entity Person
+  period Month
+  dtype Money
+  unit "USD"
+  label "Excluded resources"
+  description "Total resources excluded from countable amount"
+  reference "42 USC 1382b(a)"
+
+  formula {
+    # Sum all exclusions
+    home = medicaid_home_exempt ? primary_residence_value : 0
+    vehicle = medicaid_vehicle_exempt_value
+    burial = medicaid_burial_exempt
+    household_goods = household_goods_value  # Generally fully exempt
+    life_ins = medicaid_life_insurance_exempt ? life_insurance_cash_value : 0
+
+    return home + vehicle + burial + household_goods + life_ins
+  }
+
+  default 0
+}
+
+# Countable resources (after exclusions)
+variable medicaid_countable_resources {
+  entity Person
+  period Month
+  dtype Money
+  unit "USD"
+  label "Countable resources"
+  description "Resources counted for eligibility after exclusions"
+  reference (
+    "42 USC 1382b",
+    "42 USC 1396a(r)(2)"
+  )
+
+  formula {
+    total = medicaid_total_resources
+    excluded = medicaid_excluded_resources
+    home_equity = medicaid_home_equity_countable
+
+    return max(0, total - excluded + home_equity)
+  }
+
+  default 0
+}
+
+# =============================================================================
+# RESOURCE ELIGIBILITY DETERMINATION
+# =============================================================================
+
+# Applicable resource limit
+variable medicaid_resource_limit {
+  entity Person
+  period Month
+  dtype Money
+  unit "USD"
+  label "Medicaid resource limit"
+  description "Applicable resource limit for individual"
+  reference "42 USC 1382(a)(3)(B)"
+
+  formula {
+    # MAGI groups have no resource limit
+    if medicaid_magi_group then
+      return 999999999  # Effectively unlimited
+
+    # Use SSI standards (most states)
+    if has_eligible_spouse then
+      return resource_limit_couple
+    else
+      return resource_limit_individual
+  }
+
+  default 2000
+}
+
+# Resource eligibility
+variable medicaid_resource_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+  label "Resource eligible"
+  description "Countable resources within eligibility limit"
+  reference (
+    "42 USC 1396a(r)(2)",
+    "42 USC 1382(a)(3)(B)"
+  )
+
+  formula {
+    # MAGI groups always pass resource test (no test applies)
+    if medicaid_magi_group then
+      return true
+
+    countable = medicaid_countable_resources
+    limit = medicaid_resource_limit
+
+    return countable <= limit
+  }
+
+  default true
+}
+
+# =============================================================================
+# SPOUSAL IMPOVERISHMENT PROTECTIONS
+# 42 USC 1396r-5 - For institutional care
+# =============================================================================
+
+# Community spouse resource allowance (CSRA)
+variable medicaid_community_spouse_resource_allowance {
+  entity Person
+  period Month
+  dtype Money
+  unit "USD"
+  label "Community spouse resource allowance"
+  description "Resources protected for community spouse when partner is institutionalized"
+  reference "42 USC 1396r-5(f)"
+
+  formula {
+    # Only applies when spouse is institutionalized
+    if not spouse_is_institutionalized then
+      return 0
+
+    # CSRA: Either 50% of couple's resources or minimum, up to maximum
+    # 2024: Minimum ~$30,828, Maximum ~$154,140
+    couple_resources = medicaid_countable_resources
+
+    half = couple_resources / 2
+
+    # Get minimum and maximum from parameters
+    minimum = csra_minimum
+    maximum = csra_maximum
+
+    # CSRA is greater of: minimum or half of couple resources, up to maximum
+    csra = max(minimum, min(half, maximum))
+
+    return csra
+  }
+
+  default 0
+}

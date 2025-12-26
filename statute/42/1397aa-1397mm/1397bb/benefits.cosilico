@@ -1,0 +1,181 @@
+# 42 USC 1397bb - State Child Health Plans: Benefits
+#
+# "SEC. 2102. [42 U.S.C. 1397bb] STATE CHILD HEALTH PLANS.
+#   (a) REQUIREMENTS.--A State child health plan shall include a description of--
+#      (1) the extent to which... the plan meets... the requirements of
+#          section 2103;
+#      ...
+#   (b) GENERAL CONTENTS.--A State child health plan shall include a description,
+#       consistent with subsection (a), of--
+#      (1) the proposed type... of the plan...
+#         (A) obtain health benefits coverage that meets the requirements of
+#             section 2103 through--
+#            (i) a separate child health program;
+#            (ii) an expansion of coverage under the State's medicaid plan
+#                 under title XIX; or
+#            (iii) a combination of both such program and expansion..."
+#
+# Note: CHIP benefit value varies significantly by state based on:
+# - Program structure (separate vs Medicaid expansion)
+# - Covered services
+# - Provider networks and reimbursement rates
+#
+# This file calculates estimated CHIP benefit value using per-capita spending
+# data from MACPAC as a proxy for actual benefits provided.
+
+imports:
+  # Eligibility
+  is_chip_eligible: statute/42/1397aa-1397mm/1397aa/is_chip_eligible
+  chip_category: statute/42/1397aa-1397mm/1397aa/chip_category
+
+  # Calibration data for per-capita calculations
+  per_capita_spending: statute/42/1397aa-1397mm/calibration/per_capita_spending
+
+# =============================================================================
+# REQUIRED BENEFITS - 42 USC 1397cc(a)
+# Section 2103 specifies minimum benefit requirements
+# =============================================================================
+
+# Note: CHIP offers substantial flexibility in benefit design compared to Medicaid.
+# States can choose from:
+# (1) Federal Employees Health Benefits Program-equivalent coverage
+# (2) State employee coverage-equivalent
+# (3) Coverage offered by largest HMO in state
+# (4) Secretary-approved alternative
+#
+# Key required services (per 42 USC 1397cc(c)):
+# - Well-baby and well-child care
+# - Age-appropriate immunizations
+# - Emergency services
+# - Dental services (per CHIPRA)
+# - Mental health parity (per CHIPRA/MHPAEA)
+#
+# Benefit value modeling cannot be precisely calculated from statute alone.
+# We use per-capita spending as an approximation.
+
+# =============================================================================
+# PER-CAPITA CHIP BENEFIT VALUE
+# Average benefit value based on state spending and enrollment
+# =============================================================================
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Per-Capita CHIP Benefit Value"
+description "Estimated annual CHIP benefit value based on state per-capita spending"
+
+formula:
+  # Only calculate for eligible individuals
+  if not is_chip_eligible then
+    return 0
+
+  # Get state-specific per-capita value if available
+  # Otherwise use national average from calibration
+  state = household.state_code
+
+  # Per-capita spending varies by state from ~$2,000 to ~$5,000 annually
+  # This includes medical, dental, vision, and administrative costs
+  #
+  # Note: Actual benefit value to individual may differ from spending due to:
+  # - Adverse selection
+  # - Provider reimbursement rates
+  # - Utilization patterns
+  # - Administrative overhead
+  #
+  # Using calibration data as best available estimate
+  return per_capita_spending
+
+# =============================================================================
+# MAIN CHIP VARIABLE
+# Estimated annual benefit value for CHIP-eligible person
+# =============================================================================
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "CHIP"
+description "Children's Health Insurance Program estimated annual benefit value"
+
+formula:
+  # Zero benefit if not eligible
+  if not is_chip_eligible then
+    return 0
+
+  # Return per-capita benefit value
+  return per_capita_chip_benefit
+
+# =============================================================================
+# HOUSEHOLD CHIP SUMMARY
+# Aggregate CHIP benefits at household level
+# =============================================================================
+
+# Count of CHIP-eligible persons in household
+entity Household
+period Year
+dtype Integer
+label "CHIP Eligible Count"
+description "Number of CHIP-eligible persons in household"
+
+formula:
+  return sum(members.is_chip_eligible)
+
+# Total household CHIP benefit value
+entity Household
+period Year
+dtype Money
+unit "USD"
+label "Household CHIP"
+description "Total CHIP benefit value for household"
+
+formula:
+  return sum(members.chip)
+
+# Whether household has any CHIP-eligible member
+entity Household
+period Year
+dtype Boolean
+label "Household Has CHIP Eligible"
+description "Household contains at least one CHIP-eligible person"
+
+formula:
+  return chip_eligible_count > 0
+
+# =============================================================================
+# CHIP PROGRAM TYPE (INFORMATIONAL)
+# States operate CHIP as: separate program, Medicaid expansion, or combination
+# =============================================================================
+
+# Note: Program type affects benefit package but is captured in state-level
+# parameters rather than as a separate formula. States with Medicaid expansion
+# CHIP typically have -.inf in the child_income_limit parameter (children
+# receive Medicaid rather than separate CHIP benefits).
+
+# Enum for state program types (informational)
+enum CHIPProgramType {
+  MEDICAID_EXPANSION,  # Children covered through Medicaid expansion
+  SEPARATE_PROGRAM,    # Distinct CHIP program
+  COMBINATION          # Both expansion and separate program
+}
+
+# =============================================================================
+# BENEFIT CATEGORIES (INFORMATIONAL)
+# Key benefit categories that states must cover
+# =============================================================================
+
+# Under 42 USC 1397cc(c), benchmark-equivalent coverage must include:
+# - Inpatient and outpatient hospital services
+# - Physicians' surgical and medical services
+# - Laboratory and X-ray services
+# - Well-baby and well-child care (including immunizations)
+#
+# CHIPRA (2009) added dental coverage requirement:
+# - Dental services necessary to prevent disease
+# - Restore oral health
+# - Includes medically necessary orthodontia
+#
+# Mental health parity applies per MHPAEA:
+# - Mental health benefits
+# - Substance use disorder benefits
+# - Parity with medical/surgical benefits

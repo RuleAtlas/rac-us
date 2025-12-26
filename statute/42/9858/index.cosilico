@@ -1,0 +1,118 @@
+# 42 USC 9858 - Child Care and Development Fund (CCDF)
+#
+# The Child Care and Development Block Grant (CCDBG) Act establishes
+# the Child Care and Development Fund, which provides federal funding
+# to states to subsidize child care for low-income working families.
+#
+# Originally enacted: 1990 (Omnibus Budget Reconciliation Act of 1990)
+# Major reauthorization: 2014 (CCDBG Act of 2014, Pub. L. 113-186)
+#
+# Key sections:
+# - 9858c - Application and plan (eligibility rules, sliding fees)
+# - 9858e - Activities to improve quality of child care
+# - 9858f - Payments to States
+# - 9858n - Definitions (eligible child, State)
+#
+# Program administered by:
+# - Federal: Administration for Children and Families (ACF), HHS
+# - State: Lead agencies designated by governors
+#
+# =============================================================================
+# MODULE STRUCTURE
+# =============================================================================
+#
+# This encoding is organized into three modules:
+#
+# 1. eligibility.cosilico
+#    - Age eligibility (42 USC 9858n(4))
+#    - Income eligibility (42 USC 9858c(a)(2)(B))
+#    - Asset eligibility (state-specific, no federal mandate)
+#    - Activity test (42 USC 9858c(c)(2)(F))
+#    - Protective services pathway (42 USC 9858n(4)(B))
+#
+# 2. copayment.cosilico
+#    - Sliding fee scale (42 USC 9858c(c)(4)(A))
+#    - Poverty level waiver (42 USC 9858c(c)(4)(A)(i))
+#    - 7% affordability standard (45 CFR 98.45(k))
+#
+# 3. benefit.cosilico
+#    - Market rate calculation (42 USC 9858c(c)(4)(B))
+#    - Subsidy calculation (market rate - copayment)
+#    - Equal access requirements (42 USC 9858c(c)(4)(C))
+#
+# 4. parameters.yaml
+#    - Federal statutory limits and thresholds
+#    - State Median Income reference values
+#    - Default parameter values (states may vary)
+#
+# =============================================================================
+# KEY FEDERAL REQUIREMENTS
+# =============================================================================
+#
+# Income Eligibility (42 USC 9858c(a)(2)(B)):
+# - Maximum: 85% of State Median Income
+# - States may set lower limits
+# - 12-month eligibility periods (post-2014)
+# - Graduated phase-out when income exceeds limit
+#
+# Age Eligibility (42 USC 9858n(4)):
+# - Under 13 years of age
+# - Up to 19 for children with physical/mental disabilities
+#
+# Activity Requirements (42 USC 9858c(c)(2)(F)):
+# - Parents must be working, in training, or in education
+# - Exception: children in need of protective services
+#
+# Copayment (42 USC 9858c(c)(4)(A)):
+# - Sliding fee scale based on income and family size
+# - Families at/below poverty: waiver available
+# - Target: not more than 7% of family income
+#
+# Payment Rates (42 USC 9858c(c)(4)(B)):
+# - Based on market rate surveys (every 3 years)
+# - Target: 75th percentile of market
+# - Must provide equal access to child care
+#
+# =============================================================================
+# STATE VARIATION
+# =============================================================================
+#
+# States have significant flexibility in setting:
+# - Exact income limits (up to 85% SMI)
+# - Asset test rules (not federally mandated)
+# - Copayment sliding scales
+# - Provider payment rates
+# - Priority groups for services
+#
+# This federal encoding provides the statutory framework.
+# State-specific encodings would refine these parameters.
+#
+# =============================================================================
+
+exports:
+  # Main benefit variable
+  ccdf: benefit#ccdf_benefit
+
+  # Eligibility components
+  is_ccdf_eligible: eligibility#is_ccdf_eligible
+  is_ccdf_age_eligible: eligibility#is_ccdf_age_eligible
+  is_ccdf_income_eligible: eligibility#is_ccdf_income_eligible
+  is_ccdf_asset_eligible: eligibility#is_ccdf_asset_eligible
+  meets_ccdf_activity_test: eligibility#meets_ccdf_activity_test
+  is_ccdf_reason_for_care_eligible: eligibility#is_ccdf_reason_for_care_eligible
+
+  # Income calculations
+  ccdf_income: eligibility#ccdf_income
+  ccdf_income_to_smi_ratio: eligibility#ccdf_income_to_smi_ratio
+
+  # Copayment
+  ccdf_family_copayment: copayment#ccdf_family_copayment
+  ccdf_copay_waiver_eligible: copayment#ccdf_copay_waiver_eligible
+
+  # Benefit calculations
+  ccdf_market_rate: benefit#ccdf_market_rate
+  ccdf_subsidy: benefit#ccdf_subsidy
+
+  # Rate determination factors
+  ccdf_age_group: benefit#ccdf_age_group
+  ccdf_duration_of_care: benefit#ccdf_duration_of_care

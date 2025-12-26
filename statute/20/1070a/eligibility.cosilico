@@ -1,0 +1,166 @@
+# 20 USC 1070a & 1091 - Pell Grant Eligibility
+#
+# "A student shall be eligible to receive a Federal Pell Grant for an
+# academic year if the student—
+#   (1) has a high school diploma or equivalent...
+#   (2) is enrolled or accepted for enrollment...
+#   (3) is maintaining satisfactory academic progress...
+#   (4) is not in default on a Federal student loan...
+#   (5) is a citizen, national, or eligible noncitizen..."
+#
+# References:
+# - 20 USC 1070a(b)(1) - Basic grant eligibility
+# - 20 USC 1091 - Student eligibility provisions
+# - 34 CFR 668 - Student assistance general provisions
+
+imports:
+  # Core eligibility inputs
+  is_enrolled_in_higher_education: statute/20/1091/enrollment_status
+  has_high_school_credential: statute/20/1091/high_school_diploma
+  is_citizen_or_eligible_noncitizen: statute/20/1091/citizenship
+  maintains_satisfactory_progress: statute/20/1091/satisfactory_progress
+  is_not_in_default: statute/20/1091/default_status
+  has_valid_ssn: statute/20/1091/social_security
+
+  # SAI/EFC-based eligibility
+  pell_grant_sai: statute/20/1070a/sai#pell_grant_sai
+  pell_grant_efc: statute/20/1070a/efc#pell_grant_efc
+
+  # Parameters
+  sai_limits: statute/20/1070a/parameters#sai.limits
+  amount: statute/20/1070a/parameters#amount
+
+entity Person
+period Year
+dtype Boolean
+label "Pell Grant Eligible"
+description "Whether person meets all eligibility requirements for Federal Pell Grant per 20 USC 1070a and 1091"
+
+formula:
+  # Basic statutory requirements per 20 USC 1091
+  meets_enrollment = is_enrolled_in_higher_education
+  meets_credential = has_high_school_credential
+  meets_citizenship = is_citizen_or_eligible_noncitizen
+  meets_progress = maintains_satisfactory_progress
+  meets_default = is_not_in_default
+  meets_ssn = has_valid_ssn
+
+  # All basic eligibility requirements must be met
+  basic_eligible = (
+    meets_enrollment &
+    meets_credential &
+    meets_citizenship &
+    meets_progress &
+    meets_default &
+    meets_ssn
+  )
+
+  # Income-based eligibility: EFC or SAI must result in non-zero award
+  # Under SAI: ineligible if SAI > cost_of_attendance - min_award
+  # Simplified: Check if any Pell would be awarded
+  income_eligible = (pell_grant_efc >= 0) | (pell_grant_sai <= sai_limits.max_sai)
+
+  return basic_eligible & income_eligible
+
+# =============================================================================
+# ELIGIBILITY TYPE (for SAI methodology)
+# =============================================================================
+
+---
+# 20 USC 1070a - Pell Grant Eligibility Type (SAI Methodology)
+#
+# Under FAFSA Simplification (2024+), eligibility is determined by
+# AGI as a fraction of Federal Poverty Guidelines.
+
+imports:
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  fpg: statute/42/9902/fpg#federal_poverty_guidelines
+  fpg_fraction: statute/20/1070a/parameters#sai.fpg_fraction
+  is_tax_unit_head: statute/26/1/filing_status#is_tax_unit_head
+  filing_status: statute/26/1/filing_status
+  is_dependent_student: statute/20/1070a/dependent_status
+
+entity Person
+period Year
+dtype Enum["INELIGIBLE", "MAXIMUM", "MINIMUM", "CALCULATED"]
+label "Pell Grant Eligibility Type"
+description "Eligibility category under SAI methodology determining maximum, minimum, or calculated award"
+
+formula:
+  agi = adjusted_gross_income
+  poverty_line = fpg
+
+  # Determine household type for threshold lookup
+  is_dependent = is_dependent_student
+  is_single = (filing_status == SINGLE) | (filing_status == HEAD_OF_HOUSEHOLD)
+
+  # Get applicable FPG fraction thresholds
+  max_threshold = select(
+    [is_dependent & is_single, is_dependent & ~is_single,
+     ~is_dependent & is_single, ~is_dependent & ~is_single],
+    [fpg_fraction.max_pell_limits.DEPENDENT_SINGLE,
+     fpg_fraction.max_pell_limits.DEPENDENT_NOT_SINGLE,
+     fpg_fraction.max_pell_limits.INDEPENDENT_SINGLE,
+     fpg_fraction.max_pell_limits.INDEPENDENT_NOT_SINGLE]
+  )
+
+  min_threshold = select(
+    [is_dependent & is_single, is_dependent & ~is_single,
+     ~is_dependent & is_single, ~is_dependent & ~is_single],
+    [fpg_fraction.min_pell_limits.DEPENDENT_SINGLE,
+     fpg_fraction.min_pell_limits.DEPENDENT_NOT_SINGLE,
+     fpg_fraction.min_pell_limits.INDEPENDENT_SINGLE,
+     fpg_fraction.min_pell_limits.INDEPENDENT_NOT_SINGLE]
+  )
+
+  # Calculate AGI as fraction of FPG
+  agi_to_fpg = agi / poverty_line
+
+  # Determine eligibility type
+  return select(
+    [agi_to_fpg > min_threshold,
+     agi_to_fpg <= max_threshold,
+     agi_to_fpg <= min_threshold],
+    [INELIGIBLE, MAXIMUM, MINIMUM],
+    default=CALCULATED
+  )
+
+# =============================================================================
+# FORMULA TYPE (A, B, or C)
+# =============================================================================
+
+---
+# 20 USC 1070a - Pell Grant Formula Type
+#
+# Determines which EFC formula applies based on dependency and parental status:
+# - Formula A: Dependent student (parents contribute)
+# - Formula B: Independent student without dependents other than spouse
+# - Formula C: Independent student with dependents other than spouse
+
+imports:
+  is_tax_unit_dependent: statute/26/152/dependent_status
+  has_dependents: statute/26/151/has_dependents
+  is_tax_unit_head: statute/26/1/filing_status#is_tax_unit_head
+  is_tax_unit_spouse: statute/26/1/filing_status#is_tax_unit_spouse
+
+entity Person
+period Year
+dtype Enum["A", "B", "C"]
+label "Pell Grant Formula Type"
+description "EFC formula type based on dependency status per THE EFC FORMULA guide"
+
+formula:
+  # For Pell purposes:
+  # A = Dependent student (uses parent financials)
+  # B = Independent without dependents (single independent)
+  # C = Independent with dependents (independent parent/supporting family)
+
+  is_head_or_spouse = is_tax_unit_head | is_tax_unit_spouse
+  unit_has_dependents = has_dependents
+
+  return select(
+    [unit_has_dependents & ~is_head_or_spouse,  # Dependent child = Formula A
+     ~unit_has_dependents & is_head_or_spouse],  # Independent no deps = Formula B
+    [A, B],
+    default=C  # Independent with dependents = Formula C
+  )

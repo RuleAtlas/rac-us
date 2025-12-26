@@ -1,0 +1,152 @@
+# 26 USC 25E - Previously-Owned Clean Vehicles Credit
+#
+# "(a) ALLOWANCE OF CREDIT. -- In the case of a qualified buyer who during a
+# taxable year places in service a previously-owned clean vehicle, there shall
+# be allowed as a credit against the tax imposed by this chapter for the
+# taxable year an amount equal to the lesser of--
+#   (1) $4,000, or
+#   (2) the amount equal to 30 percent of the sale price with respect to
+#       such vehicle."
+#
+# Added by the Inflation Reduction Act of 2022 (Section 13402).
+# Effective for vehicles acquired after December 31, 2022.
+#
+# Eligibility Requirements:
+#   - MAGI limits: $150k joint, $112.5k HOH, $75k single (Section 25E(b)(1)(B))
+#   - Sale price limit: $25,000 (Section 25E(c)(1)(D))
+#   - Vehicle at least 2 model years old (Section 25E(c)(1)(B))
+#   - First transfer since IRA enactment (Section 25E(c)(1)(C))
+#   - Purchased from licensed dealer (Section 25E(c)(1)(A))
+#
+# References:
+#   - 26 USC 25E: https://www.law.cornell.edu/uscode/text/26/25E
+#   - IRA 2022: https://www.democrats.senate.gov/imo/media/doc/inflation_reduction_act_of_2022.pdf#page=386
+
+imports:
+# Parameters
+  p: statute/26/25E/parameters
+
+# Input variables (vehicle characteristics)
+  purchased_used_clean_vehicle: inputs/vehicles/purchased_used_clean_vehicle
+  used_clean_vehicle_sale_price: inputs/vehicles/used_clean_vehicle_sale_price
+
+# Other sections
+  filing_status: statute/26/1/filing_status
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  income_tax_before_credits: statute/26/1/income_tax
+
+# Filing status values
+enum FilingStatus {
+  SINGLE
+  JOINT
+  SEPARATE
+  HEAD_OF_HOUSEHOLD
+  SURVIVING_SPOUSE
+}
+
+# --- Eligibility Determination per Section 25E(b), (c) ---
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "Income Eligible for Used Clean Vehicle Credit"
+description "Whether taxpayer MAGI is below limit per 25E(b)(1)(B)"
+
+formula:
+  # Note: Law specifies lesser of current or prior year MAGI
+  # For simplicity, using current year AGI
+  agi = adjusted_gross_income
+  limit = p.eligibility.income_limit[filing_status]
+  return agi <= limit
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "Sale Price Eligible for Used Clean Vehicle Credit"
+description "Whether vehicle sale price is below limit per 25E(c)(1)(D)"
+
+formula:
+  price = used_clean_vehicle_sale_price
+  limit = p.eligibility.sale_price_limit
+  return price <= limit
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "Used Clean Vehicle Credit Eligible"
+description "Whether taxpayer meets all requirements for used clean vehicle credit per 25E"
+
+formula:
+  # Must have purchased a qualifying previously-owned clean vehicle
+  has_vehicle = purchased_used_clean_vehicle
+
+  # Income limit
+  meets_income = used_clean_vehicle_income_eligible
+
+  # Sale price limit
+  meets_price = used_clean_vehicle_sale_price_eligible
+
+  # Note: Additional requirements not modeled:
+  # - Vehicle at least 2 model years old (25E(c)(1)(B))
+  # - First transfer since IRA enactment (25E(c)(1)(C))
+  # - Purchased from licensed dealer (25E(c)(1)(A))
+  # - Not dependent on another taxpayer (25E(b)(1)(A))
+  # - No prior used vehicle credit in 3 years (25E(b)(2))
+
+  return has_vehicle & meets_income & meets_price
+
+# --- Credit Amount Calculation per Section 25E(a) ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Used Clean Vehicle Credit Potential"
+description "Potential credit amount per 25E(a) - lesser of 30% of sale price or $4,000"
+
+formula:
+  price = used_clean_vehicle_sale_price
+  rate = p.amount.percent_of_sale_price
+  max_credit = p.amount.max
+
+  # 30% of sale price
+  pct_amount = price * rate
+
+  # Lesser of percentage amount or maximum
+  return min(pct_amount, max_credit)
+
+# --- Final Credit with Nonrefundable Limitation ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Used Clean Vehicle Credit Limit"
+description "Credit limitation based on tax liability"
+
+formula:
+  # Credit cannot exceed income tax liability (nonrefundable)
+  # Note: For simplicity, not modeling preceding credits offset
+  return max(0, income_tax_before_credits)
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Used Clean Vehicle Credit"
+description "Credit for previously-owned clean vehicles per 26 USC 25E"
+
+formula:
+  # Not eligible = no credit
+  if not used_clean_vehicle_credit_eligible then
+    return 0
+
+  potential = used_clean_vehicle_credit_potential
+  limit = used_clean_vehicle_credit_limit
+
+  return min(potential, limit)
+
+defined_for:
+  purchased_used_clean_vehicle
+
+default 0
