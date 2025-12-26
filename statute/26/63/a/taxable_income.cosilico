@@ -31,11 +31,6 @@ variable deductions_from_agi {
   unit "USD"
   label "Deductions from AGI"
   description "Greater of standard or itemized deductions per 26 USC 63"
-  reference (
-    "26 USC 63(a)",
-    "26 USC 63(b)",
-    "26 USC 63(e)"
-  )
 
   formula {
     # § 63(e): Election to itemize
@@ -62,7 +57,6 @@ variable takes_standard_deduction {
   dtype Boolean
   label "Takes Standard Deduction"
   description "Whether taxpayer uses standard vs itemized deduction"
-  reference "26 USC 63(b), 63(e)"
 
   formula {
     # Taxpayer takes standard if:
@@ -85,11 +79,6 @@ variable taxable_income {
   unit "USD"
   label "Taxable Income"
   description "Adjusted gross income minus deductions per 26 USC 63"
-  reference (
-    "26 USC 63(a)",
-    "26 USC 63(b)",
-    "26 USC 151"
-  )
 
   formula {
     let agi = adjusted_gross_income

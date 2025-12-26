@@ -41,7 +41,6 @@ variable is_active_retirement_plan_participant {
   dtype Boolean
   label "Active Retirement Plan Participant"
   description "Whether individual is an active participant in an employer retirement plan"
-  reference "26 USC 219(g)(5)"
 
   # Input variable - from W-2 Box 13
 }
@@ -53,7 +52,6 @@ variable spouse_is_active_retirement_plan_participant {
   dtype Boolean
   label "Spouse is Active Retirement Plan Participant"
   description "Whether spouse is an active participant in an employer retirement plan"
-  reference "26 USC 219(g)(7)"
 
   # Input variable - from spouse's W-2 Box 13
 }
@@ -66,7 +64,6 @@ variable ira_phaseout_start {
   unit "USD"
   label "IRA Deduction Phase-out Start"
   description "AGI where IRA deduction phase-out begins"
-  reference "26 USC 219(g)(2)(A)"
 
   formula {
     # MFS has its own very narrow range
@@ -96,7 +93,6 @@ variable ira_phaseout_end {
   unit "USD"
   label "IRA Deduction Phase-out End"
   description "AGI where IRA deduction is fully phased out"
-  reference "26 USC 219(g)(2)(A)"
 
   formula {
     if filing_status == MARRIED_FILING_SEPARATELY {
@@ -121,7 +117,6 @@ variable ira_phaseout_applies {
   dtype Boolean
   label "IRA Phase-out Applies"
   description "Whether IRA deduction is subject to income-based phase-out"
-  reference "26 USC 219(g)(1)"
 
   formula {
     # Phase-out only applies if individual OR spouse is active participant
@@ -137,7 +132,6 @@ variable ira_phaseout_ratio {
   dtype Rate
   label "IRA Deduction Phase-out Ratio"
   description "Ratio of IRA deduction that is phased out based on income"
-  reference "26 USC 219(g)(2)"
 
   formula {
     # If neither spouse is an active participant, no phase-out
@@ -173,7 +167,6 @@ variable ira_deduction_after_phaseout {
   unit "USD"
   label "IRA Deduction After Phase-out"
   description "IRA deduction after applying income-based phase-out"
-  reference "26 USC 219(g)"
 
   formula {
     let max_deduction = ira_max_deductible_contribution

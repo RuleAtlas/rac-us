@@ -25,10 +25,6 @@ variable cdcc_maximum_expense_limit {
   unit "USD"
   label "CDCC Maximum Expense Limit"
   description "Dollar limit on creditable expenses based on number of qualifying individuals per 26 USC 21(c)"
-  reference (
-    "26 USC 21(c)(1): $3,000 for 1 qualifying individual",
-    "26 USC 21(c)(2): $6,000 for 2 or more qualifying individuals"
-  )
 
   formula {
     # No qualifying individuals = no credit

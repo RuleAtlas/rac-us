@@ -39,7 +39,6 @@ variable net_investment_income {
   unit "USD"
   label "Net Investment Income for 163(d)"
   description "Investment income minus investment expenses per 26 USC 163(d)(4)"
-  reference "26 USC 163(d)(4)"
 
   formula {
     return max(0, investment_income - investment_expenses)
@@ -55,10 +54,6 @@ variable deductible_investment_interest {
   unit "USD"
   label "Deductible Investment Interest"
   description "Investment interest deduction limited by net investment income per 26 USC 163(d)(1)"
-  reference (
-    "26 USC 163(d)(1)",
-    "26 USC 163(d)(2)"
-  )
 
   formula {
     # Total investment interest includes current year + carryforward
@@ -78,7 +73,6 @@ variable investment_interest_carryforward {
   unit "USD"
   label "Investment Interest Carryforward"
   description "Disallowed investment interest carried to succeeding year per 26 USC 163(d)(2)"
-  reference "26 USC 163(d)(2)"
 
   formula {
     let total_interest = investment_interest_paid + investment_interest_carryforward_prior

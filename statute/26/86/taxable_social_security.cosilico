@@ -75,7 +75,6 @@ variable tier1_taxable_social_security {
   unit "USD"
   label "Tier 1 Taxable Social Security"
   description "Amount taxable under 50% tier per 86(a)(1)"
-  reference "26 USC Section 86(a)(1)"
 
   formula {
     let base_amount = get_base_amount(filing_status)
@@ -103,7 +102,6 @@ variable tier2_additional_taxable_social_security {
   unit "USD"
   label "Tier 2 Additional Taxable Social Security"
   description "Additional amount taxable under 85% tier per 86(a)(2)"
-  reference "26 USC Section 86(a)(2)"
 
   formula {
     let adjusted_base = get_adjusted_base_amount(filing_status)
@@ -137,7 +135,6 @@ variable taxable_social_security {
   unit "USD"
   label "Taxable Social Security Benefits"
   description "Total Social Security benefits included in gross income per 26 USC Section 86"
-  reference "26 USC Section 86"
 
   formula {
     let total = tier1_taxable_social_security + tier2_additional_taxable_social_security
@@ -163,7 +160,6 @@ variable social_security_taxable_fraction {
   unit "percentage"
   label "Taxable Fraction of Social Security"
   description "Portion of Social Security benefits included in taxable income"
-  reference "26 USC Section 86"
 
   formula {
     if tax_unit_social_security <= 0 {

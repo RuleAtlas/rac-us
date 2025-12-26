@@ -13,7 +13,6 @@ variable gains_from_property {
   unit "USD"
   label "Gains from Property"
   description "Gains derived from dealings in property including capital gains"
-  reference "26 USC § 61(a)(3)"
   # Input from CPS: CAP_VAL (capital gains/losses)
   # Note: Can be negative (capital losses)
 }

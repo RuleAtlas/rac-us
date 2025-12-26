@@ -14,6 +14,5 @@ metadata:
   unit: /1
   period: year
   label: "Tier 1 benefit cap rate (50%)"
-  reference:
     - title: "26 U.S. Code Section 86(a)(1)(A)"
       href: "https://www.law.cornell.edu/uscode/text/26/86#a_1_A"

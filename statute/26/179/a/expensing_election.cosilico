@@ -33,7 +33,6 @@ variable section_179_property_placed_in_service {
   unit "USD"
   label "Section 179 Property Placed in Service"
   description "Cost of qualifying Section 179 property placed in service during the year"
-  reference "26 USC 179(d)"
 
   input {
     # Must be tangible personal property used in trade/business
@@ -51,7 +50,6 @@ variable suv_property_placed_in_service {
   unit "USD"
   label "SUV Property Placed in Service"
   description "Cost of sport utility vehicles over 6,000 lbs gross weight"
-  reference "26 USC 179(b)(5)"
 
   input {
     # Vehicles over 6,000 lbs gross vehicle weight
@@ -69,7 +67,6 @@ variable total_cost_of_section_179_property {
   unit "USD"
   label "Total Cost of Section 179 Property"
   description "Total cost of all Section 179 property for phaseout calculation"
-  reference "26 USC 179(b)(2)"
 
   input {
     # Total of all Section 179 property placed in service
@@ -87,7 +84,6 @@ variable taxable_income_before_179 {
   unit "USD"
   label "Taxable Income Before Section 179"
   description "Taxable income from active trade or business before Section 179 deduction"
-  reference "26 USC 179(b)(3)"
 
   input {
     # Active trade or business income
@@ -105,7 +101,6 @@ variable section_179_carryforward_prior {
   unit "USD"
   label "Section 179 Carryforward from Prior Year"
   description "Disallowed Section 179 amount carried forward from prior year"
-  reference "26 USC 179(b)(3)(B)"
 
   input { }
 
@@ -120,7 +115,6 @@ variable section_179_available_after_phaseout {
   unit "USD"
   label "Section 179 Available After Phaseout"
   description "Maximum deduction available after applying investment phaseout"
-  reference "26 USC 179(b)(2)"
 
   formula {
     # Start with maximum
@@ -143,7 +137,6 @@ variable section_179_after_suv_limit {
   unit "USD"
   label "Section 179 After SUV Limitation"
   description "Elected amount after applying SUV limitation"
-  reference "26 USC 179(b)(5)"
 
   formula {
     # Non-SUV property: full amount up to available
@@ -169,7 +162,6 @@ variable section_179_deduction {
   unit "USD"
   label "Section 179 Deduction"
   description "Section 179 expensing deduction for the taxable year"
-  reference "26 USC 179(a)"
 
   formula {
     # Total tentative deduction (current year + carryforward)
@@ -191,7 +183,6 @@ variable section_179_carryforward {
   unit "USD"
   label "Section 179 Carryforward"
   description "Disallowed Section 179 amount to carry forward to next year"
-  reference "26 USC 179(b)(3)(B)"
 
   formula {
     # Total tentative deduction

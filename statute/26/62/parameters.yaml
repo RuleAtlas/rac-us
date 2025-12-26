@@ -11,7 +11,6 @@ reference: "26 USC 62"
 # =============================================================================
 educator_expenses:
   description: "Maximum deduction for eligible educator expenses"
-  reference: "26 USC 62(a)(2)(D), Rev. Proc. 2023-34"
   max_deduction:
     description: "Maximum deduction per eligible educator"
     unit: USD
@@ -31,7 +30,6 @@ educator_expenses:
 # =============================================================================
 ira:
   description: "Traditional IRA contribution and deduction limits"
-  reference: "26 USC 219, Rev. Proc. 2023-34"
 
   contribution_limit:
     description: "Maximum annual IRA contribution (under age 50)"
@@ -130,7 +128,6 @@ ira:
 # =============================================================================
 hsa:
   description: "Health Savings Account contribution limits"
-  reference: "26 USC 223, Rev. Proc. 2023-22"
 
   self_only_limit:
     description: "Maximum HSA contribution for self-only HDHP coverage"
@@ -171,7 +168,6 @@ hsa:
 # =============================================================================
 student_loan_interest:
   description: "Student loan interest deduction limits and phase-outs"
-  reference: "26 USC 221, Rev. Proc. 2023-34"
 
   max_deduction:
     description: "Maximum deduction for student loan interest"

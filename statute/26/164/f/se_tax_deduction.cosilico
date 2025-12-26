@@ -21,7 +21,6 @@ variable se_tax_deduction {
   unit "USD"
   label "Self-Employment Tax Deduction"
   description "Deduction for one-half of self-employment taxes per 164(f)"
-  reference "26 USC 164(f)"
 
   formula {
     # Exactly one-half of the self-employment tax per statute

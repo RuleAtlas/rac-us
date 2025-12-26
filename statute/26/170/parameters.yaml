@@ -11,7 +11,6 @@ reference: "26 USC 170"
 # =============================================================================
 percentage_limits:
   description: "AGI-based percentage limits for charitable deductions"
-  reference: "26 USC 170(b)(1)"
 
   # Cash to 50% organizations (public charities)
   cash_to_public_charity:
@@ -91,7 +90,6 @@ percentage_limits:
 # =============================================================================
 carryforward:
   description: "Carryforward rules for excess contributions"
-  reference: "26 USC 170(d)(1)"
 
   years:
     description: "Number of years excess contributions can be carried forward"
@@ -106,7 +104,6 @@ carryforward:
 # =============================================================================
 above_the_line:
   description: "Above-the-line charitable deduction for non-itemizers (CARES Act)"
-  reference: "CARES Act Section 2204, Consolidated Appropriations Act 2021"
 
   max_single:
     description: "Maximum above-the-line deduction for single/other filers"

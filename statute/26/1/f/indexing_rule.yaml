@@ -13,7 +13,6 @@ description: Cost-of-living adjustment for income tax brackets
 
 # § 1(f)(3) - Cost-of-Living Adjustment Definition (as amended by TCJA)
 adjustment_method:
-  reference: "26 USC § 1(f)(3)"
   index: chained_cpi_u  # C-CPI-U per TCJA § 11002
 
   # TCJA changed from CPI-U to C-CPI-U
@@ -27,7 +26,6 @@ adjustment_method:
 
 # § 1(f)(6) - Rounding Rules
 rounding:
-  reference: "26 USC § 1(f)(6)"
   description: "Rounding to nearest multiple of $50"
   rules:
     # "(A) each bracket threshold which is a multiple of $50 shall be rounded

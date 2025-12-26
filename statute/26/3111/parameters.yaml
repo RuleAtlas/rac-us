@@ -40,7 +40,6 @@ employer_medicare_rate:
     1966-01-01: 0.0035
   citations:
     - "26 USC 3111(b): rate of 1.45 percent of wages"
-  reference: "https://uscode.house.gov/view.xhtml?req=26+USC+3111"
 
 # =============================================================================
 # EMPLOYER SOCIAL SECURITY TAX RATE - 26 USC 3111(a)
@@ -59,7 +58,6 @@ employer_social_security_rate:
     1984-01-01: 0.067
   citations:
     - "26 USC 3111(a): rate of 6.2 percent of wages up to wage base"
-  reference: "https://uscode.house.gov/view.xhtml?req=26+USC+3111"
 
 # =============================================================================
 # COMBINED EMPLOYER FICA RATE

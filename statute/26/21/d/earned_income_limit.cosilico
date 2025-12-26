@@ -35,10 +35,6 @@ variable cdcc_earned_income_limit {
   unit "USD"
   label "CDCC Earned Income Limit"
   description "Earned income limitation on creditable expenses per 26 USC 21(d)"
-  reference (
-    "26 USC 21(d)(1)(A): single filer's earned income",
-    "26 USC 21(d)(1)(B): lesser of spouses' earned incomes"
-  )
 
   formula {
     # For single/HoH filers: use the head's earned income

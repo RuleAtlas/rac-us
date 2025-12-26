@@ -21,12 +21,7 @@ variable charitable_deduction {
   unit "USD"
   label "Charitable Contribution Deduction"
   description "Total deductible charitable contributions for itemized deductions per 26 USC 170(a)"
-  reference (
-    "26 USC 170(a)(1)",
-    "26 USC 170(b)(1)",
-    "26 USC 170(d)(1)",
     "IRS Publication 526"
-  )
 
   formula {
     # Total deduction = current year + carryforward used

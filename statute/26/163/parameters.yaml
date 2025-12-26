@@ -11,7 +11,6 @@ reference: "26 USC 163"
 # =============================================================================
 qualified_residence:
   description: "Parameters for home mortgage interest deduction"
-  reference: "26 USC 163(h)(3), TCJA Section 11043"
 
   # Acquisition indebtedness limit - 163(h)(3)(B)(ii)
   acquisition_debt_limit:
@@ -77,7 +76,6 @@ qualified_residence:
 # =============================================================================
 investment_interest:
   description: "Investment interest limitation parameters"
-  reference: "26 USC 163(d)"
 
   # Note: Investment interest is limited to net investment income
   # Excess carries forward indefinitely

@@ -63,7 +63,6 @@ variable ptc_household_size {
   dtype Integer
   label "PTC Household Size"
   description "Household size for FPL determination per 26 USC 36B(d)(1)"
-  reference "26 USC 36B(d)(1)"
 
   formula {
     # Household includes:
@@ -82,10 +81,7 @@ variable ptc_federal_poverty_level {
   unit "USD"
   label "FPL for PTC Household"
   description "Federal poverty level for household size per 26 USC 36B(d)(3)"
-  reference (
-    "26 USC 36B(d)(3)",
     "HHS Poverty Guidelines"
-  )
 
   formula {
     let size = ptc_household_size
@@ -106,7 +102,6 @@ variable household_income_pct_fpl {
   unit "/1"
   label "Household Income as % FPL"
   description "Household income relative to federal poverty level"
-  reference "26 USC 36B(d)(1)"
 
   formula {
     let income = household_income
@@ -131,7 +126,6 @@ variable household_income {
   unit "USD"
   label "Household Income for PTC"
   description "Modified AGI of taxpayer plus modified AGI of dependents per 26 USC 36B(d)(2)"
-  reference "26 USC 36B(d)(2)"
 
   formula {
     # Household income = MAGI of taxpayer (and spouse) + MAGI of dependents
@@ -158,7 +152,6 @@ variable ptc_filing_status_eligible {
   dtype Boolean
   label "PTC Filing Status Eligible"
   description "Eligible filing status per 26 USC 36B(c)(1)(C)"
-  reference "26 USC 36B(c)(1)(C)"
 
   formula {
     # Married filing separately is generally ineligible
@@ -174,10 +167,7 @@ variable ptc_income_eligible {
   dtype Boolean
   label "PTC Income Eligible"
   description "Household income within eligible range per 26 USC 36B(c)(1)(A)"
-  reference (
-    "26 USC 36B(c)(1)(A)",
     "P.L. 117-169 Section 12001 (IRA)"
-  )
 
   formula {
     let income_pct = household_income_pct_fpl
@@ -203,7 +193,6 @@ variable ptc_not_dependent {
   dtype Boolean
   label "PTC Not Claimed as Dependent"
   description "Not claimed as dependent by another per 26 USC 36B(c)(1)(D)"
-  reference "26 USC 36B(c)(1)(D)"
 
   formula {
     # Taxpayer cannot be claimed as dependent by another
@@ -218,7 +207,6 @@ variable is_applicable_taxpayer {
   dtype Boolean
   label "Is Applicable Taxpayer"
   description "Meets all requirements for PTC per 26 USC 36B(c)(1)"
-  reference "26 USC 36B(c)(1)"
 
   formula {
     # All conditions must be met
@@ -247,7 +235,6 @@ variable ptc_coverage_months {
   dtype Integer
   label "Coverage Months"
   description "Number of months enrolled in qualified health plan per 26 USC 36B(c)(2)"
-  reference "26 USC 36B(c)(2)"
 
   # This would typically be an input variable
   # A coverage month is one where:
@@ -267,7 +254,6 @@ variable slcsp_premium {
   unit "USD"
   label "SLCSP Annual Premium"
   description "Second lowest cost silver plan premium for coverage area per 26 USC 36B(b)(3)(B)"
-  reference "26 USC 36B(b)(3)(B)"
 
   # This is determined by the Marketplace based on:
   # - Rating area (geographic location)
@@ -287,7 +273,6 @@ variable slcsp_premium_monthly {
   unit "USD"
   label "Monthly SLCSP Premium"
   description "Monthly portion of SLCSP premium"
-  reference "26 USC 36B(b)(3)(B)"
 
   formula {
     return slcsp_premium / 12
@@ -307,7 +292,6 @@ variable ptc_monthly_amount {
   unit "USD"
   label "Monthly PTC Amount"
   description "Premium tax credit for coverage month per 26 USC 36B(b)(2)"
-  reference "26 USC 36B(b)(2)"
 
   formula {
     # Credit = Benchmark Premium - Expected Contribution
@@ -327,7 +311,6 @@ variable premium_assistance_credit_amount {
   unit "USD"
   label "Premium Assistance Credit Amount"
   description "Total annual premium tax credit per 26 USC 36B(b)(1)"
-  reference "26 USC 36B(b)(1)"
 
   formula {
     # "(b) PREMIUM ASSISTANCE CREDIT AMOUNT.--
@@ -360,12 +343,7 @@ variable premium_tax_credit {
   unit "USD"
   label "Premium Tax Credit"
   description "Refundable credit for Marketplace health insurance per 26 USC 36B(a)"
-  reference (
-    "26 USC 36B(a)",
-    "26 USC 36B(b)",
-    "26 USC 36B(c)",
     "P.L. 117-169 Section 12001 (IRA)"
-  )
 
   formula {
     # Check eligibility as applicable taxpayer
@@ -392,7 +370,6 @@ variable advance_ptc {
   unit "USD"
   label "Advance Premium Tax Credit"
   description "Advance payments of PTC made during year"
-  reference "26 USC 36B(f)"
 
   # Input variable: total advance payments made to insurer
 
@@ -407,7 +384,6 @@ variable net_ptc_adjustment {
   unit "USD"
   label "Net PTC Adjustment"
   description "Reconciliation of actual PTC vs advance payments per 26 USC 36B(f)"
-  reference "26 USC 36B(f)"
 
   formula {
     let actual_credit = premium_tax_credit
@@ -427,7 +403,6 @@ variable excess_advance_ptc_repayment {
   unit "USD"
   label "Excess Advance PTC Repayment"
   description "Additional tax due for excess advance payments per 26 USC 36B(f)(2)"
-  reference "26 USC 36B(f)(2)"
 
   formula {
     let adjustment = net_ptc_adjustment
@@ -449,7 +424,6 @@ variable additional_ptc_refund {
   unit "USD"
   label "Additional PTC Refund"
   description "Additional refund if actual PTC exceeds advance payments"
-  reference "26 USC 36B(f)"
 
   formula {
     let adjustment = net_ptc_adjustment

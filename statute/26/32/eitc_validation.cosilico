@@ -148,12 +148,6 @@ variable earned_income_credit {
   unit "USD"
   label "Earned Income Tax Credit"
   description "Refundable credit for low-to-moderate income working individuals per 26 USC 32(a)(1)"
-  reference (
-    "26 USC 32(a)(1)",
-    "26 USC 32(c)(1)",
-    "26 USC 32(d)",
-    "26 USC 32(i)"
-  )
 
   formula {
     # Use is_eligible_individual which checks all requirements:

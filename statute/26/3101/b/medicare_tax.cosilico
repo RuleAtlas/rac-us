@@ -36,7 +36,6 @@ variable employee_medicare_tax {
   unit "USD"
   label "Employee Medicare Tax"
   description "Employee share of Medicare (HI) tax at 1.45% of wages per 26 USC 3101(b)(1)"
-  reference "26 USC 3101(b)(1)"
 
   formula {
     # Medicare tax applies to ALL wages - no cap unlike Social Security
@@ -53,7 +52,6 @@ variable medicare_tax_withheld {
   unit "USD"
   label "Medicare Tax Withheld"
   description "Total Medicare tax withheld from wages (employee share) per 26 USC 3101(b)"
-  reference "26 USC 3101(b)"
 
   formula {
     # Base Medicare tax (1.45%)

@@ -28,11 +28,6 @@ variable is_cdcc_qualifying_individual {
   dtype Bool
   label "Is CDCC Qualifying Individual"
   description "Whether person qualifies for purposes of Child and Dependent Care Credit per 26 USC 21(b)"
-  reference (
-    "26 USC 21(b)(1): dependent under age 13",
-    "26 USC 21(b)(2): disabled dependent",
-    "26 USC 21(b)(3): disabled spouse"
-  )
 
   formula {
     # Category 1: Dependent child under age 13

@@ -31,7 +31,6 @@ variable liheap_energy_burden {
   dtype Rate
   label "LIHEAP energy burden"
   description "Annual energy costs as proportion of household income per 42 USC 8624(b)(5)"
-  reference "42 USC 8624(b)(5)"
 
   formula {
     # Energy burden = energy costs / income
@@ -54,7 +53,6 @@ variable liheap_high_energy_burden {
   dtype Boolean
   label "LIHEAP high energy burden"
   description "Household has high energy burden per 42 USC 8624(b)(5)(A)"
-  reference "42 USC 8624(b)(5)(A)(i)"
 
   formula {
     return liheap_energy_burden >= high_energy_burden_threshold
@@ -70,7 +68,6 @@ variable liheap_priority_household {
   dtype Boolean
   label "LIHEAP priority household"
   description "Household qualifies for priority targeting per 42 USC 8624(b)(5)(A)"
-  reference "42 USC 8624(b)(5)(A)"
 
   formula {
     # Priority given to households with:
@@ -93,10 +90,8 @@ variable liheap {
   unit "USD"
   label "Low Income Home Energy Assistance"
   description "LIHEAP benefit amount per 42 USC 8624"
-  reference (
     "42 USC 8624(b)(1)",
     "42 USC 8624(b)(5)"
-  )
 
   formula {
     if not liheap_eligible then
@@ -145,7 +140,6 @@ variable liheap_heating_assistance {
   unit "USD"
   label "LIHEAP heating assistance"
   description "Home heating assistance per 42 USC 8624(b)(1)(A)"
-  reference "42 USC 8624(b)(1)(A)"
 
   formula {
     if not liheap_heating_eligible then
@@ -166,7 +160,6 @@ variable liheap_cooling_assistance {
   unit "USD"
   label "LIHEAP cooling assistance"
   description "Home cooling assistance per 42 USC 8624(b)(1)(B)"
-  reference "42 USC 8624(b)(1)(B)"
 
   formula {
     if not liheap_cooling_eligible then

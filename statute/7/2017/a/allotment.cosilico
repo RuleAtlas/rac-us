@@ -4,7 +4,7 @@
 # thrifty food plan... reduced by an amount equal to 30 per centum
 # of the household's income"
 
-references {
+imports {
   max_allotment: statute/7/2017/a/max_allotment
   expected_contribution_rate: statute/7/2017/a/expected_contribution_rate
   minimum_benefit: statute/7/2017/a/minimum_benefit
@@ -30,7 +30,7 @@ variable snap_allotment {
     let calculated = max_benefit - contribution
 
     # Apply minimum benefit for 1-2 person households
-    let minimum = household_size <= 2 ? minimum_benefit : 0
+    let minimum = if household_size <= 2 then minimum_benefit else 0
     let benefit = max(calculated, minimum)
 
     return max(0, min(benefit, max_benefit))

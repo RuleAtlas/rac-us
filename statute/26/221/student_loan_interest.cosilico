@@ -63,7 +63,6 @@ variable student_loan_interest_paid {
   unit "USD"
   label "Student Loan Interest Paid"
   description "Interest paid on qualified education loans during the tax year"
-  reference "26 USC 221(a)"
 
   # Input variable - amount of interest paid on qualified education loans
   # To qualify, the loan must be:
@@ -78,7 +77,6 @@ variable is_claimed_as_dependent {
   dtype Bool
   label "Claimed as Dependent"
   description "Whether the individual can be claimed as a dependent by another taxpayer"
-  reference "26 USC 221(d)(3)"
 
   # Input variable - true if another taxpayer can claim this person under Section 151
 }
@@ -93,7 +91,6 @@ variable student_loan_interest_deduction_eligible {
   dtype Bool
   label "Student Loan Interest Deduction Eligibility"
   description "Whether the tax unit meets eligibility requirements for the deduction"
-  reference "26 USC 221(d)"
 
   formula {
     # 26 USC 221(d)(2) - MFS cannot claim this deduction
@@ -118,7 +115,6 @@ variable student_loan_interest_phaseout_start {
   unit "USD"
   label "Phase-out Start Threshold"
   description "MAGI threshold where phase-out begins"
-  reference "26 USC 221(b)(2)(B)"
 
   formula {
     if filing_status == MARRIED_FILING_JOINTLY {
@@ -135,7 +131,6 @@ variable student_loan_interest_phaseout_end {
   unit "USD"
   label "Phase-out End Threshold"
   description "MAGI threshold where deduction is fully phased out"
-  reference "26 USC 221(b)(2)(B)"
 
   formula {
     if filing_status == MARRIED_FILING_JOINTLY {
@@ -151,7 +146,6 @@ variable student_loan_interest_phaseout_ratio {
   dtype Rate
   label "Student Loan Interest Phase-out Ratio"
   description "Ratio of deduction phased out based on MAGI"
-  reference "26 USC 221(b)(2)"
 
   formula {
     # For this deduction, MAGI = AGI (no add-backs required for Section 221)
@@ -184,7 +178,6 @@ variable student_loan_interest_deduction_before_phaseout {
   unit "USD"
   label "Student Loan Interest Deduction (Before Phase-out)"
   description "Deduction amount before applying income-based phase-out"
-  reference "26 USC 221(b)(1)"
 
   formula {
     # Sum interest paid by all members of the tax unit
@@ -202,7 +195,6 @@ variable student_loan_interest_deduction {
   unit "USD"
   label "Student Loan Interest Deduction"
   description "Above-the-line deduction for interest paid on qualified education loans"
-  reference "26 USC 221, 62(a)(17)"
 
   formula {
     # Check eligibility first

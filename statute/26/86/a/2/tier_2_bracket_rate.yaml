@@ -16,6 +16,5 @@ metadata:
   unit: /1
   period: year
   label: "Tier 2 bracket rate (50%)"
-  reference:
     - title: "26 U.S. Code Section 86(a)(2)(A)(ii)(II)"
       href: "https://www.law.cornell.edu/uscode/text/26/86#a_2_A_ii_II"

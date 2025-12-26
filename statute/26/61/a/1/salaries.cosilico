@@ -13,7 +13,6 @@ variable salaries {
   unit "USD"
   label "Salaries"
   description "Fixed periodic compensation for services as an employee"
-  reference "26 USC § 61(a)(1)"
   # Input from CPS: included in WSAL_VAL
   # Note: Often combined with wages in data sources
 }

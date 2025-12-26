@@ -58,7 +58,6 @@ variable traditional_ira_contributions {
   unit "USD"
   label "Traditional IRA Contributions"
   description "Contributions made to traditional IRA during the tax year"
-  reference "26 USC 219"
 
   # Input variable - amount contributed by taxpayer
 }
@@ -69,7 +68,6 @@ variable has_retirement_plan_at_work {
   dtype Boolean
   label "Covered by Employer Retirement Plan"
   description "Whether the individual is an active participant in an employer retirement plan"
-  reference "26 USC 219(g)(5)"
 
   # Input variable - determines whether phase-out applies
 }
@@ -81,7 +79,6 @@ variable ira_contribution_limit {
   unit "USD"
   label "IRA Contribution Limit"
   description "Maximum allowable IRA contribution including catch-up"
-  reference "26 USC 219(b)"
 
   formula {
     let base_limit = contribution_limit
@@ -101,7 +98,6 @@ variable ira_deduction_before_phaseout {
   unit "USD"
   label "IRA Deduction Before Phase-out"
   description "IRA deduction amount before applying income phase-out"
-  reference "26 USC 219"
 
   formula {
     # Cannot deduct more than contributed or the annual limit
@@ -115,7 +111,6 @@ variable ira_phaseout_ratio {
   dtype Rate
   label "IRA Deduction Phase-out Ratio"
   description "Ratio of IRA deduction that is phased out based on income"
-  reference "26 USC 219(g)"
 
   formula {
     # If not covered by employer plan (and spouse not covered for joint),
@@ -153,7 +148,6 @@ variable ira_deduction {
   unit "USD"
   label "IRA Deduction"
   description "Above-the-line deduction for traditional IRA contributions"
-  reference "26 USC 62(a)(7), 219"
 
   formula {
     let base_deduction = ira_deduction_before_phaseout
@@ -172,7 +166,6 @@ variable ira_deduction_total {
   unit "USD"
   label "Total IRA Deduction"
   description "Combined IRA deduction for tax unit"
-  reference "26 USC 62(a)(7)"
 
   formula {
     return sum(members.ira_deduction)

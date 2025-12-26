@@ -38,10 +38,7 @@ variable qualifying_medical_expenses {
   unit "USD"
   label "Qualifying Medical Expenses"
   description "Medical expenses eligible for deduction per 26 USC 213(d)"
-  reference (
-    "26 USC 213(d)",
     "IRS Publication 502"
-  )
 
   formula {
     # Start with gross medical expenses
@@ -67,12 +64,9 @@ variable medical_expense_deduction {
   unit "USD"
   label "Medical Expense Deduction"
   description "Deductible medical expenses after AGI floor per 26 USC 213(a)"
-  reference (
-    "26 USC 213(a)",
     "TCJA Section 11027",
     "CAA 2021 Section 9041",
     "IRS Publication 502"
-  )
 
   formula {
     let agi = adjusted_gross_income

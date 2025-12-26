@@ -37,11 +37,6 @@ variable is_eligible_individual {
   dtype Bool
   label "Eligible for EITC"
   description "Whether individual meets all EITC eligibility requirements per 26 USC 32(c)(1) and 32(d)"
-  reference (
-    "26 USC 32(c)(1)",
-    "26 USC 32(d)",
-    "26 USC 32(i)"
-  )
 
   formula {
     # 32(d): MFS filing status disqualifies

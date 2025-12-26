@@ -55,11 +55,8 @@ variable magi {
   unit "USD"
   label "Modified Adjusted Gross Income"
   description "MAGI per 26 USC 36B(d)(2)(B)"
-  reference (
     "42 USC 1396a(e)(14)",
-    "26 USC 36B(d)(2)(B)",
     "42 CFR 435.603(e)"
-  )
 
   formula {
     # Start with AGI (26 USC 62)
@@ -91,7 +88,6 @@ variable magi_monthly {
   unit "USD"
   label "Monthly MAGI"
   description "MAGI converted to monthly for Medicaid eligibility"
-  reference "42 CFR 435.603(h)(3)"
 
   formula {
     # Medicaid uses monthly income, but MAGI is annual
@@ -115,10 +111,8 @@ variable magi_household_size {
   dtype Integer
   label "MAGI household size"
   description "Household size for MAGI-based Medicaid eligibility"
-  reference (
     "42 CFR 435.603(b)",
     "42 CFR 435.603(c)"
-  )
 
   formula {
     # Base household size
@@ -142,7 +136,6 @@ variable medicaid_fpl_monthly {
   unit "USD"
   label "Monthly Federal Poverty Level"
   description "FPL for MAGI household size"
-  reference "42 CFR 435.603"
 
   formula {
     # FPL = base for 1 person + additional per person beyond 1
@@ -171,7 +164,6 @@ variable magi_income {
   unit "USD"
   label "Household MAGI income"
   description "Aggregated MAGI for household members per 42 CFR 435.603(d)"
-  reference "42 CFR 435.603(d)"
 
   formula {
     # 42 CFR 435.603(d)(2): Count income of all tax filers in household
@@ -189,7 +181,6 @@ variable magi_income_pct_fpl {
   dtype Rate
   label "MAGI as % of FPL"
   description "Household MAGI income as percentage of Federal Poverty Level"
-  reference "42 CFR 435.603"
 
   formula {
     if medicaid_fpl_monthly <= 0 then
@@ -214,7 +205,6 @@ variable magi_income_pct_fpl_after_disregard {
   dtype Rate
   label "MAGI % FPL after disregard"
   description "Household MAGI as % FPL after 5% income disregard"
-  reference "42 CFR 435.603(d)(4)"
 
   formula {
     # The 5% disregard is subtracted from income as % of FPL
@@ -239,7 +229,6 @@ variable current_monthly_income {
   unit "USD"
   label "Current monthly income"
   description "Current month income for ongoing eligibility"
-  reference "42 CFR 435.603(h)"
 
   formula {
     # For ongoing eligibility, use current month income
@@ -275,7 +264,6 @@ variable magi_excluded_income {
   unit "USD"
   label "MAGI excluded income"
   description "Income types not counted under MAGI methodology"
-  reference "42 CFR 435.603(e)"
 
   formula {
     # Not counted under MAGI (not taxable income):
@@ -312,7 +300,6 @@ variable lump_sum_income_treatment {
   unit "USD"
   label "Lump sum income"
   description "Lump sum income counted only in month received"
-  reference "42 CFR 435.603(h)(4)"
 
   formula {
     # Under MAGI: lump sums counted only in month received
@@ -332,7 +319,6 @@ variable self_employment_income_net {
   unit "USD"
   label "Net self-employment income"
   description "Self-employment income after business expenses"
-  reference "42 CFR 435.603(e)"
 
   formula {
     # MAGI uses net self-employment income
@@ -355,7 +341,6 @@ variable scholarship_income_countable {
   unit "USD"
   label "Countable scholarship income"
   description "Scholarship income counted under MAGI"
-  reference "42 CFR 435.603(e)(3)"
 
   formula {
     # Tuition/fees portion: NOT counted (26 USC 117)

@@ -32,7 +32,6 @@ variable uses_section_1201 {
   dtype Boolean
   label "Uses Section 1201 Alternative Tax"
   description "Whether corporation benefits from Section 1201 capital gains alternative tax"
-  reference "26 USC 1201(a)"
 
   formula {
     # Only C corporations can use Section 1201
@@ -62,7 +61,6 @@ variable section_1201_tax {
   unit "USD"
   label "Section 1201 Tax Amount"
   description "Tax computed under Section 1201 alternative method"
-  reference "26 USC 1201(a)(1)"
 
   formula {
     if not is_subject_to_corporate_tax then
@@ -93,7 +91,6 @@ variable corporate_capital_gains_alternative_tax {
   unit "USD"
   label "Corporate Income Tax (with Section 1201 consideration)"
   description "Final corporate tax applying Section 1201 if beneficial"
-  reference "26 USC 1201"
 
   formula {
     if not is_subject_to_corporate_tax then

@@ -31,7 +31,6 @@ variable traditional_ira_contributions {
   unit "USD"
   label "Traditional IRA Contributions"
   description "Contributions made to traditional IRA during the tax year"
-  reference "26 USC 219(a)"
 
   # Input variable - provided by taxpayer
 }
@@ -44,7 +43,6 @@ variable ira_contribution_limit {
   unit "USD"
   label "IRA Contribution Limit"
   description "Maximum allowable IRA contribution including catch-up for age 50+"
-  reference "26 USC 219(b)(1)(A), 219(b)(5)(B)"
 
   formula {
     let base_limit = deductible_amount
@@ -65,7 +63,6 @@ variable ira_compensation_limit {
   unit "USD"
   label "IRA Compensation Limit"
   description "IRA contribution limit based on compensation"
-  reference "26 USC 219(b)(1)(B)"
 
   formula {
     # Cannot contribute more than earned income
@@ -82,7 +79,6 @@ variable ira_max_deductible_contribution {
   unit "USD"
   label "Maximum Deductible IRA Contribution"
   description "Lesser of contribution limit or compensation"
-  reference "26 USC 219(b)(1)"
 
   formula {
     # The lesser of (A) deductible amount or (B) compensation

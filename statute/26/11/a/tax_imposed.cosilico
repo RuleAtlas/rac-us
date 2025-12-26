@@ -16,7 +16,6 @@ variable is_subject_to_corporate_tax {
   dtype Boolean
   label "Subject to Corporate Income Tax"
   description "Whether entity is subject to tax under 26 USC 11"
-  reference "26 USC 11(a)"
 
   formula {
     # Only C corporations are subject to corporate income tax

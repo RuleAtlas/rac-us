@@ -17,7 +17,6 @@ variable is_aged {
   dtype Boolean
   label "Is aged (65+) for SSI"
   description "Individual has attained age 65 per 42 USC 1382c(a)(1)(A)"
-  reference "42 USC 1382c(a)(1)(A)"
 
   formula {
     return age >= age_threshold
@@ -33,10 +32,8 @@ variable is_ssi_categorical_eligible {
   dtype Boolean
   label "SSI categorical eligibility"
   description "Individual is aged (65+), blind, or disabled per 42 USC 1382(a)(1)(A)"
-  reference (
     "42 USC 1382(a)(1)(A)",
     "42 USC 1382c(a)(1)"
-  )
 
   formula {
     return is_aged or is_blind or is_disabled

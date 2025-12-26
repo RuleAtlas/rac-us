@@ -73,7 +73,6 @@ variable hdhp_coverage_type {
   dtype Enum[none, self_only, family]
   label "HDHP Coverage Type"
   description "Type of HDHP coverage: none, self_only, or family"
-  reference "26 USC 223(c)(2)"
   default none
 }
 
@@ -85,7 +84,6 @@ variable hdhp_annual_deductible {
   unit "USD"
   label "HDHP Annual Deductible"
   description "Annual deductible amount of the high deductible health plan"
-  reference "26 USC 223(c)(2)(A)(i)"
   default 0
 }
 
@@ -97,7 +95,6 @@ variable hdhp_out_of_pocket_maximum {
   unit "USD"
   label "HDHP Out-of-Pocket Maximum"
   description "Maximum out-of-pocket expenses under the HDHP"
-  reference "26 USC 223(c)(2)(A)(ii)"
   default 0
 }
 
@@ -109,7 +106,6 @@ variable hdhp_minimum_deductible {
   unit "USD"
   label "HDHP Minimum Deductible Requirement"
   description "Minimum annual deductible required for plan to qualify as HDHP"
-  reference "26 USC 223(c)(2)(A)(i)"
 
   formula {
     if hdhp_coverage_type == self_only {
@@ -129,7 +125,6 @@ variable hdhp_maximum_oop_limit {
   unit "USD"
   label "HDHP Maximum OOP Limit"
   description "Maximum allowable out-of-pocket limit for plan to qualify as HDHP"
-  reference "26 USC 223(c)(2)(A)(ii)"
 
   formula {
     if hdhp_coverage_type == self_only {
@@ -148,7 +143,6 @@ variable meets_hdhp_deductible_requirement {
   dtype Boolean
   label "Meets HDHP Deductible Requirement"
   description "Whether plan's deductible meets or exceeds the minimum for HDHP"
-  reference "26 USC 223(c)(2)(A)(i)"
 
   formula {
     if hdhp_coverage_type == none {
@@ -165,7 +159,6 @@ variable meets_hdhp_oop_requirement {
   dtype Boolean
   label "Meets HDHP OOP Requirement"
   description "Whether plan's OOP maximum is within the limit for HDHP"
-  reference "26 USC 223(c)(2)(A)(ii)"
 
   formula {
     if hdhp_coverage_type == none {
@@ -182,7 +175,6 @@ variable is_qualifying_hdhp {
   dtype Boolean
   label "Is Qualifying HDHP"
   description "Whether the health plan qualifies as a High Deductible Health Plan"
-  reference "26 USC 223(c)(2)"
 
   formula {
     return meets_hdhp_deductible_requirement and meets_hdhp_oop_requirement
@@ -196,7 +188,6 @@ variable has_disqualifying_health_coverage {
   dtype Boolean
   label "Has Disqualifying Health Coverage"
   description "Whether individual has non-HDHP coverage that provides HDHP benefits (excluding permitted insurance)"
-  reference "26 USC 223(c)(1)(A)(ii)"
   default false
 }
 
@@ -207,7 +198,6 @@ variable is_enrolled_in_medicare {
   dtype Boolean
   label "Enrolled in Medicare"
   description "Whether the individual is enrolled in Medicare"
-  reference "26 USC 223(b)(7)"
   default false
 }
 
@@ -218,6 +208,5 @@ variable can_be_claimed_as_dependent {
   dtype Boolean
   label "Can Be Claimed as Dependent"
   description "Whether the individual can be claimed as a dependent on another person's return"
-  reference "26 USC 223(b)(6)"
   default false
 }

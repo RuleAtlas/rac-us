@@ -74,7 +74,6 @@ variable realized_gain_loss {
   unit "USD"
   label "Realized Gain or Loss"
   description "Gain or loss realized on disposition of capital asset per 26 USC Section 1001(a)"
-  reference "26 USC Section 1001(a)"
 
   formula {
     # Gain = amount realized - adjusted basis
@@ -94,7 +93,6 @@ variable amount_realized {
   unit "USD"
   label "Amount Realized"
   description "Amount realized from sale or disposition per 26 USC Section 1001(b)"
-  reference "26 USC Section 1001(b)"
 
   # Input variable - cash plus FMV of property received
   # Net of selling expenses (commissions, etc.)
@@ -112,11 +110,6 @@ variable adjusted_basis {
   unit "USD"
   label "Adjusted Basis"
   description "Adjusted basis for gain/loss determination per 26 USC Sections 1011-1016"
-  reference (
-    "26 USC Section 1011",
-    "26 USC Section 1012",
-    "26 USC Section 1016"
-  )
 
   formula {
     # Start with original cost basis (Section 1012)
@@ -137,7 +130,6 @@ variable original_basis {
   unit "USD"
   label "Original Cost Basis"
   description "Original cost basis per 26 USC Section 1012"
-  reference "26 USC Section 1012"
 
   # Input variable - purchase price plus acquisition costs
 }
@@ -150,7 +142,6 @@ variable capital_improvements {
   unit "USD"
   label "Capital Improvements"
   description "Expenditures properly chargeable to capital account per 26 USC Section 1016(a)(1)"
-  reference "26 USC Section 1016(a)(1)"
 
   default 0
 }
@@ -163,7 +154,6 @@ variable depreciation_claimed {
   unit "USD"
   label "Depreciation Claimed"
   description "Depreciation allowed or allowable per 26 USC Section 1016(a)(2)"
-  reference "26 USC Section 1016(a)(2)"
 
   default 0
 }
@@ -176,7 +166,6 @@ variable casualty_losses_claimed {
   unit "USD"
   label "Casualty Losses Claimed"
   description "Casualty losses previously claimed per 26 USC Section 1016(a)(1)"
-  reference "26 USC Section 1016(a)(1)"
 
   default 0
 }
@@ -195,7 +184,6 @@ variable recognized_gain_loss {
   unit "USD"
   label "Recognized Gain or Loss"
   description "Gain or loss recognized for tax purposes per 26 USC Section 1001(c)"
-  reference "26 USC Section 1001(c)"
 
   formula {
     # Default: full recognition
@@ -226,7 +214,6 @@ variable short_term_capital_gain {
   unit "USD"
   label "Short-Term Capital Gain"
   description "Aggregate short-term capital gains (assets held 1 year or less) per 26 USC Section 1222(1)"
-  reference "26 USC Section 1222(1)"
 
   formula {
     # Sum of all positive recognized gains on short-term assets
@@ -247,7 +234,6 @@ variable short_term_capital_loss {
   unit "USD"
   label "Short-Term Capital Loss"
   description "Aggregate short-term capital losses (assets held 1 year or less) per 26 USC Section 1222(2)"
-  reference "26 USC Section 1222(2)"
 
   formula {
     # Sum of all negative recognized gains on short-term assets (as positive number)
@@ -268,7 +254,6 @@ variable long_term_capital_gain {
   unit "USD"
   label "Long-Term Capital Gain"
   description "Aggregate long-term capital gains (assets held more than 1 year) per 26 USC Section 1222(3)"
-  reference "26 USC Section 1222(3)"
 
   formula {
     # Sum of all positive recognized gains on long-term assets
@@ -289,7 +274,6 @@ variable long_term_capital_loss {
   unit "USD"
   label "Long-Term Capital Loss"
   description "Aggregate long-term capital losses (assets held more than 1 year) per 26 USC Section 1222(4)"
-  reference "26 USC Section 1222(4)"
 
   formula {
     # Sum of all negative recognized gains on long-term assets (as positive number)
@@ -317,7 +301,6 @@ variable inherited_property_basis {
   unit "USD"
   label "Inherited Property Basis"
   description "Stepped-up basis for property acquired from decedent per 26 USC Section 1014(a)"
-  reference "26 USC Section 1014(a)(1)"
 
   formula {
     if is_inherited_property then
@@ -334,7 +317,6 @@ variable is_inherited_property {
   dtype Bool
   label "Inherited Property Indicator"
   description "Property acquired from a decedent per Section 1014"
-  reference "26 USC Section 1014(b)"
 
   # Input variable
   default false
@@ -348,7 +330,6 @@ variable fmv_at_date_of_death {
   unit "USD"
   label "FMV at Date of Death"
   description "Fair market value of inherited property at decedent's death"
-  reference "26 USC Section 1014(a)(1)"
 
   # Input variable
   default 0
@@ -368,7 +349,6 @@ variable gifted_property_basis {
   unit "USD"
   label "Gifted Property Basis"
   description "Carryover basis for property acquired by gift per 26 USC Section 1015"
-  reference "26 USC Section 1015(a)"
 
   formula {
     if is_gifted_property then
@@ -390,7 +370,6 @@ variable is_gifted_property {
   dtype Bool
   label "Gifted Property Indicator"
   description "Property acquired by gift per Section 1015"
-  reference "26 USC Section 1015(a)"
 
   default false
 }
@@ -403,7 +382,6 @@ variable donor_basis {
   unit "USD"
   label "Donor Basis"
   description "Donor's adjusted basis in gifted property"
-  reference "26 USC Section 1015(a)"
 
   default 0
 }
@@ -416,7 +394,6 @@ variable fmv_at_gift_date {
   unit "USD"
   label "FMV at Gift Date"
   description "Fair market value at date of gift"
-  reference "26 USC Section 1015(a)"
 
   default 0
 }

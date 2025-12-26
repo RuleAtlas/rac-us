@@ -83,7 +83,6 @@ variable hsa_contributions_self {
   unit "USD"
   label "Own HSA Contributions"
   description "Contributions made by the individual to their HSA"
-  reference "26 USC 223(a)"
   default 0
 }
 
@@ -95,7 +94,6 @@ variable hsa_contributions_employer {
   unit "USD"
   label "Employer HSA Contributions"
   description "Contributions made by employer to individual's HSA (excluded from income)"
-  reference "26 USC 223(b)(4)"
   default 0
 }
 
@@ -107,7 +105,6 @@ variable hsa_contributions_total {
   unit "USD"
   label "Total HSA Contributions"
   description "Total contributions to HSA (self + employer)"
-  reference "26 USC 223(b)(4)"
 
   formula {
     return hsa_contributions_self + hsa_contributions_employer
@@ -122,7 +119,6 @@ variable months_hdhp_coverage {
   dtype Integer
   label "Months of HDHP Coverage"
   description "Number of months individual was covered by qualifying HDHP"
-  reference "26 USC 223(b)(1)"
   default 12
 }
 
@@ -133,7 +129,6 @@ variable is_hsa_eligible {
   dtype Boolean
   label "HSA Eligible"
   description "Whether individual is an eligible individual for HSA purposes"
-  reference "26 USC 223(c)(1)"
 
   formula {
     # Must have qualifying HDHP coverage
@@ -167,7 +162,6 @@ variable is_hsa_catch_up_eligible {
   dtype Boolean
   label "HSA Catch-up Eligible"
   description "Whether individual is eligible for HSA catch-up contribution (age 55+)"
-  reference "26 USC 223(b)(3)"
 
   formula {
     return is_hsa_eligible and age >= catch_up_age
@@ -182,7 +176,6 @@ variable hsa_base_contribution_limit {
   unit "USD"
   label "HSA Base Contribution Limit"
   description "Base HSA contribution limit based on coverage type"
-  reference "26 USC 223(b)(2)"
 
   formula {
     if not is_hsa_eligible {
@@ -206,7 +199,6 @@ variable hsa_prorated_limit {
   unit "USD"
   label "HSA Prorated Contribution Limit"
   description "HSA contribution limit prorated for partial year coverage"
-  reference "26 USC 223(b)(1)"
 
   formula {
     if not is_hsa_eligible {
@@ -228,7 +220,6 @@ variable hsa_contribution_limit {
   unit "USD"
   label "HSA Contribution Limit"
   description "Maximum allowable HSA contribution including catch-up"
-  reference "26 USC 223(b)"
 
   formula {
     if not is_hsa_eligible {
@@ -257,7 +248,6 @@ variable hsa_excess_contributions {
   unit "USD"
   label "HSA Excess Contributions"
   description "Contributions exceeding the limit (subject to excise tax)"
-  reference "26 USC 4973(g)"
 
   formula {
     let excess = hsa_contributions_total - hsa_contribution_limit

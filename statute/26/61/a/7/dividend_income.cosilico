@@ -13,6 +13,5 @@ variable dividend_income {
   unit "USD"
   label "Dividend Income"
   description "Dividend income including qualified and ordinary dividends"
-  reference "26 USC § 61(a)(7)"
   # Input from CPS: DIV_VAL (dividend income)
 }

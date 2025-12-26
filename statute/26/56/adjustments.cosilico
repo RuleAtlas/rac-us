@@ -48,7 +48,6 @@ variable amt_salt_addback {
   unit "USD"
   label "AMT SALT Addback"
   description "State and local taxes disallowed for AMT per Section 56(b)(1)(A)"
-  reference "26 USC Section 56(b)(1)(A)(ii)"
 
   formula {
     # State and local taxes (including property taxes) claimed as itemized
@@ -67,7 +66,6 @@ variable amt_miscellaneous_addback {
   unit "USD"
   label "AMT Miscellaneous Deduction Addback"
   description "Miscellaneous itemized deductions disallowed for AMT per Section 56(b)(1)(A)"
-  reference "26 USC Section 56(b)(1)(A)(i)"
 
   formula {
     # Miscellaneous itemized deductions subject to 2% floor are
@@ -87,7 +85,6 @@ variable amt_medical_expense_adjustment {
   unit "USD"
   label "AMT Medical Expense Adjustment"
   description "Adjustment to medical expense deduction for AMT per Section 56(b)(1)(B)"
-  reference "26 USC Section 56(b)(1)(B)"
 
   formula {
     # For AMT, medical expenses must exceed 7.5% of AGI (same as regular for 2021+)
@@ -115,7 +112,6 @@ variable amt_standard_deduction_addback {
   unit "USD"
   label "AMT Standard Deduction Addback"
   description "Standard deduction disallowed for AMT per Section 56(b)(1)(E)"
-  reference "26 USC Section 56(b)(1)(E)"
 
   formula {
     # Standard deduction is not allowed for AMT purposes
@@ -136,7 +132,6 @@ variable amt_personal_exemption_addback {
   unit "USD"
   label "AMT Personal Exemption Addback"
   description "Personal exemptions disallowed for AMT per Section 56(b)(1)(E)"
-  reference "26 USC Section 56(b)(1)(E)"
 
   formula {
     # Personal exemptions are not allowed for AMT
@@ -155,7 +150,6 @@ variable amt_iso_adjustment {
   unit "USD"
   label "AMT ISO Bargain Element"
   description "Incentive stock option spread included in AMTI per Section 56(b)(3)"
-  reference "26 USC Section 56(b)(3)"
 
   formula {
     # Section 56(b)(3): ISO Spread Included for AMT
@@ -191,7 +185,6 @@ variable amt_adjustments {
   unit "USD"
   label "Total AMT Adjustments"
   description "Sum of all AMT adjustments under Section 56"
-  reference "26 USC Section 56"
 
   formula {
     # All adjustments are addbacks (increase AMTI)

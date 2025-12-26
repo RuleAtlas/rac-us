@@ -29,7 +29,6 @@ variable cost_basis {
   unit "USD"
   label "Property Cost Basis"
   description "Original cost basis of depreciable property"
-  reference "26 USC 1012"
 
   input { }
   default 0
@@ -41,7 +40,6 @@ variable property_class {
   dtype Enum
   label "Property Class"
   description "MACRS property class (3,5,7,10,15,20,25,27.5,39 year)"
-  reference "26 USC 168(e)"
 
   input { }
   enum {
@@ -63,7 +61,6 @@ variable year_placed_in_service {
   dtype Integer
   label "Year Placed in Service"
   description "Tax year when property was placed in service"
-  reference "26 USC 168(a)"
 
   input { }
 }
@@ -74,7 +71,6 @@ variable month_placed_in_service {
   dtype Integer
   label "Month Placed in Service"
   description "Month (1-12) when real property was placed in service"
-  reference "26 USC 168(d)(2)"
 
   input { }
   default 1
@@ -86,7 +82,6 @@ variable quarter_placed_in_service {
   dtype Integer
   label "Quarter Placed in Service"
   description "Quarter (1-4) when property was placed in service for mid-quarter convention"
-  reference "26 USC 168(d)(3)"
 
   input { }
   default 0  # 0 means not using mid-quarter
@@ -98,7 +93,6 @@ variable qualifies_for_bonus {
   dtype Boolean
   label "Qualifies for Bonus Depreciation"
   description "Whether property qualifies for Section 168(k) bonus depreciation"
-  reference "26 USC 168(k)(2)"
 
   input { }
   default true
@@ -110,7 +104,6 @@ variable depreciation_system {
   dtype Enum
   label "Depreciation System"
   description "GDS (general) or ADS (alternative) depreciation system"
-  reference "26 USC 168(a), (g)"
 
   input { }
   enum {
@@ -126,7 +119,6 @@ variable convention {
   dtype Enum
   label "Convention"
   description: "Depreciation convention (half-year, mid-quarter, mid-month)"
-  reference "26 USC 168(d)"
 
   input { }
   enum {
@@ -161,7 +153,6 @@ variable bonus_depreciation {
   unit "USD"
   label "Bonus Depreciation"
   description "Section 168(k) bonus depreciation amount"
-  reference "26 USC 168(k)"
 
   formula {
     # Only in first year
@@ -193,7 +184,6 @@ variable regular_macrs {
   unit "USD"
   label "Regular MACRS Depreciation"
   description "MACRS depreciation excluding bonus"
-  reference "26 USC 168(a)"
 
   formula {
     # Not yet in service or beyond recovery period
@@ -229,7 +219,6 @@ variable macrs_depreciation {
   unit "USD"
   label "MACRS Depreciation"
   description "Total depreciation deduction under Section 168"
-  reference "26 USC 168(a)"
 
   formula {
     return bonus_depreciation + regular_macrs

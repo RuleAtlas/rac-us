@@ -21,7 +21,6 @@ variable child_tax_credit {
   unit "USD"
   label "Child Tax Credit (Nonrefundable)"
   description "Nonrefundable portion of Child Tax Credit per 26 USC Section 24, limited by tax liability"
-  reference "26 USC Section 24, 26 USC Section 26(a)"
 
   formula {
     # CTC is limited to tax liability per §26(a)

@@ -29,10 +29,6 @@ variable is_covered_employment {
   dtype Boolean
   label "Covered employment for UI purposes"
   description "Employment covered under state UI law per FUTA requirements"
-  reference (
-    "26 USC 3306(c)",
-    "26 USC 3304(a)(1)"
-  )
 
   formula {
     # Most employment is covered; exceptions defined in 3306(c)
@@ -55,7 +51,6 @@ variable is_excluded_employment {
   dtype Boolean
   label "Excluded from UI coverage"
   description "Employment excluded from state UI coverage per 26 USC 3306(c)"
-  reference "26 USC 3306(c)"
 
   formula {
     # Employment specifically excluded from FUTA coverage
@@ -82,7 +77,6 @@ variable is_covered_employer {
   dtype Boolean
   label "Employer subject to FUTA"
   description "Employer meets FUTA coverage threshold per 26 USC 3306(a)"
-  reference "26 USC 3306(a)"
 
   formula {
     # General employer: paid $1,500+ wages in any quarter OR
@@ -116,7 +110,6 @@ variable futa_taxable_wages {
   unit "USD"
   label "FUTA taxable wages"
   description "Wages subject to FUTA tax per 26 USC 3306(b)(1)"
-  reference "26 USC 3306(b)(1)"
 
   formula {
     # First $7,000 in wages per employee per year
@@ -136,10 +129,6 @@ variable futa_tax_liability {
   unit "USD"
   label "FUTA tax liability"
   description "Federal unemployment tax owed by employer per 26 USC 3301"
-  reference (
-    "26 USC 3301",
-    "26 USC 3302"
-  )
 
   formula {
     # FUTA = taxable wages * gross rate - state credit

@@ -28,7 +28,6 @@ variable regular_tax_liability {
   unit "USD"
   label "Regular Tax Liability"
   description "Regular tax per Section 26(b)(1) - income tax before credits"
-  reference "26 USC Section 26(b)(1)"
 
   formula {
     # Regular tax is the income tax computed under Section 1
@@ -44,7 +43,6 @@ variable tax_liability_before_credits {
   unit "USD"
   label "Tax Liability Before Credits"
   description "Maximum amount of nonrefundable credits per Section 26(a)"
-  reference "26 USC Section 26(a)"
 
   formula {
     # Per Section 26(a), the credit limitation is:

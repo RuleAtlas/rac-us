@@ -57,7 +57,6 @@ variable medicare_wages {
   unit "USD"
   label "Medicare Wages"
   description "Combined wages and SE income subject to Additional Medicare Tax"
-  reference "26 USC 3101(b)(2), 26 USC 1401(b)(2)"
 
   formula {
     # Both wages and self-employment income are subject to the tax
@@ -76,7 +75,6 @@ variable additional_medicare_tax_threshold {
   unit "USD"
   label "Additional Medicare Tax Threshold"
   description "Income threshold for Additional Medicare Tax based on filing status"
-  reference "26 USC 3101(b)(2)(A)-(C)"
 
   formula {
     # (A) Joint return = $250k
@@ -97,10 +95,6 @@ variable additional_medicare_tax {
   unit "USD"
   label "Additional Medicare Tax"
   description "0.9% additional Medicare tax on wages above threshold per 26 USC 3101(b)(2)"
-  reference (
-    "26 USC 3101(b)(2)",
-    "26 USC 1401(b)(2)"
-  )
 
   formula {
     # Tax applies only to wages exceeding threshold

@@ -48,7 +48,6 @@ variable amt_exemption_base {
   unit "USD"
   label "AMT Base Exemption Amount"
   description "Base exemption amount before phaseout per Section 55(d)(1)"
-  reference "26 USC Section 55(d)(1)"
 
   formula {
     # Get base exemption based on filing status
@@ -72,7 +71,6 @@ variable amt_exemption_phaseout_threshold {
   unit "USD"
   label "AMT Exemption Phaseout Threshold"
   description "AMTI level at which exemption phaseout begins per Section 55(d)(2)"
-  reference "26 USC Section 55(d)(2)"
 
   formula {
     match filing_status {
@@ -92,7 +90,6 @@ variable amt_exemption {
   unit "USD"
   label "AMT Exemption Amount"
   description "Exemption amount after phaseout per Section 55(d)"
-  reference "26 USC Section 55(d)"
 
   formula {
     # Get base exemption for filing status
@@ -118,7 +115,6 @@ variable amt_taxable_excess {
   unit "USD"
   label "AMT Taxable Excess"
   description "AMTI minus exemption - the base for tentative minimum tax"
-  reference "26 USC Section 55(b)(1)"
 
   formula {
     # Taxable excess is AMTI minus exemption, but not below zero
@@ -133,7 +129,6 @@ variable amt_bracket_threshold {
   unit "USD"
   label "AMT Bracket Threshold"
   description "Threshold where AMT rate increases from 26% to 28%"
-  reference "26 USC Section 55(b)(3)"
 
   formula {
     # Section 55(b)(3): Bracket threshold varies by filing status
@@ -154,7 +149,6 @@ variable tentative_minimum_tax {
   unit "USD"
   label "Tentative Minimum Tax"
   description "TMT calculated at 26%/28% rates per Section 55(b)(1)"
-  reference "26 USC Section 55(b)(1)"
 
   formula {
     let taxable_excess = amt_taxable_excess
@@ -183,7 +177,6 @@ variable alternative_minimum_tax {
   unit "USD"
   label "Alternative Minimum Tax"
   description "AMT is the excess of tentative minimum tax over regular tax per Section 55(a)"
-  reference "26 USC Section 55(a)"
 
   formula {
     # Section 55(a): AMT = max(0, TMT - regular tax)
@@ -211,7 +204,6 @@ variable total_income_tax_with_amt {
   unit "USD"
   label "Total Income Tax with AMT"
   description "Regular tax plus AMT"
-  reference "26 USC Section 55"
 
   formula {
     return regular_tax + alternative_minimum_tax

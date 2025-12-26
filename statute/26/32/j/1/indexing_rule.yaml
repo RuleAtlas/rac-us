@@ -51,5 +51,4 @@ adjustments:
 # Method reference
 method:
   type: cost_of_living_adjustment
-  reference: "26 USC § 1(f)(3)"
   index: chained_cpi_u  # C-CPI-U per TCJA

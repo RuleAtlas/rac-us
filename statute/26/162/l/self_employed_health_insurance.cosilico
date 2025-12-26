@@ -30,7 +30,6 @@ variable self_employed_health_insurance_premiums {
   unit "USD"
   label "Self-Employed Health Insurance Premiums"
   description "Health insurance premiums paid for self-employed individual, spouse, and dependents"
-  reference "26 USC 162(l)"
 
   # Input variable - amount paid for qualifying health insurance
 }
@@ -41,7 +40,6 @@ variable is_self_employed {
   dtype Boolean
   label "Is Self-Employed"
   description "Whether the individual has self-employment income"
-  reference "26 USC 401(c)(1)"
 
   formula {
     return self_employment_income > 0
@@ -55,7 +53,6 @@ variable self_employed_health_insurance_deduction {
   unit "USD"
   label "Self-Employed Health Insurance Deduction"
   description "Above-the-line deduction for self-employed health insurance premiums"
-  reference "26 USC 162(l), 62(a)(1)"
 
   formula {
     # Must be self-employed
@@ -81,7 +78,6 @@ variable self_employed_health_insurance_deduction_total {
   unit "USD"
   label "Total Self-Employed Health Insurance Deduction"
   description "Combined self-employed health insurance deduction for tax unit"
-  reference "26 USC 162(l)"
 
   formula {
     return sum(members.self_employed_health_insurance_deduction)

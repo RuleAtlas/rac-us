@@ -25,7 +25,6 @@ variable general_income_exclusion {
   unit "USD"
   label "SSI general income exclusion"
   description "First $20 of any income excluded per 42 USC 1382a(b)(2)"
-  reference "42 USC 1382a(b)(2)"
 
   formula {
     return general_exclusion
@@ -40,7 +39,6 @@ variable earned_income_exclusion {
   unit "USD"
   label "SSI earned income $65 exclusion"
   description "First $65 of earned income excluded per 42 USC 1382a(b)(4)"
-  reference "42 USC 1382a(b)(4)"
 
   formula {
     return earned_exclusion
@@ -55,7 +53,6 @@ variable earned_income_remainder_exclusion {
   unit "USD"
   label "SSI earned income 50% exclusion"
   description "50% of earned income after $65 exclusion per 42 USC 1382a(b)(4)"
-  reference "42 USC 1382a(b)(4)"
 
   formula {
     # Per SSA POMS: $20 applied to unearned first
@@ -81,7 +78,6 @@ variable countable_unearned_income {
   unit "USD"
   label "SSI countable unearned income"
   description "Unearned income after $20 general exclusion per 42 USC 1382a(b)(2)"
-  reference "42 USC 1382a(b)(2)"
 
   formula {
     return max(0, gross_unearned_income - general_exclusion)
@@ -96,7 +92,6 @@ variable countable_earned_income {
   unit "USD"
   label "SSI countable earned income"
   description "Earned income after exclusions per 42 USC 1382a(b)(4)"
-  reference "42 USC 1382a(b)(4)"
 
   formula {
     # Per SSA POMS: $20 applied to unearned first
@@ -121,7 +116,6 @@ variable ssi_countable_income {
   unit "USD"
   label "SSI total countable income"
   description "Sum of countable earned and unearned income per 42 USC 1382a"
-  reference "42 USC 1382a"
 
   formula {
     return countable_unearned_income + countable_earned_income

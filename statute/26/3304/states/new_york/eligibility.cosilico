@@ -37,7 +37,6 @@ variable ny_ui_monetarily_eligible {
   dtype Boolean
   label "New York UI monetary eligibility"
   description "Meets New York minimum wage requirements per NY Labor Law 527"
-  reference "NY Labor Law 527"
 
   formula {
     let hq_wages = high_quarter_wages
@@ -69,7 +68,6 @@ variable ny_ui_nonmonetarily_eligible {
   dtype Boolean
   label "New York UI non-monetary eligibility"
   description "Meets able/available requirements per NY Labor Law 591"
-  reference "NY Labor Law 591"
 
   formula {
     return is_able_to_work and is_available_for_work and is_actively_seeking_work
@@ -88,10 +86,8 @@ variable ny_ui_separation_eligible {
   dtype Boolean
   label "New York UI separation eligibility"
   description "Job separation qualifies for UI per NY Labor Law 593"
-  reference (
     "NY Labor Law 593(1)",
     "NY Labor Law 593(2)"
-  )
 
   formula {
     let reason = separation_reason
@@ -134,7 +130,6 @@ variable ny_ui_requalification_amount {
   unit "USD"
   label "New York requalification earnings requirement"
   description "Earnings required to purge disqualification per NY Labor Law 593"
-  reference "NY Labor Law 593(1)"
 
   formula {
     let wba = ny_ui_weekly_benefit_amount
@@ -150,7 +145,6 @@ variable ny_ui_has_requalified {
   dtype Boolean
   label "Has requalified after disqualification"
   description "Earned sufficient wages through employment per NY Labor Law 593"
-  reference "NY Labor Law 593(1)"
 
   formula {
     let required = ny_ui_requalification_amount
@@ -172,7 +166,6 @@ variable ny_ui_eligible {
   dtype Boolean
   label "New York UI eligibility"
   description "Eligible for New York unemployment insurance benefits"
-  reference "NY Labor Law Article 18"
 
   formula {
     return (
@@ -197,7 +190,6 @@ variable ny_ui_weekly_benefit_amount {
   unit "USD"
   label "New York weekly benefit amount"
   description "Weekly UI benefit as 1/26 of high quarter wages per NY Labor Law 590"
-  reference "NY Labor Law 590"
 
   formula {
     if not ny_ui_eligible then
@@ -226,7 +218,6 @@ variable ny_ui_maximum_benefit_amount {
   unit "USD"
   label "New York maximum benefit amount"
   description "Total UI benefits available in benefit year per NY Labor Law 594"
-  reference "NY Labor Law 594"
 
   formula {
     let wba = ny_ui_weekly_benefit_amount
@@ -242,7 +233,6 @@ variable ny_ui_maximum_weeks {
   dtype Integer
   label "New York maximum benefit weeks"
   description "Maximum weeks of regular UI benefits per NY Labor Law 594"
-  reference "NY Labor Law 594"
 
   formula {
     return maximum_weeks  # 26 weeks
@@ -283,7 +273,6 @@ variable ny_ui_partial_benefit_rate {
   dtype Rate
   label "New York partial benefit rate"
   description "Benefit reduction factor based on days worked per NY Labor Law 590"
-  reference "NY Labor Law 590"
 
   formula {
     let days = days_worked_this_week
@@ -309,7 +298,6 @@ variable ny_ui_current_weekly_payment {
   unit "USD"
   label "New York current week UI payment"
   description "UI payment for current week based on days worked per NY Labor Law 590"
-  reference "NY Labor Law 590"
 
   formula {
     if not ny_ui_eligible then
@@ -339,7 +327,6 @@ variable ny_ui_waiting_week {
   dtype Boolean
   label "New York UI waiting week"
   description "Currently in serving period per NY Labor Law 590"
-  reference "NY Labor Law 590"
 
   formula {
     # NY's waiting week rules have changed; currently effectively 0

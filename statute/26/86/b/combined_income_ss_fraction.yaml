@@ -12,6 +12,5 @@ metadata:
   unit: /1
   period: year
   label: "Social Security fraction for combined income"
-  reference:
     - title: "26 U.S. Code Section 86(b)(1)"
       href: "https://www.law.cornell.edu/uscode/text/26/86#b_1"

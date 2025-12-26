@@ -21,7 +21,6 @@ variable ssi_resource_limit {
   unit "USD"
   label "SSI resource limit"
   description "Maximum countable resources for SSI eligibility per 42 USC 1382(a)(3)(B)"
-  reference "42 USC 1382(a)(3)(B)"
 
   formula {
     if has_eligible_spouse then
@@ -38,7 +37,6 @@ variable is_ssi_resource_eligible {
   dtype Boolean
   label "SSI resource eligibility"
   description "Resources do not exceed limit per 42 USC 1382(a)(3)(B)"
-  reference "42 USC 1382(a)(3)(B)"
 
   formula {
     return countable_resources <= ssi_resource_limit

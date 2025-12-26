@@ -41,7 +41,6 @@ variable holding_period_days {
   dtype Int
   label "Holding Period in Days"
   description "Number of days asset was held before disposition"
-  reference "26 USC Section 1222"
 
   formula {
     # Calculate days between acquisition and disposition
@@ -57,7 +56,6 @@ variable acquisition_date {
   dtype Date
   label "Acquisition Date"
   description "Date property was acquired for holding period purposes"
-  reference "26 USC Section 1223"
 
   # Input variable
 }
@@ -69,7 +67,6 @@ variable disposition_date {
   dtype Date
   label "Disposition Date"
   description "Date property was sold or exchanged"
-  reference "26 USC Section 1222"
 
   # Input variable
 }
@@ -87,10 +84,6 @@ variable effective_holding_period_days {
   dtype Int
   label "Effective Holding Period"
   description "Holding period including any tacked periods per 26 USC Section 1223"
-  reference (
-    "26 USC Section 1222",
-    "26 USC Section 1223"
-  )
 
   formula {
     # Special rules per Section 1223:
@@ -120,7 +113,6 @@ variable basis_is_carryover {
   dtype Bool
   label "Carryover Basis Applies"
   description "Whether basis is carried over from prior owner"
-  reference "26 USC Section 1223(2)"
 
   # True if gifted property where gain basis = donor's basis
   # False if gifted property sold at loss where FMV < donor's basis
@@ -134,7 +126,6 @@ variable donor_holding_period_days {
   dtype Int
   label "Donor Holding Period"
   description "Number of days donor held the property before gifting"
-  reference "26 USC Section 1223(2)"
 
   default 0
 }
@@ -146,7 +137,6 @@ variable relinquished_property_holding_days {
   dtype Int
   label "Relinquished Property Holding Period"
   description "Holding period of relinquished property in like-kind exchange"
-  reference "26 USC Section 1223(1)"
 
   default 0
 }
@@ -163,7 +153,6 @@ variable is_long_term_asset {
   dtype Bool
   label "Long-Term Capital Asset"
   description "Asset held more than 1 year per 26 USC Section 1222(3)-(4)"
-  reference "26 USC Section 1222(3)"
 
   formula {
     # More than 1 year = more than 365 days (366 in leap year, but statute says "> 1 year")
@@ -179,7 +168,6 @@ variable is_short_term_asset {
   dtype Bool
   label "Short-Term Capital Asset"
   description "Asset held 1 year or less per 26 USC Section 1222(1)-(2)"
-  reference "26 USC Section 1222(1)"
 
   formula {
     return not is_long_term_asset
@@ -198,7 +186,6 @@ variable is_wash_sale_replacement {
   dtype Bool
   label "Wash Sale Replacement Stock"
   description "Stock acquired that triggered wash sale rule on prior sale"
-  reference "26 USC Section 1091"
 
   default false
 }
@@ -210,10 +197,6 @@ variable wash_sale_tacked_holding_days {
   dtype Int
   label "Wash Sale Tacked Holding Period"
   description "Holding period from original shares disallowed under wash sale"
-  reference (
-    "26 USC Section 1091",
-    "26 USC Section 1223(3)"
-  )
 
   default 0
 }
@@ -226,7 +209,6 @@ variable is_short_sale {
   dtype Bool
   label "Short Sale"
   description "Sale of borrowed securities"
-  reference "26 USC Section 1233"
 
   default false
 }
@@ -239,7 +221,6 @@ variable short_sale_holding_determination {
   dtype Enum(HoldingType)
   label "Short Sale Holding Period Type"
   description "Holding period classification for short sale per Section 1233"
-  reference "26 USC Section 1233(b)"
 
   formula {
     if not is_short_sale then
@@ -269,7 +250,6 @@ variable held_substantially_identical_long_term {
   dtype Bool
   label "Held Substantially Identical Long-Term"
   description "Held substantially identical property long-term when short sale initiated"
-  reference "26 USC Section 1233(b)"
 
   default false
 }

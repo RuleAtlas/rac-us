@@ -55,7 +55,6 @@ variable net_short_term_capital_gain {
   unit "USD"
   label "Net Short-Term Capital Gain"
   description "Excess of ST gains over ST losses per 26 USC Section 1222(5)"
-  reference "26 USC Section 1222(5)"
 
   formula {
     # Include carryover losses from prior years
@@ -79,7 +78,6 @@ variable net_short_term_capital_loss {
   unit "USD"
   label "Net Short-Term Capital Loss"
   description "Excess of ST losses over ST gains per 26 USC Section 1222(6)"
-  reference "26 USC Section 1222(6)"
 
   formula {
     let total_st_loss = short_term_capital_loss + short_term_capital_loss_carryover
@@ -106,7 +104,6 @@ variable net_long_term_capital_gain {
   unit "USD"
   label "Net Long-Term Capital Gain"
   description "Excess of LT gains over LT losses per 26 USC Section 1222(7)"
-  reference "26 USC Section 1222(7)"
 
   formula {
     let total_lt_loss = long_term_capital_loss + long_term_capital_loss_carryover
@@ -128,7 +125,6 @@ variable net_long_term_capital_loss {
   unit "USD"
   label "Net Long-Term Capital Loss"
   description "Excess of LT losses over LT gains per 26 USC Section 1222(8)"
-  reference "26 USC Section 1222(8)"
 
   formula {
     let total_lt_loss = long_term_capital_loss + long_term_capital_loss_carryover
@@ -154,7 +150,6 @@ variable capital_gain_net_income {
   unit "USD"
   label "Capital Gain Net Income"
   description "Total net capital gains (if gains exceed losses) per 26 USC Section 1222(9)"
-  reference "26 USC Section 1222(9)"
 
   formula {
     # Net ST gain/loss + Net LT gain/loss
@@ -180,7 +175,6 @@ variable net_capital_loss {
   unit "USD"
   label "Net Capital Loss"
   description "Total net capital loss (before limitation) per 26 USC Section 1222(10)"
-  reference "26 USC Section 1222(10)"
 
   formula {
     let net_st = net_short_term_capital_gain - net_short_term_capital_loss
@@ -205,7 +199,6 @@ variable net_capital_gain {
   unit "USD"
   label "Net Capital Gain"
   description "Net LTCG minus net STCL, eligible for preferential rates per 26 USC Section 1222(11)"
-  reference "26 USC Section 1222(11)"
 
   formula {
     # This is what qualifies for the 0%/15%/20% preferential rates
@@ -232,7 +225,6 @@ variable capital_loss_deduction_limit {
   unit "USD"
   label "Capital Loss Deduction Limit"
   description "Maximum capital loss deductible against ordinary income per 26 USC Section 1211(b)"
-  reference "26 USC Section 1211(b)"
 
   formula {
     match filing_status {
@@ -251,7 +243,6 @@ variable capital_loss_deduction {
   unit "USD"
   label "Allowable Capital Loss Deduction"
   description "Capital loss amount deductible against ordinary income per 26 USC Section 1211(b)"
-  reference "26 USC Section 1211(b)"
 
   formula {
     return min(net_capital_loss, capital_loss_deduction_limit)
@@ -277,7 +268,6 @@ variable capital_loss_carryover_generated {
   unit "USD"
   label "Capital Loss Carryover Generated"
   description "Unused capital loss to carry to future years per 26 USC Section 1212(b)"
-  reference "26 USC Section 1212(b)"
 
   formula {
     # Carryover = Net loss minus amount allowed as deduction this year
@@ -298,7 +288,6 @@ variable short_term_loss_carryover_generated {
   unit "USD"
   label "Short-Term Loss Carryover Generated"
   description "ST capital loss carryover to future years per 26 USC Section 1212(b)(1)"
-  reference "26 USC Section 1212(b)(1)"
 
   formula {
     # Per Section 1212(b)(1): ST loss carryover = net STCL reduced by:
@@ -333,7 +322,6 @@ variable long_term_loss_carryover_generated {
   unit "USD"
   label "Long-Term Loss Carryover Generated"
   description "LT capital loss carryover to future years per 26 USC Section 1212(b)(2)"
-  reference "26 USC Section 1212(b)(2)"
 
   formula {
     # Per Section 1212(b)(2): LT loss carryover = net LTCL reduced by:
@@ -370,10 +358,6 @@ variable capital_gain_or_loss_for_agi {
   unit "USD"
   label "Capital Gain or Loss for AGI"
   description "Net capital gain or allowable loss for AGI calculation"
-  reference (
-    "26 USC Section 1222",
-    "26 USC Section 1211(b)"
-  )
 
   formula {
     if capital_gain_net_income > 0 then
@@ -394,7 +378,6 @@ variable has_net_capital_gain {
   dtype Bool
   label "Has Net Capital Gain"
   description "Taxpayer has net capital gain eligible for preferential rates"
-  reference "26 USC Section 1222(11)"
 
   formula {
     return net_capital_gain > 0
@@ -410,7 +393,6 @@ variable has_capital_loss_carryover {
   dtype Bool
   label "Has Capital Loss Carryover"
   description "Taxpayer has unused capital loss to carry forward"
-  reference "26 USC Section 1212(b)"
 
   formula {
     return capital_loss_carryover_generated > 0

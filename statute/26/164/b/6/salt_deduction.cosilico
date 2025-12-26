@@ -31,7 +31,6 @@ variable state_income_tax {
   unit "USD"
   label "State Income Tax Paid"
   description "State and local income taxes paid or withheld"
-  reference "26 USC § 164(a)(3)"
 }
 
 variable real_property_tax {
@@ -41,7 +40,6 @@ variable real_property_tax {
   unit "USD"
   label "Real Property Tax Paid"
   description "State and local real property taxes paid"
-  reference "26 USC § 164(a)(1)"
 }
 
 variable personal_property_tax {
@@ -51,7 +49,6 @@ variable personal_property_tax {
   unit "USD"
   label "Personal Property Tax Paid"
   description "State and local personal property taxes paid"
-  reference "26 USC § 164(a)(2)"
 }
 
 variable sales_tax {
@@ -61,7 +58,6 @@ variable sales_tax {
   unit "USD"
   label "Sales Tax Paid"
   description "General sales taxes paid (alternative to state income tax deduction)"
-  reference "26 USC § 164(b)(5)"
 }
 
 variable elects_sales_tax {
@@ -70,7 +66,6 @@ variable elects_sales_tax {
   dtype Boolean
   label "Elects Sales Tax Deduction"
   description "Whether taxpayer elects to deduct sales tax instead of income tax"
-  reference "26 USC § 164(b)(5)(A)"
   default false
 }
 
@@ -81,7 +76,6 @@ variable foreign_real_property_tax {
   unit "USD"
   label "Foreign Real Property Tax Paid"
   description "Foreign real property taxes (exempt from SALT cap per § 164(b)(6)(B))"
-  reference "26 USC § 164(b)(6)(B)"
 }
 
 variable filing_status {
@@ -90,7 +84,6 @@ variable filing_status {
   dtype String
   label "Filing Status"
   description "Tax filing status: JOINT, SINGLE, HEAD_OF_HOUSEHOLD, MARRIED_SEPARATE"
-  reference "26 USC § 1"
 }
 
 # --- Calculated Variables ---
@@ -102,7 +95,6 @@ variable salt_before_cap {
   unit "USD"
   label "SALT Before Cap"
   description "Total state and local taxes before applying the $10,000 cap"
-  reference "26 USC § 164(a)"
 
   formula {
     # Choose income tax or sales tax per taxpayer election
@@ -120,7 +112,6 @@ variable salt_cap_amount {
   unit "USD"
   label "SALT Cap Amount"
   description "Applicable SALT cap based on filing status"
-  reference "26 USC § 164(b)(6)(A)"
 
   formula {
     case filing_status {
@@ -137,7 +128,6 @@ variable salt_deduction {
   unit "USD"
   label "SALT Deduction"
   description "State and local tax deduction after applying the cap"
-  reference "26 USC § 164(b)(6)"
 
   formula {
     # Apply cap to domestic SALT
@@ -155,7 +145,6 @@ variable salt_cap_reduction {
   unit "USD"
   label "SALT Cap Reduction"
   description "Amount of SALT disallowed due to the $10,000 cap"
-  reference "26 USC § 164(b)(6)(A)"
 
   formula {
     max(0, salt_before_cap - salt_cap_amount)

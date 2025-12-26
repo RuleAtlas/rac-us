@@ -30,7 +30,6 @@ minimum_base_period_wages:
     2015-01-01: 2400
   citations:
     - "NY Labor Law 527"
-  reference: "https://dol.ny.gov/unemployment-insurance"
 
 high_quarter_multiplier:
   description: "New York requires base period wages to be at least 1.5 times high quarter wages per NY Labor Law 527"
@@ -66,7 +65,6 @@ wba_fraction:
     1939-01-01: 0.03846  # 1/26 of high quarter wages
   citations:
     - "NY Labor Law 590"
-  reference: "https://dol.ny.gov/unemployment-insurance-benefits"
 
 minimum_wba:
   description: "New York minimum weekly benefit amount per NY Labor Law 590"
@@ -100,7 +98,6 @@ maximum_wba:
     - "Adjusted annually, typically in October"
   citations:
     - "NY Labor Law 591"
-  reference: "https://dol.ny.gov/unemployment-insurance-benefit-rate"
 
 # =============================================================================
 # BENEFIT DURATION

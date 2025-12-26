@@ -21,6 +21,5 @@ variable filing_status {
   dtype Enum(FilingStatus)
   label "Filing Status"
   description "Tax filing status determining applicable rate schedule"
-  reference "26 USC § 1"
   # Input from CPS: derived from marital status and dependents
 }

@@ -35,7 +35,6 @@ variable adjusted_gross_income {
   unit "USD"
   label "Adjusted Gross Income"
   description "Gross income minus above-the-line deductions per 26 USC §62(a)"
-  reference "26 USC 62"
 
   formula {
     # Simplified: Sum of income sources

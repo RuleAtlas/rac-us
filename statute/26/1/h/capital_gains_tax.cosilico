@@ -79,7 +79,6 @@ variable capital_gains_taxed_at_zero_pct {
   unit "USD"
   label "Capital Gains Taxed at 0%"
   description "Portion of net capital gain subject to 0% preferential rate"
-  reference "26 USC Section 1(h)(1)(B)"
 
   formula {
     zero_threshold = get_zero_pct_threshold(filing_status)
@@ -111,7 +110,6 @@ variable capital_gains_taxed_at_fifteen_pct {
   unit "USD"
   label "Capital Gains Taxed at 15%"
   description "Portion of net capital gain subject to 15% preferential rate"
-  reference "26 USC Section 1(h)(1)(C)"
 
   formula {
     zero_threshold = get_zero_pct_threshold(filing_status)
@@ -152,7 +150,6 @@ variable capital_gains_taxed_at_twenty_pct {
   unit "USD"
   label "Capital Gains Taxed at 20%"
   description "Portion of net capital gain subject to 20% preferential rate"
-  reference "26 USC Section 1(h)(1)(D)"
 
   formula {
     # 20% rate applies to gains not already taxed at 0% or 15%
@@ -178,7 +175,6 @@ variable capital_gains_tax {
   unit "USD"
   label "Capital Gains Tax"
   description "Federal income tax on net capital gain at preferential rates per 26 USC Section 1(h)"
-  reference "26 USC Section 1(h)(1)"
 
   formula {
     # Tax = sum of gains in each bracket times the bracket rate
@@ -204,7 +200,6 @@ variable capital_gains_tax_vectorized {
   unit "USD"
   label "Capital Gains Tax (Vectorized)"
   description "Vectorized implementation for microsimulation"
-  reference "26 USC Section 1(h)"
 
   formula {
     # Get thresholds based on filing status

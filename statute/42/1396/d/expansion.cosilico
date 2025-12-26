@@ -55,7 +55,6 @@ variable expansion_age_eligible {
   dtype Boolean
   label "Expansion adult age eligible"
   description "Age 19-64 for ACA expansion per 42 USC 1396a(k)(2)(A)"
-  reference "42 USC 1396a(k)(2)(A)"
 
   formula {
     # Must be at least 19 (not under 19)
@@ -79,7 +78,6 @@ variable expansion_not_otherwise_eligible {
   dtype Boolean
   label "Not in other mandatory group"
   description "Not eligible through other mandatory Medicaid categories"
-  reference "42 USC 1396a(k)(2)(C)"
 
   formula {
     # Expansion adults are a residual category for those not:
@@ -109,7 +107,6 @@ variable expansion_not_medicare {
   dtype Boolean
   label "Not Medicare entitled"
   description "Not entitled to or enrolled in Medicare Parts A or B"
-  reference "42 USC 1396a(k)(2)(D)"
 
   formula {
     # Cannot be entitled to Medicare Part A or enrolled in Part B
@@ -133,10 +130,8 @@ variable expansion_available_in_state {
   dtype Boolean
   label "Expansion available in state"
   description "State has adopted ACA Medicaid expansion"
-  reference (
     "42 USC 1396a(a)(10)(A)(i)(VIII)",
     "NFIB v. Sebelius, 567 U.S. 519 (2012)"
-  )
 
   formula {
     # After NFIB v. Sebelius (2012), expansion is optional for states
@@ -155,10 +150,8 @@ variable expansion_income_eligible {
   dtype Boolean
   label "Expansion income eligible"
   description "Income at or below 133% FPL (138% with disregard)"
-  reference (
     "42 USC 1396a(k)(2)(E)",
     "42 CFR 435.603(d)(4)"
-  )
 
   formula {
     # Get household income as % FPL after 5% disregard
@@ -189,10 +182,8 @@ variable medicaid_expansion_eligible {
   dtype Boolean
   label "ACA expansion eligible"
   description "Eligible for Medicaid under ACA expansion per 42 USC 1396a(a)(10)(A)(i)(VIII)"
-  reference (
     "42 USC 1396a(a)(10)(A)(i)(VIII)",
     "42 USC 1396a(k)(2)"
-  )
 
   formula {
     # All requirements must be met
@@ -236,10 +227,8 @@ variable parent_caretaker_eligible {
   dtype Boolean
   label "Parent/caretaker eligible"
   description "Parent eligibility via expansion or Section 1931"
-  reference (
     "42 USC 1396u-1",
     "42 USC 1396a(a)(10)(A)(i)(VIII)"
-  )
 
   formula {
     # Must be a parent or caretaker relative
@@ -275,7 +264,6 @@ variable medicaid_expansion_category {
   dtype Category  # newly_eligible, parent_caretaker, not_applicable
   label "Expansion category"
   description "Type of ACA expansion eligibility"
-  reference "42 USC 1396a(k)"
 
   formula {
     # Parents/caretakers: special category for FMAP purposes
@@ -306,7 +294,6 @@ variable qualifies_for_enhanced_fmap {
   dtype Boolean
   label "Qualifies for enhanced FMAP"
   description "Eligible for enhanced federal match under expansion"
-  reference "42 USC 1396d(y)"
 
   formula {
     # Only newly eligible adults (not parents in pre-expansion states)

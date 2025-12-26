@@ -21,7 +21,6 @@ variable total_child_tax_credit {
   unit "USD"
   label "Total Child Tax Credit"
   description "Sum of nonrefundable CTC and refundable ACTC per 26 USC Section 24"
-  reference "26 USC Section 24"
 
   formula {
     return child_tax_credit + additional_child_tax_credit

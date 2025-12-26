@@ -44,7 +44,6 @@ variable ira_deduction {
   unit "USD"
   label "IRA Deduction"
   description "Above-the-line deduction for traditional IRA contributions per 26 USC 219"
-  reference "26 USC 219(a), 62(a)(7)"
 
   formula {
     # Must have earned income to contribute (post-SECURE, no age limit)
@@ -65,7 +64,6 @@ variable ira_deduction_total {
   unit "USD"
   label "Total IRA Deduction"
   description "Combined IRA deduction for all members of tax unit"
-  reference "26 USC 62(a)(7)"
 
   formula {
     # Sum individual IRA deductions
@@ -81,7 +79,6 @@ variable spousal_ira_eligible {
   dtype Boolean
   label "Eligible for Spousal IRA"
   description "Whether individual can contribute to IRA using spouse's compensation"
-  reference "26 USC 219(c)"
 
   formula {
     # Must be married filing jointly

@@ -80,7 +80,6 @@ variable collectibles_gain_tax {
   unit "USD"
   label "Tax on Collectibles Gain"
   description "Tax on collectibles gain at 28% rate per 26 USC Section 1(h)(4)"
-  reference "26 USC Section 1(h)(4)"
 
   formula {
     return collectibles_gain * collectibles_rate
@@ -106,7 +105,6 @@ variable section_1250_gain_tax {
   unit "USD"
   label "Tax on Section 1250 Gain"
   description "Tax on unrecaptured depreciation at 25% rate per 26 USC Section 1(h)(6)"
-  reference "26 USC Section 1(h)(6)"
 
   formula {
     return section_1250_unrecaptured_gain * section_1250_rate
@@ -132,7 +130,6 @@ variable adjusted_net_capital_gain {
   unit "USD"
   label "Adjusted Net Capital Gain"
   description "Net capital gain plus qualified dividends for preferential rate calculation"
-  reference "26 USC Section 1(h)(3)"
 
   formula {
     # Adjusted net capital gain per Section 1(h)(3):
@@ -168,10 +165,6 @@ variable total_capital_gains_tax {
   unit "USD"
   label "Total Capital Gains Tax"
   description "Complete tax on capital gains including all preferential rates"
-  reference (
-    "26 USC Section 1(h)",
-    "26 USC Section 1001"
-  )
 
   formula {
     # Tax on adjusted net capital gain (0%/15%/20% rates)
@@ -203,7 +196,6 @@ variable capital_gains_subject_to_niit {
   unit "USD"
   label "Capital Gains Subject to NIIT"
   description "Capital gains included in net investment income for NIIT purposes"
-  reference "26 USC Section 1411(c)(1)(A)(iii)"
 
   formula {
     # Capital gain net income is included in NII
@@ -222,7 +214,6 @@ variable niit_threshold {
   unit "USD"
   label "NIIT Threshold"
   description "Modified AGI threshold for NIIT per 26 USC Section 1411(b)"
-  reference "26 USC Section 1411(b)"
 
   formula {
     match filing_status {
@@ -244,7 +235,6 @@ variable niit_on_capital_gains {
   unit "USD"
   label "NIIT on Capital Gains"
   description "Net Investment Income Tax attributable to capital gains"
-  reference "26 USC Section 1411"
 
   formula {
     # NIIT applies to lesser of:
@@ -274,7 +264,6 @@ variable modified_agi {
   unit "USD"
   label "Modified AGI for NIIT"
   description "Modified adjusted gross income for NIIT threshold test"
-  reference "26 USC Section 1411(d)"
 
   # Input or calculated from AGI plus foreign earned income exclusion
 }
@@ -290,7 +279,6 @@ variable effective_capital_gains_rate {
   dtype Rate
   label "Effective Capital Gains Rate"
   description "Average tax rate on all capital gains"
-  reference "26 USC Section 1(h)"
 
   formula {
     if capital_gain_net_income <= 0 then
@@ -315,7 +303,6 @@ variable capital_gains_tax_savings {
   unit "USD"
   label "Capital Gains Tax Savings"
   description "Tax savings from preferential rates compared to ordinary income rates"
-  reference "26 USC Section 1(h)"
 
   formula {
     if adjusted_net_capital_gain <= 0 then
@@ -342,7 +329,6 @@ variable ordinary_income_marginal_rate {
   dtype Rate
   label "Ordinary Income Marginal Rate"
   description "Marginal tax rate on ordinary income"
-  reference "26 USC Section 1"
 
   # Input from Section 1 bracket calculation
   default 0.22  # Fallback to common bracket

@@ -16,7 +16,6 @@ variable num_cdcc_qualifying_individuals {
   dtype Count
   label "Number of CDCC Qualifying Individuals"
   description "Count of qualifying individuals for Child and Dependent Care Credit per 26 USC 21(b)"
-  reference "26 USC 21(c): 1 qualifying individual vs 2 or more"
 
   formula {
     return tax_unit.members.count(is_cdcc_qualifying_individual)

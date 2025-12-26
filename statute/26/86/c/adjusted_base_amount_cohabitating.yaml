@@ -11,6 +11,5 @@ values:
 metadata:
   unit: currency-USD
   label: "Adjusted base amount for cohabitating MFS"
-  reference:
     - title: "26 U.S. Code Section 86(c)(2)(C)"
       href: "https://www.law.cornell.edu/uscode/text/26/86#c_2_C"

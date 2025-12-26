@@ -34,7 +34,6 @@ variable has_hdhp {
   dtype Boolean
   label "Has High Deductible Health Plan"
   description "Whether the individual is covered by a qualifying HDHP"
-  reference "26 USC 223(c)(1)"
 
   # Input variable - must have HDHP to contribute to HSA
 }
@@ -45,7 +44,6 @@ variable hsa_coverage_type {
   dtype Enum[self_only, family]
   label "HSA Coverage Type"
   description "Type of HDHP coverage (self-only or family)"
-  reference "26 USC 223(b)"
 
   # Input variable - determines contribution limit
 }
@@ -57,7 +55,6 @@ variable hsa_contributions {
   unit "USD"
   label "HSA Contributions"
   description "Contributions made to HSA during the tax year"
-  reference "26 USC 223"
 
   # Input variable - amount contributed to HSA
 }
@@ -69,7 +66,6 @@ variable hsa_contribution_limit {
   unit "USD"
   label "HSA Contribution Limit"
   description "Maximum allowable HSA contribution based on coverage type and age"
-  reference "26 USC 223(b)"
 
   formula {
     # Must have HDHP to contribute
@@ -100,7 +96,6 @@ variable hsa_deduction {
   unit "USD"
   label "HSA Deduction"
   description "Above-the-line deduction for HSA contributions"
-  reference "26 USC 62(a)(12), 223"
 
   formula {
     # Must have HDHP
@@ -121,7 +116,6 @@ variable hsa_deduction_total {
   unit "USD"
   label "Total HSA Deduction"
   description "Combined HSA deduction for tax unit"
-  reference "26 USC 62(a)(12)"
 
   formula {
     return sum(members.hsa_deduction)

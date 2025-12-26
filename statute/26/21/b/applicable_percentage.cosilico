@@ -34,10 +34,7 @@ variable cdcc_applicable_percentage {
   dtype Rate
   label "CDCC Applicable Percentage"
   description "Credit rate for Child and Dependent Care Credit per 26 USC 21(b)"
-  reference (
-    "26 USC 21(b): 35% reduced by 1% per $2,000 over $15,000, floor 20%",
     "P.L. 117-2 Sec. 9632: 50% for AGI <= $125,000 in 2021"
-  )
 
   formula {
     let agi = adjusted_gross_income

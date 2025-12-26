@@ -34,7 +34,6 @@ variable liheap_fpl_limit {
   unit "USD"
   label "LIHEAP FPL income limit"
   description "150% of Federal Poverty Level for household size per 42 USC 8624(b)(2)(B)(i)"
-  reference "42 USC 8624(b)(2)(B)(i)"
 
   formula {
     let base_fpl = fpl_by_household_size[1]
@@ -54,7 +53,6 @@ variable liheap_smi_limit {
   unit "USD"
   label "LIHEAP SMI income limit"
   description "60% of State Median Income for household size per 42 USC 8624(b)(2)(B)(ii)"
-  reference "42 USC 8624(b)(2)(B)(ii)"
 
   formula {
     # SMI varies by state and household size
@@ -70,7 +68,6 @@ variable liheap_income_eligible {
   dtype Boolean
   label "LIHEAP income eligibility"
   description "Household income at or below greater of 150% FPL or 60% SMI per 42 USC 8624(b)(2)(B)"
-  reference "42 USC 8624(b)(2)(B)"
 
   formula {
     # Use the greater of 150% FPL or 60% SMI as limit
@@ -88,7 +85,6 @@ variable liheap_categorically_eligible {
   dtype Boolean
   label "LIHEAP categorical eligibility"
   description "Automatic eligibility from receiving SNAP, SSI, TANF, or veterans benefits per 42 USC 8624(b)(2)(A)"
-  reference "42 USC 8624(b)(2)(A)"
 
   formula {
     # 42 USC 8624(b)(2)(A): Receipt of certain benefits confers eligibility
@@ -105,7 +101,6 @@ variable liheap_vulnerable_household {
   dtype Boolean
   label "LIHEAP vulnerable household"
   description "Household with elderly, disabled, or young children for priority targeting per 42 USC 8624(b)(5)(A)"
-  reference "42 USC 8624(b)(5)(A)"
 
   formula {
     # Priority populations per 42 USC 8624(b)(5)(A)
@@ -122,7 +117,6 @@ variable liheap_heating_eligible {
   dtype Boolean
   label "LIHEAP heating assistance eligibility"
   description "Eligible for home heating assistance per 42 USC 8624(b)(1)(A)"
-  reference "42 USC 8624(b)(1)(A)"
 
   formula {
     # Must be overall LIHEAP eligible and in heating season
@@ -139,7 +133,6 @@ variable liheap_cooling_eligible {
   dtype Boolean
   label "LIHEAP cooling assistance eligibility"
   description "Eligible for home cooling assistance per 42 USC 8624(b)(1)(B)"
-  reference "42 USC 8624(b)(1)(B)"
 
   formula {
     # Must be overall LIHEAP eligible and in cooling season
@@ -156,10 +149,8 @@ variable liheap_eligible {
   dtype Boolean
   label "LIHEAP eligibility"
   description "Overall LIHEAP eligibility per 42 USC 8624(b)(2)"
-  reference (
     "42 USC 8624(b)(2)(A)",
     "42 USC 8624(b)(2)(B)"
-  )
 
   formula {
     # Eligible if categorically eligible OR meets income limit

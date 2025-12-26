@@ -26,7 +26,6 @@ variable federal_benefit_rate {
   unit "USD"
   label "SSI Federal Benefit Rate"
   description "Maximum monthly SSI payment before reductions per 42 USC 1382(b)"
-  reference "42 USC 1382(b)(1)"
 
   formula {
     if has_eligible_spouse then
@@ -45,7 +44,6 @@ variable one_third_reduction {
   unit "USD"
   label "SSI one-third reduction"
   description "FBR reduction when living in another's household per 42 USC 1382(a)(2)(A)"
-  reference "42 USC 1382(a)(2)(A)"
 
   formula {
     if not living_in_others_household then
@@ -69,10 +67,8 @@ variable applicable_fbr {
   unit "USD"
   label "SSI applicable FBR"
   description "FBR after living arrangement reduction per 42 USC 1382(a)(2)(A)"
-  reference (
     "42 USC 1382(b)",
     "42 USC 1382(a)(2)(A)"
-  )
 
   formula {
     return federal_benefit_rate - one_third_reduction

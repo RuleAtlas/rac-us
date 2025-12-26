@@ -56,7 +56,6 @@ variable actc_earned_income_portion {
   unit "USD"
   label "ACTC Earned Income Portion"
   description "15% of earned income exceeding $2,500 per Section 24(d)(1)(B)(i)"
-  reference "26 USC Section 24(d)(1)(B)(i)"
 
   formula {
     let excess_earned_income = max(0, earned_income - earned_income_threshold)
@@ -73,7 +72,6 @@ variable actc_social_security_portion {
   unit "USD"
   label "ACTC Social Security Portion"
   description "Social security taxes minus EITC per Section 24(d)(1)(B)(ii) - only for 3+ children"
-  reference "26 USC Section 24(d)(1)(B)(ii)"
 
   formula {
     # Only available for taxpayers with 3 or more qualifying children
@@ -94,7 +92,6 @@ variable actc_limit_b {
   unit "USD"
   label "ACTC Limit B"
   description "The greater of earned income portion or social security portion per Section 24(d)(1)(B)"
-  reference "26 USC Section 24(d)(1)(B)"
 
   formula {
     # For 3+ children, use whichever is greater
@@ -112,7 +109,6 @@ variable actc_per_child_cap {
   unit "USD"
   label "ACTC Per-Child Cap"
   description "Maximum refundable amount based on number of children per Section 24(h)(5)"
-  reference "26 USC Section 24(h)(5)"
 
   formula {
     return num_ctc_qualifying_children * refundable_maximum
@@ -128,7 +124,6 @@ variable additional_child_tax_credit {
   unit "USD"
   label "Additional Child Tax Credit (Refundable)"
   description "Refundable portion of Child Tax Credit per 26 USC Section 24(d)"
-  reference "26 USC Section 24(d)(1)"
 
   formula {
     # Limit A: Unused credit (tentative credit minus the nonrefundable portion used against liability)

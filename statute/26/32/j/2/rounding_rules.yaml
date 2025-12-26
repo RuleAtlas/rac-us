@@ -9,7 +9,6 @@
 # $50, such dollar amount shall be rounded to the nearest multiple of $50."
 
 rounding_rules:
-  reference: "26 USC § 32(j)(2)"
   description: EITC rounding rules for indexed amounts
 
   # Rule A: General rounding (nearest $10)

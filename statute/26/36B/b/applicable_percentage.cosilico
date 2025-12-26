@@ -55,10 +55,7 @@ variable applicable_percentage {
   unit "/1"
   label "Applicable Percentage"
   description "Percentage of income expected for premium contribution per 26 USC 36B(b)(3)(A)"
-  reference (
-    "26 USC 36B(b)(3)(A)",
     "P.L. 117-169 Section 12001 (IRA enhanced percentages)"
-  )
 
   formula {
     let income_pct = household_income_pct_fpl
@@ -148,7 +145,6 @@ variable expected_contribution {
   unit "USD"
   label "Expected Premium Contribution"
   description "Annual household income contribution toward premiums per 26 USC 36B(b)(3)(A)(ii)"
-  reference "26 USC 36B(b)(3)(A)(ii)"
 
   formula {
     let household_income = taxunit.household_income
@@ -166,7 +162,6 @@ variable expected_contribution_monthly {
   unit "USD"
   label "Monthly Expected Premium Contribution"
   description "Monthly portion of expected premium contribution"
-  reference "26 USC 36B(b)(3)(A)(ii)"
 
   formula {
     return expected_contribution / 12

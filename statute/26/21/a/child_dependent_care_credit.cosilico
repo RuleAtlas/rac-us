@@ -49,10 +49,6 @@ variable cdcc_creditable_expenses {
   unit "USD"
   label "CDCC Creditable Expenses"
   description "Employment-related expenses eligible for credit after all limitations"
-  reference (
-    "26 USC 21(c): Dollar limit based on qualifying individuals",
-    "26 USC 21(d): Earned income limitation"
-  )
 
   formula {
     # No qualifying individuals = no credit
@@ -72,7 +68,6 @@ variable cdcc_tentative_credit {
   unit "USD"
   label "CDCC Tentative Credit"
   description "Child and Dependent Care Credit before tax liability limitation"
-  reference "26 USC 21(a): applicable percentage of employment-related expenses"
 
   formula {
     return cdcc_creditable_expenses * cdcc_applicable_percentage
@@ -87,10 +82,6 @@ variable child_dependent_care_credit {
   unit "USD"
   label "Child and Dependent Care Credit"
   description "Credit for employment-related expenses for care of qualifying individuals per 26 USC 21"
-  reference (
-    "26 USC 21(a): credit = applicable percentage x creditable expenses",
-    "26 USC 21(g) (ARPA 2021): refundable for 2021"
-  )
 
   formula {
     let tentative = cdcc_tentative_credit

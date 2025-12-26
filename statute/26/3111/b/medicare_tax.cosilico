@@ -34,7 +34,6 @@ variable employer_medicare_tax {
   unit "USD"
   label "Employer Medicare Tax"
   description "Employer share of Medicare (HI) tax at 1.45% of wages per 26 USC 3111(b)"
-  reference "26 USC 3111(b)"
 
   formula {
     # Medicare tax applies to ALL wages - no cap unlike Social Security
@@ -51,10 +50,6 @@ variable total_medicare_tax {
   unit "USD"
   label "Total Medicare Tax"
   description "Combined employer and employee Medicare tax (2.9% of wages)"
-  reference (
-    "26 USC 3101(b)(1)",
-    "26 USC 3111(b)"
-  )
 
   formula {
     # Employee share: 1.45%

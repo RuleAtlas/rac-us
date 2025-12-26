@@ -42,11 +42,8 @@ variable qualified_residence_interest {
   unit "USD"
   label "Qualified Residence Interest Deduction"
   description "Deductible interest on qualified residence per 26 USC 163(h)"
-  reference (
-    "26 USC 163(h)(3)",
     "TCJA Section 11043",
     "IRS Publication 936"
-  )
 
   formula {
     # Determine applicable acquisition debt limit

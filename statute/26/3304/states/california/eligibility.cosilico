@@ -37,10 +37,8 @@ variable ca_ui_monetarily_eligible {
   dtype Boolean
   label "California UI monetary eligibility"
   description "Meets California minimum wage requirements per CUIC 1281"
-  reference (
     "Cal. Unemp. Ins. Code 1281(a)",
     "Cal. Unemp. Ins. Code 1281(a)(2)"
-  )
 
   formula {
     let hq_wages = high_quarter_wages
@@ -75,10 +73,8 @@ variable ca_ui_nonmonetarily_eligible {
   dtype Boolean
   label "California UI non-monetary eligibility"
   description "Meets able/available/seeking requirements per CUIC 1252-1253"
-  reference (
     "Cal. Unemp. Ins. Code 1252",
     "Cal. Unemp. Ins. Code 1253"
-  )
 
   formula {
     return is_able_to_work and is_available_for_work and is_actively_seeking_work
@@ -97,10 +93,8 @@ variable ca_ui_separation_eligible {
   dtype Boolean
   label "California UI separation eligibility"
   description "Job separation qualifies for UI per CUIC 1256"
-  reference (
     "Cal. Unemp. Ins. Code 1256",
     "Cal. Unemp. Ins. Code 1257"
-  )
 
   formula {
     let reason = separation_reason
@@ -137,7 +131,6 @@ variable ca_ui_eligible {
   dtype Boolean
   label "California UI eligibility"
   description "Eligible for California unemployment insurance benefits"
-  reference "Cal. Unemp. Ins. Code 1275-1281"
 
   formula {
     return (
@@ -162,7 +155,6 @@ variable ca_ui_weekly_benefit_amount {
   unit "USD"
   label "California weekly benefit amount"
   description "Weekly UI benefit based on high quarter wages per CUIC 1280"
-  reference "Cal. Unemp. Ins. Code 1280"
 
   formula {
     if not ca_ui_eligible then
@@ -195,7 +187,6 @@ variable ca_ui_maximum_benefit_amount {
   unit "USD"
   label "California maximum benefit amount"
   description "Total UI benefits available in benefit year per CUIC 1281"
-  reference "Cal. Unemp. Ins. Code 1281(a)"
 
   formula {
     let wba = ca_ui_weekly_benefit_amount
@@ -217,7 +208,6 @@ variable ca_ui_maximum_weeks {
   dtype Integer
   label "California maximum benefit weeks"
   description "Maximum weeks of regular UI benefits per CUIC 1281"
-  reference "Cal. Unemp. Ins. Code 1281(a)"
 
   formula {
     return maximum_weeks  # 26 weeks
@@ -236,7 +226,6 @@ variable ca_ui_waiting_week {
   dtype Boolean
   label "California UI waiting week"
   description "Currently in unpaid waiting period per CUIC 1253"
-  reference "Cal. Unemp. Ins. Code 1253"
 
   formula {
     let week_num = current_week_number
@@ -279,7 +268,6 @@ variable ca_ui_current_weekly_payment {
   unit "USD"
   label "California current week UI payment"
   description "UI payment for current week after deductions per CUIC 1279"
-  reference "Cal. Unemp. Ins. Code 1279(a)"
 
   formula {
     if not ca_ui_eligible then
@@ -322,7 +310,6 @@ variable ca_ui_requalification_amount {
   unit "USD"
   label "California requalification earnings requirement"
   description "Earnings required to purge disqualification per CUIC 1260"
-  reference "Cal. Unemp. Ins. Code 1260"
 
   formula {
     let wba = ca_ui_weekly_benefit_amount
@@ -338,7 +325,6 @@ variable has_requalified {
   dtype Boolean
   label "Has requalified after disqualification"
   description "Earned sufficient wages to purge disqualification per CUIC 1260"
-  reference "Cal. Unemp. Ins. Code 1260"
 
   formula {
     let required = ca_ui_requalification_amount

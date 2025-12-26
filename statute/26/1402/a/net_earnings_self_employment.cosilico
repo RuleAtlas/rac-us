@@ -17,6 +17,5 @@ variable net_earnings_self_employment {
   unit "USD"
   label "Net Earnings from Self-Employment"
   description "Gross self-employment income less attributable business deductions"
-  reference "26 USC § 1402(a)"
   # Input from CPS: SEMP_VAL (self-employment income)
 }

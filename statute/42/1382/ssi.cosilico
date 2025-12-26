@@ -37,7 +37,6 @@ variable is_ssi_income_eligible {
   dtype Boolean
   label "SSI income eligibility"
   description "Countable income does not exceed FBR per 42 USC 1382(a)"
-  reference "42 USC 1382(a)"
 
   formula {
     return ssi_countable_income <= federal_benefit_rate
@@ -53,10 +52,8 @@ variable is_ssi_eligible {
   dtype Boolean
   label "SSI eligibility"
   description "All SSI eligibility requirements met per 42 USC 1382"
-  reference (
     "42 USC 1382(a)",
     "42 USC 1382c"
-  )
 
   formula {
     # All requirements must be met
@@ -78,10 +75,8 @@ variable ssi {
   unit "USD"
   label "Supplemental Security Income"
   description "Monthly SSI payment per 42 USC 1382(b)"
-  reference (
     "42 USC 1382(b)",
     "42 USC 1382a"
-  )
 
   formula {
     if not is_ssi_eligible then

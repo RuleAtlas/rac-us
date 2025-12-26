@@ -13,6 +13,5 @@ variable interest_income {
   unit "USD"
   label "Interest Income"
   description "Taxable interest income"
-  reference "26 USC § 61(a)(4)"
   # Input from CPS: INT_VAL (interest income)
 }

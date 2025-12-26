@@ -13,6 +13,5 @@ variable wages {
   unit "USD"
   label "Wages"
   description "Compensation for services as an employee"
-  reference "26 USC § 61(a)(1)"
   # Input from CPS: WSAL_VAL (wage and salary income)
 }

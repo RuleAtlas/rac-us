@@ -33,7 +33,6 @@ variable net_self_employment_earnings {
   unit "USD"
   label "Net Self-Employment Earnings"
   description "Net self-employment income per 1402(a) - already adjusted by 92.35%"
-  reference "26 USC 1402(a)"
 
   formula {
     # taxable_self_employment_income from PE is already gross * 0.9235
@@ -50,7 +49,6 @@ variable social_security_cap_remaining {
   unit "USD"
   label "Social Security Cap Remaining"
   description "SS wage base minus W-2 wages already subject to payroll tax"
-  reference "26 USC 1402(b)"
 
   formula {
     # taxable_earnings_for_social_security is W-2 wages subject to SS
@@ -67,7 +65,6 @@ variable social_security_taxable_self_employment_income {
   unit "USD"
   label "SS Taxable SE Income"
   description "SE income subject to SS tax after W-2 wages coordination"
-  reference "26 USC 1402(b)"
 
   formula {
     # SE income is limited by remaining cap after W-2 wages
@@ -83,7 +80,6 @@ variable self_employment_social_security_tax {
   unit "USD"
   label "Self-Employment Social Security Tax"
   description "OASDI tax on self-employment earnings per 1401(a)"
-  reference "26 USC 1401(a)"
 
   formula {
     # 12.4% on SE earnings up to remaining cap
@@ -99,7 +95,6 @@ variable self_employment_medicare_tax {
   unit "USD"
   label "Self-Employment Medicare Tax"
   description "Hospital Insurance tax on self-employment earnings per 1401(b)"
-  reference "26 USC 1401(b)"
 
   formula {
     # 2.9% on all net SE earnings (no cap)
@@ -115,7 +110,6 @@ variable self_employment_tax {
   unit "USD"
   label "Self-Employment Tax"
   description "Combined OASDI and HI taxes on self-employment income per 1401"
-  reference "26 USC 1401"
 
   formula {
     return self_employment_social_security_tax + self_employment_medicare_tax

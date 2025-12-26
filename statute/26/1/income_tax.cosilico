@@ -52,7 +52,6 @@ variable income_tax_before_credits {
   unit "USD"
   label "Income Tax Before Credits"
   description "Federal income tax on ordinary income before credits per 26 USC Section 1"
-  reference "26 USC Section 1(a)-(d), (j)"
 
   formula {
     # Get bracket thresholds for this filing status
@@ -109,7 +108,6 @@ variable income_tax_before_credits_vectorized {
   unit "USD"
   label "Income Tax Before Credits (Vectorized)"
   description "Vectorized implementation for microsimulation"
-  reference "26 USC Section 1"
 
   formula {
     # This formula is designed for vectorized execution with numpy arrays

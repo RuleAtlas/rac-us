@@ -49,7 +49,6 @@ variable charitable_contribution_limit {
   unit "USD"
   label "Charitable Contribution AGI Limit"
   description "Maximum charitable deduction based on AGI per 26 USC 170(b)(1)"
-  reference "26 USC 170(b)(1)"
 
   formula {
     # Contribution base is generally AGI for individuals
@@ -77,10 +76,6 @@ variable charitable_deduction_before_carryforward {
   unit "USD"
   label "Charitable Deduction (Current Year)"
   description "Deductible charitable contributions before carryforward per 26 USC 170(b)"
-  reference (
-    "26 USC 170(a)",
-    "26 USC 170(b)(1)"
-  )
 
   formula {
     let agi = adjusted_gross_income
@@ -122,7 +117,6 @@ variable charitable_carryforward_used {
   unit "USD"
   label "Charitable Carryforward Used"
   description "Prior year carryforward applied this year per 26 USC 170(d)"
-  reference "26 USC 170(d)(1)"
 
   formula {
     let agi = adjusted_gross_income
@@ -148,7 +142,6 @@ variable charitable_carryforward {
   unit "USD"
   label "Charitable Contribution Carryforward"
   description "Excess contributions to carry forward per 26 USC 170(d)(1)"
-  reference "26 USC 170(d)(1)"
 
   formula {
     let agi = adjusted_gross_income

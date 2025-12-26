@@ -55,11 +55,7 @@ variable hsa_deduction {
   unit "USD"
   label "HSA Deduction"
   description "Above-the-line deduction for Health Savings Account contributions"
-  reference (
-    "26 USC 223(a)",
-    "26 USC 62(a)(12)",
     "Rev. Proc. 2023-22"
-  )
 
   formula {
     # Must be an eligible individual
@@ -88,7 +84,6 @@ variable hsa_deduction_total {
   unit "USD"
   label "Total HSA Deduction"
   description "Combined HSA deduction for all members of the tax unit"
-  reference "26 USC 62(a)(12)"
 
   formula {
     return sum(members.hsa_deduction)
@@ -103,7 +98,6 @@ variable hsa_distributions {
   unit "USD"
   label "HSA Distributions"
   description "Total distributions from Health Savings Account during the year"
-  reference "26 USC 223(f)"
   default 0
 }
 
@@ -115,7 +109,6 @@ variable hsa_qualified_medical_expenses {
   unit "USD"
   label "HSA Qualified Medical Expenses"
   description "Medical expenses paid from HSA that qualify under 26 USC 213(d)"
-  reference "26 USC 223(d)(2)"
   default 0
 }
 
@@ -127,7 +120,6 @@ variable hsa_nonqualified_distributions {
   unit "USD"
   label "HSA Non-Qualified Distributions"
   description "HSA distributions not used for qualified medical expenses"
-  reference "26 USC 223(f)(2)"
 
   formula {
     let nonqualified = hsa_distributions - hsa_qualified_medical_expenses
@@ -142,7 +134,6 @@ variable is_disabled {
   dtype Boolean
   label "Is Disabled"
   description "Whether the individual is disabled under 26 USC 72(m)(7)"
-  reference "26 USC 223(f)(4)"
   default false
 }
 
@@ -153,7 +144,6 @@ variable is_subject_to_hsa_penalty {
   dtype Boolean
   label "Subject to HSA Penalty"
   description "Whether non-qualified distributions are subject to 20% penalty"
-  reference "26 USC 223(f)(4)"
 
   formula {
     # Exceptions to 20% penalty:
@@ -178,7 +168,6 @@ variable hsa_additional_tax {
   unit "USD"
   label "HSA Additional Tax"
   description "20% additional tax on non-qualified HSA distributions"
-  reference "26 USC 223(f)(4)"
 
   formula {
     if not is_subject_to_hsa_penalty {

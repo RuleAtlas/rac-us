@@ -32,7 +32,6 @@ variable ssi_countable_resources {
   unit "USD"
   label "SSI countable resources"
   description "Total resources minus exclusions per 42 USC 1382b(a)"
-  reference "42 USC 1382b(a)"
 
   formula {
     # Start with total resources

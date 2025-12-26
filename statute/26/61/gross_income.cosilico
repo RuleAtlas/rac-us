@@ -61,7 +61,6 @@ variable compensation_income {
   unit "USD"
   label "Compensation Income"
   description "Total compensation for services including wages, salaries, and tips per Section 61(a)(1)"
-  reference "26 USC 61(a)(1)"
 
   formula {
     return wages + salaries + tips
@@ -76,7 +75,6 @@ variable net_capital_gains {
   unit "USD"
   label "Net Capital Gains"
   description "Capital gains after applying $3,000 loss limitation per Section 1211(b)"
-  reference "26 USC 61(a)(3), 1211(b)"
 
   formula {
     # If capital gains are positive, use full amount
@@ -99,7 +97,6 @@ variable investment_income {
   unit "USD"
   label "Investment Income"
   description "Total investment income including interest, dividends, and capital gains"
-  reference "26 USC 61(a)(4), 61(a)(7)"
 
   formula {
     return interest_income + dividend_income + net_capital_gains
@@ -114,7 +111,6 @@ variable gross_income {
   unit "USD"
   label "Gross Income"
   description "Total gross income from all sources per 26 USC Section 61"
-  reference "26 USC 61"
 
   formula {
     # Aggregate income from all members of the tax unit

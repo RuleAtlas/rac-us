@@ -41,7 +41,6 @@ variable preference_depletion {
   unit "USD"
   label "AMT Preference - Depletion"
   description "Excess depletion over cost depletion per Section 57(a)(1)"
-  reference "26 USC Section 57(a)(1)"
 
   formula {
     # The preference amount is the excess of percentage depletion over
@@ -62,7 +61,6 @@ variable preference_idc {
   unit "USD"
   label "AMT Preference - Intangible Drilling Costs"
   description "Excess IDC over 10-year amortization per Section 57(a)(2)"
-  reference "26 USC Section 57(a)(2)"
 
   formula {
     # IDC can be immediately expensed for regular tax but must be
@@ -84,7 +82,6 @@ variable preference_private_activity_bond_interest {
   unit "USD"
   label "AMT Preference - Private Activity Bond Interest"
   description "Tax-exempt interest from private activity bonds per Section 57(a)(5)"
-  reference "26 USC Section 57(a)(5)"
 
   formula {
     # Interest on specified private activity bonds is tax-exempt
@@ -105,7 +102,6 @@ variable preference_depreciation {
   unit "USD"
   label "AMT Preference - Depreciation"
   description "Accelerated depreciation preference per Section 57(a)(7)"
-  reference "26 USC Section 57(a)(7)"
 
   formula {
     # For property placed in service before 1987, the depreciation
@@ -134,7 +130,6 @@ variable amt_preferences {
   unit "USD"
   label "Total AMT Preference Items"
   description "Sum of all tax preference items under Section 57"
-  reference "26 USC Section 57"
 
   formula {
     let depletion_pref = preference_depletion

@@ -29,6 +29,5 @@ metadata:
   breakdown: filing_status
   unit: currency-USD
   label: "Social Security taxability base threshold"
-  reference:
     - title: "26 U.S. Code Section 86(c)(1)"
       href: "https://www.law.cornell.edu/uscode/text/26/86#c_1"

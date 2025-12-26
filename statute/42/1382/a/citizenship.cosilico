@@ -18,10 +18,8 @@ variable is_ssi_citizenship_eligible {
   dtype Boolean
   label "SSI citizenship/alienage eligibility"
   description "Is US citizen or qualified alien per 42 USC 1382c(a)(1)(B) and 8 USC 1612"
-  reference (
     "42 USC 1382c(a)(1)(B)",
     "8 USC 1612"
-  )
 
   formula {
     return is_us_citizen or is_qualified_alien
@@ -37,7 +35,6 @@ variable is_ssi_residency_eligible {
   dtype Boolean
   label "SSI residency eligibility"
   description "Is resident of the United States per 42 USC 1382c(a)(1)(B)"
-  reference "42 USC 1382c(a)(1)(B)"
 
   formula {
     return is_us_resident

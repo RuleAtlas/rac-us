@@ -32,7 +32,6 @@ variable is_eligible_educator {
   dtype Boolean
   label "Is Eligible Educator"
   description "Whether the individual qualifies as an eligible educator per Section 62(d)(1)"
-  reference "26 USC 62(d)(1)"
 
   # An eligible educator is a kindergarten through grade 12 teacher,
   # instructor, counselor, principal, or aide who works at least 900 hours
@@ -47,7 +46,6 @@ variable educator_expenses {
   unit "USD"
   label "Educator Expenses Paid"
   description "Unreimbursed educator expenses paid during the tax year"
-  reference "26 USC 62(a)(2)(D)"
 
   # Input variable - amount paid by the educator for qualifying supplies
 }
@@ -59,7 +57,6 @@ variable educator_expense_deduction {
   unit "USD"
   label "Educator Expense Deduction"
   description "Above-the-line deduction for eligible educator expenses, capped at $300"
-  reference "26 USC 62(a)(2)(D)"
 
   formula {
     # Only eligible educators can claim this deduction
@@ -80,7 +77,6 @@ variable educator_expense_deduction_total {
   unit "USD"
   label "Total Educator Expense Deduction"
   description "Combined educator expense deduction for tax unit (both spouses if applicable)"
-  reference "26 USC 62(a)(2)(D)"
 
   formula {
     # Sum deductions from all members (each limited to $300)

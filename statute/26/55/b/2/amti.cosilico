@@ -28,7 +28,6 @@ variable alternative_minimum_taxable_income {
   unit "USD"
   label "Alternative Minimum Taxable Income"
   description "AMTI computed per Section 55(b)(2) as taxable income plus adjustments and preferences"
-  reference "26 USC Section 55(b)(2)"
 
   formula {
     # Start with regular taxable income

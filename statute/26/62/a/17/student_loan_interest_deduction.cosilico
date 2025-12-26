@@ -38,7 +38,6 @@ variable student_loan_interest_paid {
   unit "USD"
   label "Student Loan Interest Paid"
   description "Interest paid on qualified education loans during the tax year"
-  reference "26 USC 221"
 
   # Input variable - amount of interest paid on qualified education loans
 }
@@ -50,7 +49,6 @@ variable student_loan_interest_deduction_before_phaseout {
   unit "USD"
   label "Student Loan Interest Deduction (Before Phase-out)"
   description "Student loan interest deduction before income phase-out"
-  reference "26 USC 221(b)"
 
   formula {
     # Cannot deduct more than paid or the maximum
@@ -64,7 +62,6 @@ variable student_loan_interest_phaseout_ratio {
   dtype Rate
   label "Student Loan Interest Phase-out Ratio"
   description "Ratio of deduction phased out based on MAGI"
-  reference "26 USC 221(b)(2)"
 
   formula {
     # MFS cannot claim this deduction
@@ -104,7 +101,6 @@ variable student_loan_interest_deduction {
   unit "USD"
   label "Student Loan Interest Deduction"
   description "Above-the-line deduction for student loan interest"
-  reference "26 USC 62(a)(17), 221"
 
   formula {
     # MFS cannot claim this deduction

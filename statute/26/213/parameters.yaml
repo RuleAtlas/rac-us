@@ -11,7 +11,6 @@ reference: "26 USC 213"
 # =============================================================================
 agi_floor:
   description: "Percentage of AGI subtracted from medical expenses"
-  reference: "26 USC 213(a), TCJA Section 11027, CAA 2021"
 
   rate:
     description: "AGI floor rate for medical expense deduction"
@@ -55,7 +54,6 @@ agi_floor:
 # =============================================================================
 long_term_care:
   description: "Premium limits for long-term care insurance by age"
-  reference: "26 USC 213(d)(10), Rev. Proc. 2023-34"
 
   # These limits are indexed for inflation annually
   age_40_or_less:

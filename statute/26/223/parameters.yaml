@@ -11,7 +11,6 @@ reference: "26 USC 223, Rev. Proc. 2023-22, Rev. Proc. 2024-25"
 # =============================================================================
 contribution_limits:
   description: "Maximum annual HSA contributions"
-  reference: "26 USC 223(b)(2)"
 
   self_only:
     description: "Maximum contribution for self-only HDHP coverage"
@@ -72,7 +71,6 @@ contribution_limits:
 # =============================================================================
 catch_up:
   description: "Additional contribution amount for age 55+"
-  reference: "26 USC 223(b)(3)"
 
   amount:
     description: "Additional catch-up contribution allowed"
@@ -111,7 +109,6 @@ catch_up:
 # =============================================================================
 hdhp_requirements:
   description: "High Deductible Health Plan minimum and maximum thresholds"
-  reference: "26 USC 223(c)(2)"
 
   minimum_deductible:
     self_only:
@@ -228,7 +225,6 @@ hdhp_requirements:
 # =============================================================================
 additional_tax:
   description: "Additional tax on non-qualified distributions"
-  reference: "26 USC 223(f)(4)"
 
   rate:
     description: "Penalty rate on non-qualified HSA distributions"

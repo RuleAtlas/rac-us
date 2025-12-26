@@ -14,7 +14,6 @@ variable cdcc_expenses_paid {
   unit "USD"
   label "CDCC Expenses Paid"
   description "Employment-related child/dependent care expenses paid during the year"
-  reference "26 USC 21(b)(2): employment-related expenses"
 
   # Input variable - no formula
   default 0

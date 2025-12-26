@@ -24,7 +24,6 @@ variable real_property_tax {
   unit "USD"
   label "Real Property Tax Paid"
   description "State, local, and foreign real property taxes paid or accrued"
-  reference "26 USC § 164(a)(1)"
 }
 
 variable foreign_real_property_tax {
@@ -34,10 +33,6 @@ variable foreign_real_property_tax {
   unit "USD"
   label "Foreign Real Property Tax Paid"
   description "Foreign real property taxes - exempt from SALT cap under § 164(b)(6)(B)"
-  reference (
-    "26 USC § 164(a)(1)",
-    "26 USC § 164(b)(6)(B)"
-  )
 }
 
 variable domestic_real_property_tax {
@@ -47,7 +42,6 @@ variable domestic_real_property_tax {
   unit "USD"
   label "Domestic Real Property Tax"
   description "State and local real property taxes (subject to SALT cap)"
-  reference "26 USC § 164(a)(1)"
 
   formula {
     # Total real property minus foreign portion
@@ -66,7 +60,6 @@ variable personal_property_tax {
   unit "USD"
   label "Personal Property Tax Paid"
   description "State and local personal property taxes (e.g., vehicle registration based on value)"
-  reference "26 USC § 164(a)(2)"
 }
 
 # ============================================================================
@@ -80,7 +73,6 @@ variable state_income_tax {
   unit "USD"
   label "State and Local Income Tax"
   description "State and local income taxes paid or withheld"
-  reference "26 USC § 164(a)(3)"
 }
 
 variable sales_tax {
@@ -90,10 +82,6 @@ variable sales_tax {
   unit "USD"
   label "General Sales Tax"
   description "State and local general sales taxes (alternative to income tax per § 164(b)(5))"
-  reference (
-    "26 USC § 164(a)(3)",
-    "26 USC § 164(b)(5)"
-  )
 }
 
 variable elects_sales_tax {
@@ -102,7 +90,6 @@ variable elects_sales_tax {
   dtype Boolean
   label "Elects Sales Tax Deduction"
   description "Whether taxpayer elects to deduct sales tax instead of income tax under § 164(b)(5)"
-  reference "26 USC § 164(b)(5)(A)"
   default false
 }
 
@@ -113,10 +100,6 @@ variable income_or_sales_tax {
   unit "USD"
   label "Income or Sales Tax Deducted"
   description "State/local income tax, or sales tax if elected under § 164(b)(5)"
-  reference (
-    "26 USC § 164(a)(3)",
-    "26 USC § 164(b)(5)(A)"
-  )
 
   formula {
     # Taxpayer may elect to deduct sales tax in lieu of income tax
@@ -136,7 +119,6 @@ variable total_deductible_taxes {
   unit "USD"
   label "Total Deductible Taxes"
   description "Sum of all taxes deductible under § 164(a), before limitation"
-  reference "26 USC § 164(a)"
 
   formula {
     # Real property (domestic portion - foreign handled separately for cap)
@@ -160,7 +142,6 @@ variable local_benefit_assessments {
   unit "USD"
   label "Local Benefit Assessments"
   description "Special assessments for streets, sidewalks, etc. - NOT deductible under § 164(a)(5)"
-  reference "26 USC § 164(a)(5)"
 }
 
 # Note: local_benefit_assessments is an INPUT but is NOT included in

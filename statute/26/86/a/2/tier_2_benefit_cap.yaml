@@ -12,6 +12,5 @@ metadata:
   unit: /1
   period: year
   label: "Tier 2 benefit cap rate (85%)"
-  reference:
     - title: "26 U.S. Code Section 86(a)(2)(B)"
       href: "https://www.law.cornell.edu/uscode/text/26/86#a_2_B"

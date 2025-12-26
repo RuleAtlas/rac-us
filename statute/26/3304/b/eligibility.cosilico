@@ -37,7 +37,6 @@ variable ui_base_period_wages {
   unit "USD"
   label "Base period wages for UI"
   description "Total wages in base period (first 4 of last 5 completed quarters)"
-  reference "26 USC 3304(a)(5)"
 
   formula {
     # Standard base period: first 4 of last 5 completed calendar quarters
@@ -56,7 +55,6 @@ variable ui_high_quarter_wages {
   unit "USD"
   label "Highest quarter wages"
   description "Wages in highest-earning quarter of base period"
-  reference "26 USC 3304(a)(5)"
 
   formula {
     return high_quarter_wages
@@ -71,7 +69,6 @@ variable ui_monetarily_eligible {
   dtype Boolean
   label "UI monetary eligibility"
   description "Meets minimum wage requirements for UI per federal and state law"
-  reference "26 USC 3304(a)(5)"
 
   formula {
     # Federal requirement: must have sufficient wages in base period
@@ -107,7 +104,6 @@ variable ui_able_to_work {
   dtype Boolean
   label "Able to work"
   description "Physically and mentally able to work per 26 USC 3304(a)(5)(A)"
-  reference "26 USC 3304(a)(5)(A)"
 
   formula {
     # Claimant must be able to perform work
@@ -124,7 +120,6 @@ variable ui_available_for_work {
   dtype Boolean
   label "Available for work"
   description "Ready and willing to accept suitable work per 26 USC 3304(a)(5)(A)"
-  reference "26 USC 3304(a)(5)(A)"
 
   formula {
     # Must be available for full-time or part-time work
@@ -141,7 +136,6 @@ variable ui_actively_seeking_work {
   dtype Boolean
   label "Actively seeking work"
   description "Making reasonable efforts to find work"
-  reference "26 USC 3304(a)(5)(A)"
 
   formula {
     # Most states require active work search
@@ -158,7 +152,6 @@ variable ui_nonmonetarily_eligible {
   dtype Boolean
   label "UI non-monetary eligibility"
   description "Meets able/available/seeking requirements per 26 USC 3304(a)(5)(A)"
-  reference "26 USC 3304(a)(5)(A)"
 
   formula {
     return ui_able_to_work and ui_available_for_work and ui_actively_seeking_work
@@ -178,7 +171,6 @@ variable ui_separation_eligible {
   dtype Boolean
   label "UI separation eligibility"
   description "Job separation does not disqualify from UI per 26 USC 3304(a)(5)"
-  reference "26 USC 3304(a)(5)(A)"
 
   formula {
     # Federal law allows states to disqualify for:
@@ -221,10 +213,6 @@ variable ui_eligible {
   dtype Boolean
   label "UI eligibility"
   description "Eligible to receive unemployment insurance benefits"
-  reference (
-    "26 USC 3304(a)(5)",
-    "26 USC 3304(a)(6)"
-  )
 
   formula {
     return (
@@ -248,7 +236,6 @@ variable ui_weekly_benefit_amount {
   unit "USD"
   label "Weekly benefit amount"
   description "Weekly UI benefit based on prior wages"
-  reference "26 USC 3304(a)(7)"
 
   formula {
     # State-specific formulas; common patterns:
@@ -276,7 +263,6 @@ variable ui_maximum_benefit_amount {
   unit "USD"
   label "Maximum benefit amount"
   description "Total UI benefits available in benefit year"
-  reference "26 USC 3304(a)(7)"
 
   formula {
     let wba = ui_weekly_benefit_amount
@@ -302,7 +288,6 @@ variable ui_waiting_week {
   dtype Boolean
   label "UI waiting week"
   description "Currently in unpaid waiting period per 26 USC 3304(a)(7)(A)"
-  reference "26 USC 3304(a)(7)(A)"
 
   formula {
     # First week is typically unpaid waiting week
@@ -321,7 +306,6 @@ variable ui_maximum_weeks {
   dtype Integer
   label "Maximum benefit weeks"
   description "Maximum weeks of UI benefits available"
-  reference "26 USC 3304(a)(7)"
 
   formula {
     # Standard: 26 weeks in most states
@@ -396,7 +380,6 @@ variable ui_extended_benefits_eligible {
   dtype Boolean
   label "Extended benefits eligibility"
   description "Eligible for extended benefits per 26 USC 3304(a)(11)"
-  reference "26 USC 3304(a)(11)"
 
   formula {
     # Extended benefits triggered when:
@@ -418,7 +401,6 @@ variable ui_extended_benefits_weeks {
   dtype Integer
   label "Extended benefits weeks"
   description "Additional weeks available under extended benefits"
-  reference "26 USC 3304(a)(11)"
 
   formula {
     if not ui_extended_benefits_eligible then

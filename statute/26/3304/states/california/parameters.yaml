@@ -30,7 +30,6 @@ minimum_base_period_wages:
     2010-01-01: 1300
   citations:
     - "Cal. Unemp. Ins. Code 1281(a)"
-  reference: "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=UIC&sectionNum=1281"
 
 high_quarter_multiplier:
   description: "California requires total base period wages to be at least 1.25 times high quarter wages per Cal. Unemp. Ins. Code 1281(a)"
@@ -41,7 +40,6 @@ high_quarter_multiplier:
     1939-01-01: 1.25  # Base period wages >= 1.25 * high quarter wages
   citations:
     - "Cal. Unemp. Ins. Code 1281(a)"
-  reference: "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=UIC&sectionNum=1281"
 
 minimum_outside_high_quarter:
   description: "California requires wages outside high quarter OR $900+ in high quarter per Cal. Unemp. Ins. Code 1281(a)(2)"
@@ -72,7 +70,6 @@ wba_fraction:
     - "Actual WBA depends on high quarter wages bracket"
   citations:
     - "Cal. Unemp. Ins. Code 1280"
-  reference: "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=UIC&sectionNum=1280"
 
 minimum_wba:
   description: "California minimum weekly benefit amount per Cal. Unemp. Ins. Code 1280"
@@ -105,7 +102,6 @@ maximum_wba:
     1992-01-01: 230
   citations:
     - "Cal. Unemp. Ins. Code 1280"
-  reference: "https://edd.ca.gov/en/unemployment/ui-benefits-amounts/"
 
 # =============================================================================
 # BENEFIT DURATION
@@ -329,4 +325,3 @@ wba_table:
         wba: 450  # Maximum WBA
   citations:
     - "Cal. Unemp. Ins. Code 1280"
-  reference: "https://edd.ca.gov/en/unemployment/ui-benefits-amounts/"

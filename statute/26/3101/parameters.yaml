@@ -42,7 +42,6 @@ employee_rate:
     1966-01-01: 0.0035
   citations:
     - "26 USC 3101(b)(1): rate of 1.45 percent of wages"
-  reference: "https://uscode.house.gov/view.xhtml?req=26+USC+3101"
 
 # =============================================================================
 # ADDITIONAL MEDICARE TAX - 26 USC 3101(b)(2)
@@ -59,7 +58,6 @@ additional_rate:
     # Prior to 2013: no additional Medicare tax
   citations:
     - "26 USC 3101(b)(2): additional tax equal to 0.9 percent"
-  reference: "https://uscode.house.gov/view.xhtml?req=26+USC+3101"
 
 # Thresholds vary by filing status per 26 USC 3101(b)(2)(A)-(C)
 # These amounts are NOT indexed for inflation
@@ -73,7 +71,6 @@ additional_threshold_joint:
     2013-01-01: 250000
   citations:
     - "26 USC 3101(b)(2)(A): $250,000 for joint returns"
-  reference: "https://uscode.house.gov/view.xhtml?req=26+USC+3101"
 
 additional_threshold_separate:
   description: "Additional Medicare Tax threshold for married filing separately per 26 USC 3101(b)(2)(B)"
@@ -84,7 +81,6 @@ additional_threshold_separate:
     2013-01-01: 125000
   citations:
     - "26 USC 3101(b)(2)(B): $125,000 for married filing separately"
-  reference: "https://uscode.house.gov/view.xhtml?req=26+USC+3101"
 
 additional_threshold_single:
   description: "Additional Medicare Tax threshold for single filers and others per 26 USC 3101(b)(2)(C)"
@@ -97,7 +93,6 @@ additional_threshold_single:
     - "26 USC 3101(b)(2)(C): $200,000 for any other case"
   notes:
     - "Applies to single, head of household, and surviving spouse filers"
-  reference: "https://uscode.house.gov/view.xhtml?req=26+USC+3101"
 
 # =============================================================================
 # SELF-EMPLOYMENT TAX - 26 USC 1401(b)
@@ -116,7 +111,6 @@ self_employment_rate:
     1984-01-01: 0.026
   citations:
     - "26 USC 1401(b)(1): 2.9 percent of self-employment income"
-  reference: "https://uscode.house.gov/view.xhtml?req=26+USC+1401"
 
 self_employment_additional_rate:
   description: "Additional Medicare Tax rate on self-employment income per 26 USC 1401(b)(2)"
@@ -127,4 +121,3 @@ self_employment_additional_rate:
     2013-01-01: 0.009  # Same 0.9% additional rate applies
   citations:
     - "26 USC 1401(b)(2): additional 0.9 percent on SE income above threshold"
-  reference: "https://uscode.house.gov/view.xhtml?req=26+USC+1401"

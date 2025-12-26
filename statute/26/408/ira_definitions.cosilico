@@ -37,7 +37,6 @@ variable traditional_ira_balance {
   unit "USD"
   label "Traditional IRA Balance"
   description "Total balance in traditional IRA accounts"
-  reference "26 USC 408(a)"
 
   # Input variable - account balance
 }
@@ -50,7 +49,6 @@ variable traditional_ira_distribution {
   unit "USD"
   label "Traditional IRA Distribution"
   description "Amounts distributed from traditional IRA during the year"
-  reference "26 USC 408(d)(1)"
 
   # Input variable - 1099-R Box 1
 }
@@ -63,7 +61,6 @@ variable taxable_ira_distribution {
   unit "USD"
   label "Taxable IRA Distribution"
   description "Portion of IRA distribution includible in gross income"
-  reference "26 USC 408(d)(1)"
 
   formula {
     # Simplified: assume all distributions are taxable
@@ -81,7 +78,6 @@ variable ira_rollover_amount {
   unit "USD"
   label "IRA Rollover Amount"
   description "Amount of IRA distribution rolled over within 60 days"
-  reference "26 USC 408(d)(3)"
 
   # Input variable - must be rolled over within 60 days
 }
@@ -94,7 +90,6 @@ variable ira_excess_contribution_returned {
   unit "USD"
   label "Excess IRA Contributions Returned"
   description "Excess contributions (and earnings) returned before tax filing deadline"
-  reference "26 USC 408(d)(4)"
 
   # Input variable - timely returned excess contributions
 }
@@ -107,7 +102,6 @@ variable rmd_applicable_age {
   dtype Integer
   label "RMD Applicable Age"
   description "Age at which required minimum distributions must begin"
-  reference "26 USC 408(a)(6), 401(a)(9)"
 
   formula {
     # SECURE 2.0 increased RMD age effective 2023
@@ -125,7 +119,6 @@ variable is_rmd_age {
   dtype Boolean
   label "Reached RMD Age"
   description "Whether individual must take required minimum distributions"
-  reference "26 USC 408(a)(6)"
 
   formula {
     return age >= rmd_applicable_age
