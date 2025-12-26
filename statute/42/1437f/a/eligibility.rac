@@ -12,19 +12,6 @@
 #
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1437f
 
-module statute.42.1437f.a
-version "2025.1"
-jurisdiction us
-
-references:
-  # Income limits by household size from parameters
-  very_low_income_limits: statute/42/1437f/income_limits/very_low_income
-  extremely_low_income_limits: statute/42/1437f/income_limits/extremely_low_income
-  low_income_limits: statute/42/1437f/income_limits/low_income
-
-  # Annual income calculation
-  hcv_annual_income: statute/42/1437f/b/hcv_annual_income
-
 # ============================================================
 # INCOME LIMITS - 24 CFR 5.603
 # ============================================================
@@ -37,10 +24,6 @@ variable hcv_very_low_income_limit:
   unit "USD"
   label "HCV Very Low Income Limit"
   description "50% of Area Median Income limit for HCV eligibility"
-  reference (
-    "42 USC 1437f(a)",
-    "24 CFR 5.603(b)"
-  )
 
   parameters:
     max_table_size: parameters#income_limits.max_table_size
@@ -68,10 +51,6 @@ variable hcv_extremely_low_income_limit:
   unit "USD"
   label "HCV Extremely Low Income Limit"
   description "30% of Area Median Income limit for targeting requirement"
-  reference (
-    "42 USC 1437f(o)(4)",
-    "24 CFR 5.603(b)"
-  )
 
   parameters:
     max_table_size: parameters#income_limits.max_table_size
@@ -97,7 +76,6 @@ variable hcv_low_income_limit:
   unit "USD"
   label "HCV Low Income Limit"
   description "80% of Area Median Income limit for continued occupancy"
-  reference "24 CFR 5.603(b)"
 
   parameters:
     max_table_size: parameters#income_limits.max_table_size
@@ -127,10 +105,6 @@ variable hcv_income_eligible:
   dtype Boolean
   label "HCV Income Eligible"
   description "Whether household meets 50% AMI income eligibility for HCV"
-  reference (
-    "42 USC 1437f(a)",
-    "24 CFR 5.603"
-  )
 
   formula:
     return hcv_annual_income <= hcv_very_low_income_limit
@@ -145,7 +119,6 @@ variable hcv_extremely_low_income:
   dtype Boolean
   label "HCV Extremely Low Income"
   description "Whether household is at or below 30% AMI for targeting purposes"
-  reference "42 USC 1437f(o)(4)"
 
   formula:
     return hcv_annual_income <= hcv_extremely_low_income_limit
@@ -164,7 +137,6 @@ variable hcv_family_eligible:
   dtype Boolean
   label "HCV Family Composition Eligible"
   description "Whether household constitutes a family under HCV rules"
-  reference "24 CFR 5.403"
 
   formula:
     # A family includes:
@@ -191,7 +163,6 @@ variable hcv_citizenship_eligible:
   dtype Boolean
   label "HCV Citizenship/Immigration Eligible"
   description "Whether at least one household member has eligible immigration status"
-  reference "42 USC 1436a"
 
   formula:
     # At least one family member must be:
@@ -215,7 +186,6 @@ variable hcv_eligible:
   dtype Boolean
   label "HCV Eligible"
   description "Whether household meets all HCV eligibility requirements"
-  reference "42 USC 1437f"
 
   formula:
     # Must meet all eligibility requirements:

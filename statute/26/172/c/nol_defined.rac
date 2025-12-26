@@ -20,7 +20,6 @@ dtype Money
 unit "USD"
 label "Net Operating Loss"
 description "Excess of deductions over gross income per 26 USC 172(c)"
-reference "26 USC 172(c)"
 
 formula:
   # NOL = negative taxable income (before NOL deduction), with modifications
@@ -49,7 +48,6 @@ period Year
 dtype Boolean
 label "Has Net Operating Loss"
 description "Whether taxpayer has a net operating loss in the current year"
-reference "26 USC 172(c)"
 
 formula:
   return net_operating_loss > 0

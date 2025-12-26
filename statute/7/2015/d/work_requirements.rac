@@ -14,15 +14,6 @@
 #
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2015
 
-module statute.7.2015.d
-version "2025.1"
-jurisdiction us
-
-references:
-  abawd_min_age: statute/7/2015/d/abawd_min_age
-  abawd_max_age: statute/7/2015/d/abawd_max_age
-  abawd_work_hours: statute/7/2015/d/abawd_work_hours
-
 # Determine if individual is subject to ABAWD requirements
 variable is_snap_abawd:
   entity Person
@@ -30,10 +21,6 @@ variable is_snap_abawd:
   dtype Bool
   label "Subject to SNAP ABAWD Requirements"
   description "Whether individual is an Able-Bodied Adult Without Dependents subject to work requirements"
-  reference (
-    "7 USC 2015(o)(2)",
-    "2023 Fiscal Responsibility Act"
-  )
 
   formula:
     # Section 2015(o)(2): Definition of ABAWD
@@ -60,7 +47,6 @@ variable snap_abawd_work_requirement_met:
   dtype Bool
   label "SNAP ABAWD Work Requirement Met"
   description "Whether ABAWD individual meets 80 hour/month work requirement"
-  reference "7 USC 2015(o)(2)"
 
   formula:
     # Not subject to ABAWD rules = automatically meets requirement

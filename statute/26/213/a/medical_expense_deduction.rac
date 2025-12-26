@@ -30,7 +30,6 @@ dtype Money
 unit "USD"
 label "Medical Expense Deduction"
 description "Itemized deduction for medical expenses exceeding 7.5% of AGI per 26 USC 213(a)"
-reference "26 USC 213(a)", "TCJA Section 11027", "CAA 2021 Section 9041", "IRS Publication 502"
 
 formula:
   agi = adjusted_gross_income

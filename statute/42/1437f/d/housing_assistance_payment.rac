@@ -17,33 +17,6 @@
 #
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1437f
 
-module statute.42.1437f.d
-version "2025.1"
-jurisdiction us
-
-parameters:
-  head_spouse_bedrooms: statute/42/1437f/parameters.yaml#subsidy_standards.bedroom_allocation.head_of_household
-  persons_per_bedroom: statute/42/1437f/parameters.yaml#subsidy_standards.bedroom_allocation.per_two_persons
-  rent_reasonableness_threshold: statute/42/1437f/parameters.yaml#rent_reasonableness.threshold
-  base_voucher_bedroom_count: statute/42/1437f/parameters.yaml#subsidy_standards.bedroom_allocation.base_voucher_bedroom_count
-  max_bedroom_count: statute/42/1437f/parameters.yaml#payment_standards.max_bedroom_count
-
-references:
-  # Payment standards from parameters
-  payment_standards: statute/42/1437f/payment_standards
-
-  # Tenant contribution
-  hcv_total_tenant_payment: statute/42/1437f/c/hcv_total_tenant_payment
-
-  # Monthly adjusted income
-  hcv_monthly_adjusted_income: statute/42/1437f/b/hcv_monthly_adjusted_income
-
-  # Eligibility
-  hcv_eligible: statute/42/1437f/a/hcv_eligible
-
-  # Maximum family share at initial occupancy
-  max_family_share: statute/42/1437f/housing_assistance/maximum_family_share/at_initial_lease
-
 # ============================================================
 # VOUCHER SIZE - 24 CFR 982.402
 # ============================================================
@@ -55,7 +28,6 @@ variable hcv_voucher_size:
   dtype Integer
   label "HCV Voucher Size"
   description "Number of bedrooms for voucher based on family composition"
-  reference "24 CFR 982.402"
 
   formula:
     # PHA subsidy standards determine bedroom size
@@ -88,7 +60,6 @@ variable hcv_payment_standard:
   unit "USD"
   label "HCV Payment Standard"
   description "Payment standard amount based on voucher bedroom size"
-  reference "24 CFR 982.503"
 
   formula:
     let voucher_size = hcv_voucher_size
@@ -118,7 +89,6 @@ variable hcv_gross_rent:
   unit "USD"
   label "HCV Gross Rent"
   description "Contract rent plus utility allowance"
-  reference "24 CFR 982.503(b)"
 
   formula:
     # Contract rent = rent paid to owner
@@ -139,10 +109,6 @@ variable hcv_housing_assistance_payment:
   unit "USD"
   label "HCV Housing Assistance Payment"
   description "Monthly subsidy paid by PHA to landlord"
-  reference (
-    "42 USC 1437f(o)(2)",
-    "24 CFR 982.505"
-  )
 
   formula:
     # First check eligibility
@@ -178,7 +144,6 @@ variable hcv_rent_reasonable:
   dtype Boolean
   label "HCV Rent Reasonable"
   description "Whether rent is reasonable compared to market"
-  reference "24 CFR 982.507"
 
   formula:
     # Rent reasonableness is determined by PHA comparison
@@ -200,7 +165,6 @@ variable hcv_initial_affordability_check:
   dtype Boolean
   label "HCV Initial Affordability Check"
   description "Whether family share is affordable at initial lease-up (40% limit)"
-  reference "24 CFR 982.508"
 
   formula:
     let family_share = hcv_gross_rent - hcv_housing_assistance_payment
@@ -220,7 +184,6 @@ variable hcv_family_payment:
   unit "USD"
   label "HCV Family Payment"
   description "Total amount tenant pays (gross rent minus HAP)"
-  reference "24 CFR 982.515"
 
   formula:
     # Family pays: Gross rent - HAP
@@ -242,7 +205,6 @@ variable hcv_payment_to_owner:
   unit "USD"
   label "HCV Payment to Owner"
   description "HAP amount paid directly to landlord"
-  reference "24 CFR 982.451"
 
   formula:
     # HAP paid directly to owner
@@ -266,7 +228,6 @@ variable hcv:
   unit "USD"
   label "Section 8 Housing Choice Voucher"
   description "Monthly Housing Choice Voucher benefit (Housing Assistance Payment)"
-  reference "42 USC 1437f"
 
   formula:
     return hcv_housing_assistance_payment

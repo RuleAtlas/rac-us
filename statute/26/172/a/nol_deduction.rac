@@ -35,7 +35,6 @@ dtype Money
 unit "USD"
 label "Net Operating Loss Deduction"
 description "Total NOL deduction from carryforwards and carrybacks per 26 USC 172(a)"
-reference "26 USC 172(a)"
 
 formula:
   # Aggregate of:
@@ -73,7 +72,6 @@ period Year
 dtype Boolean
 label "NOL Deduction Claimed"
 description "Whether taxpayer claims an NOL deduction in current year"
-reference "26 USC 172(a)"
 
 formula:
   return nol_deduction > 0
@@ -92,7 +90,6 @@ dtype Money
 unit "USD"
 label "Taxable Income Before NOL Deduction"
 description "Taxable income computed without NOL deduction"
-reference "26 USC 172(a)(2)"
 
 formula:
   # This is used for computing the 80% limitation
@@ -113,7 +110,6 @@ dtype Money
 unit "USD"
 label "AMT NOL Deduction"
 description "NOL deduction for AMT purposes per Section 56(d)"
-reference "26 USC 56(d)"
 
 formula:
   # For AMT, NOL deduction generally limited to 80% of AMTI

@@ -39,7 +39,6 @@ period Year
 dtype Boolean
 label "NOL Carryforward Allowed"
 description "Whether NOL can be carried forward per 172(b)(1)(A)"
-reference "26 USC 172(b)(1)(A)"
 
 formula:
   # Post-2017: NOLs can be carried forward indefinitely
@@ -58,7 +57,6 @@ period Year
 dtype Boolean
 label "NOL Carryback Allowed"
 description "Whether NOL can be carried back (generally no for post-2017)"
-reference "26 USC 172(b)(1)(A)(i)"
 
 formula:
   # Post-TCJA: General carryback eliminated
@@ -77,7 +75,6 @@ period Year
 dtype Boolean
 label "Farming Loss Carryback Allowed"
 description "Whether farming loss qualifies for 2-year carryback per 172(b)(1)(B)"
-reference "26 USC 172(b)(1)(B)"
 
 formula:
   # Farming losses may be carried back 2 years
@@ -94,7 +91,6 @@ period Year
 dtype Integer
 label "Farming Loss Carryback Years"
 description "Number of years farming loss can be carried back"
-reference "26 USC 172(b)(1)(B)(i)"
 
 formula:
   if farming_loss_carryback_allowed:
@@ -115,7 +111,6 @@ dtype Money
 unit "USD"
 label "Total NOL Carryforward Available"
 description "Total NOL carryforward from all prior years available for deduction"
-reference "26 USC 172(b)(1)(A)(ii)"
 
 formula:
   # Sum of pre-2018 and post-2017 NOL carryforwards
@@ -136,7 +131,6 @@ dtype Money
 unit "USD"
 label "Taxable Income for NOL Limitation"
 description "Taxable income computed without NOL deduction for 80% limitation"
-reference "26 USC 172(a)(2)"
 
 formula:
   # Use taxable income before NOL deduction
@@ -155,7 +149,6 @@ dtype Money
 unit "USD"
 label "NOL Limitation Amount"
 description "Maximum NOL deduction based on 80% taxable income limitation"
-reference "26 USC 172(a)(2)"
 
 formula:
   # Post-2017 NOLs limited to 80% of taxable income
@@ -177,7 +170,6 @@ dtype Money
 unit "USD"
 label "Pre-2018 NOL Deduction"
 description "NOL deduction from pre-2018 losses (not subject to 80% limit)"
-reference "26 USC 172(a)"
 
 formula:
   ti = nol_taxable_income_for_limitation
@@ -197,7 +189,6 @@ dtype Money
 unit "USD"
 label "Post-2017 NOL Deduction"
 description "NOL deduction from post-2017 losses (subject to 80% limit)"
-reference "26 USC 172(a)(2)"
 
 formula:
   ti = nol_taxable_income_for_limitation
@@ -225,7 +216,6 @@ dtype Money
 unit "USD"
 label "Remaining Pre-2018 NOL Carryforward"
 description "Pre-2018 NOL remaining after current year deduction"
-reference "26 USC 172(b)(1)(A)(ii)"
 
 formula:
   return max(0, nol_carryforward_pre_2018 - nol_deduction_pre_2018)
@@ -241,7 +231,6 @@ dtype Money
 unit "USD"
 label "Remaining Post-2017 NOL Carryforward"
 description "Post-2017 NOL remaining after current year deduction"
-reference "26 USC 172(b)(1)(A)(ii)"
 
 formula:
   return max(0, nol_carryforward_post_2017 - nol_deduction_post_2017)

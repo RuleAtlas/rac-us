@@ -8,19 +8,6 @@
 #
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014
 
-module statute.7.2014.c
-version "2025.1"
-jurisdiction us
-
-references:
-  # Parameters from YAML
-  gross_income_limit_pct: statute/7/2014/c/gross_income_limit_pct
-  net_income_limit_pct: statute/7/2014/c/net_income_limit_pct
-  fpl_by_household_size: statute/7/2014/c/fpl_by_household_size
-
-  # Net income from deductions module
-  snap_net_income: statute/7/2014/e/snap_net_income
-
 # Calculate Federal Poverty Level for SNAP household
 variable snap_fpl_monthly:
   entity Household
@@ -29,7 +16,6 @@ variable snap_fpl_monthly:
   unit "USD"
   label "SNAP Monthly FPL"
   description "Monthly Federal Poverty Level for household, scaled by size"
-  reference "HHS Poverty Guidelines"
 
   formula:
     # FPL = base for 1 person + additional per person beyond 1
@@ -49,10 +35,6 @@ variable snap_gross_income_eligible:
   dtype Bool
   label "SNAP Gross Income Eligible"
   description "Whether household passes 130% FPL gross income test (elderly/disabled exempt)"
-  reference (
-    "7 USC 2014(c)(2)",
-    "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014"
-  )
 
   formula:
     let limit_pct = parameter(gov.usda.fns.snap.income.gross_income_limit_pct)
@@ -74,10 +56,6 @@ variable snap_net_income_eligible:
   dtype Bool
   label "SNAP Net Income Eligible"
   description "Whether household passes 100% FPL net income test after deductions"
-  reference (
-    "7 USC 2014(c)(1)",
-    "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014"
-  )
 
   formula:
     let limit_pct = parameter(gov.usda.fns.snap.income.net_income_limit_pct)

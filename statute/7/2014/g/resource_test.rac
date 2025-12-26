@@ -10,16 +10,6 @@
 #
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014
 
-module statute.7.2014.g
-version "2025.1"
-jurisdiction us
-
-references:
-  # Resource limit parameters
-  resource_limit: statute/7/2014/g/resource_limit
-  resource_limit_elderly_disabled: statute/7/2014/g/resource_limit_elderly_disabled
-  vehicle_fair_market_value_exclusion: statute/7/2014/g/vehicle_fair_market_value_exclusion
-
 # Countable resources after exclusions
 variable snap_countable_resources:
   entity Household
@@ -28,10 +18,6 @@ variable snap_countable_resources:
   unit "USD"
   label "SNAP Countable Resources"
   description "Total countable resources for SNAP after applying exclusions"
-  reference (
-    "7 USC 2014(g)(1)",
-    "7 USC 2014(g)(2)"
-  )
 
   formula:
     # Start with liquid assets
@@ -55,10 +41,6 @@ variable snap_resource_eligible:
   dtype Bool
   label "SNAP Resource Eligible"
   description "Whether household's countable resources are within SNAP limits"
-  reference (
-    "7 USC 2014(g)(1)",
-    "7 USC 2014(g)(1)(B)"
-  )
 
   formula:
     let base_limit = parameter(gov.usda.fns.snap.resources.limit)

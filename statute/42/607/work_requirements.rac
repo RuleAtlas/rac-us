@@ -21,10 +21,6 @@
 #
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section607
 
-module statute.42.601-619.607.work_requirements
-version "2025.1"
-jurisdiction us
-
 # =============================================================================
 # 607(c) - Individual Work Hours Requirements
 # =============================================================================
@@ -37,10 +33,6 @@ variable tanf_required_work_hours_weekly:
   unit "hours"
   label "TANF Required Weekly Work Hours"
   description "Weekly work hours required for TANF participation based on family composition"
-  reference (
-    "42 USC 607(c)",
-    "45 CFR 261.31"
-  )
 
   formula:
     # Not all TANF recipients have work requirements
@@ -77,7 +69,6 @@ variable tanf_required_work_hours_monthly:
   unit "hours"
   label "TANF Required Monthly Work Hours"
   description "Monthly work hours required (weekly hours * 4.33)"
-  reference "42 USC 607(c)"
 
   formula:
     # Approximate monthly hours from weekly (52 weeks / 12 months = 4.33)
@@ -97,10 +88,6 @@ variable tanf_hours_in_core_activities:
   unit "hours"
   label "TANF Core Work Activity Hours"
   description "Hours in core work activities (unsubsidized employment, on-the-job training, etc.)"
-  reference (
-    "42 USC 607(d)(1)-(8)",
-    "45 CFR 261.31"
-  )
 
   formula:
     # Core activities per 607(d):
@@ -127,7 +114,6 @@ variable tanf_work_requirement_met:
   dtype Bool
   label "TANF Work Requirement Met"
   description "Whether individual meets TANF work participation requirement"
-  reference "42 USC 607(c)"
 
   formula:
     # Exempt individuals automatically meet requirement
@@ -152,11 +138,6 @@ variable tanf_work_requirement_exempt:
   dtype Bool
   label "TANF Work Requirement Exempt"
   description "Whether individual is exempt from TANF work requirements"
-  reference (
-    "42 USC 607(c)(2)(B)",
-    "42 USC 607(b)(5)",
-    "45 CFR 261.2(n)"
-  )
 
   formula:
     # 607(c)(2)(B): Caring for child under 6 with unavailable child care
@@ -189,7 +170,6 @@ variable tanf_teen_parent_education_required:
   dtype Bool
   label "TANF Teen Parent Education Required"
   description "Whether teen parent must attend school or education program"
-  reference "42 USC 607(c)(1)(A)(ii)"
 
   formula:
     let max_age = parameter(gov.hhs.acf.tanf.age.teen_parent_max_age)
@@ -206,7 +186,6 @@ variable tanf_teen_parent_education_met:
   dtype Bool
   label "TANF Teen Parent Education Requirement Met"
   description "Whether teen parent meets education/training requirement"
-  reference "42 USC 607(c)(1)(A)(ii)"
 
   formula:
     if not tanf_teen_parent_education_required:
@@ -229,7 +208,6 @@ variable tanf_unit_work_requirement_met:
   dtype Bool
   label "TANF Unit Work Requirement Met"
   description "Whether all non-exempt adults in TANF unit meet work requirements"
-  reference "42 USC 607"
 
   formula:
     # All non-exempt adults must meet requirements

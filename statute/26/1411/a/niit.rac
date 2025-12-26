@@ -59,10 +59,6 @@ dtype Money
 unit "USD"
 label "Net Investment Income Tax"
 description "3.8% surtax on investment income for high-income taxpayers per Section 1411(a)"
-reference (
-  "26 USC 1411",
-  "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title26-section1411"
-)
 
 formula:
   # Section 1411(d): Modified AGI = AGI + foreign earned income exclusion

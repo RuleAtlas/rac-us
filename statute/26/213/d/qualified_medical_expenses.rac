@@ -38,7 +38,6 @@ dtype Money
 unit "USD"
 label "Qualifying Medical Expenses"
 description "Medical expenses eligible for deduction per 26 USC 213(d), net of insurance reimbursement"
-reference "26 USC 213(d)", "IRS Publication 502"
 
 formula:
   # Step 1: Start with gross medical expenses paid during taxable year

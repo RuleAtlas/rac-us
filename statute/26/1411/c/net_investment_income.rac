@@ -48,10 +48,6 @@ dtype Money
 unit "USD"
 label "Net Investment Income"
 description "Net investment income for NIIT purposes per Section 1411(c)"
-reference (
-  "26 USC 1411(c)",
-  "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title26-section1411"
-)
 
 formula:
   # Section 1411(c)(1)(A)(i): Investment income from interest, dividends, annuities, royalties, rents

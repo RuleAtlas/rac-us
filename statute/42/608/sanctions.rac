@@ -14,10 +14,6 @@
 #
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section608
 
-module statute.42.601-619.608.sanctions
-version "2025.1"
-jurisdiction us
-
 # =============================================================================
 # 607(e) - WORK REQUIREMENT SANCTIONS
 # =============================================================================
@@ -29,10 +25,6 @@ variable tanf_work_sanction_applicable:
   dtype Bool
   label "TANF Work Sanction Applicable"
   description "Whether work requirement sanction applies to individual"
-  reference (
-    "42 USC 607(e)",
-    "45 CFR 261.14"
-  )
 
   formula:
     # Sanction applies if:
@@ -62,7 +54,6 @@ variable tanf_work_sanction_amount:
   unit "USD"
   label "TANF Work Sanction Reduction"
   description "Monthly benefit reduction due to work requirement non-compliance"
-  reference "42 USC 607(e)"
 
   formula:
     # States choose sanction approach:
@@ -92,7 +83,6 @@ variable tanf_full_family_sanction_applies:
   dtype Bool
   label "TANF Full-Family Sanction"
   description "Whether full-family sanction terminates entire benefit"
-  reference "42 USC 607(e)"
 
   formula:
     # State-specific: Some states terminate entire benefit
@@ -119,7 +109,6 @@ variable tanf_child_support_cooperation_met:
   dtype Bool
   label "TANF Child Support Cooperation Met"
   description "Whether unit cooperates with child support enforcement"
-  reference "42 USC 608(a)(4)"
 
   formula:
     # Cooperation required unless good cause exemption
@@ -148,7 +137,6 @@ variable tanf_child_support_sanction_amount:
   unit "USD"
   label "TANF Child Support Sanction"
   description "Benefit reduction for child support non-cooperation"
-  reference "42 USC 608(a)(4)"
 
   formula:
     if tanf_child_support_cooperation_met:
@@ -173,7 +161,6 @@ variable tanf_irp_required:
   dtype Bool
   label "TANF Individual Responsibility Plan Required"
   description "Whether Individual Responsibility Plan is required"
-  reference "42 USC 608(b)"
 
   formula:
     # States may require IRP as condition of benefits
@@ -191,7 +178,6 @@ variable tanf_irp_compliance:
   dtype Bool
   label "TANF IRP Compliance"
   description "Whether individual complies with Individual Responsibility Plan"
-  reference "42 USC 608(b)"
 
   formula:
     if not tanf_irp_required:
@@ -214,7 +200,6 @@ variable tanf_sanction_level:
   dtype Integer
   label "TANF Sanction Level"
   description "Current sanction level for progressive sanctions (0-3 typical)"
-  reference "State TANF Plans"
 
   formula:
     # Progressive sanctions typically:
@@ -242,7 +227,6 @@ variable tanf_total_sanction_amount:
   unit "USD"
   label "TANF Total Sanctions"
   description "Combined benefit reduction from all applicable sanctions"
-  reference "42 USC 607(e), 608(a)(4), 608(b)"
 
   formula:
     let work_sanction = tanf_work_sanction_amount
@@ -266,7 +250,6 @@ variable tanf_benefit_after_sanctions:
   unit "USD"
   label "TANF Benefit After Sanctions"
   description "TANF benefit amount after applying all sanctions"
-  reference "42 USC 607(e), 608"
 
   formula:
     let benefit = tanf_benefit_amount_before_sanctions
@@ -287,7 +270,6 @@ variable tanf_work_good_cause:
   dtype Bool
   label "TANF Work Good Cause"
   description "Whether good cause exists for work requirement non-compliance"
-  reference "45 CFR 261.14"
 
   formula:
     # Federal regulations recognize good cause including:
@@ -311,7 +293,6 @@ variable tanf_child_support_good_cause_exemption:
   dtype Bool
   label "TANF Child Support Good Cause"
   description "Whether good cause exemption applies for child support cooperation"
-  reference "42 USC 608(a)(4)"
 
   formula:
     # Good cause includes:

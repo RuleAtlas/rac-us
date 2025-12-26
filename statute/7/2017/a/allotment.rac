@@ -13,20 +13,6 @@
 #
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2017
 
-module statute.7.2017.a
-version "2025.1"
-jurisdiction us
-
-references:
-  # Allotment parameters
-  max_allotment: statute/7/2017/a/max_allotment
-  expected_contribution_rate: statute/7/2017/a/expected_contribution_rate
-  minimum_benefit: statute/7/2017/a/minimum_benefit
-
-  # Net income and eligibility
-  snap_net_income: statute/7/2014/e/snap_net_income
-  snap_eligible: statute/7/2014/a/snap_eligible
-
 # Maximum allotment based on household size
 variable snap_max_allotment:
   entity Household
@@ -35,10 +21,6 @@ variable snap_max_allotment:
   unit "USD"
   label "SNAP Maximum Allotment"
   description "Maximum monthly SNAP benefit based on Thrifty Food Plan for household size"
-  reference (
-    "7 USC 2017(a)",
-    "https://www.fns.usda.gov/snap/allotment/main"
-  )
 
   imports:
     cut: statute/26/1#cut
@@ -71,7 +53,6 @@ variable snap_expected_contribution:
   unit "USD"
   label "SNAP Expected Contribution"
   description "Expected household contribution toward food costs (30% of net income)"
-  reference "7 USC 2017(a)"
 
   formula:
     let rate = parameter(gov.usda.fns.snap.allotment.contribution_rate)
@@ -87,7 +68,6 @@ variable snap_calculated_benefit:
   unit "USD"
   label "SNAP Calculated Benefit"
   description "SNAP benefit calculated as maximum allotment minus expected contribution"
-  reference "7 USC 2017(a)"
 
   formula:
     return snap_max_allotment - snap_expected_contribution
@@ -102,7 +82,6 @@ variable snap_minimum_benefit:
   unit "USD"
   label "SNAP Minimum Benefit"
   description "Minimum monthly SNAP benefit for 1-2 person households"
-  reference "7 USC 2017(a)"
 
   parameters:
     minimum_benefit_max_size: parameters#gov.usda.fns.snap.allotment.minimum_benefit_max_size
@@ -125,10 +104,6 @@ variable snap_allotment:
   unit "USD"
   label "SNAP Allotment"
   description "Final monthly SNAP benefit amount"
-  reference (
-    "7 USC 2017(a)",
-    "https://www.fns.usda.gov/snap/allotment/main"
-  )
 
   formula:
     # Must be eligible to receive benefits

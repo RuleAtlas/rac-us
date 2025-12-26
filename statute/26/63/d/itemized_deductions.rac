@@ -32,7 +32,6 @@ dtype Money
 unit "USD"
 label "Total Itemized Deductions"
 description "Sum of allowable itemized deductions per 26 USC 63(d)"
-reference "26 USC 63(d)", "IRS Schedule A", "IRS Publication 17"
 
 formula:
   # Sum all itemized deduction components

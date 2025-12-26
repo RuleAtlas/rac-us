@@ -23,23 +23,6 @@
 #
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1396o
 
-module statute.42.1396.o
-version "2025.1"
-jurisdiction us
-
-references:
-  # Income methodology
-  magi_income_pct_fpl: statute/42/1396/b/income_methodology/magi_income_pct_fpl
-  magi_income: statute/42/1396/b/income_methodology/magi_income
-  medicaid_category: statute/42/1396/a/eligibility/medicaid_category
-
-  # Cost sharing parameters
-  nominal_copayment_max: statute/42/1396/o/parameters/nominal_copayment_max
-  copayment_rate_100_150_fpl: statute/42/1396/o/parameters/copayment_rate_100_150_fpl
-  copayment_rate_150_plus_fpl: statute/42/1396/o/parameters/copayment_rate_150_plus_fpl
-  aggregate_cost_share_limit: statute/42/1396/o/parameters/aggregate_cost_share_limit
-  child_age_threshold: statute/42/1396/o/parameters/child_age_threshold
-
 # =============================================================================
 # EXEMPT FROM COST SHARING
 # 42 USC 1396o(a), 42 USC 1396o(b)(3)
@@ -52,7 +35,6 @@ variable medicaid_child_cost_share_exempt:
   dtype Boolean
   label "Child exempt from cost sharing"
   description "Children under 18 are exempt from cost sharing per 42 USC 1396o(b)(3)(A)"
-  reference "42 USC 1396o(b)(3)(A)"
 
   formula:
     # Children under child_age_threshold are fully exempt
@@ -67,7 +49,6 @@ variable medicaid_pregnant_cost_share_exempt:
   dtype Boolean
   label "Pregnant exempt from cost sharing"
   description "Pregnant women are exempt from cost sharing per 42 USC 1396o(b)(3)(B)"
-  reference "42 USC 1396o(b)(3)(B)"
 
   formula:
     return is_pregnant
@@ -81,7 +62,6 @@ variable medicaid_institutionalized_cost_share_exempt:
   dtype Boolean
   label "Institutionalized exempt from cost sharing"
   description "Institutionalized individuals exempt per 42 USC 1396o(b)(3)(C)"
-  reference "42 USC 1396o(b)(3)(C)"
 
   formula:
     # Nursing home residents, ICF residents, etc.
@@ -96,7 +76,6 @@ variable medicaid_hospice_cost_share_exempt:
   dtype Boolean
   label "Hospice exempt from cost sharing"
   description "Individuals in hospice exempt per 42 USC 1396o(b)(3)(D)"
-  reference "42 USC 1396o(b)(3)(D)"
 
   formula:
     return is_hospice_enrolled
@@ -110,7 +89,6 @@ variable medicaid_cost_share_exempt:
   dtype Boolean
   label "Exempt from cost sharing"
   description "Individual is fully exempt from Medicaid cost sharing"
-  reference "42 USC 1396o(b)(3)"
 
   formula:
     # Any exempt category means no cost sharing
@@ -133,7 +111,6 @@ variable medicaid_nominal_cost_share_tier:
   dtype Boolean
   label "Nominal cost sharing tier"
   description "Subject to nominal cost sharing only (below 100% FPL)"
-  reference "42 USC 1396o(a)(3)"
 
   formula:
     income_pct = household.magi_income_pct_fpl
@@ -148,7 +125,6 @@ variable medicaid_moderate_cost_share_tier:
   dtype Boolean
   label "Moderate cost sharing tier"
   description "Subject to up to 10% cost sharing (100-150% FPL)"
-  reference "42 USC 1396o(c)(1)"
 
   formula:
     income_pct = household.magi_income_pct_fpl
@@ -163,7 +139,6 @@ variable medicaid_higher_cost_share_tier:
   dtype Boolean
   label "Higher cost sharing tier"
   description "Subject to up to 20% cost sharing (above 150% FPL)"
-  reference "42 USC 1396o(c)(2)"
 
   formula:
     income_pct = household.magi_income_pct_fpl
@@ -183,10 +158,6 @@ variable medicaid_max_copayment_rate:
   dtype Rate
   label "Maximum copayment rate"
   description "Maximum copayment as percentage of service cost"
-  reference (
-    "42 USC 1396o(c)",
-    "42 USC 1396o-1(a)"
-  )
 
   formula:
     # Exempt individuals pay nothing
@@ -217,7 +188,6 @@ variable medicaid_nominal_copayment:
   unit "USD"
   label "Nominal copayment"
   description "Maximum nominal copayment for individuals below 100% FPL"
-  reference "42 USC 1396o(a)(3)"
 
   formula:
     # Exempt individuals pay nothing
@@ -246,7 +216,6 @@ variable medicaid_premium_applicable:
   dtype Boolean
   label "Medicaid premium applicable"
   description "Whether premiums may be charged for this enrollee"
-  reference "42 USC 1396o(c)(3)"
 
   formula:
     # Exempt groups cannot be charged premiums
@@ -284,7 +253,6 @@ variable medicaid_max_monthly_premium:
   unit "USD"
   label "Maximum Medicaid premium"
   description "Maximum monthly premium that may be charged"
-  reference "42 USC 1396o(c)(3)"
 
   formula:
     if not medicaid_premium_applicable:
@@ -312,7 +280,6 @@ variable medicaid_monthly_cost_share_limit:
   unit "USD"
   label "Monthly cost sharing limit"
   description "Maximum total monthly cost sharing for household (5% of income)"
-  reference "42 USC 1396o(e)"
 
   formula:
     # Total cost sharing (premiums + copays + deductibles) cannot exceed 5% of income
@@ -331,7 +298,6 @@ variable medicaid_annual_cost_share_limit:
   unit "USD"
   label "Annual cost sharing limit"
   description "Maximum total annual cost sharing for household"
-  reference "42 USC 1396o(e)"
 
   formula:
     return medicaid_monthly_cost_share_limit * 12
@@ -353,7 +319,6 @@ variable medicaid_emergency_cost_share_exempt:
   dtype Boolean
   label "Emergency services exempt"
   description "Emergency services cannot have cost sharing per 42 USC 1396o(b)(2)(D)"
-  reference "42 USC 1396o(b)(2)(D)"
 
   formula:
     # This is always true - emergency services are always exempt
@@ -374,10 +339,6 @@ variable medicaid_preventive_cost_share_exempt:
   dtype Boolean
   label "Preventive services exempt"
   description "Preventive services exempt from cost sharing per federal requirements"
-  reference (
-    "42 USC 1396o(a)(2)(D)",
-    "ACA Section 4106"
-  )
 
   formula:
     # Preventive services are exempt for most Medicaid populations

@@ -29,7 +29,6 @@ dtype Money
 unit "USD"
 label "Taxable Income"
 description "Adjusted gross income minus deductions per 26 USC 63"
-reference "26 USC 63(a)", "26 USC 63(b)"
 
 formula:
   agi = adjusted_gross_income

@@ -43,7 +43,6 @@ period Year
 dtype Boolean
 label "Uses Standard Deduction"
 description "Whether the taxpayer uses standard deduction vs itemizing per 26 USC 63(e)"
-reference "26 USC 63(e)"
 
 formula:
   # Taxpayer uses standard deduction if:
@@ -72,7 +71,6 @@ dtype Money
 unit "USD"
 label "Deductions from Taxable Income"
 description "The deduction amount used (standard or itemized) per 26 USC 63"
-reference "26 USC 63(a)", "26 USC 63(b)", "26 USC 63(e)"
 
 formula:
   std = standard_deduction

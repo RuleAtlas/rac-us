@@ -14,17 +14,6 @@
 #
 # Reference: https://www.ecfr.gov/current/title-24/subtitle-A/part-5/subpart-F
 
-module statute.42.1437f.b
-version "2025.1"
-jurisdiction us
-
-references:
-  # Deduction amounts from parameters
-  dependent_deduction_amount: statute/42/1437f/deductions/dependent
-  elderly_disabled_deduction_amount: statute/42/1437f/deductions/elderly_disabled
-  medical_threshold_rate: statute/42/1437f/deductions/medical/threshold_rate
-  months_per_year: statute/42/1437f/parameters/time_periods/months_per_year
-
 # ============================================================
 # ANNUAL INCOME - 24 CFR 5.609
 # ============================================================
@@ -38,7 +27,6 @@ variable hcv_annual_income:
   unit "USD"
   label "HCV Annual Income"
   description "Total annual gross income from all counted sources per 24 CFR 5.609(b)"
-  reference "24 CFR 5.609(b)"
 
   formula:
     # Sum of all counted income sources for all family members
@@ -76,7 +64,6 @@ variable hcv_dependent_deduction:
   unit "USD"
   label "HCV Dependent Deduction"
   description "Deduction of $480 per dependent family member"
-  reference "24 CFR 5.611(a)(1)"
 
   formula:
     # Dependent = family member (other than head, spouse, or co-head) who is:
@@ -97,7 +84,6 @@ variable hcv_elderly_disabled_deduction:
   unit "USD"
   label "HCV Elderly/Disabled Deduction"
   description "Deduction of $400 for elderly (62+) or disabled head/spouse"
-  reference "24 CFR 5.611(a)(2)"
 
   formula:
     # Elderly family: head, spouse, or sole member is 62 years or older
@@ -121,7 +107,6 @@ variable hcv_childcare_deduction:
   unit "USD"
   label "HCV Child Care Deduction"
   description "Deduction for child care expenses enabling work or education"
-  reference "24 CFR 5.611(a)(3)"
 
   formula:
     # Deduction cannot exceed:
@@ -146,7 +131,6 @@ variable hcv_medical_deduction:
   unit "USD"
   label "HCV Medical Expense Deduction"
   description "Deduction for medical expenses over 3% of income (elderly/disabled only)"
-  reference "24 CFR 5.611(a)(4)"
 
   formula:
     # Only available to elderly or disabled families
@@ -173,7 +157,6 @@ variable hcv_disability_assistance_deduction:
   unit "USD"
   label "HCV Disability Assistance Deduction"
   description "Deduction for disability assistance expenses enabling work"
-  reference "24 CFR 5.611(a)(5)"
 
   formula:
     # Only available if:
@@ -200,7 +183,6 @@ variable hcv_total_deductions:
   unit "USD"
   label "HCV Total Deductions"
   description "Sum of all allowable deductions from annual income"
-  reference "24 CFR 5.611"
 
   formula:
     return (
@@ -225,7 +207,6 @@ variable hcv_annual_adjusted_income:
   unit "USD"
   label "HCV Annual Adjusted Income"
   description "Annual income minus all allowable deductions"
-  reference "24 CFR 5.611"
 
   formula:
     let adjusted = hcv_annual_income - hcv_total_deductions
@@ -241,7 +222,6 @@ variable hcv_monthly_adjusted_income:
   unit "USD"
   label "HCV Monthly Adjusted Income"
   description "Monthly adjusted income for TTP calculation"
-  reference "24 CFR 5.628"
 
   formula:
     return hcv_annual_adjusted_income / months_per_year

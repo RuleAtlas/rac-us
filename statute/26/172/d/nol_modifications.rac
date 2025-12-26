@@ -43,7 +43,6 @@ dtype Money
 unit "USD"
 label "NOL Modification - Prior NOL"
 description "Add back prior year NOL deductions per 172(d)(1)"
-reference "26 USC 172(d)(1)"
 
 formula:
   # When computing current year NOL, add back any NOL deduction taken
@@ -63,7 +62,6 @@ dtype Money
 unit "USD"
 label "NOL Modification - Capital Losses"
 description "Capital losses limited to capital gains per 172(d)(2)"
-reference "26 USC 172(d)(2)"
 
 formula:
   # Capital losses can only offset capital gains for NOL computation
@@ -98,7 +96,6 @@ dtype Money
 unit "USD"
 label "NOL Modification - Exemptions"
 description "Add back personal exemptions per 172(d)(3)"
-reference "26 USC 172(d)(3)"
 
 formula:
   # Personal exemptions are not allowed in computing NOL
@@ -119,7 +116,6 @@ dtype Money
 unit "USD"
 label "NOL Modification - Nonbusiness Deductions"
 description "Limit nonbusiness deductions to nonbusiness income per 172(d)(4)"
-reference "26 USC 172(d)(4)"
 
 formula:
   # Simplified: For individuals, nonbusiness deductions (e.g., standard/itemized)
@@ -146,7 +142,6 @@ dtype Money
 unit "USD"
 label "Total NOL Modifications"
 description "Total modifications to taxable income for NOL calculation per 172(d)"
-reference "26 USC 172(d)"
 
 formula:
   # Sum all modifications that adjust taxable income for NOL purposes

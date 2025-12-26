@@ -16,7 +16,6 @@ dtype Money
 unit "USD"
 label "Capital Losses"
 description "Losses from sales or exchanges of capital assets"
-reference "26 USC 165(f)", "26 USC 1211", "26 USC 1212"
 input true
 
 default 0
@@ -32,7 +31,6 @@ dtype Money
 unit "USD"
 label "Capital Loss Deduction"
 description "Deductible capital loss (limited to $3,000)"
-reference "26 USC 1211(b)"
 
 formula:
   net_loss = capital_losses - capital_gains

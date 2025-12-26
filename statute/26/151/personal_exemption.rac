@@ -18,7 +18,6 @@ dtype Money
 unit "USD"
 label "Personal Exemption"
 description "Deduction for personal exemptions per 26 USC 151 (suspended 2018-2025)"
-reference "26 USC 151", "TCJA Section 11041"
 
 formula:
   # Suspended 2018-2025 by TCJA Section 11041

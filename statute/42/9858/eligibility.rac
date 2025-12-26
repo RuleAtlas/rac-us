@@ -34,7 +34,6 @@ period Year
 dtype Boolean
 label "CCDF Age Eligible"
 description "Child meets age requirements for CCDF per 42 USC 9858n(4)(A)"
-reference "42 USC 9858n(4)(A)(i)"
 
 formula:
   age = this.age
@@ -68,7 +67,6 @@ period Year
 dtype Boolean
 label "CCDF Income Eligible"
 description "Family meets income requirements for CCDF per 42 USC 9858c(a)(2)(B)"
-reference "42 USC 9858c(a)(2)(B)"
 
 formula:
   # Family income for CCDF purposes
@@ -95,7 +93,6 @@ period Year
 dtype Rate
 label "CCDF Income to SMI Ratio"
 description "Family income as percentage of State Median Income for CCDF"
-reference "42 USC 9858c(a)(2)(B)"
 
 formula:
   family_income = this.ccdf_income
@@ -115,7 +112,6 @@ dtype Money
 unit "USD"
 label "CCDF Countable Income"
 description "Income counted for CCDF eligibility determination"
-reference "45 CFR 98.20(a)(2)"
 
 formula:
   # Most states use gross market income (earned + unearned)
@@ -130,7 +126,6 @@ period Year
 dtype Boolean
 label "CCDF Asset Eligible"
 description "Family meets asset/resource requirements for CCDF"
-reference "42 USC 9858c(a)(2)"
 
 formula:
   family_assets = this.spm_unit_assets
@@ -147,7 +142,6 @@ period Year
 dtype Boolean
 label "CCDF Activity Test Met"
 description "Parent(s) meet activity requirements for CCDF per 42 USC 9858c(c)(2)(F)"
-reference "42 USC 9858c(c)(2)(F)"
 
 formula:
   # Check if any parent/caretaker in the unit is:
@@ -174,7 +168,6 @@ period Year
 dtype Boolean
 label "CCDF Reason for Care Eligible"
 description "Child qualifies for CCDF due to parent activity or protective services need"
-reference "42 USC 9858n(4)(B)"
 
 formula:
   # Parents in the unit meet activity requirements
@@ -198,7 +191,6 @@ period Year
 dtype Boolean
 label "CCDF Eligible"
 description "Child is eligible for CCDF child care subsidy per 42 USC 9858"
-reference "42 USC 9858c, 42 USC 9858n(4)"
 
 formula:
   # Child-level: age eligibility

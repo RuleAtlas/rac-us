@@ -32,7 +32,6 @@ dtype Money
 unit "USD"
 label "CCDF Family Copayment"
 description "Annual family copayment for CCDF child care per 42 USC 9858c(c)(4)(A)"
-reference "42 USC 9858c(c)(4)(A)"
 
 formula:
   # Get family income and poverty level
@@ -115,7 +114,6 @@ period Year
 dtype Boolean
 label "CCDF Copay Waiver Eligible"
 description "Family qualifies for copayment waiver per 42 USC 9858c(c)(4)(A)(i)"
-reference "42 USC 9858c(c)(4)(A)(i)"
 
 formula:
   family_income = this.ccdf_income
@@ -136,7 +134,6 @@ period Year
 dtype Rate
 label "CCDF Copay as Percent of Income"
 description "Family copayment as percentage of income (7% max is federal guideline)"
-reference "45 CFR 98.45(k)"
 
 formula:
   copay = this.ccdf_family_copayment

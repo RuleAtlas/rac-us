@@ -8,10 +8,6 @@
 #
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014
 
-module statute.7.2014.e.4
-version "2025.1"
-jurisdiction us
-
 # Child support deduction
 variable snap_child_support_deduction:
   entity Household
@@ -20,7 +16,6 @@ variable snap_child_support_deduction:
   unit "USD"
   label "SNAP Child Support Deduction"
   description "Deduction for legally obligated child support payments actually made"
-  reference "7 USC 2014(e)(4)"
 
   formula:
     # Section 2014(e)(4): Legally obligated child support payments actually made

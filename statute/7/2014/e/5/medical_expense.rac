@@ -9,13 +9,6 @@
 #
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014
 
-module statute.7.2014.e.5
-version "2025.1"
-jurisdiction us
-
-references:
-  medical_expense_threshold: statute/7/2014/e/5/medical_expense_threshold
-
 # Medical expense deduction for elderly/disabled households
 variable snap_medical_expense_deduction:
   entity Household
@@ -24,10 +17,6 @@ variable snap_medical_expense_deduction:
   unit "USD"
   label "SNAP Medical Expense Deduction"
   description "Deduction for medical expenses over $35/month for elderly/disabled members"
-  reference (
-    "7 USC 2014(e)(5)",
-    "2014 Farm Bill (P.L. 113-79)"
-  )
 
   formula:
     # Only available for elderly/disabled households

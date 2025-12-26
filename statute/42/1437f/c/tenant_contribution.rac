@@ -17,22 +17,6 @@
 #
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1437f
 
-module statute.42.1437f.c
-version "2025.1"
-jurisdiction us
-
-references:
-  # Contribution rates from parameters
-  adjusted_income_rate: statute/42/1437f/tenant_contribution/income_rate
-  gross_income_rate: statute/42/1437f/tenant_contribution/gross_income_rate
-  minimum_rent: statute/42/1437f/tenant_contribution/minimum_rent/default
-  months_per_year: statute/42/1437f/parameters/time_periods/months_per_year
-
-  # Income variables
-  hcv_annual_income: statute/42/1437f/b/hcv_annual_income
-  hcv_annual_adjusted_income: statute/42/1437f/b/hcv_annual_adjusted_income
-  hcv_monthly_adjusted_income: statute/42/1437f/b/hcv_monthly_adjusted_income
-
 # ============================================================
 # TTP COMPONENTS - 24 CFR 5.628
 # ============================================================
@@ -45,7 +29,6 @@ variable hcv_contribution_30_adjusted:
   unit "USD"
   label "HCV 30% Adjusted Income Contribution"
   description "30% of monthly adjusted income per 24 CFR 5.628(a)(1)"
-  reference "24 CFR 5.628(a)(1)"
 
   formula:
     let rate = parameter(gov.hud.hcv.tenant_contribution.income_rate)
@@ -61,7 +44,6 @@ variable hcv_contribution_10_gross:
   unit "USD"
   label "HCV 10% Gross Income Contribution"
   description "10% of monthly gross income per 24 CFR 5.628(a)(2)"
-  reference "24 CFR 5.628(a)(2)"
 
   formula:
     let rate = parameter(gov.hud.hcv.tenant_contribution.gross_income_rate)
@@ -79,7 +61,6 @@ variable hcv_welfare_rent:
   unit "USD"
   label "HCV Welfare Rent"
   description "Welfare assistance portion designated for housing"
-  reference "24 CFR 5.628(a)(3)"
 
   formula:
     # Welfare rent = portion of welfare designated for housing
@@ -97,7 +78,6 @@ variable hcv_minimum_rent:
   unit "USD"
   label "HCV Minimum Rent"
   description "PHA-determined minimum rent ($0-$50)"
-  reference "24 CFR 5.630"
 
   formula:
     # Using default minimum rent from parameters
@@ -118,10 +98,6 @@ variable hcv_total_tenant_payment:
   unit "USD"
   label "HCV Total Tenant Payment"
   description "Monthly tenant contribution - greatest of 30% adjusted, 10% gross, welfare rent, or minimum rent"
-  reference (
-    "42 USC 1437f(o)(2)",
-    "24 CFR 5.628"
-  )
 
   formula:
     # Per 24 CFR 5.628, TTP = greatest of:
@@ -157,7 +133,6 @@ variable hcv_tenant_rent_to_owner:
   unit "USD"
   label "HCV Tenant Rent to Owner"
   description "Amount tenant pays directly to landlord"
-  reference "24 CFR 982.515"
 
   formula:
     # Tenant rent = greater of:
@@ -184,7 +159,6 @@ variable hcv_utility_reimbursement:
   unit "USD"
   label "HCV Utility Reimbursement"
   description "Reimbursement when utility allowance exceeds TTP"
-  reference "24 CFR 982.514(b)"
 
   formula:
     # If utility allowance > TTP, family receives the difference
