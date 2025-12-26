@@ -15,9 +15,13 @@ amt_bracket_joint:
     2022-01-01: 206100
     2023-01-01: 220700
     2024-01-01: 232600
+    2025-01-01: 239100
+    # Post-TCJA sunset (same statutory rules, inflation-adjusted)
+    2026-01-01: 245000  # Estimated
   citations:
     - "§ 55(b)(3): Bracket threshold for 28% rate"
     - "Rev. Proc. 2023-34, Section 3.04: 2024 inflation adjustments"
+    - "Rev. Proc. 2024-40: 2025 inflation adjustments"
 
 amt_bracket_single:
   description: "AMT bracket threshold for single filers (where 28% rate begins)"
@@ -31,9 +35,13 @@ amt_bracket_single:
     2022-01-01: 103050
     2023-01-01: 110350
     2024-01-01: 116300
+    2025-01-01: 119550
+    # Post-TCJA sunset
+    2026-01-01: 122500  # Estimated (half of joint)
   citations:
     - "§ 55(b)(3)(B): 50% of joint amount for non-joint filers"
     - "Rev. Proc. 2023-34, Section 3.04: 2024 inflation adjustments"
+    - "Rev. Proc. 2024-40: 2025 inflation adjustments"
 
 amt_bracket_married_separate:
   description: "AMT bracket threshold for married filing separately"
@@ -47,5 +55,9 @@ amt_bracket_married_separate:
     2022-01-01: 103050
     2023-01-01: 110350
     2024-01-01: 116300
+    2025-01-01: 119550
+    # Post-TCJA sunset
+    2026-01-01: 122500  # Estimated (half of joint)
   citations:
     - "§ 55(b)(3)(C): 50% of joint amount for married filing separately"
+    - "Rev. Proc. 2024-40: 2025 inflation adjustments"

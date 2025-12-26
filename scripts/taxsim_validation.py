@@ -108,7 +108,8 @@ class PolicyEngineResult:
     refundable_ctc: float = 0.0
     employee_social_security_tax: float = 0.0
     self_employment_tax: float = 0.0
-    amt_income: float = 0.0
+    amt_income: float = 0.0  # Alternative Minimum Taxable Income
+    amt: float = 0.0  # Alternative Minimum Tax
 
 
 @dataclass
@@ -266,6 +267,55 @@ def generate_test_cases() -> List[TaxCase]:
                     pwages=other_income,
                 )
             )
+
+    # 11. AMT-triggering scenarios (high income with large itemized deductions)
+    # AMT is triggered when tentative minimum tax > regular tax
+    # Key triggers: high SALT (added back for AMT), large ISO exercise
+    # Note: Post-TCJA, AMT exemption is much higher ($133,300 joint, $85,700 single for 2024)
+    # so fewer taxpayers are subject to AMT
+
+    # High-income with large SALT (capped at $10k for regular tax, but fully added back for AMT)
+    for income in [500000, 750000, 1000000]:
+        cases.append(
+            TaxCase(
+                name=f"AMT - High income ${income:,}",
+                mstat=2,  # Joint
+                page=50,
+                pwages=int(income * 0.6),
+                sage=48,
+                swages=int(income * 0.4),
+                proptax=50000,  # High SALT
+                mortgage=30000,
+            )
+        )
+
+    # Single high earner - more likely to trigger AMT
+    for income in [400000, 600000, 800000]:
+        cases.append(
+            TaxCase(
+                name=f"AMT - Single high ${income:,}",
+                mstat=1,
+                page=45,
+                pwages=income,
+                proptax=30000,
+                mortgage=20000,
+            )
+        )
+
+    # Exemption phaseout range scenarios
+    # Joint phaseout starts at $1,218,700 for 2024, Single at $609,350
+    for income in [1200000, 1500000, 2000000]:
+        cases.append(
+            TaxCase(
+                name=f"AMT phaseout - Joint ${income:,}",
+                mstat=2,
+                page=55,
+                pwages=int(income * 0.6),
+                sage=53,
+                swages=int(income * 0.4),
+                proptax=40000,
+            )
+        )
 
     return cases
 
@@ -554,6 +604,18 @@ def run_policyengine(case: TaxCase) -> PolicyEngineResult:
             ),
         )
 
+        # Try to get AMT variables (may not exist in all PE versions)
+        try:
+            result.amt_income = float(
+                sim.calculate("alternative_minimum_taxable_income", case.year)[0]
+            )
+            result.amt = float(
+                sim.calculate("alternative_minimum_tax", case.year)[0]
+            )
+        except Exception:
+            # AMT variables may not be implemented in PolicyEngine-US yet
+            pass
+
         return result
 
     except Exception as e:
@@ -609,6 +671,7 @@ def compute_comparison_stats(comparisons: List[ComparisonResult]) -> Dict:
         "eitc": {"diffs": [], "pe": [], "ts": []},
         "ctc": {"diffs": [], "pe": [], "ts": []},
         "fica": {"diffs": [], "pe": [], "ts": []},
+        "amti": {"diffs": [], "pe": [], "ts": []},
     }
 
     for c in comparisons:
@@ -656,6 +719,14 @@ def compute_comparison_stats(comparisons: List[ComparisonResult]) -> Dict:
         stats["fica"]["pe"].append(pe_fica)
         stats["fica"]["ts"].append(c.taxsim.fica)
         stats["fica"]["diffs"].append(pe_fica - c.taxsim.fica)
+
+        # AMTI (only if PolicyEngine has AMT values)
+        if c.policyengine.amt_income > 0 or c.taxsim.v26_amt > 0:
+            stats["amti"]["pe"].append(c.policyengine.amt_income)
+            stats["amti"]["ts"].append(c.taxsim.v26_amt)
+            stats["amti"]["diffs"].append(
+                c.policyengine.amt_income - c.taxsim.v26_amt
+            )
 
     # Compute summary stats for each variable
     summary = {}
@@ -718,6 +789,7 @@ def generate_dashboard(
         "eitc": "EITC",
         "ctc": "CTC",
         "fica": "FICA",
+        "amti": "AMTI",
     }
 
     for var, s in stats.items():

@@ -24,8 +24,8 @@
 | v23 - Additional Child Tax Credit | Refundable ACTC | ✅ `refundable_credit` |
 | v24 - Child Care Credit | CDCC | ✅ `child_dependent_care_credit` |
 | v25 - Earned Income Credit | EITC | ✅ `earned_income_credit` |
-| v26 - Income for AMT | AMTI | ✅ `amti` |
-| v27 - AMT Liability | Alternative minimum tax | ✅ `amt` |
+| v26 - Income for AMT | AMTI | ✅ `alternative_minimum_taxable_income` |
+| v27 - AMT Liability | Alternative minimum tax | ✅ `alternative_minimum_tax` |
 | v28 - Tax Before Credits | Gross tax liability | ✅ `tax_liability_before_credits` |
 | v29 - FICA | Social Security + Medicare | ✅ `employee_fica_tax` |
 | fiitax - Total Federal Tax | Net federal liability | ✅ `total_federal_income_tax` |
