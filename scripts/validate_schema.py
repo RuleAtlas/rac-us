@@ -34,8 +34,8 @@ ALLOWED_ATTRIBUTES = {
 
 # Keywords that can appear in formula/function bodies (not attributes)
 CODE_KEYWORDS = {
-    "if", "else", "return", "for", "break", "continue", "while",
-    "and", "or", "not", "in", "true", "false", "null",
+    "if", "else", "return", "for", "break",
+    "and", "or", "not", "in",
 }
 
 def validate_file(filepath: Path) -> list[str]:
