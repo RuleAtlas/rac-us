@@ -1,0 +1,38 @@
+# 26 USC 3101 - Employee FICA Tax (Combined Social Security + Medicare)
+#
+# FICA (Federal Insurance Contributions Act) imposes two taxes on wages:
+# - 26 USC 3101(a): Social Security (OASDI) tax - 6.2% up to wage base
+# - 26 USC 3101(b): Medicare (HI) tax - 1.45% on all wages (no cap)
+#
+# Total employee FICA rate: 7.65% (up to wage base)
+#                          1.45% (above wage base, Medicare only)
+#
+# Employer pays matching amounts under 26 USC 3111.
+# Combined employer + employee: 15.3% (up to wage base)
+#
+# This variable sums the two employee tax components.
+#
+# References:
+# - 26 USC 3101(a): Employee OASDI tax
+# - 26 USC 3101(b)(1): Employee Medicare tax
+# - 26 USC 3101(b)(2): Additional Medicare Tax (handled separately)
+
+imports:
+  # Employee Social Security tax (6.2% up to wage base)
+  employee_social_security_tax: statute/26/3101/a/employee_social_security_tax
+
+  # Employee Medicare tax (1.45% on all wages)
+  employee_medicare_tax: statute/26/3101/b/medicare_tax
+
+# Combined employee FICA tax
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Employee FICA Tax"
+description "Combined employee Social Security and Medicare taxes per 26 USC 3101"
+
+formula:
+  # Sum of Social Security (6.2%) and Medicare (1.45%) employee taxes
+  # Note: Additional Medicare Tax (0.9%) is computed separately in 3101(b)(2)
+  return employee_social_security_tax + employee_medicare_tax

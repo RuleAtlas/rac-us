@@ -1,0 +1,150 @@
+# Tests for 26 USC 25B(c) - Eligible Individual
+# Reference: 26 USC 25B(c)
+
+# --- Age Requirement Tests (25B(c)(1)) ---
+
+- name: Age 18 exactly - eligible
+  description: Individual who is exactly 18 at end of tax year is eligible
+  period: 2024
+  input:
+    age: 18
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+  output:
+    is_savers_credit_eligible: True
+
+- name: Age 17 - not eligible
+  description: Individual under 18 at end of tax year is not eligible
+  period: 2024
+  input:
+    age: 17
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+  output:
+    is_savers_credit_eligible: False
+
+- name: Age 65 - eligible
+  description: Older individual meets age requirement
+  period: 2024
+  input:
+    age: 65
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+  output:
+    is_savers_credit_eligible: True
+
+- name: Age 0 - not eligible
+  description: Child is not eligible
+  period: 2024
+  input:
+    age: 0
+    is_tax_unit_dependent: True
+    is_full_time_student: False
+  output:
+    is_savers_credit_eligible: False
+
+# --- Dependent Exclusion Tests (25B(c)(2)(A)) ---
+
+- name: Dependent - not eligible
+  description: Individual claimed as dependent on another return is not eligible
+  period: 2024
+  input:
+    age: 25
+    is_tax_unit_dependent: True
+    is_full_time_student: False
+  output:
+    is_savers_credit_eligible: False
+
+- name: Not a dependent - eligible
+  description: Individual not claimed as dependent is eligible
+  period: 2024
+  input:
+    age: 25
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+  output:
+    is_savers_credit_eligible: True
+
+# --- Full-Time Student Exclusion Tests (25B(c)(2)(B)) ---
+
+- name: Full-time student - not eligible
+  description: Full-time student is not eligible per 25B(c)(2)(B)
+  period: 2024
+  input:
+    age: 22
+    is_tax_unit_dependent: False
+    is_full_time_student: True
+  output:
+    is_savers_credit_eligible: False
+
+- name: Part-time student - eligible
+  description: Part-time student is eligible (only full-time excluded)
+  period: 2024
+  input:
+    age: 22
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+  output:
+    is_savers_credit_eligible: True
+
+- name: Not a student - eligible
+  description: Non-student is eligible
+  period: 2024
+  input:
+    age: 30
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+  output:
+    is_savers_credit_eligible: True
+
+# --- Combined Condition Tests ---
+
+- name: All conditions met - eligible
+  description: Individual meets all eligibility requirements
+  period: 2024
+  input:
+    age: 35
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+  output:
+    is_savers_credit_eligible: True
+
+- name: Under 18 and dependent - not eligible (both failed)
+  description: Individual fails multiple eligibility requirements
+  period: 2024
+  input:
+    age: 16
+    is_tax_unit_dependent: True
+    is_full_time_student: False
+  output:
+    is_savers_credit_eligible: False
+
+- name: Adult student dependent - not eligible
+  description: 22-year-old full-time student claimed as dependent
+  period: 2024
+  input:
+    age: 22
+    is_tax_unit_dependent: True
+    is_full_time_student: True
+  output:
+    is_savers_credit_eligible: False
+
+- name: Older full-time student - not eligible
+  description: 30-year-old returning to school full-time (not dependent)
+  period: 2024
+  input:
+    age: 30
+    is_tax_unit_dependent: False
+    is_full_time_student: True
+  output:
+    is_savers_credit_eligible: False
+
+- name: Adult former student - eligible
+  description: 25-year-old who graduated (no longer full-time student)
+  period: 2024
+  input:
+    age: 25
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+  output:
+    is_savers_credit_eligible: True

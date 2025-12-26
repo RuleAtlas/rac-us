@@ -1,0 +1,244 @@
+# Tests for 26 USC 25B(b) - Applicable Percentage
+# Reference: Rev. Proc. 2023-34, Section 3.09 (2024 thresholds)
+
+# --- Single Filer Rate Brackets ---
+
+- name: Single - 50% rate bracket minimum
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 0
+  output:
+    savers_credit_applicable_percentage: 0.50
+
+- name: Single - 50% rate bracket maximum
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 23000
+  output:
+    savers_credit_applicable_percentage: 0.50
+
+- name: Single - 20% rate bracket minimum
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 23001
+  output:
+    savers_credit_applicable_percentage: 0.20
+
+- name: Single - 20% rate bracket maximum
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 25000
+  output:
+    savers_credit_applicable_percentage: 0.20
+
+- name: Single - 10% rate bracket minimum
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 25001
+  output:
+    savers_credit_applicable_percentage: 0.10
+
+- name: Single - 10% rate bracket maximum
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 38250
+  output:
+    savers_credit_applicable_percentage: 0.10
+
+- name: Single - No credit above limit
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 38251
+  output:
+    savers_credit_applicable_percentage: 0.0
+
+# --- Joint Filer Rate Brackets ---
+
+- name: Joint - 50% rate bracket minimum
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_JOINTLY
+    adjusted_gross_income: 0
+  output:
+    savers_credit_applicable_percentage: 0.50
+
+- name: Joint - 50% rate bracket maximum
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_JOINTLY
+    adjusted_gross_income: 46000
+  output:
+    savers_credit_applicable_percentage: 0.50
+
+- name: Joint - 20% rate bracket minimum
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_JOINTLY
+    adjusted_gross_income: 46001
+  output:
+    savers_credit_applicable_percentage: 0.20
+
+- name: Joint - 20% rate bracket maximum
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_JOINTLY
+    adjusted_gross_income: 50000
+  output:
+    savers_credit_applicable_percentage: 0.20
+
+- name: Joint - 10% rate bracket minimum
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_JOINTLY
+    adjusted_gross_income: 50001
+  output:
+    savers_credit_applicable_percentage: 0.10
+
+- name: Joint - 10% rate bracket maximum
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_JOINTLY
+    adjusted_gross_income: 76500
+  output:
+    savers_credit_applicable_percentage: 0.10
+
+- name: Joint - No credit above limit
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_JOINTLY
+    adjusted_gross_income: 76501
+  output:
+    savers_credit_applicable_percentage: 0.0
+
+# --- Head of Household Rate Brackets ---
+
+- name: HOH - 50% rate bracket minimum
+  period: 2024
+  input:
+    filing_status: HEAD_OF_HOUSEHOLD
+    adjusted_gross_income: 0
+  output:
+    savers_credit_applicable_percentage: 0.50
+
+- name: HOH - 50% rate bracket maximum
+  period: 2024
+  input:
+    filing_status: HEAD_OF_HOUSEHOLD
+    adjusted_gross_income: 34500
+  output:
+    savers_credit_applicable_percentage: 0.50
+
+- name: HOH - 20% rate bracket minimum
+  period: 2024
+  input:
+    filing_status: HEAD_OF_HOUSEHOLD
+    adjusted_gross_income: 34501
+  output:
+    savers_credit_applicable_percentage: 0.20
+
+- name: HOH - 20% rate bracket maximum
+  period: 2024
+  input:
+    filing_status: HEAD_OF_HOUSEHOLD
+    adjusted_gross_income: 37500
+  output:
+    savers_credit_applicable_percentage: 0.20
+
+- name: HOH - 10% rate bracket minimum
+  period: 2024
+  input:
+    filing_status: HEAD_OF_HOUSEHOLD
+    adjusted_gross_income: 37501
+  output:
+    savers_credit_applicable_percentage: 0.10
+
+- name: HOH - 10% rate bracket maximum
+  period: 2024
+  input:
+    filing_status: HEAD_OF_HOUSEHOLD
+    adjusted_gross_income: 57375
+  output:
+    savers_credit_applicable_percentage: 0.10
+
+- name: HOH - No credit above limit
+  period: 2024
+  input:
+    filing_status: HEAD_OF_HOUSEHOLD
+    adjusted_gross_income: 57376
+  output:
+    savers_credit_applicable_percentage: 0.0
+
+# --- Married Filing Separately (uses "Other" thresholds) ---
+
+- name: MFS - 50% rate bracket
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_SEPARATELY
+    adjusted_gross_income: 20000
+  output:
+    savers_credit_applicable_percentage: 0.50
+
+- name: MFS - 20% rate bracket
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_SEPARATELY
+    adjusted_gross_income: 24000
+  output:
+    savers_credit_applicable_percentage: 0.20
+
+- name: MFS - 10% rate bracket
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_SEPARATELY
+    adjusted_gross_income: 30000
+  output:
+    savers_credit_applicable_percentage: 0.10
+
+- name: MFS - No credit above limit
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_SEPARATELY
+    adjusted_gross_income: 40000
+  output:
+    savers_credit_applicable_percentage: 0.0
+
+# --- Qualifying Widow(er) (uses Joint thresholds) ---
+
+- name: Qualifying Widow - 50% rate bracket
+  period: 2024
+  input:
+    filing_status: QUALIFYING_WIDOW
+    adjusted_gross_income: 40000
+  output:
+    savers_credit_applicable_percentage: 0.50
+
+- name: Qualifying Widow - 20% rate bracket
+  period: 2024
+  input:
+    filing_status: QUALIFYING_WIDOW
+    adjusted_gross_income: 48000
+  output:
+    savers_credit_applicable_percentage: 0.20
+
+- name: Qualifying Widow - 10% rate bracket
+  period: 2024
+  input:
+    filing_status: QUALIFYING_WIDOW
+    adjusted_gross_income: 60000
+  output:
+    savers_credit_applicable_percentage: 0.10
+
+- name: Qualifying Widow - No credit above limit
+  period: 2024
+  input:
+    filing_status: QUALIFYING_WIDOW
+    adjusted_gross_income: 80000
+  output:
+    savers_credit_applicable_percentage: 0.0

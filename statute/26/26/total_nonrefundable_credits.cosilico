@@ -1,0 +1,47 @@
+# 26 USC Section 26 - Total Nonrefundable Personal Credits
+#
+# Section 26(a) provides: "The aggregate amount of credits allowed by this
+# subpart for the taxable year shall not exceed the excess (if any) of -
+#   (1) the taxpayer's regular tax liability for the taxable year, over
+#   (2) the tentative minimum tax for the taxable year."
+#
+# This variable sums all nonrefundable personal credits from Subpart A
+# (Sections 21-25D), each already limited by tax liability before credits.
+#
+# Nonrefundable credits encoded:
+# - Section 21: Child and Dependent Care Credit
+# - Section 24: Child Tax Credit (nonrefundable portion)
+# - Section 25A: Education Credits (nonrefundable portion = 60% AOC + LLC)
+
+imports:
+# Child and Dependent Care Credit per Section 21
+# Already limited by tax liability in its formula
+  child_dependent_care_credit: statute/26/21/a/child_dependent_care_credit
+
+# Child Tax Credit (nonrefundable portion) per Section 24
+# Limited to tax liability per Section 26(a)
+  child_tax_credit: statute/26/24/child_tax_credit
+
+# Education Credits (nonrefundable portion) per Section 25A
+# Includes 60% of AOC + 100% of LLC, limited to tax liability
+  education_credits_nonrefundable: statute/26/25A/a/education_credits
+
+# Tax liability ceiling per Section 26(a)
+  tax_liability_before_credits: statute/26/26/a/tax_liability_before_credits
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Nonrefundable Credits"
+description "Sum of nonrefundable personal credits per 26 USC Section 26, limited by tax liability"
+
+formula:
+  # Sum all nonrefundable credits
+  # Each credit is already individually limited by tax liability in its own formula
+  total = child_dependent_care_credit + child_tax_credit + education_credits_nonrefundable
+
+  # Total cannot exceed tax liability (belt-and-suspenders with individual limits)
+  return min(total, tax_liability_before_credits)
+
+default 0

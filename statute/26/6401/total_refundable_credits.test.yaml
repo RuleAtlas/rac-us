@@ -1,0 +1,89 @@
+# Tests for 26 USC Section 6401 - Total Refundable Credits
+
+- name: No refundable credits
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        earned_income_credit: 0
+        additional_child_tax_credit: 0
+        education_credits_refundable: 0
+  output:
+    total_refundable_credits: 0
+
+- name: EITC only - worker with no children
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        earned_income_credit: 632
+        additional_child_tax_credit: 0
+        education_credits_refundable: 0
+  output:
+    total_refundable_credits: 632
+
+- name: EITC only - worker with 2 children
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        earned_income_credit: 6604
+        additional_child_tax_credit: 0
+        education_credits_refundable: 0
+  output:
+    total_refundable_credits: 6604
+
+- name: Additional Child Tax Credit only
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        earned_income_credit: 0
+        additional_child_tax_credit: 1700
+        education_credits_refundable: 0
+  output:
+    total_refundable_credits: 1700
+
+- name: Refundable AOC portion only (40% of AOC)
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        earned_income_credit: 0
+        additional_child_tax_credit: 0
+        education_credits_refundable: 1000
+  output:
+    total_refundable_credits: 1000
+
+- name: All refundable credits combined
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        earned_income_credit: 5548
+        additional_child_tax_credit: 3400
+        education_credits_refundable: 1000
+  output:
+    total_refundable_credits: 9948
+
+- name: Large EITC with ACTC - low income family with 3 children
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        earned_income_credit: 7830
+        additional_child_tax_credit: 5100
+        education_credits_refundable: 0
+  output:
+    total_refundable_credits: 12930
+
+- name: Moderate EITC with education credit
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        earned_income_credit: 3995
+        additional_child_tax_credit: 0
+        education_credits_refundable: 1000
+  output:
+    total_refundable_credits: 4995

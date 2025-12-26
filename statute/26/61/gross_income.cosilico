@@ -41,6 +41,9 @@ imports:
 # Other income categories (simplified aggregation)
   other_income: statute/26/61/a/other_income
 
+# Section 85 - Unemployment compensation is gross income
+  unemployment_compensation: statute/26/85/a/unemployment_compensation
+
 # Capital loss limitation - per Section 1211(b), individual capital losses
 # are limited to $3,000 per year against ordinary income
 
@@ -112,4 +115,7 @@ formula:
   # Sum other income
   total_other = sum(members.other_income)
 
-  return total_compensation + total_se_income + total_investment + total_other
+  # Sum unemployment compensation (Section 85)
+  total_unemployment = sum(members.unemployment_compensation)
+
+  return total_compensation + total_se_income + total_investment + total_other + total_unemployment

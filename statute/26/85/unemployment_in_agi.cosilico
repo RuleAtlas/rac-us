@@ -1,0 +1,29 @@
+# 26 USC Section 85 - Unemployment Compensation in AGI
+#
+# Determines the amount of unemployment compensation included in gross income.
+#
+# (a) General Rule: Unemployment compensation is included in gross income.
+#
+# (c) Special Rule for 2020: For tax year 2020 only, up to $10,200 of
+# unemployment compensation was excluded if AGI was less than $150,000.
+# This temporary exclusion is no longer in effect for 2021+.
+#
+# Current implementation: 100% of unemployment compensation is included
+# in gross income for all tax years after 2020.
+
+imports:
+  unemployment_compensation: statute/26/85/a/unemployment_compensation
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Taxable Unemployment Compensation"
+description "Unemployment compensation included in gross income per 26 USC Section 85"
+
+formula:
+  # Sum unemployment compensation from all members of the tax unit
+  # Post-2020: Full amount is included in gross income
+  return sum(members.unemployment_compensation)
+
+default 0

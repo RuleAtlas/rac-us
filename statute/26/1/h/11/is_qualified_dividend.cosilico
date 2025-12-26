@@ -1,0 +1,49 @@
+# 26 USC Section 1(h)(11)(B) - Qualified Dividend Income Definition
+#
+# "The term 'qualified dividend income' means dividends received during
+# the taxable year from—
+#   (i) domestic corporations, and
+#   (ii) qualified foreign corporations."
+#
+# Per Section 1(h)(11)(B)(iii), a dividend is NOT qualified if:
+# - The taxpayer did not hold the stock for the required holding period
+#   (more than 60 days during the 121-day period beginning 60 days before
+#   the ex-dividend date)
+# - The dividend is from a tax-exempt organization
+# - The dividend is a deductible dividend paid on employer securities
+#
+# This variable determines whether a dividend payment qualifies for
+# preferential capital gains tax rates rather than ordinary income rates.
+
+imports:
+  # Holding period requirement: > 60 days within 121-day window
+  holding_period_days: statute/26/1/h/11/holding_period_days
+  min_holding_days: params/26/1/h/11/qualified_dividends#min_holding_days
+
+  # Corporation qualification
+  is_domestic_corporation: statute/26/1/h/11/B/i/is_domestic_corporation
+  is_qualified_foreign_corporation: statute/26/1/h/11/B/ii/is_qualified_foreign_corporation
+
+  # Exclusions per Section 1(h)(11)(B)(iii)
+  is_from_tax_exempt_org: statute/26/1/h/11/B/iii/I/is_from_tax_exempt_org
+  is_employer_securities_deductible: statute/26/1/h/11/B/iii/II/is_employer_securities_deductible
+
+entity Person
+period Year
+dtype Boolean
+label "Is Qualified Dividend"
+description "Whether a dividend payment qualifies for preferential capital gains tax rates per 26 USC Section 1(h)(11)(B)"
+
+formula:
+  # Corporation must be domestic or qualified foreign
+  from_qualified_corp = is_domestic_corporation or is_qualified_foreign_corporation
+
+  # Must meet holding period requirement (> 60 days within 121-day window)
+  meets_holding_period = holding_period_days > min_holding_days
+
+  # Not excluded under Section 1(h)(11)(B)(iii)
+  not_excluded = not is_from_tax_exempt_org and not is_employer_securities_deductible
+
+  return from_qualified_corp and meets_holding_period and not_excluded
+
+default False

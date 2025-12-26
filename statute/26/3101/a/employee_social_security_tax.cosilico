@@ -1,0 +1,41 @@
+# 26 USC 3101(a) - Employee Social Security (OASDI) Tax
+#
+# "(a) Old-age, survivors, and disability insurance -
+# In addition to other taxes, there is hereby imposed on the income of every
+# individual a tax equal to 6.2 percent of the wages (as defined in section
+# 3121(a)) received by him with respect to employment (as defined in section
+# 3121(b))."
+#
+# Key features:
+# - Rate: 6.2% of wages (employee share)
+# - Subject to wage base cap ($168,600 in 2024)
+# - Employer pays matching 6.2% under 26 USC 3111(a)
+# - Combined rate: 12.4% (employee + employer)
+#
+# References:
+# - 26 USC 3101(a): Employee OASDI tax rate
+# - 26 USC 3111(a): Employer OASDI tax rate (matching)
+# - 26 USC 3121(a): Definition of wages
+# - Rev. Proc. 2023-34: 2024 wage base ($168,600)
+
+imports:
+  # Wages subject to FICA per 3121(a)
+  irs_employment_income: statute/26/3121/a/irs_employment_income
+
+parameters:
+  # Load rate and wage base from parameters.yaml
+  employee_rate: statute/26/3101/parameters.yaml#employee_social_security_rate
+  wage_base: statute/26/3101/parameters.yaml#social_security_wage_base
+
+# Employee Social Security tax on wages
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Employee Social Security Tax"
+description "Employee share of Social Security (OASDI) tax at 6.2% of wages up to wage base per 26 USC 3101(a)"
+
+formula:
+  # Social Security tax applies only up to the wage base cap
+  taxable_wages = min(irs_employment_income, wage_base)
+  return taxable_wages * employee_rate

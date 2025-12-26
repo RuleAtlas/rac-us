@@ -1,0 +1,39 @@
+# 26 USC Section 6401 - Total Refundable Credits
+#
+# Section 6401(b) defines "excessive credits" as credits that exceed tax
+# liability and are treated as overpayments, allowing refunds.
+#
+# Refundable credits are not limited by tax liability - they can create
+# a refund even when tax liability is zero.
+#
+# Refundable credits encoded:
+# - Section 32: Earned Income Tax Credit (EITC) - fully refundable
+# - Section 24(d): Additional Child Tax Credit (ACTC) - refundable portion of CTC
+# - Section 25A(i): American Opportunity Credit (40% refundable portion)
+
+imports:
+# Earned Income Tax Credit per Section 32
+# Fully refundable - can exceed tax liability
+  earned_income_credit: statute/26/32/a/1/earned_income_credit
+
+# Additional Child Tax Credit per Section 24(d)
+# The refundable portion of the Child Tax Credit
+  additional_child_tax_credit: statute/26/24/d/1/B/refundable_credit
+
+# Refundable portion of education credits per Section 25A(i)
+# 40% of AOC is refundable
+  education_credits_refundable: statute/26/25A/a/education_credits
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Refundable Credits"
+description "Sum of refundable credits that can generate refunds per 26 USC Section 6401"
+
+formula:
+  # Sum all refundable credits
+  # These are NOT limited by tax liability and can create refunds
+  return earned_income_credit + additional_child_tax_credit + education_credits_refundable
+
+default 0

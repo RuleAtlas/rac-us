@@ -1,0 +1,117 @@
+# 26 USC 25B(a) - Allowance of Credit
+#
+# "(a) ALLOWANCE OF CREDIT.--In the case of an eligible individual, there shall
+#      be allowed as a credit against the tax imposed by this subtitle for the
+#      taxable year an amount equal to the applicable percentage of so much of
+#      the qualified retirement savings contributions of the eligible individual
+#      for the taxable year as do not exceed $2,000."
+#
+# Credit = Applicable Percentage x min(Qualified Contributions, $2,000)
+#
+# Key components:
+#   - 25B(a): Credit formula
+#   - 25B(b): Applicable percentage (50%, 20%, 10%, or 0% based on AGI)
+#   - 25B(c): Eligible individual definition
+#   - 25B(d): Qualified retirement savings contributions
+
+imports:
+# Eligibility per 25B(c)
+  is_savers_credit_eligible: statute/26/25B/c/eligible_individual
+
+# Applicable percentage per 25B(b)
+  savers_credit_applicable_percentage: statute/26/25B/b/applicable_percentage
+
+# Qualified contributions (elective deferrals + IRA contributions)
+# Per 25B(d)(1): "qualified retirement savings contributions" includes:
+#   - Elective deferrals (401(k), 403(b), 457(b), etc.) per 402(g)(3)
+#   - Contributions to a Roth IRA per 408A
+#   - Contributions to a traditional IRA per 219
+  elective_deferrals: inputs/person/elective_deferrals
+  traditional_ira_contributions: statute/26/219/b/contribution_limits
+  roth_ira_contributions: inputs/person/roth_ira_contributions
+
+# Maximum contribution eligible for credit
+  maximum_eligible_contribution: params/savers_credit/2024#maximum_eligible_contribution
+
+# Tax liability (for nonrefundable limitation)
+  tax_liability_before_credits: statute/26/26/a/tax_liability_before_credits
+
+# --- Person-Level: Qualified Contributions ---
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Saver's Credit Qualified Contributions"
+description "Qualified retirement savings contributions per 26 USC 25B(d)"
+
+formula:
+  # Sum of all qualified retirement savings contributions
+  # 25B(d)(1): elective deferrals + IRA contributions (traditional and Roth)
+  return elective_deferrals + traditional_ira_contributions + roth_ira_contributions
+
+# --- Person-Level: Eligible Contributions (Capped at $2,000) ---
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Saver's Credit Eligible Contributions"
+description "Qualified contributions eligible for credit, capped at statutory limit per 26 USC 25B(a)"
+
+formula:
+  # Only eligible individuals can claim the credit
+  if not is_savers_credit_eligible then
+    return 0
+
+  # Cap contributions at maximum eligible amount (per person)
+  return min(savers_credit_qualified_contributions, maximum_eligible_contribution)
+
+# --- TaxUnit-Level: Total Eligible Contributions ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Saver's Credit Eligible Contributions"
+description "Sum of eligible contributions for all eligible individuals in the tax unit"
+
+formula:
+  # Aggregate eligible contributions from all members
+  return sum(Person.savers_credit_eligible_contributions)
+
+# --- TaxUnit-Level: Tentative Credit ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Tentative Saver's Credit"
+description "Saver's Credit before tax liability limitation"
+
+formula:
+  eligible_contributions = savers_credit_total_eligible_contributions
+  rate = savers_credit_applicable_percentage
+
+  # Credit = Applicable Percentage x Eligible Contributions
+  return eligible_contributions * rate
+
+# --- TaxUnit-Level: Final Credit ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Saver's Credit"
+description "Credit for qualified retirement savings contributions per 26 USC 25B (nonrefundable)"
+
+formula:
+  tentative = savers_credit_tentative
+
+  # Saver's Credit is nonrefundable - limited to tax liability
+  return min(tentative, tax_liability_before_credits)
+
+defined_for:
+  savers_credit_total_eligible_contributions > 0
+
+default 0

@@ -1,0 +1,41 @@
+# 26 USC Section 1(h)(11)(A) - Qualified Dividend Income
+#
+# "(A) IN GENERAL.—For purposes of this section, the term 'net capital gain'
+# means net capital gain (determined without regard to this paragraph)
+# increased by qualified dividend income."
+#
+# This treats qualified dividend income as if it were net capital gain,
+# subjecting it to the preferential 0%/15%/20% capital gains tax rates
+# instead of ordinary income rates.
+#
+# Qualified dividend income is the aggregate of dividends received during
+# the taxable year that meet the requirements of Section 1(h)(11)(B):
+# - From domestic corporations or qualified foreign corporations
+# - Holding period requirements met (>60 days in 121-day window)
+# - Not from tax-exempt organizations
+# - Not deductible dividends on employer securities
+
+imports:
+  # Total dividends received (from Form 1099-DIV)
+  total_dividends: statute/26/61/a/7/dividend_income
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Qualified Dividend Income"
+description "Total qualified dividend income eligible for preferential capital gains rates per 26 USC Section 1(h)(11)"
+
+# Note: This variable represents the sum of qualified dividends at the
+# TaxUnit level. The qualification determination (is_qualified_dividend)
+# is made per dividend payment at the Person level, but for tax calculation
+# purposes we need the aggregate qualified dividend income.
+#
+# In practice, this comes from Form 1099-DIV Box 1b (Qualified Dividends).
+# The taxpayer/payer has already determined which dividends qualify.
+#
+# For simulation purposes, this is treated as an input variable.
+# The formula would aggregate Person.qualified_dividends if modeled at
+# that granularity.
+
+default 0

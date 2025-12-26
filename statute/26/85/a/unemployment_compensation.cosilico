@@ -1,0 +1,18 @@
+# 26 USC Section 85(a) - Unemployment Compensation
+#
+# "(a) General rule.—In the case of an individual, gross income includes
+# unemployment compensation."
+#
+# Unemployment compensation is defined in 85(b) as amounts received under
+# a law of the United States or of a State which is in the nature of
+# unemployment compensation.
+#
+# This is an input variable - the actual amount received by the taxpayer.
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Unemployment Compensation"
+description "Unemployment compensation received per 26 USC Section 85(a)"
+# Input from CPS: UC_VAL (unemployment compensation income)

@@ -1,0 +1,50 @@
+# 26 USC 25B - Saver's Credit Parameters
+#
+# Reference: Rev. Proc. 2023-34, Section 3.09 (2024 thresholds)
+# https://www.irs.gov/irb/2023-48_IRB#REV-PROC-2023-34
+#
+# The Saver's Credit (Retirement Savings Contributions Credit) provides
+# a credit to low- and moderate-income taxpayers who contribute to
+# qualified retirement plans or IRAs.
+
+# Credit rates per 25B(b)
+rate_50_percent: 0.50
+rate_20_percent: 0.20
+rate_10_percent: 0.10
+
+# Maximum contribution eligible for credit per 25B(a)
+# "$2,000" - this amount is NOT indexed for inflation
+maximum_eligible_contribution: 2000
+
+# Minimum age requirement per 25B(c)(1)
+minimum_age: 18
+
+# 2024 AGI thresholds (from Rev. Proc. 2023-34, Section 3.09)
+# These thresholds are indexed for inflation annually
+
+# Joint Returns - 25B(b)(1)
+# 50% rate: $0 to $46,000
+# 20% rate: $46,001 to $50,000
+# 10% rate: $50,001 to $76,500
+# 0% rate:  over $76,500
+joint_threshold_50: 46000
+joint_threshold_20: 50000
+joint_threshold_10: 76500
+
+# Head of Household - 25B(b)(2)
+# 50% rate: $0 to $34,500
+# 20% rate: $34,501 to $37,500
+# 10% rate: $37,501 to $57,375
+# 0% rate:  over $57,375
+hoh_threshold_50: 34500
+hoh_threshold_20: 37500
+hoh_threshold_10: 57375
+
+# Other Filers (Single, MFS) - 25B(b)(3)
+# 50% rate: $0 to $23,000
+# 20% rate: $23,001 to $25,000
+# 10% rate: $25,001 to $38,250
+# 0% rate:  over $38,250
+other_threshold_50: 23000
+other_threshold_20: 25000
+other_threshold_10: 38250

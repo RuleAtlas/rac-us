@@ -1,20 +1,92 @@
-# 26 USC 3101 - Medicare Tax Parameters
+# 26 USC 3101 - Employee FICA Tax Parameters
 #
-# Employee share of Hospital Insurance (HI) tax under FICA.
+# Employee share of FICA taxes:
+# - 26 USC 3101(a): Social Security (OASDI) tax - 6.2% up to wage base
+# - 26 USC 3101(b): Medicare (HI) tax - 1.45% on all wages (no cap)
+# - 26 USC 3101(b)(2): Additional Medicare Tax on high earners (0.9%)
+#
 # Employer share is under 26 USC 3111.
 #
 # Key statutes:
+# - 26 USC 3101(a): Employee Social Security tax rate
 # - 26 USC 3101(b)(1): Base Medicare tax rate
 # - 26 USC 3101(b)(2): Additional Medicare Tax on high earners
 # - 26 USC 3121(a): Definition of wages subject to tax
+# - Rev. Proc. 2023-34: 2024 Social Security wage base ($168,600)
 #
-# Note: Unlike Social Security tax, there is NO wage base limit for Medicare tax.
-# All covered wages are subject to the tax.
+# Note: Social Security tax has a wage base cap; Medicare has no cap.
 
-variable: medicare_tax
+variable: employee_fica_tax
 entity: Person
 period: Year
 dtype: Money
+
+# =============================================================================
+# SOCIAL SECURITY TAX - 26 USC 3101(a)
+# =============================================================================
+
+employee_social_security_rate:
+  description: "Employee Social Security (OASDI) tax rate per 26 USC 3101(a)"
+  unit: rate
+  period: year
+  label: "Employee Social Security tax rate"
+  values:
+    # Current rate since 1990
+    1990-01-01: 0.062
+    # Historical rates
+    1988-01-01: 0.0755
+    1985-01-01: 0.0705
+    1984-01-01: 0.067
+    1983-01-01: 0.067
+    1982-01-01: 0.054
+    1981-01-01: 0.053
+    1979-01-01: 0.0505
+    1978-01-01: 0.0505
+    1973-01-01: 0.0485
+    1971-01-01: 0.046
+    1969-01-01: 0.042
+    1966-01-01: 0.035
+  citations:
+    - "26 USC 3101(a): rate of 6.2 percent of wages up to wage base"
+    - "Social Security Act Amendments history"
+
+social_security_wage_base:
+  description: "Maximum earnings subject to Social Security tax (OASDI) per Rev. Proc."
+  unit: currency-USD
+  period: year
+  label: "Social Security wage base"
+  values:
+    # Recent years
+    2025-01-01: 176100
+    2024-01-01: 168600
+    2023-01-01: 160200
+    2022-01-01: 147000
+    2021-01-01: 142800
+    2020-01-01: 137700
+    2019-01-01: 132900
+    2018-01-01: 128400
+    2017-01-01: 127200
+    2016-01-01: 118500
+    2015-01-01: 118500
+    2014-01-01: 117000
+    2013-01-01: 113700
+    2012-01-01: 110100
+    2011-01-01: 106800
+    2010-01-01: 106800
+    2009-01-01: 106800
+    2008-01-01: 102000
+    2007-01-01: 97500
+    2006-01-01: 94200
+    2005-01-01: 90000
+    2004-01-01: 87900
+    2003-01-01: 87000
+    2002-01-01: 84900
+    2001-01-01: 80400
+    2000-01-01: 76200
+  citations:
+    - "Rev. Proc. 2024-40: 2025 wage base is $176,100"
+    - "Rev. Proc. 2023-34: 2024 wage base is $168,600"
+    - "42 USC 430: Contribution and benefit base formula"
 
 # =============================================================================
 # BASE MEDICARE TAX RATE - 26 USC 3101(b)(1)

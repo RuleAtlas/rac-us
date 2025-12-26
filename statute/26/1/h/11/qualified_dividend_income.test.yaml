@@ -1,0 +1,277 @@
+# 26 USC Section 1(h)(11) - Qualified Dividend Income Tests
+#
+# Test cases for validating qualified dividend income tax calculations.
+# Per Section 1(h)(11)(A), qualified dividend income receives the same
+# preferential tax rates (0%, 15%, 20%) as long-term capital gains.
+#
+# Uses 2024 tax year thresholds from Rev. Proc. 2023-34.
+#
+# 2024 Preferential Rate Thresholds (apply to capital gains + qualified dividends):
+#
+# Single Filer:
+#   0% rate: $0 - $47,025 (taxable income)
+#   15% rate: $47,025 - $518,900
+#   20% rate: Over $518,900
+#
+# Married Filing Jointly:
+#   0% rate: $0 - $94,050 (taxable income)
+#   15% rate: $94,050 - $583,750
+#   20% rate: Over $583,750
+
+reference: "26 USC Section 1(h)(11)"
+tax_year: 2024
+
+tests:
+  # ==========================================================================
+  # QUALIFIED DIVIDENDS ONLY (NO CAPITAL GAINS)
+  # ==========================================================================
+
+  # Test 1: Single filer, qualified dividends at 0%
+  - name: "Single - Qualified dividends at 0%"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 30000
+      net_capital_gain: 0
+      qualified_dividend_income: 30000
+    expected:
+      preferential_income_taxed_at_zero_pct: 30000
+      preferential_income_taxed_at_fifteen_pct: 0
+      preferential_income_taxed_at_twenty_pct: 0
+      preferential_rate_tax: 0
+      qualified_dividends_taxed_at_zero_pct: 30000
+      qualified_dividend_tax: 0
+    notes: |
+      All income is qualified dividends.
+      All dividends fit within 0% bracket (threshold: $47,025).
+      Tax = $0.
+
+  # Test 2: Single filer, qualified dividends split 0%/15%
+  - name: "Single - Qualified dividends split between 0% and 15%"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 60000
+      net_capital_gain: 0
+      qualified_dividend_income: 60000
+    expected:
+      preferential_income_taxed_at_zero_pct: 47025
+      preferential_income_taxed_at_fifteen_pct: 12975
+      preferential_income_taxed_at_twenty_pct: 0
+      # Tax = $47,025 * 0% + $12,975 * 15% = $1,946.25
+      preferential_rate_tax: 1946.25
+      qualified_dividends_taxed_at_zero_pct: 47025
+      qualified_dividends_taxed_at_fifteen_pct: 12975
+      qualified_dividend_tax: 1946.25
+    notes: |
+      All income is qualified dividends.
+      $47,025 at 0% = $0
+      $12,975 at 15% = $1,946.25
+      Total tax = $1,946.25
+
+  # Test 3: Single filer, qualified dividends with ordinary income
+  - name: "Single - Qualified dividends with ordinary income using 0% space"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 80000
+      net_capital_gain: 0
+      qualified_dividend_income: 40000
+    expected:
+      preferential_income_taxed_at_zero_pct: 7025
+      preferential_income_taxed_at_fifteen_pct: 32975
+      preferential_income_taxed_at_twenty_pct: 0
+      # Tax = $7,025 * 0% + $32,975 * 15% = $4,946.25
+      preferential_rate_tax: 4946.25
+    notes: |
+      Ordinary income = $80,000 - $40,000 = $40,000.
+      Space in 0% bracket = $47,025 - $40,000 = $7,025.
+      $7,025 at 0% = $0
+      $32,975 at 15% = $4,946.25
+      Total tax = $4,946.25
+
+  # Test 4: Single filer, high income qualified dividends at 20%
+  - name: "Single - Qualified dividends at 20%"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 700000
+      net_capital_gain: 0
+      qualified_dividend_income: 100000
+    expected:
+      preferential_income_taxed_at_zero_pct: 0
+      preferential_income_taxed_at_fifteen_pct: 0
+      preferential_income_taxed_at_twenty_pct: 100000
+      # Tax = $100,000 * 20% = $20,000
+      preferential_rate_tax: 20000
+    notes: |
+      Ordinary income = $700,000 - $100,000 = $600,000.
+      Ordinary income exceeds 15% threshold ($518,900).
+      All qualified dividends at 20%.
+      Tax = $100,000 * 20% = $20,000
+
+  # ==========================================================================
+  # COMBINED CAPITAL GAINS AND QUALIFIED DIVIDENDS
+  # ==========================================================================
+
+  # Test 5: Single filer, equal capital gains and qualified dividends at 0%
+  - name: "Single - Equal cap gains and qualified dividends at 0%"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 40000
+      net_capital_gain: 20000
+      qualified_dividend_income: 20000
+    expected:
+      preferential_income_taxed_at_zero_pct: 40000
+      preferential_income_taxed_at_fifteen_pct: 0
+      preferential_income_taxed_at_twenty_pct: 0
+      preferential_rate_tax: 0
+      # 50/50 split between cap gains and qualified divs
+      capital_gains_taxed_at_zero_pct: 20000
+      qualified_dividends_taxed_at_zero_pct: 20000
+    notes: |
+      All income is preferential (cap gains + qualified divs).
+      All fits within 0% bracket (threshold: $47,025).
+      Tax = $0.
+
+  # Test 6: Single filer, combined income splits brackets
+  - name: "Single - Combined income splits 0% and 15%"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 100000
+      net_capital_gain: 30000
+      qualified_dividend_income: 20000
+    expected:
+      # Preferential income = $30,000 + $20,000 = $50,000
+      # Ordinary income = $100,000 - $50,000 = $50,000
+      # Ordinary income exceeds 0% threshold ($47,025)
+      # All preferential income in 15% bracket
+      preferential_income_taxed_at_zero_pct: 0
+      preferential_income_taxed_at_fifteen_pct: 50000
+      preferential_income_taxed_at_twenty_pct: 0
+      # Tax = $50,000 * 15% = $7,500
+      preferential_rate_tax: 7500
+      # Proportional split: 60% cap gains, 40% qualified divs
+      capital_gains_taxed_at_fifteen_pct: 30000
+      qualified_dividends_taxed_at_fifteen_pct: 20000
+    notes: |
+      Preferential income = $50,000 (30k cap gains + 20k divs)
+      Ordinary income = $50,000 > $47,025 threshold
+      All preferential income in 15% bracket
+      Tax = $50,000 * 15% = $7,500
+
+  # Test 7: Joint filers, combined income across all brackets
+  - name: "Joint - Combined income across all three brackets"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      taxable_income: 700000
+      net_capital_gain: 100000
+      qualified_dividend_income: 100000
+    expected:
+      # Preferential income = $200,000
+      # Ordinary income = $700,000 - $200,000 = $500,000
+      # Ordinary income > 0% threshold ($94,050)
+      # Space in 15% bracket = $583,750 - $500,000 = $83,750
+      preferential_income_taxed_at_zero_pct: 0
+      preferential_income_taxed_at_fifteen_pct: 83750
+      preferential_income_taxed_at_twenty_pct: 116250
+      # Tax = $83,750 * 15% + $116,250 * 20% = $12,562.50 + $23,250 = $35,812.50
+      preferential_rate_tax: 35812.50
+    notes: |
+      Preferential income = $200,000 (100k each)
+      Ordinary income = $500,000 > 0% threshold
+      $83,750 at 15% = $12,562.50
+      $116,250 at 20% = $23,250
+      Total tax = $35,812.50
+
+  # Test 8: Different proportions of cap gains vs qualified divs
+  - name: "Single - Mostly qualified dividends"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 100000
+      net_capital_gain: 10000
+      qualified_dividend_income: 40000
+    expected:
+      # Preferential income = $50,000
+      # Ordinary income = $100,000 - $50,000 = $50,000
+      # Ordinary income exceeds 0% threshold ($47,025)
+      preferential_income_taxed_at_zero_pct: 0
+      preferential_income_taxed_at_fifteen_pct: 50000
+      preferential_income_taxed_at_twenty_pct: 0
+      preferential_rate_tax: 7500
+      # 20% cap gains (10k/50k), 80% qualified divs (40k/50k)
+      capital_gains_taxed_at_fifteen_pct: 10000
+      qualified_dividends_taxed_at_fifteen_pct: 40000
+    notes: |
+      80% qualified dividends, 20% capital gains
+      Proportional allocation to brackets
+
+  # ==========================================================================
+  # EDGE CASES
+  # ==========================================================================
+
+  # Test 9: Zero qualified dividends
+  - name: "Zero qualified dividends (capital gains only)"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 60000
+      net_capital_gain: 60000
+      qualified_dividend_income: 0
+    expected:
+      preferential_income_taxed_at_zero_pct: 47025
+      preferential_income_taxed_at_fifteen_pct: 12975
+      preferential_rate_tax: 1946.25
+      qualified_dividend_tax: 0
+    notes: |
+      Same as capital gains only test.
+      Qualified dividend variables should be 0.
+
+  # Test 10: Very small qualified dividends
+  - name: "Very small qualified dividends ($100)"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 100
+      net_capital_gain: 0
+      qualified_dividend_income: 100
+    expected:
+      preferential_income_taxed_at_zero_pct: 100
+      preferential_income_taxed_at_fifteen_pct: 0
+      preferential_rate_tax: 0
+    notes: "Small qualified dividends entirely in 0% bracket."
+
+  # Test 11: Married Filing Separately (lower 20% threshold)
+  - name: "MFS - Qualified dividends hit 20% earlier"
+    inputs:
+      filing_status: MARRIED_FILING_SEPARATELY
+      taxable_income: 350000
+      net_capital_gain: 50000
+      qualified_dividend_income: 50000
+    expected:
+      # Preferential income = $100,000
+      # Ordinary income = $350,000 - $100,000 = $250,000
+      # Ordinary income > 0% threshold ($47,025)
+      # Space in 15% bracket = $291,850 - $250,000 = $41,850
+      preferential_income_taxed_at_zero_pct: 0
+      preferential_income_taxed_at_fifteen_pct: 41850
+      preferential_income_taxed_at_twenty_pct: 58150
+      # Tax = $41,850 * 15% + $58,150 * 20% = $6,277.50 + $11,630 = $17,907.50
+      preferential_rate_tax: 17907.50
+    notes: |
+      MFS has lower 20% threshold ($291,850)
+      Combined preferential income hits 20% bracket sooner
+
+  # Test 12: Head of Household with mixed income
+  - name: "HoH - Mixed income with partial 0% bracket"
+    inputs:
+      filing_status: HEAD_OF_HOUSEHOLD
+      taxable_income: 100000
+      net_capital_gain: 20000
+      qualified_dividend_income: 20000
+    expected:
+      # Preferential income = $40,000
+      # Ordinary income = $100,000 - $40,000 = $60,000
+      # Space in 0% bracket = $63,000 - $60,000 = $3,000
+      preferential_income_taxed_at_zero_pct: 3000
+      preferential_income_taxed_at_fifteen_pct: 37000
+      preferential_income_taxed_at_twenty_pct: 0
+      # Tax = $3,000 * 0% + $37,000 * 15% = $5,550
+      preferential_rate_tax: 5550
+    notes: |
+      HoH 0% threshold = $63,000
+      Small portion at 0%, rest at 15%

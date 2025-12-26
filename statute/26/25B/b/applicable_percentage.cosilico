@@ -1,0 +1,92 @@
+# 26 USC 25B(b) - Applicable Percentage
+#
+# "(b) APPLICABLE PERCENTAGE.--For purposes of this section--
+#   (1) JOINT RETURNS.--In the case of a joint return, the applicable percentage
+#       is determined in accordance with the following table:
+#
+#       Over $0   but not over $43,500 . . . . . . . . . 50 percent
+#       Over $43,500 but not over $47,500 . . . . . . . 20 percent
+#       Over $47,500 but not over $73,000 . . . . . . . 10 percent
+#       Over $73,000 . . . . . . . . . . . . . . . . .  0 percent
+#
+#   (2) HEAD OF HOUSEHOLD.--In the case of an individual who is a head of
+#       household (as defined in section 2(b)), the applicable percentage...
+#
+#   (3) OTHER INDIVIDUALS.--In any other case, the applicable percentage..."
+#
+# Note: 2024 thresholds from Rev. Proc. 2023-34:
+#   Joint: $46,000 (50%), $50,000 (20%), $76,500 (10%)
+#   HOH:   $34,500 (50%), $37,500 (20%), $57,375 (10%)
+#   Other: $23,000 (50%), $25,000 (20%), $38,250 (10%)
+
+imports:
+# Filing status
+  filing_status: statute/26/1/filing_status
+# AGI
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+
+# Credit rates
+  rate_50_percent: params/savers_credit/2024#rate_50_percent
+  rate_20_percent: params/savers_credit/2024#rate_20_percent
+  rate_10_percent: params/savers_credit/2024#rate_10_percent
+
+# AGI thresholds by filing status - Joint
+  joint_threshold_50: params/savers_credit/2024#joint_threshold_50
+  joint_threshold_20: params/savers_credit/2024#joint_threshold_20
+  joint_threshold_10: params/savers_credit/2024#joint_threshold_10
+
+# AGI thresholds by filing status - Head of Household
+  hoh_threshold_50: params/savers_credit/2024#hoh_threshold_50
+  hoh_threshold_20: params/savers_credit/2024#hoh_threshold_20
+  hoh_threshold_10: params/savers_credit/2024#hoh_threshold_10
+
+# AGI thresholds by filing status - Other (Single, MFS)
+  other_threshold_50: params/savers_credit/2024#other_threshold_50
+  other_threshold_20: params/savers_credit/2024#other_threshold_20
+  other_threshold_10: params/savers_credit/2024#other_threshold_10
+
+entity TaxUnit
+period Year
+dtype Rate
+label "Saver's Credit Applicable Percentage"
+description "Credit rate for Saver's Credit based on AGI and filing status per 26 USC 25B(b)"
+
+formula:
+  agi = adjusted_gross_income
+
+  # Determine applicable thresholds based on filing status
+  # 25B(b)(1): Joint returns (includes Qualifying Widow/Widower)
+  if filing_status == MARRIED_FILING_JOINTLY or filing_status == QUALIFYING_WIDOW then
+    threshold_50 = joint_threshold_50
+    threshold_20 = joint_threshold_20
+    threshold_10 = joint_threshold_10
+
+  # 25B(b)(2): Head of Household
+  else if filing_status == HEAD_OF_HOUSEHOLD then
+    threshold_50 = hoh_threshold_50
+    threshold_20 = hoh_threshold_20
+    threshold_10 = hoh_threshold_10
+
+  # 25B(b)(3): Other individuals (Single, MFS)
+  else
+    threshold_50 = other_threshold_50
+    threshold_20 = other_threshold_20
+    threshold_10 = other_threshold_10
+
+  # Apply rate based on AGI
+  # AGI at or below 50% threshold
+  if agi <= threshold_50 then
+    return rate_50_percent
+
+  # AGI above 50% threshold but at or below 20% threshold
+  if agi <= threshold_20 then
+    return rate_20_percent
+
+  # AGI above 20% threshold but at or below 10% threshold
+  if agi <= threshold_10 then
+    return rate_10_percent
+
+  # AGI above 10% threshold - no credit
+  return 0
+
+default 0

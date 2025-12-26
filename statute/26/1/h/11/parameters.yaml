@@ -1,0 +1,31 @@
+# 26 USC Section 1(h)(11) - Qualified Dividend Income Parameters
+#
+# These parameters define the requirements for dividend income to qualify
+# for preferential capital gains tax rates.
+
+reference: "26 USC Section 1(h)(11)(B)(iii)"
+description: Qualified dividend income parameters
+
+# Holding period requirement per Section 1(h)(11)(B)(iii)(I)
+# The taxpayer must hold the stock for more than 60 days during the
+# 121-day period beginning 60 days before the ex-dividend date.
+min_holding_days: 60
+
+# The window for measuring holding period
+holding_period_window_days: 121
+
+# Days before ex-dividend date when window begins
+days_before_ex_dividend: 60
+
+# Source references
+source:
+  statute: "26 USC Section 1(h)(11)(B)(iii)(I)"
+  notes: |
+    The holding period requirement is designed to prevent taxpayers from
+    purchasing stock shortly before a dividend, collecting the dividend
+    at preferential rates, and then selling the stock.
+
+    For preferred stock with a dividend period of greater than 366 days,
+    the required holding period is more than 90 days during the 181-day
+    period beginning 90 days before the ex-dividend date.
+    See Section 1(h)(11)(B)(iii)(II).

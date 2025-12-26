@@ -1,0 +1,85 @@
+# Tests for 26 USC Section 26 - Total Nonrefundable Credits
+
+- name: No credits claimed
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        child_dependent_care_credit: 0
+        child_tax_credit: 0
+        education_credits_nonrefundable: 0
+        tax_liability_before_credits: 5000
+  output:
+    total_nonrefundable_credits: 0
+
+- name: Single credit - Child Tax Credit only
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        child_dependent_care_credit: 0
+        child_tax_credit: 2000
+        education_credits_nonrefundable: 0
+        tax_liability_before_credits: 5000
+  output:
+    total_nonrefundable_credits: 2000
+
+- name: Multiple credits - all within tax liability
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        child_dependent_care_credit: 600
+        child_tax_credit: 4000
+        education_credits_nonrefundable: 1500
+        tax_liability_before_credits: 10000
+  output:
+    total_nonrefundable_credits: 6100
+
+- name: Credits exceed tax liability - limited to liability
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        child_dependent_care_credit: 1200
+        child_tax_credit: 6000
+        education_credits_nonrefundable: 2500
+        tax_liability_before_credits: 5000
+  output:
+    total_nonrefundable_credits: 5000
+
+- name: Zero tax liability - no nonrefundable credits used
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        child_dependent_care_credit: 600
+        child_tax_credit: 2000
+        education_credits_nonrefundable: 1000
+        tax_liability_before_credits: 0
+  output:
+    total_nonrefundable_credits: 0
+
+- name: Child and Dependent Care Credit only
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        child_dependent_care_credit: 1050
+        child_tax_credit: 0
+        education_credits_nonrefundable: 0
+        tax_liability_before_credits: 8000
+  output:
+    total_nonrefundable_credits: 1050
+
+- name: Education credits only (Lifetime Learning Credit scenario)
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        child_dependent_care_credit: 0
+        child_tax_credit: 0
+        education_credits_nonrefundable: 2000
+        tax_liability_before_credits: 3500
+  output:
+    total_nonrefundable_credits: 2000

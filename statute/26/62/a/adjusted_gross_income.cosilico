@@ -24,6 +24,9 @@ imports:
 # Other income
   other_income: statute/26/61/a/other_income
 
+# Unemployment compensation - included per Section 85
+  unemployment_in_agi: statute/26/85/unemployment_in_agi
+
 entity TaxUnit
 period Year
 dtype Money
@@ -44,4 +47,4 @@ formula:
   employee_income = wages + salaries + tips
   investment_income = interest_income + dividend_income + capital_gains
 
-  return employee_income + self_employment_income + investment_income + other_income
+  return employee_income + self_employment_income + investment_income + other_income + unemployment_in_agi

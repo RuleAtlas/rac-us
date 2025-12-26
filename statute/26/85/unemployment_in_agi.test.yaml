@@ -1,0 +1,52 @@
+# Tests for 26 USC Section 85 - Unemployment Compensation in AGI
+
+- name: Single filer with unemployment compensation
+  period: 2024
+  input:
+    persons:
+      - id: filer
+        unemployment_compensation: 15000
+  output:
+    unemployment_in_agi: 15000
+
+- name: No unemployment compensation
+  period: 2024
+  input:
+    persons:
+      - id: filer
+        unemployment_compensation: 0
+  output:
+    unemployment_in_agi: 0
+
+- name: Married filing jointly - both spouses have unemployment
+  period: 2024
+  input:
+    persons:
+      - id: spouse1
+        unemployment_compensation: 8000
+      - id: spouse2
+        unemployment_compensation: 5000
+  output:
+    unemployment_in_agi: 13000
+
+- name: Family with children - only adults have unemployment
+  period: 2024
+  input:
+    persons:
+      - id: parent1
+        unemployment_compensation: 12000
+      - id: parent2
+        unemployment_compensation: 3500
+      - id: child
+        unemployment_compensation: 0
+  output:
+    unemployment_in_agi: 15500
+
+- name: Small unemployment amount
+  period: 2024
+  input:
+    persons:
+      - id: filer
+        unemployment_compensation: 500
+  output:
+    unemployment_in_agi: 500

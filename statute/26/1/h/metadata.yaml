@@ -2,7 +2,7 @@
 
 encoding:
   created: 2024-12-24
-  updated: 2024-12-24
+  updated: 2024-12-25
   status: implemented
   encoded_by: claude-opus-4.5
 
@@ -94,6 +94,16 @@ architecture:
     - path: statute/26/1222/11
       description: "Net capital gain (input)"
 
+  implemented:
+    - provision: "Section 1(h)(11)"
+      description: "Qualified dividend income treatment"
+      path: statute/26/1/h/11/
+      status: "Added 2024-12-25"
+      notes: |
+        Qualified dividends now receive preferential capital gains rates.
+        The capital_gains_tax.cosilico file was updated to include qualified
+        dividend income in the preferential rate calculation per Section 1(h)(11)(A).
+
   not_implemented:
     - provision: "Section 1(h)(1)(E)"
       description: "25% rate for unrecaptured Section 1250 gain"
@@ -106,10 +116,6 @@ architecture:
     - provision: "Section 1(h)(4)"
       description: "Net capital gain definition adjustments"
       reason: "Complex carryover calculations"
-
-    - provision: "Section 1(h)(11)"
-      description: "Qualified dividend income treatment"
-      reason: "Requires separate dividend classification"
 
 validation:
   pe_variable: capital_gains_tax

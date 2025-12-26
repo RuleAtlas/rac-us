@@ -8,6 +8,13 @@
 #   - 15% on portion within the 15% bracket (Section 1(h)(1)(C))
 #   - 20% on portion above the 15% bracket (Section 1(h)(1)(D))
 #
+# Per Section 1(h)(11)(A): "For purposes of this section, the term 'net capital
+# gain' means net capital gain (determined without regard to this paragraph)
+# increased by qualified dividend income."
+#
+# This means qualified dividends receive the same preferential rates as
+# long-term capital gains.
+#
 # The bracket thresholds are based on TAXABLE INCOME, not capital gains alone.
 
 imports:
@@ -19,6 +26,9 @@ imports:
 
 # Net capital gain (long-term gains minus short-term losses)
   net_capital_gain: statute/26/1222/11/net_capital_gain
+
+# Qualified dividend income per Section 1(h)(11)
+  qualified_dividend_income: statute/26/1/h/11/qualified_dividend_income
 
 # Adjusted net capital gain (for rate calculation)
   adjusted_net_capital_gain: statute/26/1/h/3/adjusted_net_capital_gain
@@ -62,6 +72,160 @@ HEAD_OF_HOUSEHOLD => fifteen_pct_hoh
 MARRIED_FILING_SEPARATELY => fifteen_pct_separate
 QUALIFYING_WIDOW => fifteen_pct_surviving
 
+# =============================================================================
+# Section 1(h)(11) - Net Capital Gain Including Qualified Dividends
+# =============================================================================
+# Per Section 1(h)(11)(A), for purposes of applying the preferential rates,
+# "net capital gain" includes qualified dividend income.
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Net Capital Gain for Preferential Rate Purposes"
+description "Net capital gain plus qualified dividend income per 26 USC Section 1(h)(11)(A)"
+
+formula:
+  # Section 1(h)(11)(A): net capital gain increased by qualified dividend income
+  return net_capital_gain + qualified_dividend_income
+
+default 0
+
+# =============================================================================
+# Preferential income taxed at 0%
+# =============================================================================
+# Per Section 1(h)(1)(B): 0% rate applies to the extent preferential income
+# (net capital gain + qualified dividends) falls within taxable income
+# below the 0% threshold.
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Preferential Income Taxed at 0%"
+description "Portion of net capital gain and qualified dividends subject to 0% rate"
+
+formula:
+  zero_threshold = get_zero_pct_threshold(filing_status)
+
+  # Preferential income = net capital gain + qualified dividends
+  preferential_income = net_capital_gain + qualified_dividend_income
+
+  # Ordinary income is taxable income minus preferential income
+  ordinary_income = max(0, taxable_income - preferential_income)
+
+  # Space available in 0% bracket after ordinary income
+  zero_bracket_space = max(0, zero_threshold - ordinary_income)
+
+  # Preferential income taxed at 0% = min(preferential income, available space)
+  return min(preferential_income, zero_bracket_space)
+
+defined_for:
+  net_capital_gain > 0 or qualified_dividend_income > 0
+
+default 0
+
+# =============================================================================
+# Preferential income taxed at 15%
+# =============================================================================
+# Per Section 1(h)(1)(C): 15% rate applies to preferential income above the
+# 0% threshold but within the 15% threshold.
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Preferential Income Taxed at 15%"
+description "Portion of net capital gain and qualified dividends subject to 15% rate"
+
+formula:
+  zero_threshold = get_zero_pct_threshold(filing_status)
+  fifteen_threshold = get_fifteen_pct_threshold(filing_status)
+
+  # Preferential income = net capital gain + qualified dividends
+  preferential_income = net_capital_gain + qualified_dividend_income
+
+  # Ordinary income = taxable income minus preferential income
+  ordinary_income = max(0, taxable_income - preferential_income)
+
+  # Income already taxed at 0%
+  income_at_zero = preferential_income_taxed_at_zero_pct
+
+  # Remaining preferential income after 0% bracket
+  remaining_income = max(0, preferential_income - income_at_zero)
+
+  # Space available in 15% bracket
+  # The 15% bracket runs from zero_threshold to fifteen_threshold
+  # Position in bracket starts where 0% bracket ended
+  bracket_start = max(ordinary_income, zero_threshold)
+  fifteen_bracket_space = max(0, fifteen_threshold - bracket_start)
+
+  # Preferential income taxed at 15% = min(remaining income, available space)
+  return min(remaining_income, fifteen_bracket_space)
+
+defined_for:
+  net_capital_gain > 0 or qualified_dividend_income > 0
+
+default 0
+
+# =============================================================================
+# Preferential income taxed at 20%
+# =============================================================================
+# Per Section 1(h)(1)(D): 20% rate applies to preferential income above the
+# 15% threshold.
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Preferential Income Taxed at 20%"
+description "Portion of net capital gain and qualified dividends subject to 20% rate"
+
+formula:
+  # Preferential income = net capital gain + qualified dividends
+  preferential_income = net_capital_gain + qualified_dividend_income
+
+  # 20% rate applies to income not already taxed at 0% or 15%
+  income_at_zero = preferential_income_taxed_at_zero_pct
+  income_at_fifteen = preferential_income_taxed_at_fifteen_pct
+
+  return max(0, preferential_income - income_at_zero - income_at_fifteen)
+
+defined_for:
+  net_capital_gain > 0 or qualified_dividend_income > 0
+
+default 0
+
+# =============================================================================
+# Total preferential rate tax (capital gains and qualified dividends)
+# =============================================================================
+# This is the tax on net capital gain and qualified dividend income using
+# the preferential rates per Section 1(h).
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Preferential Rate Tax"
+description "Federal income tax on net capital gain and qualified dividends at preferential rates per 26 USC Section 1(h)"
+
+formula:
+  # Tax = sum of preferential income in each bracket times the bracket rate
+  tax_at_zero = preferential_income_taxed_at_zero_pct * 0.00
+  tax_at_fifteen = preferential_income_taxed_at_fifteen_pct * 0.15
+  tax_at_twenty = preferential_income_taxed_at_twenty_pct * 0.20
+
+  return tax_at_zero + tax_at_fifteen + tax_at_twenty
+
+defined_for:
+  net_capital_gain > 0 or qualified_dividend_income > 0
+
+default 0
+
+# =============================================================================
+# BACKWARD COMPATIBILITY: Capital gains-only variables
+# =============================================================================
+# These variables maintain backward compatibility with existing code that
+# references capital_gains_taxed_at_* variables. They are calculated by
+# apportioning the preferential rate brackets between capital gains and
+# qualified dividends proportionally.
+
 # Net capital gain amount taxed at 0%
 # Per Section 1(h)(1)(B): 0% rate applies to the extent capital gains
 # fall within taxable income below the 0% threshold
@@ -73,16 +237,17 @@ label "Capital Gains Taxed at 0%"
 description "Portion of net capital gain subject to 0% preferential rate"
 
 formula:
-  zero_threshold = get_zero_pct_threshold(filing_status)
+  # Proportional allocation of 0% bracket between cap gains and qualified divs
+  preferential_income = net_capital_gain + qualified_dividend_income
+  income_at_zero = preferential_income_taxed_at_zero_pct
 
-  # Ordinary income is taxable income minus net capital gain
-  ordinary_income = max(0, taxable_income - net_capital_gain)
+  # If no preferential income, return 0
+  cap_gain_share = if preferential_income > 0 then
+    net_capital_gain / preferential_income
+  else
+    0
 
-  # Space available in 0% bracket after ordinary income
-  zero_bracket_space = max(0, zero_threshold - ordinary_income)
-
-  # Capital gains taxed at 0% = min(net capital gain, available space)
-  return min(net_capital_gain, zero_bracket_space)
+  return income_at_zero * cap_gain_share
 
 defined_for:
   net_capital_gain > 0
@@ -100,26 +265,17 @@ label "Capital Gains Taxed at 15%"
 description "Portion of net capital gain subject to 15% preferential rate"
 
 formula:
-  zero_threshold = get_zero_pct_threshold(filing_status)
-  fifteen_threshold = get_fifteen_pct_threshold(filing_status)
+  # Proportional allocation of 15% bracket between cap gains and qualified divs
+  preferential_income = net_capital_gain + qualified_dividend_income
+  income_at_fifteen = preferential_income_taxed_at_fifteen_pct
 
-  # Ordinary income = taxable income minus net capital gain
-  ordinary_income = max(0, taxable_income - net_capital_gain)
+  # If no preferential income, return 0
+  cap_gain_share = if preferential_income > 0 then
+    net_capital_gain / preferential_income
+  else
+    0
 
-  # Gains already taxed at 0%
-  gains_at_zero = capital_gains_taxed_at_zero_pct
-
-  # Remaining capital gains after 0% bracket
-  remaining_gains = max(0, net_capital_gain - gains_at_zero)
-
-  # Space available in 15% bracket
-  # The 15% bracket runs from zero_threshold to fifteen_threshold
-  # Position in bracket starts where 0% bracket ended
-  bracket_start = max(ordinary_income, zero_threshold)
-  fifteen_bracket_space = max(0, fifteen_threshold - bracket_start)
-
-  # Capital gains taxed at 15% = min(remaining gains, available space)
-  return min(remaining_gains, fifteen_bracket_space)
+  return income_at_fifteen * cap_gain_share
 
 defined_for:
   net_capital_gain > 0
@@ -136,11 +292,17 @@ label "Capital Gains Taxed at 20%"
 description "Portion of net capital gain subject to 20% preferential rate"
 
 formula:
-  # 20% rate applies to gains not already taxed at 0% or 15%
-  gains_at_zero = capital_gains_taxed_at_zero_pct
-  gains_at_fifteen = capital_gains_taxed_at_fifteen_pct
+  # Proportional allocation of 20% bracket between cap gains and qualified divs
+  preferential_income = net_capital_gain + qualified_dividend_income
+  income_at_twenty = preferential_income_taxed_at_twenty_pct
 
-  return max(0, net_capital_gain - gains_at_zero - gains_at_fifteen)
+  # If no preferential income, return 0
+  cap_gain_share = if preferential_income > 0 then
+    net_capital_gain / preferential_income
+  else
+    0
+
+  return income_at_twenty * cap_gain_share
 
 defined_for:
   net_capital_gain > 0
@@ -169,12 +331,112 @@ defined_for:
 
 default 0
 
-# Vectorized version for microsimulation
+# =============================================================================
+# Qualified dividend income tax breakdown
+# =============================================================================
+# These variables show how qualified dividends are taxed at each rate.
+
+# Qualified dividends taxed at 0%
 entity TaxUnit
 period Year
 dtype Money
 unit "USD"
-label "Capital Gains Tax (Vectorized)"
+label "Qualified Dividends Taxed at 0%"
+description "Portion of qualified dividend income subject to 0% preferential rate"
+
+formula:
+  preferential_income = net_capital_gain + qualified_dividend_income
+  income_at_zero = preferential_income_taxed_at_zero_pct
+
+  # If no preferential income, return 0
+  qdi_share = if preferential_income > 0 then
+    qualified_dividend_income / preferential_income
+  else
+    0
+
+  return income_at_zero * qdi_share
+
+defined_for:
+  qualified_dividend_income > 0
+
+default 0
+
+# Qualified dividends taxed at 15%
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Qualified Dividends Taxed at 15%"
+description "Portion of qualified dividend income subject to 15% preferential rate"
+
+formula:
+  preferential_income = net_capital_gain + qualified_dividend_income
+  income_at_fifteen = preferential_income_taxed_at_fifteen_pct
+
+  qdi_share = if preferential_income > 0 then
+    qualified_dividend_income / preferential_income
+  else
+    0
+
+  return income_at_fifteen * qdi_share
+
+defined_for:
+  qualified_dividend_income > 0
+
+default 0
+
+# Qualified dividends taxed at 20%
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Qualified Dividends Taxed at 20%"
+description "Portion of qualified dividend income subject to 20% preferential rate"
+
+formula:
+  preferential_income = net_capital_gain + qualified_dividend_income
+  income_at_twenty = preferential_income_taxed_at_twenty_pct
+
+  qdi_share = if preferential_income > 0 then
+    qualified_dividend_income / preferential_income
+  else
+    0
+
+  return income_at_twenty * qdi_share
+
+defined_for:
+  qualified_dividend_income > 0
+
+default 0
+
+# Total qualified dividend tax
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Qualified Dividend Tax"
+description "Federal income tax on qualified dividend income at preferential rates per 26 USC Section 1(h)(11)"
+
+formula:
+  tax_at_zero = qualified_dividends_taxed_at_zero_pct * 0.00
+  tax_at_fifteen = qualified_dividends_taxed_at_fifteen_pct * 0.15
+  tax_at_twenty = qualified_dividends_taxed_at_twenty_pct * 0.20
+
+  return tax_at_zero + tax_at_fifteen + tax_at_twenty
+
+defined_for:
+  qualified_dividend_income > 0
+
+default 0
+
+# =============================================================================
+# Vectorized version for microsimulation
+# =============================================================================
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Preferential Rate Tax (Vectorized)"
 description "Vectorized implementation for microsimulation"
 
 formula:
@@ -182,26 +444,29 @@ formula:
   zero_threshold = get_zero_pct_threshold(filing_status)
   fifteen_threshold = get_fifteen_pct_threshold(filing_status)
 
-  n = len(net_capital_gain)
+  # Preferential income = net capital gain + qualified dividends (Section 1(h)(11))
+  preferential_income = net_capital_gain + qualified_dividend_income
 
-  # Ordinary income = taxable income minus net capital gain
-  ordinary_income = maximum(0, taxable_income - net_capital_gain)
+  n = len(preferential_income)
+
+  # Ordinary income = taxable income minus preferential income
+  ordinary_income = maximum(0, taxable_income - preferential_income)
 
   # === 0% bracket ===
   # Space available in 0% bracket after ordinary income
   zero_bracket_space = maximum(0, zero_threshold - ordinary_income)
-  gains_at_zero = minimum(net_capital_gain, zero_bracket_space)
+  income_at_zero = minimum(preferential_income, zero_bracket_space)
 
   # === 15% bracket ===
-  remaining_after_zero = maximum(0, net_capital_gain - gains_at_zero)
+  remaining_after_zero = maximum(0, preferential_income - income_at_zero)
   bracket_start = maximum(ordinary_income, zero_threshold)
   fifteen_bracket_space = maximum(0, fifteen_threshold - bracket_start)
-  gains_at_fifteen = minimum(remaining_after_zero, fifteen_bracket_space)
+  income_at_fifteen = minimum(remaining_after_zero, fifteen_bracket_space)
 
   # === 20% bracket ===
-  gains_at_twenty = maximum(0, net_capital_gain - gains_at_zero - gains_at_fifteen)
+  income_at_twenty = maximum(0, preferential_income - income_at_zero - income_at_fifteen)
 
   # Calculate tax
-  tax = gains_at_zero * 0.00 + gains_at_fifteen * 0.15 + gains_at_twenty * 0.20
+  tax = income_at_zero * 0.00 + income_at_fifteen * 0.15 + income_at_twenty * 0.20
 
   return tax

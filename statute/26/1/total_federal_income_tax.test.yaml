@@ -1,0 +1,201 @@
+# Tests for 26 USC Section 1 - Total Federal Income Tax Liability
+
+- name: Simple tax - no additional taxes or credits
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        income_tax_before_credits: 5000
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        net_investment_income_tax: 0
+        additional_medicare_tax: 0
+        total_nonrefundable_credits: 0
+        total_refundable_credits: 0
+    persons:
+      - id: taxpayer
+        self_employment_tax: 0
+  output:
+    total_federal_income_tax: 5000
+
+- name: Tax with capital gains
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        income_tax_before_credits: 12000
+        capital_gains_tax: 1500
+        alternative_minimum_tax: 0
+        net_investment_income_tax: 0
+        additional_medicare_tax: 0
+        total_nonrefundable_credits: 0
+        total_refundable_credits: 0
+    persons:
+      - id: taxpayer
+        self_employment_tax: 0
+  output:
+    total_federal_income_tax: 13500
+
+- name: High earner with NIIT
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        income_tax_before_credits: 50000
+        capital_gains_tax: 3000
+        alternative_minimum_tax: 0
+        net_investment_income_tax: 1900
+        additional_medicare_tax: 450
+        total_nonrefundable_credits: 0
+        total_refundable_credits: 0
+    persons:
+      - id: taxpayer
+        self_employment_tax: 0
+  output:
+    total_federal_income_tax: 55350
+
+- name: Self-employed individual
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        income_tax_before_credits: 8000
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        net_investment_income_tax: 0
+        additional_medicare_tax: 0
+        total_nonrefundable_credits: 0
+        total_refundable_credits: 0
+    persons:
+      - id: taxpayer
+        self_employment_tax: 7650
+  output:
+    total_federal_income_tax: 15650
+
+- name: Tax reduced by nonrefundable credits
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        income_tax_before_credits: 10000
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        net_investment_income_tax: 0
+        additional_medicare_tax: 0
+        total_nonrefundable_credits: 4000
+        total_refundable_credits: 0
+    persons:
+      - id: taxpayer
+        self_employment_tax: 0
+  output:
+    total_federal_income_tax: 6000
+
+- name: Refundable credits create refund
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        income_tax_before_credits: 3000
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        net_investment_income_tax: 0
+        additional_medicare_tax: 0
+        total_nonrefundable_credits: 3000
+        total_refundable_credits: 5000
+    persons:
+      - id: taxpayer
+        self_employment_tax: 0
+  output:
+    total_federal_income_tax: -5000
+
+- name: Low income family with EITC and ACTC refund
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        income_tax_before_credits: 1500
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        net_investment_income_tax: 0
+        additional_medicare_tax: 0
+        total_nonrefundable_credits: 1500
+        total_refundable_credits: 8500
+    persons:
+      - id: taxpayer
+        self_employment_tax: 0
+  output:
+    total_federal_income_tax: -8500
+
+- name: AMT applies
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        income_tax_before_credits: 25000
+        capital_gains_tax: 2000
+        alternative_minimum_tax: 5000
+        net_investment_income_tax: 1000
+        additional_medicare_tax: 0
+        total_nonrefundable_credits: 2000
+        total_refundable_credits: 0
+    persons:
+      - id: taxpayer
+        self_employment_tax: 0
+  output:
+    total_federal_income_tax: 31000
+
+- name: Married couple with two earners - self-employment
+  period: 2024
+  input:
+    tax_units:
+      - id: family
+        income_tax_before_credits: 15000
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        net_investment_income_tax: 0
+        additional_medicare_tax: 500
+        total_nonrefundable_credits: 4000
+        total_refundable_credits: 2000
+    persons:
+      - id: spouse1
+        self_employment_tax: 6000
+      - id: spouse2
+        self_employment_tax: 4500
+  output:
+    total_federal_income_tax: 19000
+
+- name: All components - complex scenario
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        income_tax_before_credits: 45000
+        capital_gains_tax: 7500
+        alternative_minimum_tax: 3000
+        net_investment_income_tax: 2500
+        additional_medicare_tax: 1200
+        total_nonrefundable_credits: 6000
+        total_refundable_credits: 1000
+    persons:
+      - id: taxpayer
+        self_employment_tax: 8000
+  output:
+    total_federal_income_tax: 60200
+
+- name: Zero tax liability - no income
+  period: 2024
+  input:
+    tax_units:
+      - id: filer
+        income_tax_before_credits: 0
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        net_investment_income_tax: 0
+        additional_medicare_tax: 0
+        total_nonrefundable_credits: 0
+        total_refundable_credits: 0
+    persons:
+      - id: taxpayer
+        self_employment_tax: 0
+  output:
+    total_federal_income_tax: 0

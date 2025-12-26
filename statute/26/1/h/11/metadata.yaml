@@ -1,0 +1,140 @@
+# Encoding Metadata for 26 USC Section 1(h)(11) - Qualified Dividend Income
+
+encoding:
+  created: 2024-12-25
+  updated: 2024-12-25
+  status: implemented
+  encoded_by: claude-opus-4.5
+
+variable:
+  name: qualified_dividend_income
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+
+coverage:
+  tax_years: [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  notes: |
+    Section 1(h)(11) was added by the Jobs and Growth Tax Relief Reconciliation
+    Act of 2003 (JGTRRA), effective for tax years beginning after December 31, 2002.
+
+    The provision treats qualified dividend income as net capital gain, allowing
+    dividends that meet specific requirements to be taxed at the preferential
+    capital gains rates (0%, 15%, 20%) rather than ordinary income rates.
+
+    Originally set to expire, the preferential treatment was made permanent by
+    the American Taxpayer Relief Act of 2012.
+
+sources:
+  statute:
+    - citation: "26 USC Section 1(h)(11)"
+      title: "Dividends taxed as net capital gain"
+      path: statute/26/1/h/11/
+      files:
+        - qualified_dividend_income.cosilico  # Total qualified dividend income
+        - is_qualified_dividend.cosilico      # Per-dividend qualification test
+        - parameters.yaml                      # Holding period parameters
+
+  guidance:
+    - citation: "IRS Publication 550"
+      title: "Investment Income and Expenses"
+      source: https://www.irs.gov/pub/irs-pdf/p550.pdf
+      provides:
+        - Definition of qualified dividends
+        - Holding period requirements
+        - Examples of qualified vs non-qualified dividends
+
+    - citation: "Form 1099-DIV Instructions"
+      source: https://www.irs.gov/forms-pubs/about-form-1099-div
+      provides:
+        - Box 1b: Qualified Dividends reporting
+
+architecture:
+  description: |
+    Section 1(h)(11) integrates qualified dividend income into the capital gains
+    tax framework. The key provision is Section 1(h)(11)(A):
+
+    "For purposes of this section, the term 'net capital gain' means net capital
+    gain (determined without regard to this paragraph) increased by qualified
+    dividend income."
+
+    This means that when calculating the tax on net capital gain using the
+    preferential 0%/15%/20% rates, qualified dividends are added to actual
+    capital gains. The combined amount is then subject to the bracket calculations.
+
+    Key components:
+
+    1. Section 1(h)(11)(A) - Treatment as net capital gain
+       - Qualified dividends are taxed at capital gains rates
+       - Combined with actual capital gains for bracket calculations
+
+    2. Section 1(h)(11)(B) - Definition of qualified dividend income
+       - Must be from domestic corporation OR qualified foreign corporation
+       - Must meet holding period requirement (>60 days in 121-day window)
+       - Not from tax-exempt organization
+       - Not a deductible dividend on employer securities
+
+    3. Section 1(h)(11)(B)(iii) - Holding period requirement
+       - Stock must be held >60 days during 121-day period
+       - Period begins 60 days before ex-dividend date
+       - Different rules for preferred stock (>90 days in 181-day window)
+
+  key_provisions:
+    - provision: "Section 1(h)(11)(A)"
+      description: "Treatment of qualified dividends as net capital gain"
+      variable: qualified_dividend_income
+      integration: "Added to net_capital_gain for preferential rate calculation"
+
+    - provision: "Section 1(h)(11)(B)(i)"
+      description: "Dividends from domestic corporations"
+      variable: is_domestic_corporation
+      status: simplified
+
+    - provision: "Section 1(h)(11)(B)(ii)"
+      description: "Dividends from qualified foreign corporations"
+      variable: is_qualified_foreign_corporation
+      status: simplified
+
+    - provision: "Section 1(h)(11)(B)(iii)(I)"
+      description: "Holding period requirement"
+      variable: is_qualified_dividend
+      parameters:
+        - h/11/parameters#min_holding_days
+        - h/11/parameters#holding_period_window_days
+
+  dependencies:
+    - path: statute/26/1/h
+      description: "Capital gains tax rate brackets and calculation"
+    - path: statute/26/61/a/7
+      description: "Dividend income (gross)"
+    - path: statute/26/1222/11
+      description: "Net capital gain"
+
+  simplifications:
+    - aspect: "Dividend source qualification"
+      description: |
+        The qualification of dividend source (domestic vs foreign corporation,
+        tax-exempt organization, etc.) is assumed to be determined by the
+        payer and reported on Form 1099-DIV. The is_qualified_dividend
+        variable models the full legal test but in practice qualified_dividend_income
+        is typically an input from Form 1099-DIV Box 1b.
+
+    - aspect: "Holding period tracking"
+      description: |
+        PolicyEngine cannot track day-by-day holding periods. The model assumes
+        the taxpayer (or their broker) correctly determines which dividends meet
+        the holding period requirement.
+
+validation:
+  pe_variable: qualified_dividend_income
+  taxsim_variable: N/A
+  tolerance_dollars: 1
+  notes: |
+    Validation compares against expected calculations for various income levels
+    and filing statuses, particularly testing:
+    - Combined capital gains + qualified dividends bracket calculations
+    - Proportional allocation between capital gains and dividends
+    - Correct application of preferential rates
+
+test_files:
+  - qualified_dividend_income.test.yaml

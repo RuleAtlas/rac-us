@@ -1,0 +1,121 @@
+# 26 USC Section 1 - Total Federal Income Tax Liability
+#
+# This variable aggregates all federal income tax components and subtracts
+# credits to compute the final federal income tax liability (or refund).
+#
+# Corresponds to TaxSim output variable `fiitax`.
+#
+# Tax components (positive):
+# - Section 1: Income tax on ordinary income (progressive brackets)
+# - Section 1(h): Capital gains tax at preferential rates
+# - Section 55: Alternative Minimum Tax (excess of TMT over regular tax)
+# - Section 1411: Net Investment Income Tax (3.8% on high earners)
+# - Section 1401: Self-employment tax (12.4% SS + 2.9% Medicare)
+# - Section 3101(b)(2): Additional Medicare Tax (0.9% over threshold)
+#
+# Credits (reduce liability):
+# - Section 26: Nonrefundable credits (limited to tax liability)
+# - Section 6401: Refundable credits (can generate refunds)
+
+imports:
+# --- Tax Components ---
+
+# Regular income tax on ordinary income per Section 1
+  income_tax_before_credits: statute/26/1/income_tax
+
+# Capital gains tax at 0%/15%/20% preferential rates per Section 1(h)
+  capital_gains_tax: statute/26/1/h/capital_gains_tax
+
+# Alternative Minimum Tax per Section 55(a)
+# This is the EXCESS of tentative minimum tax over regular tax, not the full TMT
+  alternative_minimum_tax: statute/26/55/a/amt
+
+# Net Investment Income Tax per Section 1411
+# 3.8% on lesser of NII or MAGI above threshold
+  net_investment_income_tax: statute/26/1411/net_investment_income_tax
+
+# Self-employment tax per Section 1401
+# Person-level variable - must be aggregated to TaxUnit
+  self_employment_tax: statute/26/1401/self_employment_tax
+
+# Additional Medicare Tax per Section 3101(b)(2)
+# 0.9% on wages/SE income above threshold
+  additional_medicare_tax: statute/26/3101/b/2/additional_medicare_tax
+
+# --- Credits ---
+
+# Total nonrefundable credits per Section 26
+  total_nonrefundable_credits: statute/26/26/total_nonrefundable_credits
+
+# Total refundable credits per Section 6401
+  total_refundable_credits: statute/26/6401/total_refundable_credits
+
+# --- Gross Tax Before Credits ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Gross Tax Before Credits"
+description "Sum of all federal tax components before credits"
+
+formula:
+  # Regular income tax (on ordinary income)
+  regular_tax = income_tax_before_credits
+
+  # Capital gains are taxed at preferential rates under Section 1(h)
+  # For taxpayers with capital gains, the actual tax is computed
+  # as the lesser of regular tax or the Section 1(h) calculation
+  # For simplicity, we use the capital gains tax as an add-on here
+  cap_gains_tax = capital_gains_tax
+
+  # AMT is only the excess over regular tax per Section 55(a)
+  amt = alternative_minimum_tax
+
+  # NIIT applies in addition to all other taxes
+  niit = net_investment_income_tax
+
+  # Self-employment tax - aggregate from Person level
+  se_tax = sum(Person.self_employment_tax)
+
+  # Additional Medicare Tax
+  add_medicare = additional_medicare_tax
+
+  return regular_tax + cap_gains_tax + amt + niit + se_tax + add_medicare
+
+# --- Net Tax After Credits ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Tax After Nonrefundable Credits"
+description "Tax liability after applying nonrefundable credits per Section 26"
+
+formula:
+  # Nonrefundable credits reduce tax to zero but cannot create refund
+  gross = gross_tax_before_credits
+  nonref = total_nonrefundable_credits
+
+  return max(0, gross - nonref)
+
+# --- Total Federal Income Tax ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Federal Income Tax"
+description "Final federal income tax liability (negative = refund) per 26 USC Section 1"
+
+formula:
+  # Start with tax after nonrefundable credits
+  tax_after_nonref = tax_after_nonrefundable_credits
+
+  # Refundable credits can create negative liability (refund)
+  ref = total_refundable_credits
+
+  # Final liability - can be negative indicating refund due
+  return tax_after_nonref - ref
+
+default 0

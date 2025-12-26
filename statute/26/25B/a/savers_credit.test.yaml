@@ -1,0 +1,381 @@
+# Tests for 26 USC 25B - Saver's Credit
+# Reference: IRS Form 8880 Instructions
+
+# --- Single Filer Tests ---
+
+- name: Single filer with 50% rate
+  description: Single filer with AGI under $23,000 gets 50% credit rate
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 20000
+    elective_deferrals: 1000
+    traditional_ira_contributions: 500
+    roth_ira_contributions: 0
+    age: 25
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 1500
+  output:
+    savers_credit_qualified_contributions: 1500
+    savers_credit_eligible_contributions: 1500
+    savers_credit_applicable_percentage: 0.50
+    savers_credit_tentative: 750
+    savers_credit: 750
+
+- name: Single filer with 20% rate
+  description: Single filer with AGI between $23,001 and $25,000 gets 20% rate
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 24000
+    elective_deferrals: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 30
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 2000
+  output:
+    savers_credit_applicable_percentage: 0.20
+    savers_credit_tentative: 400
+    savers_credit: 400
+
+- name: Single filer with 10% rate
+  description: Single filer with AGI between $25,001 and $38,250 gets 10% rate
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 30000
+    elective_deferrals: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 35
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 3000
+  output:
+    savers_credit_applicable_percentage: 0.10
+    savers_credit_tentative: 200
+    savers_credit: 200
+
+- name: Single filer over income limit
+  description: Single filer with AGI over $38,250 gets no credit
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 40000
+    elective_deferrals: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 40
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 4000
+  output:
+    savers_credit_applicable_percentage: 0.0
+    savers_credit: 0
+
+# --- Joint Filer Tests ---
+
+- name: Joint filer with 50% rate
+  description: Joint filer with AGI under $46,000 gets 50% credit rate
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_JOINTLY
+    adjusted_gross_income: 40000
+    elective_deferrals: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 35
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 3000
+  output:
+    savers_credit_applicable_percentage: 0.50
+    savers_credit_tentative: 1000
+    savers_credit: 1000
+
+- name: Joint filer with 20% rate
+  description: Joint filer with AGI between $46,001 and $50,000 gets 20% rate
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_JOINTLY
+    adjusted_gross_income: 48000
+    elective_deferrals: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 40
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 3500
+  output:
+    savers_credit_applicable_percentage: 0.20
+    savers_credit_tentative: 400
+    savers_credit: 400
+
+- name: Joint filer with 10% rate
+  description: Joint filer with AGI between $50,001 and $76,500 gets 10% rate
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_JOINTLY
+    adjusted_gross_income: 60000
+    elective_deferrals: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 45
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 5000
+  output:
+    savers_credit_applicable_percentage: 0.10
+    savers_credit_tentative: 200
+    savers_credit: 200
+
+- name: Joint filer over income limit
+  description: Joint filer with AGI over $76,500 gets no credit
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_JOINTLY
+    adjusted_gross_income: 80000
+    elective_deferrals: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 50
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 6000
+  output:
+    savers_credit_applicable_percentage: 0.0
+    savers_credit: 0
+
+# --- Head of Household Tests ---
+
+- name: Head of Household with 50% rate
+  description: HOH with AGI under $34,500 gets 50% credit rate
+  period: 2024
+  input:
+    filing_status: HEAD_OF_HOUSEHOLD
+    adjusted_gross_income: 30000
+    elective_deferrals: 1500
+    traditional_ira_contributions: 500
+    roth_ira_contributions: 0
+    age: 35
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 2000
+  output:
+    savers_credit_applicable_percentage: 0.50
+    savers_credit_eligible_contributions: 2000
+    savers_credit_tentative: 1000
+    savers_credit: 1000
+
+- name: Head of Household with 20% rate
+  description: HOH with AGI between $34,501 and $37,500 gets 20% rate
+  period: 2024
+  input:
+    filing_status: HEAD_OF_HOUSEHOLD
+    adjusted_gross_income: 36000
+    elective_deferrals: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 40
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 2500
+  output:
+    savers_credit_applicable_percentage: 0.20
+    savers_credit_tentative: 400
+    savers_credit: 400
+
+- name: Head of Household with 10% rate
+  description: HOH with AGI between $37,501 and $57,375 gets 10% rate
+  period: 2024
+  input:
+    filing_status: HEAD_OF_HOUSEHOLD
+    adjusted_gross_income: 45000
+    elective_deferrals: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 45
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 3000
+  output:
+    savers_credit_applicable_percentage: 0.10
+    savers_credit_tentative: 200
+    savers_credit: 200
+
+# --- Contribution Cap Tests ---
+
+- name: Contributions exceed $2,000 cap
+  description: Contributions are capped at $2,000 per person
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 20000
+    elective_deferrals: 5000
+    traditional_ira_contributions: 2000
+    roth_ira_contributions: 1000
+    age: 30
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 2000
+  output:
+    savers_credit_qualified_contributions: 8000
+    savers_credit_eligible_contributions: 2000
+    savers_credit_applicable_percentage: 0.50
+    savers_credit_tentative: 1000
+    savers_credit: 1000
+
+# --- Eligibility Tests ---
+
+- name: Under age 18 not eligible
+  description: Individual under 18 is not eligible per 25B(c)(1)
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 15000
+    elective_deferrals: 1000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 17
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 1000
+  output:
+    is_savers_credit_eligible: False
+    savers_credit_eligible_contributions: 0
+    savers_credit: 0
+
+- name: Dependent not eligible
+  description: Individual claimed as dependent is not eligible per 25B(c)(2)(A)
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 15000
+    elective_deferrals: 1000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 22
+    is_tax_unit_dependent: True
+    is_full_time_student: False
+    tax_liability_before_credits: 1000
+  output:
+    is_savers_credit_eligible: False
+    savers_credit_eligible_contributions: 0
+    savers_credit: 0
+
+- name: Full-time student not eligible
+  description: Full-time student is not eligible per 25B(c)(2)(B)
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 15000
+    elective_deferrals: 1000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 22
+    is_tax_unit_dependent: False
+    is_full_time_student: True
+    tax_liability_before_credits: 1000
+  output:
+    is_savers_credit_eligible: False
+    savers_credit_eligible_contributions: 0
+    savers_credit: 0
+
+# --- Nonrefundable Credit Tests ---
+
+- name: Credit limited by tax liability
+  description: Nonrefundable credit cannot exceed tax liability
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 18000
+    elective_deferrals: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 25
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 500
+  output:
+    savers_credit_applicable_percentage: 0.50
+    savers_credit_tentative: 1000
+    savers_credit: 500
+
+- name: Zero tax liability means no credit
+  description: With zero tax liability, nonrefundable credit is zero
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 10000
+    elective_deferrals: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 25
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 0
+  output:
+    savers_credit_applicable_percentage: 0.50
+    savers_credit_tentative: 1000
+    savers_credit: 0
+
+# --- Boundary Tests ---
+
+- name: Single filer at exact 50% threshold
+  description: AGI exactly at $23,000 gets 50% rate
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 23000
+    elective_deferrals: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 30
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 2000
+  output:
+    savers_credit_applicable_percentage: 0.50
+    savers_credit: 1000
+
+- name: Single filer just above 50% threshold
+  description: AGI at $23,001 gets 20% rate
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 23001
+    elective_deferrals: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    age: 30
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 2000
+  output:
+    savers_credit_applicable_percentage: 0.20
+    savers_credit: 400
+
+# --- Multiple Contribution Types ---
+
+- name: Mix of elective deferrals and IRAs
+  description: Credit calculated on combined contributions
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 22000
+    elective_deferrals: 500
+    traditional_ira_contributions: 750
+    roth_ira_contributions: 750
+    age: 28
+    is_tax_unit_dependent: False
+    is_full_time_student: False
+    tax_liability_before_credits: 1500
+  output:
+    savers_credit_qualified_contributions: 2000
+    savers_credit_eligible_contributions: 2000
+    savers_credit_applicable_percentage: 0.50
+    savers_credit_tentative: 1000
+    savers_credit: 1000
