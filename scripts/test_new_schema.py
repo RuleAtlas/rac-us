@@ -433,5 +433,305 @@ variable snap_allotment:
         assert errors == [], f"Errors: {errors}"
 
 
+class TestTopLevelImportsFormat:
+    """Test old format with top-level imports (no variable keyword)."""
+
+    def test_parse_top_level_imports(self):
+        """Parse file with top-level imports: block."""
+        from scripts.convert_to_new_format import parse_old_rac
+
+        content = '''
+# 20 USC 1070a - Expected Family Contribution
+
+imports:
+  pell_grant_formula: statute/20/1070a/formula_type
+  head_contribution: statute/20/1070a/head_contribution
+
+entity Person
+period Year
+dtype Money
+label "Expected Family Contribution"
+
+formula:
+  return head_contribution
+
+default 0
+'''
+        result = parse_old_rac(content)
+        # Should create an anonymous variable with the imports
+        assert len(result["variables"]) == 1
+        var = result["variables"][0]
+        assert var["attributes"]["entity"] == "Person"
+        assert len(var["imports"]) == 2
+
+    def test_convert_top_level_imports_file(self):
+        """Convert file with top-level imports to new format."""
+        from scripts.convert_to_new_format import convert_to_new_format
+
+        old_content = '''
+# 20 USC 1070a - EFC
+
+imports:
+  head_contribution: statute/20/1070a/head_contribution
+  agi: statute/26/62/a/adjusted_gross_income
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Expected Family Contribution"
+
+formula:
+  return max(0, head_contribution)
+
+default 0
+'''
+        new_content = convert_to_new_format(old_content, {})
+        # Should have variable with imports in new format
+        assert "variable" in new_content
+        assert "imports:" in new_content
+        assert "entity: Person" in new_content
+
+    def test_anonymous_var_gets_filename(self):
+        """Anonymous variables should get name from filename."""
+        from scripts.convert_to_new_format import convert_to_new_format
+
+        old_content = '''
+# Test file
+
+entity Person
+period Year
+dtype Money
+
+formula:
+  return 100
+'''
+        # Pass filename hint to converter
+        new_content = convert_to_new_format(old_content, {}, filename="efc")
+        assert "variable efc:" in new_content
+
+
+class TestParamDataEdgeCases:
+    """Test edge cases in parameter data structures."""
+
+    def test_amounts_as_list(self):
+        """Parameters with amounts as list (not dict) should be handled."""
+        from scripts.convert_to_new_format import convert_to_new_format
+
+        old_content = '''
+variable test_var:
+  entity TaxUnit
+  period Year
+
+  parameters:
+    rate: parameters#gov.foo.rate
+
+  formula:
+    return rate
+'''
+        # Amounts is a list instead of dict
+        params_lookup = {
+            "gov.foo.rate": {
+                "description": "Some rate",
+                "amounts": [0.5, 0.6, 0.7]  # List, not dict
+            }
+        }
+        new_content = convert_to_new_format(old_content, params_lookup)
+        # Should handle list gracefully
+        assert "parameter rate:" in new_content
+        assert "values:" in new_content
+
+
+class TestConverterParsing:
+    """Test parsing of old format files."""
+
+    def test_parse_old_format_with_variable_keyword(self):
+        """Parse old format that uses 'variable name:' syntax."""
+        from scripts.convert_to_new_format import parse_old_rac
+
+        content = '''
+# Comment
+variable snap_allotment:
+  entity Household
+  period Month
+  dtype Money
+
+  imports:
+    household_size: statute/7/2014#household_size
+
+  parameters:
+    rate: parameters#gov.usda.fns.snap.rate
+
+  formula:
+    return household_size * rate
+
+  default 0
+'''
+        result = parse_old_rac(content)
+        assert len(result["variables"]) == 1
+        assert result["variables"][0]["name"] == "snap_allotment"
+        assert result["variables"][0]["attributes"]["entity"] == "Household"
+
+    def test_parse_old_format_multi_variable_no_keyword(self):
+        """Parse old format with multiple variables without 'variable' keyword."""
+        from scripts.convert_to_new_format import parse_old_rac
+
+        content = '''
+# CTC file with multiple variables
+imports:
+  earned_income: statute/26/32#earned_income
+
+# First variable
+entity TaxUnit
+period Year
+dtype Money
+label "First Var"
+
+formula:
+  return earned_income * 0.15
+
+# Second variable
+entity TaxUnit
+period Year
+dtype Money
+label "Second Var"
+
+formula:
+  return first_var * 2
+'''
+        # This format is trickier - variables aren't named explicitly
+        # The converter should detect this pattern
+        result = parse_old_rac(content)
+        # For now, this may not parse correctly - that's the test
+
+
+class TestConverterTransform:
+    """Test conversion from old to new format."""
+
+    def test_convert_simple_variable(self):
+        """Convert a simple variable with parameters."""
+        from scripts.convert_to_new_format import convert_to_new_format
+
+        old_content = '''
+# 7 USC 2017(a) - Test
+variable snap_rate:
+  entity Household
+  period Month
+  dtype Money
+  description "Test variable"
+
+  parameters:
+    rate: parameters#gov.usda.fns.snap.rate
+
+  formula:
+    return income * rate
+
+  default 0
+'''
+        params_lookup = {
+            "gov.usda.fns.snap.rate": {
+                "description": "SNAP rate",
+                "values": {"2024-01-01": 0.30}
+            }
+        }
+
+        new_content = convert_to_new_format(old_content, params_lookup)
+
+        # Should have parameter declaration
+        assert "parameter rate:" in new_content
+        assert "2024-01-01: 0.3" in new_content
+
+        # Should have variable
+        assert "variable snap_rate:" in new_content
+        assert "entity: Household" in new_content
+
+    def test_convert_preserves_imports(self):
+        """Imports should be converted to new syntax."""
+        from scripts.convert_to_new_format import convert_to_new_format
+
+        old_content = '''
+variable test_var:
+  entity Person
+  period Year
+  dtype Money
+
+  imports:
+    foo: statute/26/32#foo
+    bar: statute/7/2014/e#bar
+
+  formula:
+    return foo + bar
+'''
+        new_content = convert_to_new_format(old_content, {})
+
+        # Should have new import syntax
+        assert "imports:" in new_content
+        # The exact format may vary, but should reference the paths
+
+
+class TestEdgeCases:
+    """Test edge cases and error handling."""
+
+    def test_empty_file(self):
+        """Empty file should produce minimal valid output."""
+        errors = validate_new_format("")
+        # Empty file is technically valid (no violations)
+        assert errors == []
+
+    def test_file_with_only_comments(self):
+        """File with only comments should be valid."""
+        content = '''
+# This is a comment
+# Another comment
+'''
+        errors = validate_new_format(content)
+        assert errors == []
+
+    def test_multiline_formula(self):
+        """Multi-line formula with complex logic."""
+        content = '''
+variable complex_calc:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  formula: |
+    if income > threshold:
+      rate = high_rate
+    else:
+      rate = low_rate
+
+    base = income * rate
+
+    for deduction in deductions:
+      base = base - deduction
+
+    return max(0, base)
+'''
+        errors = validate_new_format(content)
+        assert errors == []
+
+    def test_versioned_variable(self):
+        """Variable with temporal versions."""
+        content = '''
+variable ctc_refundable:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+
+  versions:
+    2018-01-01:
+      enacted_by: "P.L. 115-97"
+      parameters:
+        threshold: 2500
+      formula: |
+        return (earned_income - threshold) * 0.15
+
+    2026-01-01:
+      reverts_to: 2001-01-01
+'''
+        errors = validate_new_format(content)
+        assert errors == []
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

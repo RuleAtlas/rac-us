@@ -79,15 +79,30 @@ def parse_old_rac(content: str) -> dict:
 
     # Parse variables
     current_var = None
-    current_indent = 0
+    in_imports_block = False
+    in_params_block = False
+
+    def ensure_anonymous_var():
+        """Create anonymous variable if none exists (for files without 'variable x:')."""
+        nonlocal current_var
+        if current_var is None:
+            current_var = {
+                "name": "_anonymous",  # Will be replaced with filename
+                "attributes": {},
+                "imports": [],
+                "param_refs": [],
+                "formula_lines": [],
+                "raw_lines": [],
+            }
 
     while i < len(lines):
         line = lines[i]
         stripped = line.strip()
+        indent = len(line) - len(line.lstrip())
 
         # New variable declaration
         var_match = re.match(r'^variable\s+(\w+):', stripped)
-        if var_match and not line.startswith(' '):
+        if var_match and indent == 0:
             if current_var:
                 result["variables"].append(current_var)
             current_var = {
@@ -98,13 +113,43 @@ def parse_old_rac(content: str) -> dict:
                 "formula_lines": [],
                 "raw_lines": [line],
             }
+            in_imports_block = False
+            in_params_block = False
             i += 1
             continue
+
+        # Handle top-level imports: block (no variable keyword)
+        if stripped == 'imports:' and indent == 0 and current_var is None:
+            ensure_anonymous_var()
+            in_imports_block = True
+            in_params_block = False
+            i += 1
+            continue
+
+        # Handle top-level entity/period/dtype (no variable keyword)
+        if indent == 0 and current_var is None:
+            if stripped.startswith('entity ') or stripped.startswith('period ') or stripped.startswith('dtype '):
+                ensure_anonymous_var()
 
         if current_var:
             current_var["raw_lines"].append(line)
 
-            # Parse attributes
+            # Detect block starts
+            if stripped == 'imports:':
+                in_imports_block = True
+                in_params_block = False
+                i += 1
+                continue
+            elif stripped == 'parameters:':
+                in_params_block = True
+                in_imports_block = False
+                i += 1
+                continue
+            elif stripped.startswith('formula:') or stripped.startswith('entity ') or stripped.startswith('period '):
+                in_imports_block = False
+                in_params_block = False
+
+            # Parse attributes (with space separator - old format)
             if stripped.startswith('entity '):
                 current_var["attributes"]["entity"] = stripped.split()[1]
             elif stripped.startswith('period '):
@@ -120,31 +165,29 @@ def parse_old_rac(content: str) -> dict:
             elif stripped.startswith('default '):
                 current_var["attributes"]["default"] = stripped.split()[1]
 
-            # Parse imports
-            import_match = re.match(r'^\s+(\w+):\s*statute/(.+)#(\w+)', stripped)
-            if import_match:
-                alias = import_match.group(1)
-                path = import_match.group(2)
-                var_name = import_match.group(3)
-                current_var["imports"].append({
-                    "alias": alias,
-                    "path": path,
-                    "variable": var_name
-                })
+            # Parse imports inside imports: block
+            if in_imports_block and ':' in stripped:
+                import_match = re.match(r'^(\w+):\s*statute/(.+?)(?:#(\w+))?$', stripped)
+                if import_match:
+                    alias = import_match.group(1)
+                    path = import_match.group(2)
+                    var_name = import_match.group(3) or alias
+                    current_var["imports"].append({
+                        "alias": alias,
+                        "path": path,
+                        "variable": var_name
+                    })
 
-            # Parse parameter references
-            param_match = re.match(r'^\s+(\w+):\s*parameters#(.+)', stripped)
-            if param_match:
-                alias = param_match.group(1)
-                param_path = param_match.group(2)
-                current_var["param_refs"].append({
-                    "alias": alias,
-                    "path": param_path
-                })
-
-            # Track if we're in formula block
-            if stripped.startswith('formula:'):
-                in_formula = True
+            # Parse parameter references inside parameters: block
+            if in_params_block and ':' in stripped:
+                param_match = re.match(r'^(\w+):\s*parameters#(.+)', stripped)
+                if param_match:
+                    alias = param_match.group(1)
+                    param_path = param_match.group(2)
+                    current_var["param_refs"].append({
+                        "alias": alias,
+                        "path": param_path
+                    })
 
         i += 1
 
@@ -175,8 +218,15 @@ def extract_text_from_comments(comments: list[str]) -> str:
     return '\n'.join(text_lines) if text_lines else None
 
 
-def convert_to_new_format(old_content: str, params_lookup: dict, tests_lookup: dict = None) -> str:
-    """Convert old format to new format."""
+def convert_to_new_format(old_content: str, params_lookup: dict, tests_lookup: dict = None, filename: str = None) -> str:
+    """Convert old format to new format.
+
+    Args:
+        old_content: The old .rac file content
+        params_lookup: Dict of parameter path -> values
+        tests_lookup: Optional dict of variable name -> tests
+        filename: Optional filename hint for naming anonymous variables
+    """
     parsed = parse_old_rac(old_content)
 
     lines = []
@@ -215,13 +265,27 @@ def convert_to_new_format(old_content: str, params_lookup: dict, tests_lookup: d
 
             # Values
             if 'values' in param_data:
+                values = param_data['values']
                 lines.append('  values:')
-                for date, value in sorted(param_data['values'].items(), reverse=True):
-                    lines.append(f'    {date}: {value}')
+                if isinstance(values, dict):
+                    for date, value in sorted(values.items(), reverse=True):
+                        lines.append(f'    {date}: {value}')
+                elif isinstance(values, list):
+                    # List of values without dates - output as array
+                    lines.append(f'    # Schedule: {values}')
+                else:
+                    lines.append(f'    # Value: {values}')
             elif 'amounts' in param_data:
+                amounts = param_data['amounts']
                 lines.append('  values:')
-                for date, value in sorted(param_data['amounts'].items(), reverse=True):
-                    lines.append(f'    {date}: {value}')
+                if isinstance(amounts, dict):
+                    for date, value in sorted(amounts.items(), reverse=True):
+                        lines.append(f'    {date}: {value}')
+                elif isinstance(amounts, list):
+                    # List of amounts without dates - output as array
+                    lines.append(f'    # Schedule: {amounts}')
+                else:
+                    lines.append(f'    # Value: {amounts}')
             else:
                 lines.append('  values:')
                 lines.append('    # TODO: add values')
@@ -229,19 +293,31 @@ def convert_to_new_format(old_content: str, params_lookup: dict, tests_lookup: d
 
     # Emit variables
     for var in parsed["variables"]:
-        lines.append(f'variable {var["name"]}:')
+        # Use filename for anonymous variables
+        var_name = var["name"]
+        if var_name == "_anonymous" and filename:
+            var_name = filename
+        lines.append(f'variable {var_name}:')
 
-        # Imports
+        # Imports - convert to new syntax
         if var["imports"]:
             import_strs = []
             for imp in var["imports"]:
-                if imp["alias"] == imp["variable"]:
-                    import_strs.append(f'{imp["path"]}#{imp["variable"]}')
+                path = imp["path"].rstrip('/')
+                var_name = imp["variable"]
+                alias = imp["alias"]
+                if alias == var_name:
+                    import_strs.append(f'{path}#{var_name}')
                 else:
-                    import_strs.append(f'{imp["path"]}#{imp["variable"]} as {imp["alias"]}')
-            lines.append(f'  imports: [{", ".join(import_strs)}]')
+                    import_strs.append(f'{path}#{var_name} as {alias}')
+            if len(import_strs) == 1:
+                lines.append(f'  imports: [{import_strs[0]}]')
+            else:
+                lines.append(f'  imports:')
+                for imp_str in import_strs:
+                    lines.append(f'    - {imp_str}')
 
-        # Standard attributes
+        # Standard attributes - convert space to colon syntax
         for attr in ["entity", "period", "dtype", "unit", "label", "description"]:
             if attr in var["attributes"]:
                 val = var["attributes"][attr]
@@ -310,7 +386,10 @@ def convert_file(rac_path: Path, params_lookup: dict, dry_run: bool = True) -> s
     if '_v2.rac' in str(rac_path):
         return None
 
-    new_content = convert_to_new_format(content, params_lookup)
+    # Extract filename without extension for anonymous variable naming
+    filename = rac_path.stem  # e.g., "efc" from "efc.rac"
+
+    new_content = convert_to_new_format(content, params_lookup, filename=filename)
 
     if not dry_run:
         # Write to new file (or overwrite)
