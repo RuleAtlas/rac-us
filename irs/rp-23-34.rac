@@ -1,0 +1,62 @@
+# IRS Rev. Proc. 2023-34: 2024 Tax Rate Tables
+# Inflation-adjusted thresholds for tax year 2024
+
+text: """
+Rev. Proc. 2023-34 provides inflation-adjusted items for tax year 2024.
+Section 3 sets forth the tax rate tables under § 1(a)-(d) for 2024.
+"""
+
+source:
+  title: "Rev. Proc. 2023-34"
+  effective_date: 2024-01-01
+  url: "https://www.irs.gov/pub/irs-drop/rp-23-34.pdf"
+
+# Overrides for statute/26/1/brackets
+
+parameter single:
+  overrides: statute/26/1/brackets#single
+  description: "2024 tax bracket thresholds for single filers"
+  brackets:
+    0.10: 0
+    0.12: 11600
+    0.22: 47150
+    0.24: 100525
+    0.32: 191950
+    0.35: 243725
+    0.37: 609350
+
+parameter married_filing_jointly:
+  overrides: statute/26/1/brackets#married_filing_jointly
+  description: "2024 tax bracket thresholds for married filing jointly"
+  brackets:
+    0.10: 0
+    0.12: 23200
+    0.22: 94300
+    0.24: 201050
+    0.32: 383900
+    0.35: 487450
+    0.37: 731200
+
+parameter married_filing_separately:
+  overrides: statute/26/1/brackets#married_filing_separately
+  description: "2024 tax bracket thresholds for married filing separately"
+  brackets:
+    0.10: 0
+    0.12: 11600
+    0.22: 47150
+    0.24: 100525
+    0.32: 191950
+    0.35: 243725
+    0.37: 365600
+
+parameter head_of_household:
+  overrides: statute/26/1/brackets#head_of_household
+  description: "2024 tax bracket thresholds for head of household"
+  brackets:
+    0.10: 0
+    0.12: 16550
+    0.22: 63100
+    0.24: 100500
+    0.32: 191950
+    0.35: 243700
+    0.37: 609350

@@ -1,0 +1,26 @@
+# 26 USC § 164(b)(6) - SALT Deduction Cap Parameters
+#
+# Reference: Tax Cuts and Jobs Act of 2017 (P.L. 115-97)
+# Effective: Tax years 2018-2025
+
+text: """
+(A) IN GENERAL.—In the case of an individual, the aggregate amount of taxes
+taken into account under subsection (a) for any taxable year shall not exceed
+$10,000 ($5,000 in the case of a married individual filing a separate return).
+"""
+
+parameter salt_cap:
+  description: "SALT deduction cap for most filing statuses"
+  unit: USD
+  values:
+    2026-01-01: .inf
+    2018-01-01: 10000
+    1900-01-01: .inf
+
+parameter salt_cap_married_separate:
+  description: "SALT deduction cap for married filing separately"
+  unit: USD
+  values:
+    2026-01-01: .inf
+    2018-01-01: 5000
+    1900-01-01: .inf

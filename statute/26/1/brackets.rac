@@ -1,0 +1,59 @@
+# 26 USC § 1 - Tax Brackets (Base TCJA 2018 thresholds)
+# These are the base statutory values from TCJA.
+# IRS annual guidance overrides these with inflation-adjusted values.
+
+text: """
+Section 1(a)-(d) of the Internal Revenue Code establishes the tax rate
+schedules for different filing statuses. The thresholds shown here are
+the base values from the Tax Cuts and Jobs Act of 2017, effective for
+tax years 2018-2025. These are adjusted annually for inflation per IRS
+Revenue Procedures.
+"""
+
+# Single filer brackets (§ 1(c))
+parameter single:
+  description: "Tax bracket thresholds for single filers"
+  brackets:
+    0.10: 0
+    0.12: 9525
+    0.22: 38700
+    0.24: 82500
+    0.32: 157500
+    0.35: 200000
+    0.37: 500000
+
+# Married filing jointly brackets (§ 1(a))
+parameter married_filing_jointly:
+  description: "Tax bracket thresholds for married filing jointly"
+  brackets:
+    0.10: 0
+    0.12: 19050
+    0.22: 77400
+    0.24: 165000
+    0.32: 315000
+    0.35: 400000
+    0.37: 600000
+
+# Married filing separately brackets (§ 1(d))
+parameter married_filing_separately:
+  description: "Tax bracket thresholds for married filing separately"
+  brackets:
+    0.10: 0
+    0.12: 9525
+    0.22: 38700
+    0.24: 82500
+    0.32: 157500
+    0.35: 200000
+    0.37: 300000
+
+# Head of household brackets (§ 1(b))
+parameter head_of_household:
+  description: "Tax bracket thresholds for head of household"
+  brackets:
+    0.10: 0
+    0.12: 13600
+    0.22: 51800
+    0.24: 82500
+    0.32: 157500
+    0.35: 200000
+    0.37: 500000

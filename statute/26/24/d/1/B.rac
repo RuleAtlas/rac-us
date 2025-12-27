@@ -1,0 +1,33 @@
+# 26 USC § 24(d)(1)(B) - Additional Child Tax Credit Parameters
+#
+# Reference: IRC Section 24(d)(1)(B)
+
+text: """
+(d) Portion of credit refundable
+(1) In general
+The aggregate credits allowed to a taxpayer under subpart C shall be increased
+by the lesser of—
+(A) the credit which would be allowed under this section without regard to this
+    subsection and the limitation under section 26(a), or
+(B) the amount by which the aggregate amount of credits allowed by this subpart
+    (determined without regard to this subsection) would increase if the
+    limitation imposed by section 26(a) were increased by the greater of—
+    (i) 15 percent of so much of the taxpayer's earned income which is taken
+        into account in computing taxable income for the taxable year as exceeds
+        $2,500, or
+    (ii) in the case of a taxpayer with 3 or more qualifying children, the
+        excess of the taxpayer's social security taxes for the taxable year,
+        over the credit allowed under section 32 for the taxable year.
+"""
+
+parameter refundable_rate:
+  description: "ACTC rate (15% of earned income over threshold)"
+  unit: rate
+  values:
+    2018-01-01: 0.15
+
+parameter earned_income_threshold:
+  description: "Earned income threshold for ACTC"
+  unit: USD
+  values:
+    2018-01-01: 2500

@@ -1,0 +1,18 @@
+# 26 USC § 24(h)(2) - Child Tax Credit Amount
+#
+# Reference: IRC Section 24(h)(2)
+# TCJA increased credit to $2,000 per qualifying child
+
+text: """
+(h) Special rules for 2018 through 2025
+(2) Credit amount
+The amount of credit allowable under subsection (a) for each qualifying child
+shall be $2,000.
+"""
+
+parameter credit_amount:
+  description: "CTC amount per qualifying child"
+  unit: USD
+  values:
+    2018-01-01: 2000
+    1900-01-01: 1000

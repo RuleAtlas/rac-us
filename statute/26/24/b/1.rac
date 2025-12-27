@@ -1,0 +1,32 @@
+# 26 USC § 24(b)(1) - CTC Phaseout Thresholds
+#
+# Reference: IRC Section 24(b)(1) as amended by TCJA
+
+text: """
+(b) Limitations
+(1) Limitation based on adjusted gross income
+The amount of the credit allowable under subsection (a) shall be reduced by $50
+for each $1,000 (or fraction thereof) by which the taxpayer's modified adjusted
+gross income exceeds the threshold amount.
+"""
+
+parameter phaseout_threshold_joint:
+  description: "CTC phaseout threshold for married filing jointly"
+  unit: USD
+  values:
+    2018-01-01: 400000
+    1900-01-01: 110000
+
+parameter phaseout_threshold_single:
+  description: "CTC phaseout threshold for single and head of household"
+  unit: USD
+  values:
+    2018-01-01: 200000
+    1900-01-01: 75000
+
+parameter phaseout_threshold_married_separate:
+  description: "CTC phaseout threshold for married filing separately"
+  unit: USD
+  values:
+    2018-01-01: 200000
+    1900-01-01: 55000
