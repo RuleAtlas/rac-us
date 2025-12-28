@@ -35,11 +35,13 @@ parameter priority_multiplier:
   values:
     1981-01-01: 1.25
 
+# NOTE: LIHEAP benefits are set by states, not a federal indexed value
+# This is a placeholder for demonstration - actual amounts vary by state/year
 parameter base_benefit_placeholder:
   description: "Placeholder base benefit amount (actual varies by state/year)"
-  unit: USD
+  unit: "USD"
   values:
-    2024-01-01: 500
+    1981-01-01: 500
 
 parameter cooling_assistance_fraction:
   description: "Cooling assistance as fraction of total LIHEAP benefit"

@@ -8,29 +8,26 @@ The threshold amount for the 28% rate bracket, adjusted for inflation.
 For 2024: $232,600 for joint filers, $116,300 for single and MFS.
 """
 
+# Base TCJA values (2018) - indexed annually
+# Current values in IRS guidance files
+
 parameter amt_bracket_joint:
   description: "AMT 28% bracket threshold for married filing jointly"
-  unit: USD
+  unit: "USD"
+  indexed_by: statute/26/55/d/4
   values:
-    2024-01-01: 232600
-    2023-01-01: 220700
-    2022-01-01: 206100
     2018-01-01: 191100
 
 parameter amt_bracket_single:
   description: "AMT 28% bracket threshold for single filers"
-  unit: USD
+  unit: "USD"
+  indexed_by: statute/26/55/d/4
   values:
-    2024-01-01: 116300
-    2023-01-01: 110350
-    2022-01-01: 103050
     2018-01-01: 95550
 
 parameter amt_bracket_married_separate:
   description: "AMT 28% bracket threshold for married filing separately"
-  unit: USD
+  unit: "USD"
+  indexed_by: statute/26/55/d/4
   values:
-    2024-01-01: 116300
-    2023-01-01: 110350
-    2022-01-01: 103050
     2018-01-01: 95550

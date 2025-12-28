@@ -20,42 +20,84 @@ variable ira_deduction:
     return base_limit + catch_up_amount
 
 
-parameters:
-  # Regular contribution limit
-  contribution_limit:
-    2024-01-01: 7000
+# Base TCJA values (2018) - contribution limit indexed annually
+# Current indexed values in IRS guidance files
 
-  # Catch-up contribution for age 50+
-  catch_up_amount:
-    2024-01-01: 1000
+parameter contribution_limit:
+  description: "IRA regular contribution limit"
+  unit: "USD"
+  indexed_by: statute/26/219/b/5
+  values:
+    2018-01-01: 5500
 
-  # Age at which catch-up contributions allowed
-  catch_up_age:
-    2024-01-01: 50
+# Statutory fixed amount - not indexed
+parameter catch_up_amount:
+  description: "IRA catch-up contribution for age 50+"
+  unit: "USD"
+  values:
+    2006-01-01: 1000
 
-  # Phase-out thresholds when covered by employer plan - Single
-  phaseout_single_start:
-    2024-01-01: 77000
-  phaseout_single_end:
-    2024-01-01: 87000
+# Statutory age threshold - not indexed
+parameter catch_up_age:
+  description: "Age at which catch-up contributions allowed"
+  values:
+    2002-01-01: 50
 
-  # Phase-out thresholds when covered by employer plan - MFJ (contributor covered)
-  phaseout_joint_start:
-    2024-01-01: 123000
-  phaseout_joint_end:
-    2024-01-01: 143000
+# Phase-out thresholds - indexed annually
+parameter phaseout_single_start:
+  description: "IRA phase-out start for single filers covered by employer plan"
+  unit: "USD"
+  indexed_by: statute/26/219/g
+  values:
+    2018-01-01: 63000
 
-  # Phase-out thresholds when only spouse is covered - MFJ
-  phaseout_spouse_covered_start:
-    2024-01-01: 230000
-  phaseout_spouse_covered_end:
-    2024-01-01: 240000
+parameter phaseout_single_end:
+  description: "IRA phase-out end for single filers covered by employer plan"
+  unit: "USD"
+  indexed_by: statute/26/219/g
+  values:
+    2018-01-01: 73000
 
-  # Phase-out for MFS when either spouse is covered
-  phaseout_mfs_start:
-    2024-01-01: 0
-  phaseout_mfs_end:
-    2024-01-01: 10000
+parameter phaseout_joint_start:
+  description: "IRA phase-out start for joint filers (contributor covered)"
+  unit: "USD"
+  indexed_by: statute/26/219/g
+  values:
+    2018-01-01: 101000
+
+parameter phaseout_joint_end:
+  description: "IRA phase-out end for joint filers (contributor covered)"
+  unit: "USD"
+  indexed_by: statute/26/219/g
+  values:
+    2018-01-01: 121000
+
+parameter phaseout_spouse_covered_start:
+  description: "IRA phase-out start when only spouse is covered"
+  unit: "USD"
+  indexed_by: statute/26/219/g
+  values:
+    2018-01-01: 189000
+
+parameter phaseout_spouse_covered_end:
+  description: "IRA phase-out end when only spouse is covered"
+  unit: "USD"
+  indexed_by: statute/26/219/g
+  values:
+    2018-01-01: 199000
+
+# Statutory fixed threshold - not indexed
+parameter phaseout_mfs_start:
+  description: "IRA phase-out start for MFS when spouse is covered"
+  unit: "USD"
+  values:
+    2018-01-01: 0
+
+parameter phaseout_mfs_end:
+  description: "IRA phase-out end for MFS when spouse is covered"
+  unit: "USD"
+  values:
+    2018-01-01: 10000
 
 
 input traditional_ira_contributions:
@@ -154,33 +196,36 @@ variable total_ira_deduction:
 
 examples:
   - name: "Under 50, no employer plan, full contribution"
+    period: 2018-01
     inputs:
       person:
         age: 35
-        traditional_ira_contributions: 7000
+        traditional_ira_contributions: 5500
         has_retirement_plan_at_work: false
         adjusted_gross_income: 100000
     outputs:
-      ira_deduction: 7000
+      ira_deduction: 5500
 
   - name: "Age 50+, catch-up eligible"
+    period: 2018-01
     inputs:
       person:
         age: 55
-        traditional_ira_contributions: 8000
+        traditional_ira_contributions: 6500
         has_retirement_plan_at_work: false
         adjusted_gross_income: 100000
     outputs:
-      ira_contribution_limit: 8000
-      ira_deduction: 8000
+      ira_contribution_limit: 6500
+      ira_deduction: 6500
 
   - name: "With employer plan, mid-phaseout"
+    period: 2018-01
     inputs:
       person:
         age: 40
-        traditional_ira_contributions: 7000
+        traditional_ira_contributions: 5500
         has_retirement_plan_at_work: true
-        adjusted_gross_income: 82000  # Midpoint of 77k-87k
+        adjusted_gross_income: 68000  # Midpoint of 63k-73k
     outputs:
       ira_phaseout_ratio: 0.5
-      ira_deduction: 3500
+      ira_deduction: 2750

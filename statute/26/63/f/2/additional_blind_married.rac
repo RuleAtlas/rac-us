@@ -13,29 +13,7 @@ to the taxpayer for such spouse under section 151(b).
 
 parameter additional_blind_married:
   description: "Additional standard deduction for blind taxpayer who is married or surviving spouse"
-  unit: USD
-  reference: "26 USC 63(f)(2), Rev. Proc. 2023-34"
+  unit: "USD"
+  indexed_by: statute/26/63/f/3
   values:
-    2024-01-01: 1550
-    2023-01-01: 1500
-    2022-01-01: 1400
-    2021-01-01: 1350
-    2020-01-01: 1300
-    2019-01-01: 1300
-    2018-01-01: 1300
-    2017-01-01: 1250
-    2016-01-01: 1250
-    2015-01-01: 1250
-    2014-01-01: 1200
-    2013-01-01: 1200
-    2012-01-01: 1150
-    2011-01-01: 1150
-    2010-01-01: 1100
-    2009-01-01: 1100
-    2008-01-01: 1050
-    2007-01-01: 1050
-    2006-01-01: 1000
-    2005-01-01: 1000
-    2004-01-01: 950
-    2003-01-01: 950
     1988-01-01: 600

@@ -11,29 +11,7 @@ the regular basic standard deduction.
 
 parameter dependent_earned_addon:
   description: "Amount added to dependent's earned income for standard deduction calculation"
-  unit: USD
-  reference: "26 USC 63(c)(5)(A)(ii), Rev. Proc. 2023-34"
+  unit: "USD"
+  indexed_by: statute/26/63/c/4
   values:
-    2024-01-01: 450
-    2023-01-01: 400
-    2022-01-01: 400
-    2021-01-01: 350
-    2020-01-01: 350
-    2019-01-01: 350
-    2018-01-01: 350
-    2017-01-01: 350
-    2016-01-01: 350
-    2015-01-01: 350
-    2014-01-01: 350
-    2013-01-01: 350
-    2012-01-01: 300
-    2011-01-01: 300
-    2010-01-01: 300
-    2009-01-01: 300
-    2008-01-01: 300
-    2007-01-01: 300
-    2006-01-01: 250
-    2005-01-01: 250
-    2004-01-01: 250
-    2003-01-01: 250
     1988-01-01: 250

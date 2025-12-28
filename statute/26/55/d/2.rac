@@ -10,33 +10,31 @@ by an amount equal to 25 percent of the amount by which the alternative
 minimum taxable income of the taxpayer exceeds the threshold amount.
 """
 
+# Base TCJA values (2018) - indexed annually
+# Current values in IRS guidance files
+
 parameter phaseout_threshold_joint:
   description: "AMT phaseout threshold for married filing jointly"
-  unit: USD
+  unit: "USD"
+  indexed_by: statute/26/55/d/4
   values:
-    2024-01-01: 1218700
-    2023-01-01: 1156300
-    2022-01-01: 1079800
     2018-01-01: 1000000
 
 parameter phaseout_threshold_single:
   description: "AMT phaseout threshold for single filers"
-  unit: USD
+  unit: "USD"
+  indexed_by: statute/26/55/d/4
   values:
-    2024-01-01: 609350
-    2023-01-01: 578150
-    2022-01-01: 539900
     2018-01-01: 500000
 
 parameter phaseout_threshold_married_separate:
   description: "AMT phaseout threshold for married filing separately"
-  unit: USD
+  unit: "USD"
+  indexed_by: statute/26/55/d/4
   values:
-    2024-01-01: 609350
-    2023-01-01: 578150
-    2022-01-01: 539900
     2018-01-01: 500000
 
+# Statutory rate - not indexed
 parameter phaseout_rate:
   description: "AMT exemption phaseout rate"
   unit: rate

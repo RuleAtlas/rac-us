@@ -60,99 +60,67 @@ input qualified_dividends:
   default: 0
 
 # === PARAMETERS ===
-# Capital gains rate thresholds by filing status (indexed for inflation annually)
-# These are the top of the 0% rate bracket (where 15% begins)
-# Per Rev. Proc. 2023-34 for 2024 tax year
+# Capital gains rate thresholds by filing status
+# Base TCJA 2018 values - indexed annually per 1(h)(1)(D)
+# Current indexed values in IRS guidance files
 
 parameter zero_rate_threshold_single:
   description: "Maximum taxable income for 0% capital gains rate - single filers"
-  unit: USD
-  reference: "26 USC 1(h)(1)(B); Rev. Proc. 2023-34"
+  unit: "USD"
+  indexed_by: statute/26/1/h
   values:
-    2024-01-01: 47025
-    2023-01-01: 44625
-    2022-01-01: 41675
-    2021-01-01: 40400
-    2020-01-01: 40000
+    2018-01-01: 38600
 
 parameter zero_rate_threshold_joint:
   description: "Maximum taxable income for 0% capital gains rate - married filing jointly"
-  unit: USD
-  reference: "26 USC 1(h)(1)(B); Rev. Proc. 2023-34"
+  unit: "USD"
+  indexed_by: statute/26/1/h
   values:
-    2024-01-01: 94050
-    2023-01-01: 89250
-    2022-01-01: 83350
-    2021-01-01: 80800
-    2020-01-01: 80000
+    2018-01-01: 77200
 
 parameter zero_rate_threshold_separate:
   description: "Maximum taxable income for 0% capital gains rate - married filing separately"
-  unit: USD
-  reference: "26 USC 1(h)(1)(B); Rev. Proc. 2023-34"
+  unit: "USD"
+  indexed_by: statute/26/1/h
   values:
-    2024-01-01: 47025
-    2023-01-01: 44625
-    2022-01-01: 41675
-    2021-01-01: 40400
-    2020-01-01: 40000
+    2018-01-01: 38600
 
 parameter zero_rate_threshold_hoh:
   description: "Maximum taxable income for 0% capital gains rate - head of household"
-  unit: USD
-  reference: "26 USC 1(h)(1)(B); Rev. Proc. 2023-34"
+  unit: "USD"
+  indexed_by: statute/26/1/h
   values:
-    2024-01-01: 63000
-    2023-01-01: 59750
-    2022-01-01: 55800
-    2021-01-01: 54100
-    2020-01-01: 53600
+    2018-01-01: 51700
 
 # 15% rate threshold (where 20% begins)
 
 parameter fifteen_rate_threshold_single:
   description: "Maximum taxable income for 15% capital gains rate - single filers"
-  unit: USD
-  reference: "26 USC 1(h)(1)(C); Rev. Proc. 2023-34"
+  unit: "USD"
+  indexed_by: statute/26/1/h
   values:
-    2024-01-01: 518900
-    2023-01-01: 492300
-    2022-01-01: 459750
-    2021-01-01: 445850
-    2020-01-01: 441450
+    2018-01-01: 425800
 
 parameter fifteen_rate_threshold_joint:
   description: "Maximum taxable income for 15% capital gains rate - married filing jointly"
-  unit: USD
-  reference: "26 USC 1(h)(1)(C); Rev. Proc. 2023-34"
+  unit: "USD"
+  indexed_by: statute/26/1/h
   values:
-    2024-01-01: 583750
-    2023-01-01: 553850
-    2022-01-01: 517200
-    2021-01-01: 501600
-    2020-01-01: 496600
+    2018-01-01: 479000
 
 parameter fifteen_rate_threshold_separate:
   description: "Maximum taxable income for 15% capital gains rate - married filing separately"
-  unit: USD
-  reference: "26 USC 1(h)(1)(C); Rev. Proc. 2023-34"
+  unit: "USD"
+  indexed_by: statute/26/1/h
   values:
-    2024-01-01: 291850
-    2023-01-01: 276900
-    2022-01-01: 258600
-    2021-01-01: 250800
-    2020-01-01: 248300
+    2018-01-01: 239500
 
 parameter fifteen_rate_threshold_hoh:
   description: "Maximum taxable income for 15% capital gains rate - head of household"
-  unit: USD
-  reference: "26 USC 1(h)(1)(C); Rev. Proc. 2023-34"
+  unit: "USD"
+  indexed_by: statute/26/1/h
   values:
-    2024-01-01: 551350
-    2023-01-01: 523050
-    2022-01-01: 488500
-    2021-01-01: 473750
-    2020-01-01: 469050
+    2018-01-01: 452400
 
 # Capital gains rates
 
@@ -329,65 +297,65 @@ variable capital_gains_tax:
     return tax_at_zero + tax_at_fifteen + tax_at_twenty
   default: 0
   tests:
-    - name: "Single filer, $40k taxable income, $10k LTCG, fully in 0% bracket"
-      period: 2024-01
+    - name: "Single filer, $30k taxable income, $10k LTCG, fully in 0% bracket"
+      period: 2018-01
       inputs:
-        taxable_income: 40000
+        taxable_income: 30000
         long_term_capital_gains: 10000
         qualified_dividends: 0
         filing_status: SINGLE
-      # Ordinary = $40k - $10k = $30k. Room in 0% = $47,025 - $30,000 = $17,025
+      # Ordinary = $30k - $10k = $20k. Room in 0% = $38,600 - $20,000 = $18,600
       # All $10k fits in 0% bracket. Tax = $0
       expect: 0
-    - name: "Single filer, $60k taxable income, $20k LTCG, spans 0% and 15%"
-      period: 2024-01
+    - name: "Single filer, $50k taxable income, $20k LTCG, spans 0% and 15%"
+      period: 2018-01
       inputs:
-        taxable_income: 60000
+        taxable_income: 50000
         long_term_capital_gains: 20000
         qualified_dividends: 0
         filing_status: SINGLE
-      # Ordinary = $60k - $20k = $40k. Room in 0% = $47,025 - $40,000 = $7,025
-      # At 0%: $7,025. At 15%: $20,000 - $7,025 = $12,975
-      # Tax = $0 + $12,975 * 0.15 = $1,946.25 -> $1,946
-      expect: 1946
-    - name: "Joint filer, $600k taxable income, $50k ANCG, spans 15% and 20%"
-      period: 2024-01
+      # Ordinary = $50k - $20k = $30k. Room in 0% = $38,600 - $30,000 = $8,600
+      # At 0%: $8,600. At 15%: $20,000 - $8,600 = $11,400
+      # Tax = $0 + $11,400 * 0.15 = $1,710
+      expect: 1710
+    - name: "Joint filer, $500k taxable income, $50k ANCG, spans 15% and 20%"
+      period: 2018-01
       inputs:
-        taxable_income: 600000
+        taxable_income: 500000
         long_term_capital_gains: 30000
         qualified_dividends: 20000
         filing_status: JOINT
-      # Ordinary = $600k - $50k = $550k. 0% threshold joint = $94,050
-      # 15% threshold joint = $583,750
-      # Room at 0%: max(0, $94,050 - $550,000) = $0
-      # Room at 15%: max(0, $583,750 - max($550,000, $94,050)) = $33,750
-      # At 15%: $33,750. At 20%: $50,000 - $33,750 = $16,250
-      # Tax = $33,750 * 0.15 + $16,250 * 0.20 = $5,062.50 + $3,250 = $8,312.50
-      expect: 8312
-    - name: "Head of household, $100k taxable income, $40k ANCG"
-      period: 2024-01
+      # Ordinary = $500k - $50k = $450k. 0% threshold joint = $77,200
+      # 15% threshold joint = $479,000
+      # Room at 0%: max(0, $77,200 - $450,000) = $0
+      # Room at 15%: max(0, $479,000 - max($450,000, $77,200)) = $29,000
+      # At 15%: $29,000. At 20%: $50,000 - $29,000 = $21,000
+      # Tax = $29,000 * 0.15 + $21,000 * 0.20 = $4,350 + $4,200 = $8,550
+      expect: 8550
+    - name: "Head of household, $60k taxable income, $20k ANCG"
+      period: 2018-01
       inputs:
-        taxable_income: 100000
-        long_term_capital_gains: 30000
-        qualified_dividends: 10000
+        taxable_income: 60000
+        long_term_capital_gains: 15000
+        qualified_dividends: 5000
         filing_status: HEAD_OF_HOUSEHOLD
-      # Ordinary = $100k - $40k = $60k. 0% threshold HOH = $63,000
-      # Room in 0% = $63,000 - $60,000 = $3,000
-      # At 0%: $3,000. At 15%: $40,000 - $3,000 = $37,000
-      # Tax = $0 + $37,000 * 0.15 = $5,550
-      expect: 5550
-    - name: "MFS, $300k taxable income, $20k LTCG, spans 15% and 20%"
-      period: 2024-01
+      # Ordinary = $60k - $20k = $40k. 0% threshold HOH = $51,700
+      # Room in 0% = $51,700 - $40,000 = $11,700
+      # At 0%: $11,700. At 15%: $20,000 - $11,700 = $8,300
+      # Tax = $0 + $8,300 * 0.15 = $1,245
+      expect: 1245
+    - name: "MFS, $250k taxable income, $20k LTCG, spans 15% and 20%"
+      period: 2018-01
       inputs:
-        taxable_income: 300000
+        taxable_income: 250000
         long_term_capital_gains: 20000
         qualified_dividends: 0
         filing_status: SEPARATE
-      # Ordinary = $300k - $20k = $280k. 15% threshold MFS = $291,850
-      # Room at 15%: $291,850 - $280,000 = $11,850
-      # At 15%: $11,850. At 20%: $20,000 - $11,850 = $8,150
-      # Tax = $11,850 * 0.15 + $8,150 * 0.20 = $1,777.50 + $1,630 = $3,407.50
-      expect: 3407
+      # Ordinary = $250k - $20k = $230k. 15% threshold MFS = $239,500
+      # Room at 15%: $239,500 - $230,000 = $9,500
+      # At 15%: $9,500. At 20%: $20,000 - $9,500 = $10,500
+      # Tax = $9,500 * 0.15 + $10,500 * 0.20 = $1,425 + $2,100 = $3,525
+      expect: 3525
 
 variable qualified_dividend_tax:
   entity: TaxUnit
