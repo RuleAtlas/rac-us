@@ -77,11 +77,12 @@ variable actc_ss_tax_formula:
   syntax: python
   formula: |
     # Only applies with 3+ qualifying children
-    if num_ctc_qualifying_children < qualifying_children_threshold:
-      return 0
     ss_excess = max(0, social_security_taxes - earned_income_credit)
     max_refundable = refundable_max * num_ctc_qualifying_children
-    return min(ss_excess, max_refundable)
+    # Zero out if less than 3 children (vectorized)
+    applies = (num_ctc_qualifying_children >= qualifying_children_threshold)
+    result = min(ss_excess, max_refundable) * applies
+    return result
 
 variable additional_child_tax_credit:
   imports:

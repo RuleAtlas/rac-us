@@ -49,8 +49,10 @@ variable ctc_phaseout_threshold:
   syntax: python
   formula: |
     if filing_status == JOINT:
-      return phaseout_threshold_joint
-    return phaseout_threshold_other
+        threshold = phaseout_threshold_joint
+    else:
+        threshold = phaseout_threshold_other
+    return threshold
   tests:
     - name: "Joint filers, 2024"
       period: 2024-01
