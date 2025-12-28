@@ -16,17 +16,21 @@ indebtedness for any period shall not exceed $1,000,000
 separate return).
 """
 
-parameter pre_tcja_acquisition_limit:
-  description: "Pre-TCJA acquisition debt limit (pre-Dec 15, 2017)"
+parameter acquisition_debt_limit:
+  description: "Maximum acquisition indebtedness for mortgage interest deduction"
   unit: "USD"
+  reference: "26 USC 163(h)(3)(B)(ii)"
   values:
     1987-01-01: 1000000
+    2017-12-15: 750000  # TCJA reduced limit for debt incurred after this date
 
-parameter pre_tcja_acquisition_limit_mfs:
-  description: "Pre-TCJA acquisition debt limit for married filing separately"
+parameter acquisition_debt_limit_mfs:
+  description: "Maximum acquisition indebtedness for married filing separately"
   unit: "USD"
+  reference: "26 USC 163(h)(3)(B)(ii)"
   values:
     1987-01-01: 500000
+    2017-12-15: 375000  # TCJA reduced limit for debt incurred after this date
 
 variable qualified_residence_interest:
   imports: [26/1#filing_status]
@@ -38,21 +42,13 @@ variable qualified_residence_interest:
   description: "Deductible interest on qualified residence per 26 USC 163(h)"
   syntax: python
   formula: |
-    # Determine applicable acquisition debt limit
+    # Determine applicable acquisition debt limit based on when debt was incurred
     is_mfs = filing_status == "married_separate"
-    # Use pre-TCJA limit ($1M) for grandfathered debt
+    # Parameter lookup uses debt_incurred_date to get correct limit
     if is_mfs:
-        pre_tcja_limit = pre_tcja_acquisition_limit_mfs
+        applicable_limit = acquisition_debt_limit_mfs
     else:
-        pre_tcja_limit = pre_tcja_acquisition_limit
-    if is_mfs:
-        tcja_limit = p.acquisition_debt_limit_mfs
-    else:
-        tcja_limit = p.acquisition_debt_limit
-    if debt_incurred_before_tcja:
-        applicable_limit = pre_tcja_limit
-    else:
-        applicable_limit = tcja_limit
+        applicable_limit = acquisition_debt_limit
     # Calculate deductible acquisition interest
     acquisition_ratio = min(1, applicable_limit / max(1, acquisition_debt))
     acquisition_interest = mortgage_interest_paid * acquisition_ratio
