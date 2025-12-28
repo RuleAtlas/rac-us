@@ -4,6 +4,71 @@ text: """
 exceed 100 percent of the poverty line
 (2) Elderly and disabled exemption from gross income test
 """
+
+input household_size:
+  entity: Household
+  period: Month
+  dtype: Integer
+  label: "Household Size"
+  description: "Number of persons in the SNAP household"
+  default: 1
+
+input has_elderly_disabled:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Has Elderly or Disabled Member"
+  description: "Whether household has member 60+ or disabled"
+  default: false
+
+input gross_income:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Gross Income"
+  description: "Total gross monthly income before deductions"
+  default: 0
+
+imports:
+  - 7/2014/e#snap_net_income
+
+parameter fpl_base:
+  values:
+    2024-01-01: 1255
+  unit: "USD"
+  period: Month
+  label: "Federal Poverty Level Base"
+  description: "Monthly FPL for 1-person household"
+  reference: "https://aspe.hhs.gov/poverty-guidelines"
+
+parameter fpl_additional_per_person:
+  values:
+    2024-01-01: 440
+  unit: "USD"
+  period: Month
+  label: "FPL Additional Per Person"
+  description: "Monthly FPL increment for each additional person"
+  reference: "https://aspe.hhs.gov/poverty-guidelines"
+
+parameter gross_income_limit_pct:
+  values:
+    1977-01-01: 1.30
+  unit: "/1"
+  period: Month
+  label: "SNAP Gross Income Limit"
+  description: "Gross income must be at or below this percentage of FPL"
+  reference: "https://www.fns.usda.gov/snap/recipient/eligibility"
+
+parameter net_income_limit_pct:
+  values:
+    1977-01-01: 1.00
+  unit: "/1"
+  period: Month
+  label: "SNAP Net Income Limit"
+  description: "Net income must be at or below this percentage of FPL"
+  reference: "https://www.fns.usda.gov/snap/recipient/eligibility"
+
 variable snap_fpl_monthly:
   entity: Household
   period: Month
@@ -14,10 +79,8 @@ variable snap_fpl_monthly:
   syntax: python
   formula: |
     # FPL = base for 1 person + additional per person beyond 1
-    base = parameter("gov.hhs.fpl.base")
-    additional = parameter("gov.hhs.fpl.additional_per_person")
     extra_members = max(0, household_size - 1)
-    return base + (additional * extra_members)
+    return fpl_base + (fpl_additional_per_person * extra_members)
   default: 0
 
 variable snap_gross_income_eligible:
@@ -28,11 +91,10 @@ variable snap_gross_income_eligible:
   description: "Whether household passes 130% FPL gross income test (elderly/disabled exempt)"
   syntax: python
   formula: |
-    limit_pct = parameter("gov.usda.fns.snap.income.gross_income_limit_pct")
     # Section 2014(c)(2): Elderly/disabled exempt from gross income test
     if has_elderly_disabled:
         return True
-    gross_limit = snap_fpl_monthly * limit_pct
+    gross_limit = snap_fpl_monthly * gross_income_limit_pct
     return gross_income <= gross_limit
   default: false
 
@@ -44,7 +106,6 @@ variable snap_net_income_eligible:
   description: "Whether household passes 100% FPL net income test after deductions"
   syntax: python
   formula: |
-    limit_pct = parameter("gov.usda.fns.snap.income.net_income_limit_pct")
-    net_limit = snap_fpl_monthly * limit_pct
+    net_limit = snap_fpl_monthly * net_income_limit_pct
     return snap_net_income <= net_limit
   default: false

@@ -2,6 +2,36 @@ text: """
 (a) Eligible households shall meet the income and other eligibility
 requirements of this section.
 """
+
+input receives_ssi:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives SSI"
+  description: "Whether any household member receives Supplemental Security Income"
+  default: false
+
+input receives_tanf:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives TANF"
+  description: "Whether household receives TANF cash assistance"
+  default: false
+
+input receives_general_assistance:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives General Assistance"
+  description: "Whether household receives state/local General Assistance"
+  default: false
+
+imports:
+  - 7/2014/c#snap_gross_income_eligible
+  - 7/2014/c#snap_net_income_eligible
+  - 7/2014/g#snap_resource_eligible
+
 variable snap_categorically_eligible:
   entity: Household
   period: Month

@@ -3,6 +3,33 @@ text: """
 for any elderly or disabled member, including transportation costs necessary
 to secure medical treatment or services
 """
+
+input has_elderly_disabled:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Has Elderly or Disabled Member"
+  description: "Whether household has member 60+ or disabled"
+  default: false
+
+input medical_expenses:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Medical Expenses"
+  description: "Monthly out-of-pocket medical expenses for elderly/disabled members"
+  default: 0
+
+parameter medical_expense_threshold:
+  values:
+    1977-01-01: 35
+  unit: "USD"
+  period: Month
+  label: "SNAP Medical Expense Deduction Threshold"
+  description: "Monthly threshold above which medical expenses are deductible"
+  reference: "https://www.fns.usda.gov/snap/deductions"
+
 variable snap_medical_expense_deduction:
   entity: Household
   period: Month
@@ -16,7 +43,6 @@ variable snap_medical_expense_deduction:
     if not has_elderly_disabled:
         return 0
     # Section 2014(e)(5): Deduct expenses in excess of threshold
-    threshold = parameter("gov.usda.fns.snap.deductions.medical.threshold")
-    excess = medical_expenses - threshold
+    excess = medical_expenses - medical_expense_threshold
     return max(0, excess)
   default: 0

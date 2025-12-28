@@ -27,3 +27,39 @@ variable earned_income_credit:
     # Credit = phase-in amount minus phase-out reduction, but not below zero
     return max(0, initial_credit_amount - credit_reduction_amount)
   default: 0
+  tests:
+    - name: "Eligible individual with positive credit"
+      period: 2024-01
+      inputs:
+        is_eligible_individual: true
+        initial_credit_amount: 4000
+        credit_reduction_amount: 500
+      expect: 3500
+    - name: "Eligible individual, no reduction"
+      period: 2024-01
+      inputs:
+        is_eligible_individual: true
+        initial_credit_amount: 4212.60
+        credit_reduction_amount: 0
+      expect: 4212.60
+    - name: "Ineligible individual gets 0"
+      period: 2024-01
+      inputs:
+        is_eligible_individual: false
+        initial_credit_amount: 6960
+        credit_reduction_amount: 1000
+      expect: 0
+    - name: "Reduction exceeds credit, result is 0"
+      period: 2024-01
+      inputs:
+        is_eligible_individual: true
+        initial_credit_amount: 2000
+        credit_reduction_amount: 3000
+      expect: 0
+    - name: "Zero credit, no reduction"
+      period: 2024-01
+      inputs:
+        is_eligible_individual: true
+        initial_credit_amount: 0
+        credit_reduction_amount: 0
+      expect: 0

@@ -43,7 +43,7 @@ variable acp_enrollment_eligible:
 variable acp_total_value:
   imports:
     - 47/1752/a/7#acp_annual_benefit
-    - 47/1752/a/8#acp_device_subsidy
+    - 47/1752/b/5#acp_device_subsidy
   entity: Household
   period: Year
   dtype: Money

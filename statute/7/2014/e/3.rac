@@ -4,6 +4,16 @@ payments for dependents, when necessary for a household member to accept
 or continue employment, or training or education that is preparatory to
 employment
 """
+
+input dependent_care_expenses:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Dependent Care Expenses"
+  description: "Monthly out-of-pocket expenses for care of dependents needed for work/training"
+  default: 0
+
 variable snap_dependent_care_deduction:
   entity: Household
   period: Month

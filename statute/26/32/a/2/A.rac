@@ -21,3 +21,68 @@ variable initial_credit_amount:
     cap = earned_income_amount[num_qualifying_children]
     # Credit = rate × min(earned_income, cap)
     return rate * min(earned_income, cap)
+  tests:
+    - name: "No children, income below cap"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        earned_income: 5000
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        earned_income_amount: {0: 8260, 1: 12390, 2: 17400, 3: 17400}
+      expect: 382.50  # 0.0765 * 5000
+    - name: "No children, income at cap"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        earned_income: 8260
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        earned_income_amount: {0: 8260, 1: 12390, 2: 17400, 3: 17400}
+      expect: 631.89  # 0.0765 * 8260
+    - name: "No children, income above cap"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        earned_income: 15000
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        earned_income_amount: {0: 8260, 1: 12390, 2: 17400, 3: 17400}
+      expect: 631.89  # 0.0765 * 8260 (capped)
+    - name: "One child, income below cap"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+        earned_income: 10000
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        earned_income_amount: {0: 8260, 1: 12390, 2: 17400, 3: 17400}
+      expect: 3400  # 0.34 * 10000
+    - name: "One child, maximum credit"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+        earned_income: 12390
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        earned_income_amount: {0: 8260, 1: 12390, 2: 17400, 3: 17400}
+      expect: 4212.60  # 0.34 * 12390
+    - name: "Two children, income at cap"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 2
+        earned_income: 17400
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        earned_income_amount: {0: 8260, 1: 12390, 2: 17400, 3: 17400}
+      expect: 6960  # 0.40 * 17400
+    - name: "Three+ children, income at cap"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 3
+        earned_income: 17400
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        earned_income_amount: {0: 8260, 1: 12390, 2: 17400, 3: 17400}
+      expect: 7830  # 0.45 * 17400
+    - name: "Zero earned income"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 2
+        earned_income: 0
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        earned_income_amount: {0: 8260, 1: 12390, 2: 17400, 3: 17400}
+      expect: 0

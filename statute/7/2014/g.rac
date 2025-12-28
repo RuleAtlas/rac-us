@@ -3,6 +3,100 @@ text: """
 resources (liquid and nonliquid assets) an eligible household may own...
 (1)(B) ...increased for households with elderly or disabled members
 """
+
+input bank_accounts:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Bank Account Balances"
+  description: "Total balance in checking and savings accounts"
+  default: 0
+
+input cash_on_hand:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Cash on Hand"
+  description: "Physical cash not deposited in bank accounts"
+  default: 0
+
+input stocks:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Stocks Value"
+  description: "Fair market value of stocks"
+  default: 0
+
+input bonds:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Bonds Value"
+  description: "Fair market value of bonds"
+  default: 0
+
+input other_financial_assets:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Other Financial Assets"
+  description: "Value of other non-exempt financial assets"
+  default: 0
+
+input vehicle_fair_market_value:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Vehicle Fair Market Value"
+  description: "Fair market value of countable vehicle(s)"
+  default: 0
+
+input has_elderly_disabled:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Has Elderly or Disabled Member"
+  description: "Whether household has member 60+ or disabled"
+  default: false
+
+parameter vehicle_exclusion:
+  description: "Fair market value exclusion for one vehicle"
+  unit: "USD"
+  period: Month
+  label: "SNAP Vehicle Exclusion"
+  reference: "https://www.fns.usda.gov/snap/recipient/eligibility"
+  values:
+    1977-01-01: 4650
+
+parameter resource_limit:
+  description: "Resource limit for non-elderly/disabled households"
+  unit: "USD"
+  period: Month
+  label: "SNAP Resource Limit"
+  reference: "https://www.fns.usda.gov/snap/recipient/eligibility"
+  values:
+    2024-10-01: 2750
+    2023-10-01: 2750
+    2022-10-01: 2500
+
+parameter resource_limit_elderly_disabled:
+  description: "Resource limit for households with elderly/disabled members"
+  unit: "USD"
+  period: Month
+  label: "SNAP Resource Limit (Elderly/Disabled)"
+  reference: "https://www.fns.usda.gov/snap/recipient/eligibility"
+  values:
+    2024-10-01: 4250
+    2023-10-01: 4250
+    2022-10-01: 3750
+
 variable snap_countable_resources:
   entity: Household
   period: Month

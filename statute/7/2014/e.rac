@@ -1,3 +1,51 @@
+input household_size:
+  entity: Household
+  period: Month
+  dtype: Integer
+  label: "Household Size"
+  description: "Number of persons in the SNAP household"
+  default: 1
+
+input earned_income:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Earned Income"
+  description: "Monthly gross earned income from employment"
+  default: 0
+
+input gross_income:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Gross Income"
+  description: "Total gross monthly income before deductions"
+  default: 0
+
+input shelter_costs:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Shelter Costs"
+  description: "Monthly housing costs including rent/mortgage, utilities, property taxes"
+  default: 0
+
+input has_elderly_disabled:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Has Elderly or Disabled Member"
+  description: "Whether household has member 60+ or disabled"
+  default: false
+
+imports:
+  - 7/2014/e/3#snap_dependent_care_deduction
+  - 7/2014/e/4#snap_child_support_deduction
+  - 7/2014/e/5#snap_medical_expense_deduction
+
 parameter standard_deduction_schedule:
   description: "SNAP standard deduction by household size, for use with cut()"
   unit: currency-USD
@@ -14,6 +62,27 @@ parameter excess_shelter_rate:
   source: "7 USC 2014(e)(6)(A)"
   values:
     1977-01-01: 0.5
+
+parameter earned_income_deduction_rate:
+  description: "SNAP earned income deduction rate applied to gross earnings"
+  unit: "/1"
+  period: Month
+  label: "SNAP Earned Income Deduction Rate"
+  reference: "https://www.fns.usda.gov/snap/recipient/eligibility"
+  values:
+    1977-01-01: 0.20
+
+parameter shelter_deduction_cap:
+  description: "Maximum shelter deduction for non-elderly/disabled households"
+  unit: "USD"
+  period: Month
+  label: "SNAP Shelter Deduction Cap"
+  reference: "https://www.fns.usda.gov/snap/recipient/eligibility"
+  values:
+    2024-10-01: 672
+    2023-10-01: 624
+    2022-10-01: 597
+    2021-10-01: 586
 
 variable snap_standard_deduction:
   imports: [26/1#cut]
@@ -39,8 +108,7 @@ variable snap_earned_income_deduction:
   description: "20% of gross earned income deducted before other calculations"
   syntax: python
   formula: |
-    rate = parameter("gov.usda.fns.snap.deductions.earned_income_rate")
-    return earned_income * rate
+    return earned_income * earned_income_deduction_rate
   default: 0
 
 variable snap_pre_shelter_deductions:
@@ -89,8 +157,7 @@ variable snap_shelter_deduction:
     if has_elderly_disabled:
         return excess
     # Section 2014(e)(6)(B): Cap for non-elderly/disabled households
-    cap = parameter("gov.usda.fns.snap.deductions.shelter.cap")
-    return min(excess, cap)
+    return min(excess, shelter_deduction_cap)
   default: 0
 
 variable snap_net_income:
