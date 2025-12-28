@@ -31,6 +31,27 @@ variable child_tax_credit:
   description: "Nonrefundable portion of Child Tax Credit per 26 USC Section 24"
   formula: return ctc
   default: 0
+  tests:
+    - name: "Zero credit when no qualifying children"
+      period: 2024
+      inputs:
+        ctc: 0
+      expect: 0
+    - name: "Standard CTC with two children at $2,000 each"
+      period: 2024
+      inputs:
+        ctc: 4_000
+      expect: 4_000
+    - name: "Maximum nonrefundable credit scenario"
+      period: 2024
+      inputs:
+        ctc: 6_000
+      expect: 6_000
+    - name: "Partial credit after phaseout"
+      period: 2024
+      inputs:
+        ctc: 1_500
+      expect: 1_500
 
 variable additional_child_tax_credit:
   imports:
@@ -43,6 +64,27 @@ variable additional_child_tax_credit:
   description: "Refundable portion of Child Tax Credit per 26 USC Section 24(d)"
   formula: return actc
   default: 0
+  tests:
+    - name: "Zero refundable credit when fully nonrefundable"
+      period: 2024
+      inputs:
+        actc: 0
+      expect: 0
+    - name: "Standard refundable ACTC"
+      period: 2024
+      inputs:
+        actc: 1_700
+      expect: 1_700
+    - name: "Maximum refundable credit at $1,700 per child"
+      period: 2024
+      inputs:
+        actc: 3_400
+      expect: 3_400
+    - name: "Partial refundable credit based on earned income"
+      period: 2024
+      inputs:
+        actc: 850
+      expect: 850
 
 variable total_child_tax_credit:
   imports:
@@ -55,3 +97,24 @@ variable total_child_tax_credit:
   description: "Combined nonrefundable CTC and refundable ACTC per 26 USC Section 24"
   formula: return ctc_total
   default: 0
+  tests:
+    - name: "Zero total when no qualifying children"
+      period: 2024
+      inputs:
+        ctc_total: 0
+      expect: 0
+    - name: "Total credit with two qualifying children"
+      period: 2024
+      inputs:
+        ctc_total: 4_000
+      expect: 4_000
+    - name: "Maximum total credit scenario (three children)"
+      period: 2024
+      inputs:
+        ctc_total: 6_000
+      expect: 6_000
+    - name: "Combined nonrefundable and refundable portions"
+      period: 2024
+      inputs:
+        ctc_total: 5_400
+      expect: 5_400

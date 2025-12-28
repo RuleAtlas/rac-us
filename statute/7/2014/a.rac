@@ -43,6 +43,49 @@ variable snap_categorically_eligible:
     # Section 2014(a) + Section 2014(j): SSI and TANF recipients
     return receives_ssi or receives_tanf or receives_general_assistance
   default: false
+  tests:
+    - name: "Household with no categorical eligibility"
+      period: 2024-01
+      inputs:
+        receives_ssi: false
+        receives_tanf: false
+        receives_general_assistance: false
+      expect: false
+    - name: "Household receives SSI only"
+      period: 2024-01
+      inputs:
+        receives_ssi: true
+        receives_tanf: false
+        receives_general_assistance: false
+      expect: true
+    - name: "Household receives TANF only"
+      period: 2024-01
+      inputs:
+        receives_ssi: false
+        receives_tanf: true
+        receives_general_assistance: false
+      expect: true
+    - name: "Household receives General Assistance only"
+      period: 2024-01
+      inputs:
+        receives_ssi: false
+        receives_tanf: false
+        receives_general_assistance: true
+      expect: true
+    - name: "Household receives both SSI and TANF"
+      period: 2024-01
+      inputs:
+        receives_ssi: true
+        receives_tanf: true
+        receives_general_assistance: false
+      expect: true
+    - name: "Household receives all three programs"
+      period: 2024-01
+      inputs:
+        receives_ssi: true
+        receives_tanf: true
+        receives_general_assistance: true
+      expect: true
 
 variable snap_eligible:
   entity: Household
@@ -60,3 +103,113 @@ variable snap_eligible:
     # Regular eligibility: must pass all three tests
     return snap_gross_income_eligible and snap_net_income_eligible and snap_resource_eligible
   default: false
+  tests:
+    # Regular eligibility pathway tests (non-categorical)
+    - name: "Regular household passes all three tests"
+      period: 2024-01
+      inputs:
+        # Non-categorical
+        receives_ssi: false
+        receives_tanf: false
+        receives_general_assistance: false
+        # Passes all tests
+        snap_gross_income_eligible: true
+        snap_net_income_eligible: true
+        snap_resource_eligible: true
+      expect: true
+    - name: "Regular household fails gross income test only"
+      period: 2024-01
+      inputs:
+        receives_ssi: false
+        receives_tanf: false
+        receives_general_assistance: false
+        # Fails gross income
+        snap_gross_income_eligible: false
+        snap_net_income_eligible: true
+        snap_resource_eligible: true
+      expect: false
+    - name: "Regular household fails net income test only"
+      period: 2024-01
+      inputs:
+        receives_ssi: false
+        receives_tanf: false
+        receives_general_assistance: false
+        snap_gross_income_eligible: true
+        # Fails net income
+        snap_net_income_eligible: false
+        snap_resource_eligible: true
+      expect: false
+    - name: "Regular household fails resource test only"
+      period: 2024-01
+      inputs:
+        receives_ssi: false
+        receives_tanf: false
+        receives_general_assistance: false
+        snap_gross_income_eligible: true
+        snap_net_income_eligible: true
+        # Fails resources
+        snap_resource_eligible: false
+      expect: false
+    - name: "Regular household fails all tests"
+      period: 2024-01
+      inputs:
+        receives_ssi: false
+        receives_tanf: false
+        receives_general_assistance: false
+        snap_gross_income_eligible: false
+        snap_net_income_eligible: false
+        snap_resource_eligible: false
+      expect: false
+    # Categorical eligibility pathway tests
+    - name: "SSI recipient bypasses gross income and resource tests"
+      period: 2024-01
+      inputs:
+        receives_ssi: true
+        receives_tanf: false
+        receives_general_assistance: false
+        # Would fail gross and resource if tested
+        snap_gross_income_eligible: false
+        snap_net_income_eligible: true
+        snap_resource_eligible: false
+      expect: true  # Categorical eligibility bypasses gross/resource
+    - name: "TANF recipient bypasses gross income and resource tests"
+      period: 2024-01
+      inputs:
+        receives_ssi: false
+        receives_tanf: true
+        receives_general_assistance: false
+        snap_gross_income_eligible: false
+        snap_net_income_eligible: true
+        snap_resource_eligible: false
+      expect: true
+    - name: "GA recipient bypasses gross income and resource tests"
+      period: 2024-01
+      inputs:
+        receives_ssi: false
+        receives_tanf: false
+        receives_general_assistance: true
+        snap_gross_income_eligible: false
+        snap_net_income_eligible: true
+        snap_resource_eligible: false
+      expect: true
+    - name: "Categorical recipient still must pass net income test"
+      period: 2024-01
+      inputs:
+        receives_ssi: true
+        receives_tanf: false
+        receives_general_assistance: false
+        snap_gross_income_eligible: true
+        # Fails net income - categorical does not bypass this
+        snap_net_income_eligible: false
+        snap_resource_eligible: true
+      expect: false
+    - name: "Categorical recipient passes net income test"
+      period: 2024-01
+      inputs:
+        receives_ssi: true
+        receives_tanf: true
+        receives_general_assistance: false
+        snap_gross_income_eligible: true
+        snap_net_income_eligible: true
+        snap_resource_eligible: true
+      expect: true

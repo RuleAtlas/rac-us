@@ -13,27 +13,426 @@ the Social Security Act [SSI];
 (i) 150 percent of the poverty level for such State; or
 (ii) 60 percent of the State median income
 """
-variable eligibility:
+
+# 42 USC 8624(b) - LIHEAP Eligibility and Benefits
+# Low Income Home Energy Assistance Program
+
+# Inputs required for LIHEAP calculations
+input household_size:
+  entity: Household
+  period: Year
+  dtype: Integer
+  label: "Household Size"
+  description: "Number of persons in the household"
+  default: 1
+
+input annual_gross_income:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Annual Gross Income"
+  description: "Total annual gross household income"
+  default: 0
+
+input receives_tanf:
   entity: Household
   period: Year
   dtype: Boolean
+  label: "Receives TANF"
+  description: "Whether household member receives TANF benefits"
+  default: false
+
+input receives_ssi:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "Receives SSI"
+  description: "Whether household member receives SSI payments"
+  default: false
+
+input receives_snap:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "Receives SNAP"
+  description: "Whether household member receives SNAP benefits"
+  default: false
+
+input receives_veterans_benefits:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "Receives Veterans Benefits"
+  description: "Whether household member receives VA pension/benefits under 38 USC 415/521/541/542"
+  default: false
+
+input has_elderly_member:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "Has Elderly Member"
+  description: "Whether household has a member age 60 or older"
+  default: false
+
+input has_disabled_member:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "Has Disabled Member"
+  description: "Whether household has a disabled member"
+  default: false
+
+input has_young_children:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "Has Young Children"
+  description: "Whether household has children under age 6"
+  default: false
+
+input annual_energy_costs:
+  entity: Household
+  period: Year
+  dtype: Money
   unit: "USD"
-  label: "LIHEAP eligibility"
+  label: "Annual Energy Costs"
+  description: "Total annual home energy costs"
+  default: 0
+
+# Federal Poverty Level parameters (annual, 48 contiguous states + DC)
+# Source: HHS Poverty Guidelines
+parameter fpl_base:
+  values:
+    2024-01-01: 15_060
+    2023-01-01: 14_580
+  unit: "USD"
+  period: Year
+  label: "Federal Poverty Level Base"
+  description: "Annual FPL for 1-person household"
+  reference: "https://aspe.hhs.gov/poverty-guidelines"
+
+parameter fpl_additional_per_person:
+  values:
+    2024-01-01: 5_380
+    2023-01-01: 5_140
+  unit: "USD"
+  period: Year
+  label: "FPL Additional Per Person"
+  description: "Annual FPL increment for each additional household member"
+  reference: "https://aspe.hhs.gov/poverty-guidelines"
+
+parameter fpl_percentage:
+  values:
+    1981-01-01: 1.50
+  unit: "/1"
+  period: Year
+  label: "LIHEAP FPL Percentage"
+  description: "Income limit as percentage of FPL (150%)"
+  reference: "42 USC 8624(b)(2)(B)(i)"
+
+# Calculated variables
+
+variable liheap_fpl_annual:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "LIHEAP Annual FPL"
+  description: "Annual Federal Poverty Level for household, scaled by size"
+  syntax: python
+  formula: |
+    # FPL = base for 1 person + additional per person beyond 1
+    extra_members = max(0, household_size - 1)
+    return fpl_base + (fpl_additional_per_person * extra_members)
+  default: 0
+  tests:
+    - name: "Single person household"
+      period: 2024
+      inputs: {household_size: 1}
+      expect: 15_060
+    - name: "Two-person household"
+      period: 2024
+      inputs: {household_size: 2}
+      expect: 20_440  # 15_060 + 5_380
+    - name: "Three-person household"
+      period: 2024
+      inputs: {household_size: 3}
+      expect: 25_820  # 15_060 + (5_380 * 2)
+    - name: "Four-person household"
+      period: 2024
+      inputs: {household_size: 4}
+      expect: 31_200  # 15_060 + (5_380 * 3)
+    - name: "Large household (6 persons)"
+      period: 2024
+      inputs: {household_size: 6}
+      expect: 41_960  # 15_060 + (5_380 * 5)
+    - name: "Prior year FPL (2023)"
+      period: 2023
+      inputs: {household_size: 1}
+      expect: 14_580
+
+variable liheap_income_limit:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "LIHEAP Income Limit"
+  description: "Maximum income for LIHEAP eligibility (150% FPL)"
+  syntax: python
+  formula: |
+    return liheap_fpl_annual * fpl_percentage
+  default: 0
+  tests:
+    - name: "Single person household at 150% FPL"
+      period: 2024
+      inputs: {household_size: 1}
+      expect: 22_590  # 15_060 * 1.50
+    - name: "Two-person household at 150% FPL"
+      period: 2024
+      inputs: {household_size: 2}
+      expect: 30_660  # 20_440 * 1.50
+    - name: "Three-person household at 150% FPL"
+      period: 2024
+      inputs: {household_size: 3}
+      expect: 38_730  # 25_820 * 1.50
+    - name: "Four-person household at 150% FPL"
+      period: 2024
+      inputs: {household_size: 4}
+      expect: 46_800  # 31_200 * 1.50
+    - name: "Large household (6 persons) at 150% FPL"
+      period: 2024
+      inputs: {household_size: 6}
+      expect: 62_940  # 41_960 * 1.50
+    - name: "Prior year income limit (2023)"
+      period: 2023
+      inputs: {household_size: 1}
+      expect: 21_870  # 14_580 * 1.50
+
+variable liheap_categorically_eligible:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "LIHEAP Categorically Eligible"
+  description: "Categorical eligibility via TANF, SSI, SNAP, or VA benefits per 42 USC 8624(b)(2)(A)"
+  syntax: python
+  formula: |
+    # Per 42 USC 8624(b)(2)(A), households are eligible if any member receives:
+    # (i) TANF, (ii) SSI, (iii) SNAP, or (iv) VA pension benefits
+    return receives_tanf or receives_ssi or receives_snap or receives_veterans_benefits
+  default: false
+  tests:
+    - name: "Receives TANF only"
+      period: 2024
+      inputs: {receives_tanf: true, receives_ssi: false, receives_snap: false, receives_veterans_benefits: false}
+      expect: true
+    - name: "Receives SSI only"
+      period: 2024
+      inputs: {receives_tanf: false, receives_ssi: true, receives_snap: false, receives_veterans_benefits: false}
+      expect: true
+    - name: "Receives SNAP only"
+      period: 2024
+      inputs: {receives_tanf: false, receives_ssi: false, receives_snap: true, receives_veterans_benefits: false}
+      expect: true
+    - name: "Receives VA benefits only"
+      period: 2024
+      inputs: {receives_tanf: false, receives_ssi: false, receives_snap: false, receives_veterans_benefits: true}
+      expect: true
+    - name: "Receives multiple benefits"
+      period: 2024
+      inputs: {receives_tanf: true, receives_ssi: true, receives_snap: false, receives_veterans_benefits: false}
+      expect: true
+    - name: "No categorical benefits"
+      period: 2024
+      inputs: {receives_tanf: false, receives_ssi: false, receives_snap: false, receives_veterans_benefits: false}
+      expect: false
+
+variable liheap_income_eligible:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "LIHEAP Income Eligible"
+  description: "Income eligibility based on 150% FPL per 42 USC 8624(b)(2)(B)"
+  syntax: python
+  formula: |
+    # Per 42 USC 8624(b)(2)(B), income must not exceed 150% FPL
+    # (or 60% state median income, but we use the FPL test as the baseline)
+    return annual_gross_income <= liheap_income_limit
+  default: false
+  tests:
+    - name: "Single person - income exactly at 150% FPL"
+      period: 2024
+      inputs: {household_size: 1, annual_gross_income: 22_590}
+      expect: true
+    - name: "Single person - income below 150% FPL"
+      period: 2024
+      inputs: {household_size: 1, annual_gross_income: 20_000}
+      expect: true
+    - name: "Single person - income just above 150% FPL"
+      period: 2024
+      inputs: {household_size: 1, annual_gross_income: 22_591}
+      expect: false
+    - name: "Four-person household - income at limit"
+      period: 2024
+      inputs: {household_size: 4, annual_gross_income: 46_800}
+      expect: true
+    - name: "Four-person household - income over limit"
+      period: 2024
+      inputs: {household_size: 4, annual_gross_income: 50_000}
+      expect: false
+    - name: "Zero income always eligible"
+      period: 2024
+      inputs: {household_size: 2, annual_gross_income: 0}
+      expect: true
+
+variable liheap_eligible:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "LIHEAP Eligible"
   description: "Overall LIHEAP eligibility per 42 USC 8624(b)(2)"
   syntax: python
   formula: |
-    base_fpl = fpl_by_household_size[1]
-    additional_per_person = fpl_by_household_size["additional_per_person"]
-    extra_members = max(0, household_size - 1)
-    fpl = base_fpl + (additional_per_person * extra_members)
-    return fpl * fpl_percentage
-  default: False
+    # Eligible if either:
+    # (A) Categorically eligible via TANF/SSI/SNAP/VA benefits, OR
+    # (B) Income does not exceed 150% FPL (or 60% state median income)
+    return liheap_categorically_eligible or liheap_income_eligible
+  default: false
+  tests:
+    - name: "Categorically eligible via SNAP, high income"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 50_000
+        receives_snap: true
+      expect: true
+    - name: "Income eligible, no categorical benefits"
+      period: 2024
+      inputs:
+        household_size: 4
+        annual_gross_income: 40_000
+        receives_tanf: false
+        receives_ssi: false
+        receives_snap: false
+        receives_veterans_benefits: false
+      expect: true
+    - name: "Both categorical and income eligible"
+      period: 2024
+      inputs:
+        household_size: 2
+        annual_gross_income: 20_000
+        receives_ssi: true
+      expect: true
+    - name: "High income, no categorical benefits - ineligible"
+      period: 2024
+      inputs:
+        household_size: 2
+        annual_gross_income: 50_000
+        receives_tanf: false
+        receives_ssi: false
+        receives_snap: false
+        receives_veterans_benefits: false
+      expect: false
+    - name: "Single person at income threshold"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 22_590
+        receives_tanf: false
+        receives_ssi: false
+        receives_snap: false
+        receives_veterans_benefits: false
+      expect: true
+    - name: "Large household with low income"
+      period: 2024
+      inputs:
+        household_size: 6
+        annual_gross_income: 35_000
+        receives_tanf: false
+        receives_ssi: false
+        receives_snap: false
+        receives_veterans_benefits: false
+      expect: true
 
+variable liheap_priority_household:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "LIHEAP Priority Household"
+  description: "Whether household qualifies for priority/enhanced benefits per 42 USC 8624(b)(5)"
+  syntax: python
+  formula: |
+    # Per 42 USC 8624(b)(5), priority goes to households with:
+    # (i) lowest incomes paying high proportion for energy
+    # (ii) elderly members
+    # (iii) disabled members
+    # (iv) young children
+    return has_elderly_member or has_disabled_member or has_young_children
+  default: false
+  tests:
+    - name: "Household with elderly member"
+      period: 2024
+      inputs: {has_elderly_member: true, has_disabled_member: false, has_young_children: false}
+      expect: true
+    - name: "Household with disabled member"
+      period: 2024
+      inputs: {has_elderly_member: false, has_disabled_member: true, has_young_children: false}
+      expect: true
+    - name: "Household with young children"
+      period: 2024
+      inputs: {has_elderly_member: false, has_disabled_member: false, has_young_children: true}
+      expect: true
+    - name: "Household with multiple priority factors"
+      period: 2024
+      inputs: {has_elderly_member: true, has_disabled_member: true, has_young_children: false}
+      expect: true
+    - name: "No priority factors"
+      period: 2024
+      inputs: {has_elderly_member: false, has_disabled_member: false, has_young_children: false}
+      expect: false
+    - name: "All priority factors"
+      period: 2024
+      inputs: {has_elderly_member: true, has_disabled_member: true, has_young_children: true}
+      expect: true
 
-
-# ---- Merged from liheap.rac ----
-
-# 42 USC 8624 - Low Income Home Energy Assistance Program (LIHEAP)
-#
-variable liheap:
-  imports:
+variable liheap_energy_burden:
+  entity: Household
+  period: Year
+  dtype: Rate
+  unit: "/1"
+  label: "Energy Burden"
+  description: "Ratio of energy costs to income, used in benefit targeting"
+  syntax: python
+  formula: |
+    # Energy burden = annual energy costs / annual income
+    # High burden indicates priority for assistance
+    if annual_gross_income <= 0:
+      # Zero/negative income: cap burden at 1.0 (100%)
+      return 1
+    return min(1, annual_energy_costs / annual_gross_income)
+  default: 0
+  tests:
+    - name: "Low energy burden (5%)"
+      period: 2024
+      inputs: {annual_energy_costs: 2_500, annual_gross_income: 50_000}
+      expect: 0.05
+    - name: "Moderate energy burden (10%)"
+      period: 2024
+      inputs: {annual_energy_costs: 3_000, annual_gross_income: 30_000}
+      expect: 0.10
+    - name: "High energy burden (20%)"
+      period: 2024
+      inputs: {annual_energy_costs: 4_000, annual_gross_income: 20_000}
+      expect: 0.20
+    - name: "Very high energy burden (capped at 100%)"
+      period: 2024
+      inputs: {annual_energy_costs: 5_000, annual_gross_income: 3_000}
+      expect: 1.0
+    - name: "Zero income - maximum burden"
+      period: 2024
+      inputs: {annual_energy_costs: 2_400, annual_gross_income: 0}
+      expect: 1.0
+    - name: "Zero energy costs"
+      period: 2024
+      inputs: {annual_energy_costs: 0, annual_gross_income: 40_000}
+      expect: 0.0

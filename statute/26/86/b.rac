@@ -26,6 +26,43 @@ variable combined_income:
   formula: |
     # Per Section 86(b)(1), combined income = MAGI + 0.5 * SS benefits
     return modified_agi + (ss_fraction * tax_unit_social_security)
+  tests:
+    - name: "Combined income with zero SS benefits"
+      period: 2024
+      inputs:
+        modified_agi: 30_000
+        tax_unit_social_security: 0
+      expect: 30_000
+    - name: "Combined income adds half of SS benefits"
+      period: 2024
+      inputs:
+        modified_agi: 30_000
+        tax_unit_social_security: 20_000
+      expect: 40_000  # 30_000 + 0.5 * 20_000
+    - name: "Typical retiree with moderate SS benefits"
+      period: 2024
+      inputs:
+        modified_agi: 25_000
+        tax_unit_social_security: 24_000
+      expect: 37_000  # 25_000 + 0.5 * 24_000
+    - name: "High SS benefit recipient"
+      period: 2024
+      inputs:
+        modified_agi: 50_000
+        tax_unit_social_security: 45_000
+      expect: 72_500  # 50_000 + 0.5 * 45_000
+    - name: "Zero MAGI with SS benefits"
+      period: 2024
+      inputs:
+        modified_agi: 0
+        tax_unit_social_security: 36_000
+      expect: 18_000  # 0 + 0.5 * 36_000
+    - name: "Maximum SS benefit scenario"
+      period: 2024
+      inputs:
+        modified_agi: 100_000
+        tax_unit_social_security: 58_000
+      expect: 129_000  # 100_000 + 0.5 * 58_000 (max SS ~$4,873/mo in 2024)
 
 
 variable modified_agi:
@@ -43,3 +80,40 @@ variable modified_agi:
     # Per Section 86(b)(1)(A) and IRS Publication 915:
     # MAGI = AGI + tax-exempt interest
     return adjusted_gross_income + tax_exempt_interest
+  tests:
+    - name: "MAGI with zero tax-exempt interest"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 50_000
+        tax_exempt_interest: 0
+      expect: 50_000
+    - name: "MAGI with municipal bond interest"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 45_000
+        tax_exempt_interest: 5_000
+      expect: 50_000  # 45_000 + 5_000
+    - name: "Retiree with significant tax-exempt interest"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 30_000
+        tax_exempt_interest: 15_000
+      expect: 45_000  # 30_000 + 15_000
+    - name: "Zero AGI with tax-exempt interest only"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 0
+        tax_exempt_interest: 20_000
+      expect: 20_000
+    - name: "High income taxpayer with modest tax-exempt interest"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 150_000
+        tax_exempt_interest: 8_000
+      expect: 158_000  # 150_000 + 8_000
+    - name: "Taxpayer with substantial muni bond portfolio"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 75_000
+        tax_exempt_interest: 25_000
+      expect: 100_000  # 75_000 + 25_000
