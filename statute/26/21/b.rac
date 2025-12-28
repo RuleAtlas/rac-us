@@ -4,6 +4,54 @@ text: """
 1 percentage point for each $2,000 (or fraction thereof) by which the taxpayer's
 adjusted gross income for the taxable year exceeds $15,000.
 """
+
+parameter maximum_rate:
+  description: "Maximum applicable percentage for CDCC"
+  unit: rate
+  reference: "26 USC 21(a)(2)"
+  values:
+    1976-01-01: 0.35
+
+parameter minimum_rate:
+  description: "Minimum applicable percentage for CDCC (floor rate)"
+  unit: rate
+  reference: "26 USC 21(a)(2)"
+  values:
+    1976-01-01: 0.20
+
+parameter phase_down_threshold:
+  description: "AGI threshold above which applicable percentage begins to decrease"
+  unit: USD
+  reference: "26 USC 21(a)(2)"
+  values:
+    1976-01-01: 15_000
+
+parameter phase_down_increment:
+  description: "AGI increment for each 1% reduction in applicable percentage"
+  unit: USD
+  reference: "26 USC 21(a)(2)"
+  values:
+    1976-01-01: 2_000
+
+parameter phase_down_rate:
+  description: "Rate reduction per AGI increment"
+  unit: rate
+  reference: "26 USC 21(a)(2)"
+  values:
+    1976-01-01: 0.01
+
+parameter arpa_complete_phaseout_threshold:
+  description: "AGI threshold above which ARPA 2021 rate phases out completely (set to infinity for permanent law)"
+  unit: USD
+  reference: "P.L. 117-2 Section 9631"
+  values:
+    # Under permanent law, there is no complete phaseout - use infinity
+    1976-01-01: 999_999_999
+    # ARPA 2021 temporarily added complete phaseout above $400,000
+    2021-01-01: 400_000
+    # Reverted to permanent law in 2022
+    2022-01-01: 999_999_999
+
 variable applicable_percentage:
   imports:
     - 26/62/a#adjusted_gross_income
@@ -32,3 +80,67 @@ variable applicable_percentage:
     rate_reduction = increments * phase_down_rate
     # Apply reduction but floor at minimum rate
     return max(minimum_rate, maximum_rate - rate_reduction)
+  tests:
+    # Low income - maximum rate of 35%
+    - name: "AGI at threshold - maximum 35% rate"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 15_000
+      expect: 0.35
+
+    - name: "AGI below threshold - maximum 35% rate"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 10_000
+      expect: 0.35
+
+    # Phase-down tests
+    - name: "AGI $17,000 - one increment above threshold (34%)"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 17_000
+      # $2,000 above threshold = 1 increment = 35% - 1% = 34%
+      expect: 0.34
+
+    - name: "AGI $19,000 - two increments above threshold (33%)"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 19_000
+      # $4,000 above threshold = 2 increments = 35% - 2% = 33%
+      expect: 0.33
+
+    - name: "AGI $25,000 - five increments above threshold (30%)"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 25_000
+      # $10,000 above threshold = 5 increments = 35% - 5% = 30%
+      expect: 0.30
+
+    # Floor rate tests
+    - name: "AGI $45,000 - hits 20% floor rate"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 45_000
+      # $30,000 above threshold = 15 increments = 35% - 15% = 20%
+      expect: 0.20
+
+    - name: "High AGI - stays at 20% floor"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 100_000
+      # Would be -8% but floor is 20%
+      expect: 0.20
+
+    # Edge cases
+    - name: "AGI $16,001 - fraction of increment counts as full (34%)"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 16_001
+      # $1,001 above threshold = 1 increment (ceiling) = 35% - 1% = 34%
+      expect: 0.34
+
+    - name: "Zero AGI - maximum 35% rate"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 0
+      expect: 0.35

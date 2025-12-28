@@ -7,6 +7,46 @@ of abode as the taxpayer for more than one-half of such taxable year, or
 (3) the spouse of the taxpayer, if the spouse is physically or mentally
 incapable of caring for himself or herself...
 """
+
+parameter child_age_limit:
+  description: "Maximum age (exclusive) for CDCC qualifying child"
+  unit: years
+  reference: "26 USC 21(b)(1)"
+  values:
+    1976-01-01: 13
+
+input is_dependent:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Dependent"
+  description: "Whether the person is a dependent of the taxpayer"
+  default: false
+
+input age:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Age"
+  description: "Age of the person at end of tax year"
+  default: 0
+
+input is_disabled:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Disabled"
+  description: "Whether the person is physically or mentally incapable of self-care"
+  default: false
+
+input is_tax_unit_spouse:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Spouse"
+  description: "Whether the person is the spouse of the taxpayer"
+  default: false
+
 variable is_qualifying_individual:
   entity: Person
   period: Year
@@ -22,6 +62,100 @@ variable is_qualifying_individual:
     # Category 3: Disabled spouse
     is_qualifying_disabled_spouse = is_tax_unit_spouse and is_disabled
     return is_qualifying_child or is_qualifying_disabled_dependent or is_qualifying_disabled_spouse
+  tests:
+    # Category 1: Dependent child under age 13
+    - name: "Dependent child age 5 qualifies"
+      period: 2024
+      inputs:
+        is_dependent: true
+        age: 5
+        is_disabled: false
+        is_tax_unit_spouse: false
+      expect: true
+
+    - name: "Dependent child age 12 qualifies (just under limit)"
+      period: 2024
+      inputs:
+        is_dependent: true
+        age: 12
+        is_disabled: false
+        is_tax_unit_spouse: false
+      expect: true
+
+    - name: "Dependent child age 13 does not qualify (at limit)"
+      period: 2024
+      inputs:
+        is_dependent: true
+        age: 13
+        is_disabled: false
+        is_tax_unit_spouse: false
+      expect: false
+
+    - name: "Non-dependent child age 5 does not qualify"
+      period: 2024
+      inputs:
+        is_dependent: false
+        age: 5
+        is_disabled: false
+        is_tax_unit_spouse: false
+      expect: false
+
+    # Category 2: Disabled dependent
+    - name: "Disabled dependent adult qualifies"
+      period: 2024
+      inputs:
+        is_dependent: true
+        age: 25
+        is_disabled: true
+        is_tax_unit_spouse: false
+      expect: true
+
+    - name: "Disabled dependent teenager qualifies"
+      period: 2024
+      inputs:
+        is_dependent: true
+        age: 15
+        is_disabled: true
+        is_tax_unit_spouse: false
+      expect: true
+
+    # Category 3: Disabled spouse
+    - name: "Disabled spouse qualifies"
+      period: 2024
+      inputs:
+        is_dependent: false
+        age: 45
+        is_disabled: true
+        is_tax_unit_spouse: true
+      expect: true
+
+    - name: "Non-disabled spouse does not qualify"
+      period: 2024
+      inputs:
+        is_dependent: false
+        age: 45
+        is_disabled: false
+        is_tax_unit_spouse: true
+      expect: false
+
+    # Edge cases and combinations
+    - name: "Adult disabled non-dependent non-spouse does not qualify"
+      period: 2024
+      inputs:
+        is_dependent: false
+        age: 30
+        is_disabled: true
+        is_tax_unit_spouse: false
+      expect: false
+
+    - name: "Dependent child under 13 who is also disabled qualifies"
+      period: 2024
+      inputs:
+        is_dependent: true
+        age: 8
+        is_disabled: true
+        is_tax_unit_spouse: false
+      expect: true
 
 variable num_qualifying_individuals:
   imports: [26/21/e#is_cdcc_qualifying_individual]
@@ -33,3 +167,39 @@ variable num_qualifying_individuals:
   syntax: python
   formula: |
     return tax_unit.members.count(is_cdcc_qualifying_individual)
+  tests:
+    - name: "No qualifying individuals"
+      period: 2024
+      inputs:
+        is_cdcc_qualifying_individual: [false, false]
+      expect: 0
+
+    - name: "One qualifying child under 13"
+      period: 2024
+      inputs:
+        is_cdcc_qualifying_individual: [false, true]
+      expect: 1
+
+    - name: "Two qualifying children"
+      period: 2024
+      inputs:
+        is_cdcc_qualifying_individual: [false, true, true]
+      expect: 2
+
+    - name: "Three qualifying individuals"
+      period: 2024
+      inputs:
+        is_cdcc_qualifying_individual: [false, true, true, true]
+      expect: 3
+
+    - name: "Single qualifying disabled spouse"
+      period: 2024
+      inputs:
+        is_cdcc_qualifying_individual: [false, true]
+      expect: 1
+
+    - name: "Mixed household - one qualifying one not"
+      period: 2024
+      inputs:
+        is_cdcc_qualifying_individual: [false, false, true, false]
+      expect: 1

@@ -25,6 +25,37 @@ variable other_income:
   unit: USD
   label: Other Income
   description: Miscellaneous income not categorized as wages, interest, dividends, etc.
+  tests:
+    - name: "Zero other income"
+      period: 2024
+      inputs:
+        other_income: 0
+      expect: 0
+    - name: "Small miscellaneous income (hobby sales)"
+      period: 2024
+      inputs:
+        other_income: 500
+      expect: 500
+    - name: "Moderate other income (side gig)"
+      period: 2024
+      inputs:
+        other_income: 5_000
+      expect: 5_000
+    - name: "Gambling winnings"
+      period: 2024
+      inputs:
+        other_income: 12_500
+      expect: 12_500
+    - name: "Jury duty pay and prizes"
+      period: 2024
+      inputs:
+        other_income: 1_200
+      expect: 1_200
+    - name: "Large miscellaneous income"
+      period: 2024
+      inputs:
+        other_income: 50_000
+      expect: 50_000
 
 variable gross_income:
   imports:
@@ -46,3 +77,158 @@ variable gross_income:
   syntax: python
   formula: |
     return wages + salaries + tips + self_employment_income + gains_from_property + interest_income + dividend_income + pension_income + other_income + unemployment_compensation
+  tests:
+    # Zero income cases
+    - name: "Zero income - no sources"
+      period: 2024
+      inputs:
+        wages: 0
+        salaries: 0
+        tips: 0
+        self_employment_income: 0
+        gains_from_property: 0
+        interest_income: 0
+        dividend_income: 0
+        pension_income: 0
+        other_income: 0
+        unemployment_compensation: 0
+      expect: 0
+    # Single income source cases
+    - name: "Wages only - median worker"
+      period: 2024
+      inputs:
+        wages: 56_000
+        salaries: 0
+        tips: 0
+        self_employment_income: 0
+        gains_from_property: 0
+        interest_income: 0
+        dividend_income: 0
+        pension_income: 0
+        other_income: 0
+        unemployment_compensation: 0
+      expect: 56_000
+    - name: "Self-employment only - freelancer"
+      period: 2024
+      inputs:
+        wages: 0
+        salaries: 0
+        tips: 0
+        self_employment_income: 85_000
+        gains_from_property: 0
+        interest_income: 0
+        dividend_income: 0
+        pension_income: 0
+        other_income: 0
+        unemployment_compensation: 0
+      expect: 85_000
+    # Typical income scenarios
+    - name: "W2 employee with savings interest"
+      period: 2024
+      inputs:
+        wages: 65_000
+        salaries: 0
+        tips: 0
+        self_employment_income: 0
+        gains_from_property: 0
+        interest_income: 850
+        dividend_income: 200
+        pension_income: 0
+        other_income: 0
+        unemployment_compensation: 0
+      # wages + interest + dividends = 65_000 + 850 + 200
+      expect: 66_050
+    - name: "Restaurant worker with tips"
+      period: 2024
+      inputs:
+        wages: 25_000
+        salaries: 0
+        tips: 18_000
+        self_employment_income: 0
+        gains_from_property: 0
+        interest_income: 0
+        dividend_income: 0
+        pension_income: 0
+        other_income: 0
+        unemployment_compensation: 0
+      # wages + tips = 25_000 + 18_000
+      expect: 43_000
+    - name: "Retiree with pension and investment income"
+      period: 2024
+      inputs:
+        wages: 0
+        salaries: 0
+        tips: 0
+        self_employment_income: 0
+        gains_from_property: 0
+        interest_income: 3_500
+        dividend_income: 8_200
+        pension_income: 42_000
+        other_income: 0
+        unemployment_compensation: 0
+      # pension + interest + dividends = 42_000 + 3_500 + 8_200
+      expect: 53_700
+    # High income scenarios
+    - name: "High earner with diversified income"
+      period: 2024
+      inputs:
+        wages: 0
+        salaries: 180_000
+        tips: 0
+        self_employment_income: 50_000
+        gains_from_property: 25_000
+        interest_income: 12_000
+        dividend_income: 35_000
+        pension_income: 0
+        other_income: 5_000
+        unemployment_compensation: 0
+      # salaries + SE + gains + interest + dividends + other
+      # 180_000 + 50_000 + 25_000 + 12_000 + 35_000 + 5_000
+      expect: 307_000
+    - name: "Investor with capital gains"
+      period: 2024
+      inputs:
+        wages: 0
+        salaries: 0
+        tips: 0
+        self_employment_income: 0
+        gains_from_property: 150_000
+        interest_income: 25_000
+        dividend_income: 75_000
+        pension_income: 0
+        other_income: 0
+        unemployment_compensation: 0
+      # gains + interest + dividends = 150_000 + 25_000 + 75_000
+      expect: 250_000
+    # Mixed scenarios
+    - name: "Unemployed with benefits"
+      period: 2024
+      inputs:
+        wages: 0
+        salaries: 0
+        tips: 0
+        self_employment_income: 0
+        gains_from_property: 0
+        interest_income: 100
+        dividend_income: 0
+        pension_income: 0
+        other_income: 0
+        unemployment_compensation: 15_600
+      # unemployment + interest = 15_600 + 100
+      expect: 15_700
+    - name: "Mixed employment and side business"
+      period: 2024
+      inputs:
+        wages: 48_000
+        salaries: 0
+        tips: 0
+        self_employment_income: 22_000
+        gains_from_property: 0
+        interest_income: 500
+        dividend_income: 1_200
+        pension_income: 0
+        other_income: 800
+        unemployment_compensation: 0
+      # wages + SE + interest + dividends + other
+      # 48_000 + 22_000 + 500 + 1_200 + 800
+      expect: 72_500

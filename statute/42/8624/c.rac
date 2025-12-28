@@ -52,13 +52,14 @@ parameter income_factor_floor:
   values:
     1981-01-01: 0.1
 
-variable benefit_calculation:
+variable liheap_energy_burden_factor:
+  imports: [42/8624/b#annual_gross_income, 42/8624/b#annual_energy_costs]
   entity: Household
   period: Year
-  dtype: Money
-  unit: "USD"
-  label: "LIHEAP cooling assistance"
-  description: "Home cooling assistance per 42 USC 8624(b)(1)(B)"
+  dtype: Rate
+  unit: "/1"
+  label: "LIHEAP Energy Burden Factor"
+  description: "Energy burden calculation per 42 USC 8624(c)(5)(A)(i) - ratio of energy costs to income, used for benefit targeting"
   syntax: python
   formula: |
     # Energy burden = energy costs / income
@@ -69,3 +70,459 @@ variable benefit_calculation:
         return 1.0
     return min(1.0, annual_energy_costs / annual_gross_income)
   default: 0
+  tests:
+    - name: "Low income, high energy costs - high burden"
+      period: 2024
+      inputs: {annual_gross_income: 15_000, annual_energy_costs: 3_000}
+      expect: 0.2
+    - name: "Moderate income, moderate energy costs"
+      period: 2024
+      inputs: {annual_gross_income: 30_000, annual_energy_costs: 2_400}
+      expect: 0.08
+    - name: "High income, low relative energy costs"
+      period: 2024
+      inputs: {annual_gross_income: 60_000, annual_energy_costs: 1_800}
+      expect: 0.03
+    - name: "Zero income - burden capped at 100%"
+      period: 2024
+      inputs: {annual_gross_income: 0, annual_energy_costs: 2_000}
+      expect: 1.0
+    - name: "Energy costs exceed income - capped at 100%"
+      period: 2024
+      inputs: {annual_gross_income: 1_500, annual_energy_costs: 3_000}
+      expect: 1.0
+    - name: "Zero energy costs - no burden"
+      period: 2024
+      inputs: {annual_gross_income: 25_000, annual_energy_costs: 0}
+      expect: 0.0
+
+variable liheap_income_factor:
+  imports: [42/8624/b#annual_gross_income, 42/8624/b#liheap_income_limit]
+  entity: Household
+  period: Year
+  dtype: Rate
+  unit: "/1"
+  label: "LIHEAP Income Factor"
+  description: "Income-based factor for benefit calculation - lower income yields higher factor"
+  syntax: python
+  formula: |
+    # Income factor: higher for lower incomes relative to income limit
+    # Returns 1.0 for zero income, decreasing as income approaches limit
+    if liheap_income_limit <= 0:
+        return income_factor_floor
+    ratio = annual_gross_income / liheap_income_limit
+    # Factor = 1 - ratio, floored at minimum
+    return max(income_factor_floor, 1 - ratio)
+  default: 0
+  tests:
+    - name: "Zero income - maximum factor"
+      period: 2024
+      inputs: {household_size: 1, annual_gross_income: 0}
+      expect: 1.0
+    - name: "Income at 50% of limit - factor 0.5"
+      period: 2024
+      inputs: {household_size: 1, annual_gross_income: 11_295}
+      expect: 0.5
+    - name: "Income at income limit - minimum factor"
+      period: 2024
+      inputs: {household_size: 1, annual_gross_income: 22_590}
+      expect: 0.1
+    - name: "Income above limit - floored at minimum"
+      period: 2024
+      inputs: {household_size: 1, annual_gross_income: 30_000}
+      expect: 0.1
+    - name: "Four-person household at 25% of limit"
+      period: 2024
+      inputs: {household_size: 4, annual_gross_income: 11_700}
+      expect: 0.75
+    - name: "Large household with very low income"
+      period: 2024
+      inputs: {household_size: 6, annual_gross_income: 6_294}
+      expect: 0.9
+
+variable liheap_combined_factor:
+  entity: Household
+  period: Year
+  dtype: Rate
+  unit: "/1"
+  label: "LIHEAP Combined Benefit Factor"
+  description: "Weighted combination of income and energy burden factors per 42 USC 8624(c)(5)"
+  syntax: python
+  formula: |
+    # Combined factor = weighted average of income factor and energy burden factor
+    # Per statute: target assistance to lowest incomes with highest energy burden
+    return (income_factor_weight * liheap_income_factor) + (burden_factor_weight * liheap_energy_burden_factor)
+  default: 0
+  tests:
+    - name: "Low income, high energy burden - high combined factor"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 5_000
+        annual_energy_costs: 2_000
+      expect: 0.59
+    - name: "Moderate income, moderate burden"
+      period: 2024
+      inputs:
+        household_size: 2
+        annual_gross_income: 15_330
+        annual_energy_costs: 1_533
+      expect: 0.30
+    - name: "At income limit with low burden"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 22_590
+        annual_energy_costs: 1_130
+      expect: 0.075
+    - name: "Zero income, high energy costs"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 0
+        annual_energy_costs: 3_000
+      expect: 1.0
+    - name: "Very low income, extreme energy burden"
+      period: 2024
+      inputs:
+        household_size: 3
+        annual_gross_income: 5_000
+        annual_energy_costs: 5_000
+      expect: 0.90
+
+variable liheap_priority_multiplier_applied:
+  imports: [42/8624/b#liheap_priority_household]
+  entity: Household
+  period: Year
+  dtype: Rate
+  unit: "/1"
+  label: "LIHEAP Priority Multiplier Applied"
+  description: "Benefit multiplier for priority households per 42 USC 8624(c)(5)(A)(ii-iv)"
+  syntax: python
+  formula: |
+    # Priority households receive enhanced benefits
+    # Per 42 USC 8624(c)(5)(A): elderly, disabled, or young children
+    if liheap_priority_household:
+        return priority_multiplier
+    return 1
+  default: 1
+  tests:
+    - name: "Priority household with elderly - enhanced multiplier"
+      period: 2024
+      inputs: {has_elderly_member: true, has_disabled_member: false, has_young_children: false}
+      expect: 1.25
+    - name: "Priority household with disabled - enhanced multiplier"
+      period: 2024
+      inputs: {has_elderly_member: false, has_disabled_member: true, has_young_children: false}
+      expect: 1.25
+    - name: "Priority household with young children - enhanced multiplier"
+      period: 2024
+      inputs: {has_elderly_member: false, has_disabled_member: false, has_young_children: true}
+      expect: 1.25
+    - name: "Multiple priority factors - same multiplier"
+      period: 2024
+      inputs: {has_elderly_member: true, has_disabled_member: true, has_young_children: true}
+      expect: 1.25
+    - name: "Non-priority household - no enhancement"
+      period: 2024
+      inputs: {has_elderly_member: false, has_disabled_member: false, has_young_children: false}
+      expect: 1.0
+    - name: "Elderly and young children - enhanced"
+      period: 2024
+      inputs: {has_elderly_member: true, has_disabled_member: false, has_young_children: true}
+      expect: 1.25
+
+variable liheap_cooling_assistance:
+  imports: [42/8624/b#liheap_eligible]
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "LIHEAP Cooling Assistance"
+  description: "Home cooling assistance benefit per 42 USC 8624(b)(1)(B) and (c)(5)"
+  syntax: python
+  formula: |
+    # Cooling assistance = base * combined_factor * priority_multiplier * cooling_fraction
+    # Only eligible households receive benefits
+    if not liheap_eligible:
+        return 0
+    base = base_benefit_placeholder
+    factor = liheap_combined_factor
+    priority = liheap_priority_multiplier_applied
+    cooling = cooling_assistance_fraction
+    return base * factor * priority * cooling
+  default: 0
+  tests:
+    - name: "Eligible low-income priority household"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 10_000
+        annual_energy_costs: 2_000
+        has_elderly_member: true
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+      expect: 184.38
+    - name: "Eligible moderate-income non-priority"
+      period: 2024
+      inputs:
+        household_size: 2
+        annual_gross_income: 20_000
+        annual_energy_costs: 1_600
+        has_elderly_member: false
+        has_disabled_member: false
+        has_young_children: false
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+      expect: 54.45
+    - name: "Categorically eligible via SNAP, low burden"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 50_000
+        annual_energy_costs: 1_000
+        receives_snap: true
+        has_elderly_member: false
+        has_disabled_member: false
+        has_young_children: false
+      expect: 30.0
+    - name: "Ineligible - income too high, no categorical benefits"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 50_000
+        annual_energy_costs: 2_000
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+        has_elderly_member: false
+        has_disabled_member: false
+        has_young_children: false
+      expect: 0
+    - name: "Zero income with disabled member"
+      period: 2024
+      inputs:
+        household_size: 3
+        annual_gross_income: 0
+        annual_energy_costs: 3_000
+        has_disabled_member: true
+        has_elderly_member: false
+        has_young_children: false
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+      expect: 312.5
+    - name: "Large family with young children at income limit"
+      period: 2024
+      inputs:
+        household_size: 6
+        annual_gross_income: 62_940
+        annual_energy_costs: 3_147
+        has_young_children: true
+        has_elderly_member: false
+        has_disabled_member: false
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+      expect: 46.88
+
+variable liheap_heating_assistance:
+  imports: [42/8624/b#liheap_eligible]
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "LIHEAP Heating Assistance"
+  description: "Home heating assistance benefit per 42 USC 8624(b)(1)(A) and (c)(5)"
+  syntax: python
+  formula: |
+    # Heating assistance = base * combined_factor * priority_multiplier * (1 - cooling_fraction)
+    # Heating gets the complement of cooling fraction
+    if not liheap_eligible:
+        return 0
+    base = base_benefit_placeholder
+    factor = liheap_combined_factor
+    priority = liheap_priority_multiplier_applied
+    heating_fraction = 1 - cooling_assistance_fraction
+    return base * factor * priority * heating_fraction
+  default: 0
+  tests:
+    - name: "Eligible low-income priority household"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 10_000
+        annual_energy_costs: 2_000
+        has_elderly_member: true
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+      expect: 184.38
+    - name: "Eligible moderate-income non-priority"
+      period: 2024
+      inputs:
+        household_size: 2
+        annual_gross_income: 20_000
+        annual_energy_costs: 1_600
+        has_elderly_member: false
+        has_disabled_member: false
+        has_young_children: false
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+      expect: 54.45
+    - name: "Categorically eligible via SSI"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 40_000
+        annual_energy_costs: 800
+        receives_ssi: true
+        has_elderly_member: false
+        has_disabled_member: false
+        has_young_children: false
+      expect: 27.5
+    - name: "Ineligible household"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 50_000
+        annual_energy_costs: 2_000
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+        has_elderly_member: false
+        has_disabled_member: false
+        has_young_children: false
+      expect: 0
+    - name: "Very low income with disabled member"
+      period: 2024
+      inputs:
+        household_size: 2
+        annual_gross_income: 5_000
+        annual_energy_costs: 2_500
+        has_disabled_member: true
+        has_elderly_member: false
+        has_young_children: false
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+      expect: 296.88
+    - name: "Veterans benefits recipient"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 30_000
+        annual_energy_costs: 1_500
+        receives_veterans_benefits: true
+        has_elderly_member: true
+        has_disabled_member: false
+        has_young_children: false
+      expect: 57.81
+
+variable liheap_total_assistance:
+  imports: [42/8624/b#liheap_eligible]
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "LIHEAP Total Assistance"
+  description: "Total LIHEAP assistance (heating + cooling) per 42 USC 8624"
+  syntax: python
+  formula: |
+    # Total = heating + cooling, which equals base * combined_factor * priority_multiplier
+    if not liheap_eligible:
+        return 0
+    return liheap_cooling_assistance + liheap_heating_assistance
+  default: 0
+  tests:
+    - name: "Total equals heating plus cooling"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 10_000
+        annual_energy_costs: 2_000
+        has_elderly_member: true
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+      expect: 368.75
+    - name: "Non-priority eligible household"
+      period: 2024
+      inputs:
+        household_size: 4
+        annual_gross_income: 30_000
+        annual_energy_costs: 2_400
+        has_elderly_member: false
+        has_disabled_member: false
+        has_young_children: false
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+      expect: 110.0
+    - name: "Maximum benefit - zero income, high burden, priority"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 0
+        annual_energy_costs: 5_000
+        has_disabled_member: true
+        has_elderly_member: false
+        has_young_children: false
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+      expect: 625.0
+    - name: "Ineligible - no benefits"
+      period: 2024
+      inputs:
+        household_size: 2
+        annual_gross_income: 100_000
+        annual_energy_costs: 3_000
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+        has_elderly_member: false
+        has_disabled_member: false
+        has_young_children: false
+      expect: 0
+    - name: "Family with young children"
+      period: 2024
+      inputs:
+        household_size: 5
+        annual_gross_income: 25_000
+        annual_energy_costs: 2_000
+        has_young_children: true
+        has_elderly_member: false
+        has_disabled_member: false
+        receives_snap: false
+        receives_tanf: false
+        receives_ssi: false
+        receives_veterans_benefits: false
+      expect: 284.38
+    - name: "TANF recipient priority household"
+      period: 2024
+      inputs:
+        household_size: 3
+        annual_gross_income: 18_000
+        annual_energy_costs: 1_800
+        receives_tanf: true
+        has_young_children: true
+        has_elderly_member: false
+        has_disabled_member: false
+      expect: 200.78

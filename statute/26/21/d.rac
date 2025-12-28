@@ -8,7 +8,47 @@ such individual's earned income for such year, or
 (B) in the case of an individual who is married at the close of such year,
 the lesser of such individual's earned income or the earned income of
 his spouse for such year.
+
+(2) SPECIAL RULE FOR SPOUSE WHO IS A STUDENT OR INCAPABLE OF CARING FOR HIMSELF. --
+In the case of a spouse who is a full-time student at an educational institution
+or who is physically or mentally incapable of caring for himself, such spouse shall
+be deemed for each month during which such spouse is a full-time student or is so
+incapable to be gainfully employed and to have earned income of not less than --
+(A) $250 if there is 1 qualifying individual, or
+(B) $500 if there are 2 or more qualifying individuals.
 """
+
+# Parameter for imputed earned income for disabled/student spouse per 26 USC 21(d)(2)
+parameter imputed_earned_income_one_individual:
+  description: "Monthly imputed earned income for disabled/student spouse with 1 qualifying individual"
+  unit: USD
+  reference: "26 USC 21(d)(2)(A)"
+  values:
+    1976-01-01: 250
+
+parameter imputed_earned_income_two_or_more:
+  description: "Monthly imputed earned income for disabled/student spouse with 2+ qualifying individuals"
+  unit: USD
+  reference: "26 USC 21(d)(2)(B)"
+  values:
+    1976-01-01: 500
+
+input is_tax_unit_head:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Tax Unit Head"
+  description: "Whether the person is the head of the tax unit"
+  default: false
+
+input is_tax_unit_spouse:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Spouse"
+  description: "Whether the person is the spouse in the tax unit"
+  default: false
+
 variable earned_income_limit:
   imports:
     - 26/1#filing_status
@@ -32,3 +72,77 @@ variable earned_income_limit:
     # For married filers: use lesser of two spouses' earned income
     # This incentivizes work for both spouses
     return min(head_earned, spouse_earned)
+  tests:
+    # Single/HoH filers - use taxpayer's earned income
+    - name: "Single filer - earned income determines limit"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        earned_income: [40_000]
+        is_tax_unit_head: [true]
+        is_tax_unit_spouse: [false]
+      expect: 40_000
+
+    - name: "Head of household - uses head's earned income"
+      period: 2024
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        earned_income: [55_000, 0]
+        is_tax_unit_head: [true, false]
+        is_tax_unit_spouse: [false, false]
+      expect: 55_000
+
+    - name: "Single filer with no earned income"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        earned_income: [0]
+        is_tax_unit_head: [true]
+        is_tax_unit_spouse: [false]
+      expect: 0
+
+    # Married filers - use lesser of two spouses' income
+    - name: "Married - both spouses work, primary earner higher"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        earned_income: [60_000, 30_000]
+        is_tax_unit_head: [true, false]
+        is_tax_unit_spouse: [false, true]
+      expect: 30_000
+
+    - name: "Married - both spouses work, spouse earner higher"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        earned_income: [25_000, 50_000]
+        is_tax_unit_head: [true, false]
+        is_tax_unit_spouse: [false, true]
+      expect: 25_000
+
+    - name: "Married - equal earned income"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        earned_income: [35_000, 35_000]
+        is_tax_unit_head: [true, false]
+        is_tax_unit_spouse: [false, true]
+      expect: 35_000
+
+    - name: "Married - one spouse has no earned income"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        earned_income: [45_000, 0]
+        is_tax_unit_head: [true, false]
+        is_tax_unit_spouse: [false, true]
+      expect: 0
+
+    - name: "Married - low earning spouse limits credit"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        earned_income: [80_000, 5_000]
+        is_tax_unit_head: [true, false]
+        is_tax_unit_spouse: [false, true]
+      expect: 5_000

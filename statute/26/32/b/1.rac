@@ -1,11 +1,141 @@
-# Loaded from credit_percentage.yaml
-variable credit_percentage:
-  entity: TaxUnit
-  period: Year
-  dtype: Rate
+# 26 USC 32(b)(1) - Credit and Phaseout Percentages
 
-# 26 USC §32(b)(1) - Phaseout Percentage
-variable phaseout_percentage:
+text: """
+(b) Percentages and amounts.—
+(1) Percentages.—
+The credit percentage and the phaseout percentage shall be determined as follows:
+In the case of an eligible individual with:
+    1 qualifying child........credit percentage is 34 percent,
+                              phaseout percentage is 15.98 percent.
+    2 qualifying children.....credit percentage is 40 percent,
+                              phaseout percentage is 21.06 percent.
+    3 or more qualifying
+    children..................credit percentage is 45 percent,
+                              phaseout percentage is 21.06 percent.
+    No qualifying children....credit percentage is 7.65 percent,
+                              phaseout percentage is 7.65 percent.
+"""
+
+# Parameters for credit percentage by number of qualifying children
+# These are statutory percentages (not inflation-adjusted)
+parameter credit_percentage_by_children:
+  description: "Credit percentage for EITC phase-in calculation, indexed by number of qualifying children"
+  unit: rate
+  source: "26 USC 32(b)(1)"
+  reference: "26 USC 32(b)(1)"
+  values:
+    2024-01-01:
+      0: 0.0765
+      1: 0.34
+      2: 0.40
+      3: 0.45
+
+# Parameters for phaseout percentage by number of qualifying children
+# These are statutory percentages (not inflation-adjusted)
+parameter phaseout_percentage_by_children:
+  description: "Phaseout percentage for EITC reduction calculation, indexed by number of qualifying children"
+  unit: rate
+  source: "26 USC 32(b)(1)"
+  reference: "26 USC 32(b)(1)"
+  values:
+    2024-01-01:
+      0: 0.0765
+      1: 0.1598
+      2: 0.2106
+      3: 0.2106
+
+# 26 USC 32(b)(1) - Credit Percentage
+variable credit_percentage:
+  imports:
+    - 26/32/c/3/A#num_qualifying_children
   entity: TaxUnit
   period: Year
   dtype: Rate
+  unit: "rate"
+  label: "EITC Credit Percentage"
+  description: "Credit percentage for EITC phase-in calculation per 26 USC 32(b)(1)"
+  syntax: python
+  formula: |
+    # Cap at 3 for lookup (3+ children use same percentage as 3)
+    children_key = min(num_qualifying_children, 3)
+    return credit_percentage_by_children[children_key]
+  tests:
+    # Test: Credit percentage by number of qualifying children
+    - name: "No qualifying children - 7.65% credit rate"
+      period: 2024
+      inputs:
+        num_qualifying_children: 0
+      expect: 0.0765
+    - name: "One qualifying child - 34% credit rate"
+      period: 2024
+      inputs:
+        num_qualifying_children: 1
+      expect: 0.34
+    - name: "Two qualifying children - 40% credit rate"
+      period: 2024
+      inputs:
+        num_qualifying_children: 2
+      expect: 0.40
+    - name: "Three qualifying children - 45% credit rate"
+      period: 2024
+      inputs:
+        num_qualifying_children: 3
+      expect: 0.45
+    - name: "Four qualifying children - uses 3+ rate (45%)"
+      period: 2024
+      inputs:
+        num_qualifying_children: 4
+      expect: 0.45
+    - name: "Seven qualifying children - uses 3+ rate (45%)"
+      period: 2024
+      inputs:
+        num_qualifying_children: 7
+      expect: 0.45
+
+# 26 USC 32(b)(1) - Phaseout Percentage
+variable phaseout_percentage:
+  imports:
+    - 26/32/c/3/A#num_qualifying_children
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  unit: "rate"
+  label: "EITC Phaseout Percentage"
+  description: "Phaseout percentage for EITC reduction calculation per 26 USC 32(b)(1)"
+  syntax: python
+  formula: |
+    # Cap at 3 for lookup (3+ children use same percentage as 3)
+    children_key = min(num_qualifying_children, 3)
+    return phaseout_percentage_by_children[children_key]
+  tests:
+    # Test: Phaseout percentage by number of qualifying children
+    - name: "No qualifying children - 7.65% phaseout rate"
+      period: 2024
+      inputs:
+        num_qualifying_children: 0
+      expect: 0.0765
+    - name: "One qualifying child - 15.98% phaseout rate"
+      period: 2024
+      inputs:
+        num_qualifying_children: 1
+      expect: 0.1598
+    - name: "Two qualifying children - 21.06% phaseout rate"
+      period: 2024
+      inputs:
+        num_qualifying_children: 2
+      expect: 0.2106
+    - name: "Three qualifying children - 21.06% phaseout rate"
+      period: 2024
+      inputs:
+        num_qualifying_children: 3
+      expect: 0.2106
+    - name: "Five qualifying children - uses 3+ rate (21.06%)"
+      period: 2024
+      inputs:
+        num_qualifying_children: 5
+      expect: 0.2106
+    - name: "Ten qualifying children - uses 3+ rate (21.06%)"
+      period: 2024
+      inputs:
+        num_qualifying_children: 10
+      expect: 0.2106
