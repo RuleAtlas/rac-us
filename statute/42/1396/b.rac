@@ -8,13 +8,9 @@ for medical assistance... using modified adjusted gross income...
 """
 variable income_methodology:
   imports:
-    - 7/2014/c/fpl_by_household_size#fpl_by_household_size
     - 26/62/a#adjusted_gross_income
     - 26/103#tax_exempt_interest
-    - 26/86/social_security_benefits#social_security_benefits
     - 26/86#taxable_social_security
-    - 26/911/foreign_earned_income_exclusion#foreign_earned_income_exclusion
-    - 42/1396/magi_disregard#magi_disregard
   entity: Person
   period: Month
   dtype: Money

@@ -14,8 +14,6 @@ variable credit_reduction_amount:
     - 26/62/a#adjusted_gross_income
     - 26/1#filing_status
     - 26/32/b/1#phaseout_percentage
-    - 26/32/b/2/A/base_amounts#phaseout_amount
-    - 26/32/b/2/B/base_joint_return_adjustment#joint_return_adjustment
     - 26/32/c/3/A#num_qualifying_children
   entity: TaxUnit
   period: Year

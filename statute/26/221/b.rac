@@ -35,11 +35,7 @@ educational institution' for 'eligible educational institution (as
 defined in section 25A(f)(2))'.
 """
 variable qualified_loan:
-  imports:
-    - 26/25A/b/3/eligible_student#is_eligible_student
-    - 26/152/dependent#is_dependent
-    - 26/529/e/3/expenses#qualified_higher_education_expenses
-  entity: Person
+    entity: Person
   period: Year
   dtype: Boolean
   label: "Has Qualified Education Loan"

@@ -12,10 +12,7 @@ the Federal Government... for 60 months (whether or not consecutive)
 after the date the State program... becomes effective
 """
 variable time_limits:
-  imports:
-    - 42/607/parameters/federal_time_limit#federal_time_limit_months
-    - 42/607/parameters/hardship_exemption_rate#hardship_exemption_pct
-  entity: Person
+    entity: Person
   period: Month
   dtype: Boolean
   formula: return federal_time_limit_months  # 60 months

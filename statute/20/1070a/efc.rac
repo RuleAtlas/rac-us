@@ -2,11 +2,7 @@
 #
 variable efc:
   imports:
-    - 20/1070a/formula_type#pell_grant_formula
     - 26/62/a#adjusted_gross_income
-    - 20/1070a/head_contribution#head_contribution
-    - 20/1070a/dependent_contribution#dependent_contribution
-    - 20/1070a/parameters#efc as efc_params
   entity: Person
   period: Year
   dtype: Money

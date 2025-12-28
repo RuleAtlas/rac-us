@@ -9,7 +9,6 @@ new clean vehicle placed in service by the taxpayer during the taxable year.
 """
 variable new_vehicle_credit:
   imports:
-    - 26/30D/parameters#p
     - 26/1#filing_status
     - 26/62/a#adjusted_gross_income
     - 26/1#income_tax_before_credits

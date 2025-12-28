@@ -2,7 +2,6 @@
 #
 variable child_tax_credit:
   imports:
-    - 26/24/a/2#tentative_child_tax_credit
     - 26/26/a#tax_liability_before_credits
   entity: TaxUnit
   period: Year

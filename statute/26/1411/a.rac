@@ -27,12 +27,7 @@ variable niit:
   imports:
     - 26/1411/c#net_investment_income
     - 26/62/a#adjusted_gross_income
-    - 26/911/a/1/foreign_earned_income_exclusion#foreign_earned_income_exclusion
     - 26/1#filing_status
-    - 26/1411/parameters#rate as niit_rate
-    - 26/1411/parameters#threshold/joint#threshold_joint
-    - 26/1411/parameters#threshold/separate#threshold_separate
-    - 26/1411/parameters#threshold/other#threshold_other
   entity: TaxUnit
   period: Year
   dtype: Money

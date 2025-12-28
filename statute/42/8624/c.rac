@@ -56,12 +56,7 @@ parameter income_factor_floor:
     1981-01-01: 0.1
 
 variable benefit_calculation:
-  imports:
-    - 42/8624/b/eligibility/liheap_eligible#liheap_eligible
-    - 42/8624/b/eligibility/liheap_vulnerable_household#liheap_vulnerable_household
-    - 42/8624/benefit_targeting/minimum_benefit#minimum_benefit
-    - 42/8624/benefit_targeting/high_energy_burden_threshold#high_energy_burden_threshold
-  entity: Household
+    entity: Household
   period: Year
   dtype: Money
   unit: "USD"

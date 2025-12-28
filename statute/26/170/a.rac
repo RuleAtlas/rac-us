@@ -9,10 +9,7 @@ as a deduction only if verified under regulations prescribed by the
 Secretary.
 """
 variable charitable_deduction:
-  imports:
-    - 26/170/b/charitable_deduction_before_carryforward#charitable_deduction_before_carryforward
-    - 26/170/b/charitable_carryforward_used#charitable_carryforward_used
-  entity: TaxUnit
+    entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"

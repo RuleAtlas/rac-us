@@ -15,8 +15,6 @@ separate return by a married individual).
 variable exclusion:
   imports:
     - 26/21/e#num_cdcc_qualifying_individuals
-    - 26/129/e/parameters#exclusion_limit
-    - 26/129/e/parameters#exclusion_limit_mfs
     - 26/129/b#dcap_earned_income_limit
     - 26/1#filing_status
     - 26/129/a#dcap_benefits_received

@@ -15,14 +15,7 @@ title XVIII (Medicare), and
 poverty line applicable to the size of the household.
 """
 variable expansion:
-  imports:
-    - 42/1396/b/income_methodology/magi_income_pct_fpl_after_disregard#magi_income_pct_fpl_after_disregard
-    - 42/1396/b/income_methodology/magi_household_size#magi_household_size
-    - 42/1396/income_limits/expansion_adult#income_limit_expansion_adult
-    - 42/1396/age_thresholds/child_max#age_child_max
-    - 42/1396/age_thresholds/elderly_min#age_elderly_min
-    - 42/1396/expansion_status/adopted#state_has_expansion
-  entity: Person
+    entity: Person
   period: Month
   dtype: Boolean
   label: "Qualifies for enhanced FMAP"

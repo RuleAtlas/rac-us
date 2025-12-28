@@ -10,7 +10,6 @@ variable income_methodology:
   imports:
     - 26/62/a#adjusted_gross_income
     - 26/103#tax_exempt_interest
-    - 26/86/social_security_benefits#social_security_benefits
     - 26/86#taxable_social_security
   entity: Person
   period: Month

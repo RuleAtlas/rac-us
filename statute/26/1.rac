@@ -34,7 +34,6 @@ parameter brackets:
 
 variable income_tax:
   imports:
-    - 26/63/c/taxable_income#taxable_income
     - 26/1#filing_status
 
 variable income_tax_before_credits:

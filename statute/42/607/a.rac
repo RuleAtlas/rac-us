@@ -10,11 +10,7 @@ specified in the following table for the fiscal year with respect
 to all families receiving assistance under the State program...
 """
 variable work_requirements:
-  imports:
-    - 42/607/parameters/minimum_participation_rate#work_rate
-    - 42/607/parameters/hours_per_week#hours_per_week
-    - 42/607/d/work_activities#countable_activities
-  entity: Family
+    entity: Family
   period: Month
   dtype: Boolean
   syntax: python

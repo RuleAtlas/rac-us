@@ -12,7 +12,6 @@ such vehicle.
 """
 variable used_vehicle_credit:
   imports:
-    - 26/25E/parameters#p
     - 26/1#filing_status
     - 26/62/a#adjusted_gross_income
     - 26/1#income_tax_before_credits

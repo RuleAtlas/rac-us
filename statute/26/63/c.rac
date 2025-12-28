@@ -40,13 +40,7 @@ variable standard_deduction_standalone:
   default: 0
 
 variable standard_deduction:
-  imports:
-    - 26/63/c/2/basic_standard_deduction#basic_standard_deduction
-    - 26/63/c/5/dependent_standard_deduction#dependent_standard_deduction
-    - 26/63/f/additional_standard_deduction#additional_standard_deduction
-    - 26/63/c/6/is_ineligible_for_standard_deduction#is_ineligible_for_standard_deduction
-    - 26/152#is_dependent
-  entity: TaxUnit
+    entity: TaxUnit
   period: Year
   dtype: Money
   syntax: python

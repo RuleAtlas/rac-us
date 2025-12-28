@@ -7,13 +7,7 @@ taxable year, the following adjustments shall apply to taxable income...
 """
 variable adjustments:
   imports:
-    - 26/63/c/taxable_income#taxable_income
-    - 26/164/state_local_tax_deduction#state_local_taxes
-    - 26/67/miscellaneous_itemized_deductions#miscellaneous_deductions
-    - 26/213/medical_expense_deduction#medical_expenses_claimed
     - 26/63/c#standard_deduction
-    - 26/151/personal_exemption_amount#personal_exemptions
-    - 26/63/e/uses_standard_deduction#uses_standard_deduction
     - 26/62/a#adjusted_gross_income
     - 26/1#filing_status
     - 26/422/b#iso_exercise_bargain_element

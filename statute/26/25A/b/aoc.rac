@@ -12,16 +12,6 @@ exceed $4,000.
 """
 variable aoc:
   imports:
-    - 26/25A/b/aoc_parameters#aoc_first_tier_limit as first_tier_limit
-    - 26/25A/b/aoc_parameters#aoc_second_tier_limit as second_tier_limit
-    - 26/25A/b/aoc_parameters#aoc_first_tier_rate as first_tier_rate
-    - 26/25A/b/aoc_parameters#aoc_second_tier_rate as second_tier_rate
-    - 26/25A/b/aoc_parameters#aoc_maximum_credit as maximum_credit
-    - 26/25A/d/phaseout_parameters#aoc_phaseout_start_single as phaseout_start_single
-    - 26/25A/d/phaseout_parameters#aoc_phaseout_start_joint as phaseout_start_joint
-    - 26/25A/d/phaseout_parameters#aoc_phaseout_range_single as phaseout_range_single
-    - 26/25A/d/phaseout_parameters#aoc_phaseout_range_joint as phaseout_range_joint
-    - 26/25A/i/refundable_parameters#aoc_refundable_rate as refundable_rate
     - 26/1#filing_status
     - 26/62/a#adjusted_gross_income
   entity: TaxUnit

@@ -14,8 +14,6 @@ for the taxable year.
 """
 variable qbi_deduction:
   imports:
-    - 26/63/taxable_income#taxable_income
-    - 26/1/h/net_capital_gain#net_capital_gain
     - 26/1#filing_status
     - 26/199A/c#net_qualified_business_income
     - 26/199A/d#is_sstb
@@ -30,14 +28,6 @@ variable qbi_deduction:
     - 26/199A/b#is_in_qbi_phaseout
     - 26/199A/b#is_above_qbi_phaseout
     - 26/199A/b#qbi_reduction_ratio
-    - 26/199A/b/parameters#qbi_deduction_rate
-    - 26/199A/e/parameters#threshold_single
-    - 26/199A/e/parameters#threshold_joint
-    - 26/199A/e/parameters#phaseout_range_single
-    - 26/199A/e/parameters#phaseout_range_joint
-    - 26/199A/b/parameters#w2_wage_limit_rate
-    - 26/199A/b/parameters#w2_wage_property_rate
-    - 26/199A/b/parameters#ubia_rate
   entity: TaxUnit
   period: Year
   dtype: Money

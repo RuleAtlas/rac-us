@@ -16,13 +16,7 @@ eligible applicant solely on the basis of the applicant's failure to meet
 a residency requirement...
 """
 variable eligibility:
-  imports:
-    - 42/1786/d/1/wic_category#wic_category
-    - 42/1786/d/1/is_wic_categorical_eligible#is_wic_categorical_eligible
-    - 42/1786/d/2/is_wic_person_income_eligible#is_wic_person_income_eligible
-    - 42/1786/d/2/is_wic_income_eligible#is_wic_income_eligible
-    - 42/1786/d/3/is_wic_adjunctively_eligible#is_wic_adjunctively_eligible
-  entity: Household
+    entity: Household
   period: Month
   dtype: Boolean
   syntax: python

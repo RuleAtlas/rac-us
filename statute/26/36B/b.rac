@@ -12,23 +12,7 @@ specified in such table for such income tier...
 This determines the "expected contribution" which is subtracted from
 """
 variable applicable_percentage:
-  imports:
-    - 26/36B/d/household_income_pct_fpl#household_income_pct_fpl
-    - 26/36B/applicable_percentage/brackets_2024/bracket_1#bracket_1
-    - 26/36B/applicable_percentage/brackets_2024/bracket_2#bracket_2
-    - 26/36B/applicable_percentage/brackets_2024/bracket_3#bracket_3
-    - 26/36B/applicable_percentage/brackets_2024/bracket_4#bracket_4
-    - 26/36B/applicable_percentage/brackets_2024/bracket_5#bracket_5
-    - 26/36B/applicable_percentage/brackets_2024/bracket_6#bracket_6
-    - 26/36B/maximum_applicable_percentage#max_applicable_pct
-    - 26/36B/fpl_thresholds/minimum_eligibility_pct_fpl#min_eligibility_pct_fpl
-    - 26/36B/fpl_thresholds/bracket_150_pct_fpl#bracket_150_pct
-    - 26/36B/fpl_thresholds/bracket_200_pct_fpl#bracket_200_pct
-    - 26/36B/fpl_thresholds/bracket_250_pct_fpl#bracket_250_pct
-    - 26/36B/fpl_thresholds/bracket_300_pct_fpl#bracket_300_pct
-    - 26/36B/fpl_thresholds/bracket_400_pct_fpl#bracket_400_pct
-    - 26/36B/months_per_year#months_per_year
-  entity: TaxUnit
+    entity: TaxUnit
   period: Month
   dtype: Money
   unit: "USD"

@@ -16,8 +16,6 @@ variable earned_income_limit:
   imports:
     - 26/1#filing_status
     - 26/32/c/2/A#earned_income
-    - 26/1/person/is_tax_unit_head#is_tax_unit_head
-    - 26/1/person/is_tax_unit_spouse#is_tax_unit_spouse
   entity: TaxUnit
   period: Year
   dtype: Money

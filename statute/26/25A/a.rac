@@ -10,10 +10,6 @@ the sum of—
 """
 variable education_credits:
   imports:
-    - 26/25A/b/american_opportunity_credit#american_opportunity_credit
-    - 26/25A/b/aoc_refundable#aoc_refundable
-    - 26/25A/b/aoc_nonrefundable#aoc_nonrefundable
-    - 26/25A/c/lifetime_learning_credit#lifetime_learning_credit
     - 26/62/a#adjusted_gross_income
     - 26/1#tax_liability_before_credits
   entity: TaxUnit

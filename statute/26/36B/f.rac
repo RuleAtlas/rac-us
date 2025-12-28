@@ -24,18 +24,7 @@ dollar amount determined in accordance with the following table...
 variable reconciliation:
   imports:
     - 26/36B/a#premium_tax_credit
-    - 26/36B/d/household_income_pct_fpl#household_income_pct_fpl
     - 26/1#filing_status
-    - 26/36B/repayment_caps/under_200_pct_fpl/single#repay_cap_under_200_single
-    - 26/36B/repayment_caps/under_200_pct_fpl/joint#repay_cap_under_200_joint
-    - 26/36B/repayment_caps/200_to_300_pct_fpl/single#repay_cap_200_300_single
-    - 26/36B/repayment_caps/200_to_300_pct_fpl/joint#repay_cap_200_300_joint
-    - 26/36B/repayment_caps/300_to_400_pct_fpl/single#repay_cap_300_400_single
-    - 26/36B/repayment_caps/300_to_400_pct_fpl/joint#repay_cap_300_400_joint
-    - 26/36B/fpl_thresholds/bracket_200_pct_fpl#bracket_200_pct
-    - 26/36B/fpl_thresholds/bracket_300_pct_fpl#bracket_300_pct
-    - 26/36B/fpl_thresholds/bracket_400_pct_fpl#bracket_400_pct
-    - 26/36B/no_repayment_cap#no_repayment_cap
 
 variable advance_ptc:
   entity: TaxUnit

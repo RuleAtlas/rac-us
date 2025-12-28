@@ -12,9 +12,6 @@ to the taxpayer by section 164(f).
 """
 variable earned_income:
   imports:
-    - 26/61/a/1/wages#wages
-    - 26/61/a/1/salaries#salaries
-    - 26/61/a/1/tips#tips
     - 26/1402/a#net_earnings_self_employment
     - 26/164/f#se_tax_deduction
   entity: TaxUnit

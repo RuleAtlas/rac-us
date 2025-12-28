@@ -21,13 +21,7 @@ with respect to the taxpayer, or
 """
 variable net_investment_income:
   imports:
-    - 26/61/a/4/taxable_interest_income#taxable_interest_income
-    - 26/61/a/7/dividend_income#dividend_income
     - 26/32/i/2/C#rental_income
-    - 26/61/a/6/royalty_income#royalty_income
-    - 26/61/a/9/annuity_income#annuity_income
-    - 26/1211/b/loss_limited_net_capital_gains#loss_limited_net_capital_gains
-    - 26/469/passive_activity_income#passive_business_income
   entity: TaxUnit
   period: Year
   dtype: Money

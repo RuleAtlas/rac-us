@@ -32,7 +32,6 @@ variable deduction_choice:
   imports:
     - 26/63/c#standard_deduction
     - 26/63/d#itemized_taxable_income_deductions
-    - 26/63/c/6/is_ineligible_for_standard_deduction#is_ineligible_for_standard_deduction
 
 variable uses_standard_deduction:
   entity: TaxUnit

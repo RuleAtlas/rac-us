@@ -177,9 +177,7 @@ variable adjusted_net_capital_gain:
   default: 0
 
 variable ordinary_income:
-  imports:
-    - 26/63/c/taxable_income#taxable_income
-  entity: TaxUnit
+    entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
@@ -239,9 +237,7 @@ variable fifteen_rate_threshold:
   default: 0
 
 variable capital_gains_zero_rate_amount:
-  imports:
-    - 26/63/c/taxable_income#taxable_income
-  entity: TaxUnit
+    entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
@@ -258,9 +254,7 @@ variable capital_gains_zero_rate_amount:
   default: 0
 
 variable capital_gains_fifteen_rate_amount:
-  imports:
-    - 26/63/c/taxable_income#taxable_income
-  entity: TaxUnit
+    entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"

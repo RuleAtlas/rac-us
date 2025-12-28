@@ -15,7 +15,6 @@ by $500 for each such dependent.
 
 variable is_other_dependent:
   imports:
-    - 26/152#is_dependent
     - 26/24/c/1#is_ctc_qualifying_child
   entity: Person
   period: Year

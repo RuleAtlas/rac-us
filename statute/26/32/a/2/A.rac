@@ -10,7 +10,6 @@ variable initial_credit_amount:
   imports:
     - 26/32/c/2/A#earned_income
     - 26/32/b/1#credit_percentage
-    - 26/32/b/2/A/base_amounts#earned_income_amount
     - 26/32/c/3/A#num_qualifying_children
   entity: TaxUnit
   period: Year

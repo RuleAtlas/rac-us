@@ -27,10 +27,7 @@ variable citizenship:
 
 
 variable resource_test:
-  imports:
-    - 42/1382/parameters/resource_limit/individual#resource_limit_individual
-    - 42/1382/parameters/resource_limit/couple#resource_limit_couple
-  entity: Person
+    entity: Person
   period: Month
   dtype: Boolean
   unit: "USD"

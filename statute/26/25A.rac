@@ -1,23 +1,7 @@
 # 26 USC § 25A - Education Credits (Validation Version)
 #
 variable education_credits_validation:
-  imports:
-    - 26/25A/b/aoc_parameters#aoc_first_tier_limit
-    - 26/25A/b/aoc_parameters#aoc_second_tier_limit
-    - 26/25A/b/aoc_parameters#aoc_first_tier_rate
-    - 26/25A/b/aoc_parameters#aoc_second_tier_rate
-    - 26/25A/i/refundable_parameters#aoc_refundable_rate
-    - 26/25A/c/llc_parameters#llc_expense_limit
-    - 26/25A/c/llc_parameters#llc_rate
-    - 26/25A/d/phaseout_parameters#aoc_phaseout_start_single
-    - 26/25A/d/phaseout_parameters#aoc_phaseout_start_joint
-    - 26/25A/d/phaseout_parameters#aoc_phaseout_range_single
-    - 26/25A/d/phaseout_parameters#aoc_phaseout_range_joint
-    - 26/25A/d/phaseout_parameters#llc_phaseout_start_single
-    - 26/25A/d/phaseout_parameters#llc_phaseout_start_joint
-    - 26/25A/d/phaseout_parameters#llc_phaseout_range_single
-    - 26/25A/d/phaseout_parameters#llc_phaseout_range_joint
-  entity: TaxUnit
+    entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"

@@ -7,12 +7,6 @@ For purposes of this part—
 variable denial_of_losses:
   imports:
     - 26/1#filing_status
-    - 26/61/a/farming_income#farming_income
-    - 26/165/farming_loss#farming_loss
-    - 26/469/passive_activity_loss#passive_activity_loss
-    - 26/465/at_risk_amount#at_risk_amount
-    - 26/617/mining_exploration_deduction#mining_exploration_costs
-    - 26/616/mining_development_deduction#mining_development_costs
     - 26/62/a#adjusted_gross_income
   entity: TaxUnit
   period: Year

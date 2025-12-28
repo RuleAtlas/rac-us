@@ -26,9 +26,6 @@ taxable year begins.
 variable applicable_taxpayer:
   imports:
     - 26/1#filing_status
-    - 26/36B/d/household_income_pct_fpl#household_income_pct_fpl
-    - 26/36B/income_eligibility/lower_limit#income_lower_limit
-    - 26/36B/income_eligibility/upper_limit_ira#income_upper_limit_ira
 
 variable ptc_filing_status_eligible:
   entity: TaxUnit

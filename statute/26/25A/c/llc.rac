@@ -9,13 +9,6 @@ period beginning in such taxable year) as does not exceed $10,000.
 """
 variable llc:
   imports:
-    - 26/25A/c/llc_parameters#llc_expense_limit as expense_limit
-    - 26/25A/c/llc_parameters#llc_rate as rate
-    - 26/25A/c/llc_parameters#llc_maximum_credit as maximum_credit
-    - 26/25A/d/phaseout_parameters#llc_phaseout_start_single as phaseout_start_single
-    - 26/25A/d/phaseout_parameters#llc_phaseout_start_joint as phaseout_start_joint
-    - 26/25A/d/phaseout_parameters#llc_phaseout_range_single as phaseout_range_single
-    - 26/25A/d/phaseout_parameters#llc_phaseout_range_joint as phaseout_range_joint
     - 26/1#filing_status
     - 26/62/a#adjusted_gross_income
   entity: TaxUnit

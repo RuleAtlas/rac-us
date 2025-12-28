@@ -7,9 +7,6 @@ text: """
 variable eligibility:
   imports:
     - 7/2014/a#snap_eligibility
-    - 7/2014/c/fpl_by_household_size#federal_poverty_level
-    - 42/608/parameters.yaml#adult_age_threshold
-    - 42/608/parameters.yaml#noncitizen_5_year_bar as noncitizen_waiting_period_years
   entity: TanfUnit
   period: Month
   dtype: Boolean

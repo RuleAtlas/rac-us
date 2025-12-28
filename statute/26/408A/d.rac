@@ -22,7 +22,6 @@ individual made a contribution to a Roth IRA...
 """
 variable distributions:
   imports:
-    - 26/person/age#age
     - 26/408/d#taxable_ira_distribution
   entity: Person
   period: Year

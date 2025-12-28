@@ -17,14 +17,7 @@ the Social Security Act [SSI];
 (ii) 60 percent of the State median income
 """
 variable eligibility:
-  imports:
-    - 42/8624/income_eligibility/fpl_percentage#fpl_percentage
-    - 42/8624/income_eligibility/smi_percentage#smi_percentage
-    - 42/8624/fpl_by_household_size#fpl_by_household_size
-    - 42/8624/state_median_income#state_median_income
-    - 42/8624/vulnerable_populations/elderly_age_threshold#elderly_age_threshold
-    - 42/8624/vulnerable_populations/young_child_age_threshold#young_child_age_threshold
-  entity: Household
+    entity: Household
   period: Year
   dtype: Boolean
   unit: "USD"
@@ -47,13 +40,3 @@ variable eligibility:
 #
 variable liheap:
   imports:
-    - 42/8624/b/eligibility/liheap_eligible#liheap_eligible
-    - 42/8624/b/eligibility/liheap_income_eligible#liheap_income_eligible
-    - 42/8624/b/eligibility/liheap_categorically_eligible#liheap_categorically_eligible
-    - 42/8624/b/eligibility/liheap_vulnerable_household#liheap_vulnerable_household
-    - 42/8624/b/eligibility/liheap_heating_eligible#liheap_heating_eligible
-    - 42/8624/b/eligibility/liheap_cooling_eligible#liheap_cooling_eligible
-    - 42/8624/c/benefit_calculation/liheap#liheap
-    - 42/8624/c/benefit_calculation/liheap_energy_burden#liheap_energy_burden
-    - 42/8624/c/benefit_calculation/liheap_heating_assistance#liheap_heating_assistance
-    - 42/8624/c/benefit_calculation/liheap_cooling_assistance#liheap_cooling_assistance

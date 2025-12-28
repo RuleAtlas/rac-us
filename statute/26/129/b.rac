@@ -21,14 +21,6 @@ variable earned_income_limit:
   imports:
     - 26/1#filing_status
     - 26/32/c/2/A#earned_income
-    - 26/1/person/is_tax_unit_head#is_tax_unit_head
-    - 26/1/person/is_tax_unit_spouse#is_tax_unit_spouse
-    - 26/1/person/is_full_time_student#is_full_time_student
-    - 26/1/person/is_disabled#is_disabled
-    - 26/129/e/parameters#imputed_earned_income_monthly_one as imputed_monthly_one
-    - 26/129/e/parameters#imputed_earned_income_monthly_two as imputed_monthly_two
-    - 26/129/e/parameters#months_per_year
-    - 26/129/e/parameters#qualifying_individuals_higher_imputed_threshold
     - 26/21/e#num_cdcc_qualifying_individuals
   entity: TaxUnit
   period: Year

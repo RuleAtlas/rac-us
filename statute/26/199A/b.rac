@@ -24,20 +24,11 @@ after acquisition of all qualified property...
 """
 variable w2_wage_limitation:
   imports:
-    - 26/63/taxable_income#taxable_income
     - 26/1#filing_status
     - 26/199A/c#net_qualified_business_income
     - 26/199A/d#is_sstb
     - 26/199A/d#sstb_qbi
     - 26/199A/d#qbi_applicable_percentage
-    - 26/199A/e/parameters#threshold_single
-    - 26/199A/e/parameters#threshold_joint
-    - 26/199A/e/parameters#phaseout_range_single
-    - 26/199A/e/parameters#phaseout_range_joint
-    - 26/199A/b/parameters#qbi_deduction_rate
-    - 26/199A/b/parameters#w2_wage_limit_rate
-    - 26/199A/b/parameters#w2_wage_property_rate
-    - 26/199A/b/parameters#ubia_rate
   entity: TaxUnit
   period: Year
   dtype: Rate

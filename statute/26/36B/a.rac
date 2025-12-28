@@ -12,11 +12,6 @@ variable premium_tax_credit:
     - 26/62/a#adjusted_gross_income
     - 26/1#filing_status
     - 26/36B/b#applicable_percentage
-    - 26/36B/b/expected_contribution#expected_contribution
-    - 26/36B/federal_poverty_level/2024/first_person#fpl_first_person
-    - 26/36B/federal_poverty_level/2024/additional_person#fpl_additional_person
-    - 26/36B/income_eligibility/lower_limit#income_lower_limit
-    - 26/36B/income_eligibility/upper_limit_ira#income_upper_limit_ira
   entity: TaxUnit
   period: Year
   dtype: Money

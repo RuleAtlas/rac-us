@@ -8,21 +8,7 @@ text: """
 (ii) to all qualified pregnant women and children...
 """
 variable eligibility:
-  imports:
-    - 7/2014/c/fpl_by_household_size#fpl_by_household_size
-    - 42/1396/income_limits/infant#income_limit_infant
-    - 42/1396/income_limits/child_1_5#income_limit_child_1_5
-    - 42/1396/income_limits/child_6_18#income_limit_child_6_18
-    - 42/1396/income_limits/pregnant#income_limit_pregnant
-    - 42/1396/income_limits/expansion_adult#income_limit_expansion_adult
-    - 42/1396/income_limits/parent_caretaker#income_limit_parent
-    - 42/1396/magi_disregard#magi_disregard
-    - 42/1396/age_thresholds/infant_max#age_infant_max
-    - 42/1396/age_thresholds/child_1_5_max#age_child_1_5_max
-    - 42/1396/age_thresholds/child_max#age_child_max
-    - 42/1396/age_thresholds/elderly_min#age_elderly_min
-    - 42/1396/chip/default_income_limit#chip_income_limit
-  entity: Person
+    entity: Person
   period: Month
   dtype: Boolean
   syntax: python

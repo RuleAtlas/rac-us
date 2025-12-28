@@ -11,11 +11,7 @@ text: """
 of earned income... plus one-half of the remainder
 """
 variable income_exclusions:
-  imports:
-    - 42/1382/parameters/unearned_income/general_exclusion#general_exclusion
-    - 42/1382/parameters/earned_income/general_exclusion#earned_exclusion
-    - 42/1382/parameters/earned_income/remainder_exclusion_rate#remainder_rate
-  entity: Person
+    entity: Person
   period: Month
   dtype: Money
   unit: "USD"

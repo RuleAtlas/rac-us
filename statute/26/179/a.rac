@@ -8,13 +8,7 @@ Any cost so treated shall be allowed as a deduction for the taxable year in
 which the section 179 property is placed in service.
 """
 variable expensing_election:
-  imports:
-    - 26/179/parameters/maximum_deduction#maximum_deduction
-    - 26/179/parameters/phaseout_threshold#phaseout_threshold
-    - 26/179/parameters/phaseout_rate#phaseout_rate
-    - 26/179/parameters/suv_limitation#suv_limitation
-    - 26/179/parameters/suv_weight_threshold#suv_weight_threshold
-  entity: Business
+    entity: Business
   period: Year
   dtype: Money
   unit: "USD"

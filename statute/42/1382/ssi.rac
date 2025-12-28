@@ -1,15 +1,7 @@
 # 42 USC 1382 - Supplemental Security Income (SSI)
 #
 variable ssi:
-  imports:
-    - 42/1382/a/age_requirement/is_ssi_categorical_eligible#is_ssi_categorical_eligible
-    - 42/1382/a/resource_test/is_ssi_resource_eligible#is_ssi_resource_eligible
-    - 42/1382/a/citizenship/is_ssi_citizenship_eligible#is_ssi_citizenship_eligible
-    - 42/1382/a/citizenship/is_ssi_residency_eligible#is_ssi_residency_eligible
-    - 42/1382a/income_exclusions/ssi_countable_income#ssi_countable_income
-    - 42/1382/b/federal_benefit_rate/applicable_fbr#applicable_fbr
-    - 42/1382/b/federal_benefit_rate/federal_benefit_rate#federal_benefit_rate
-  entity: Person
+    entity: Person
   period: Month
   dtype: Money
   unit: "USD"

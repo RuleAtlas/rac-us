@@ -6,12 +6,7 @@ The Secretary shall prescribe by regulation... the supplemental foods to
 be made available in the program under this section.
 """
 variable food_package:
-  imports:
-    - 42/1786/d/1/wic_category#wic_category
-    - 42/1786/d/is_wic_eligible#is_wic_eligible
-    - 42/1786/postpartum/max_months_breastfeeding#postpartum_max_months_breastfeeding
-    - 42/1786/postpartum/max_months_non_breastfeeding#postpartum_max_months_non_breastfeeding
-  entity: Household
+    entity: Household
   period: Month
   dtype: Integer
   syntax: python
@@ -64,8 +59,6 @@ parameter priority_ranges:
 
 variable priority:
   imports:
-    - 42/1786/d/1/wic_category#wic_category
-    - 42/1786/d/is_wic_eligible#is_wic_eligible
 
 variable wic_priority_level:
   entity: Person

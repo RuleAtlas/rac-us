@@ -8,12 +8,7 @@ have an eligible spouse shall be payable at the rate of...
 eligible spouse shall be payable at the rate of...
 """
 variable federal_benefit_rate:
-  imports:
-    - 42/1382/parameters/federal_benefit_rate/2024/individual#fbr_individual
-    - 42/1382/parameters/federal_benefit_rate/2024/couple#fbr_couple
-    - 42/1382/parameters/living_arrangement/2024/one_third_reduction/individual#one_third_individual
-    - 42/1382/parameters/living_arrangement/2024/one_third_reduction/couple#one_third_couple
-  entity: Person
+    entity: Person
   period: Month
   dtype: Money
   unit: "USD"

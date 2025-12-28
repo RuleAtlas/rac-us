@@ -1,16 +1,7 @@
 # 26 USC 3304(a)(1)-(3) - Coverage Requirements
 #
 variable coverage:
-  imports:
-    - 26/3304/parameters/futa_wage_base#futa_wage_base
-    - 26/3304/parameters/futa_gross_tax_rate#futa_gross_tax_rate
-    - 26/3304/parameters/futa_credit_reduction_max#futa_credit_reduction_max
-    - 26/3304/employer_coverage/general_quarterly_wages_threshold#general_quarterly_wages_threshold
-    - 26/3304/employer_coverage/weeks_with_employees_threshold#weeks_with_employees_threshold
-    - 26/3304/employer_coverage/agricultural_workers_threshold#agricultural_workers_threshold
-    - 26/3304/employer_coverage/agricultural_wages_threshold#agricultural_wages_threshold
-    - 26/3304/employer_coverage/domestic_quarterly_wages_threshold#domestic_quarterly_wages_threshold
-  entity: TaxUnit
+    entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"

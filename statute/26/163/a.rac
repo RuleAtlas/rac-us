@@ -8,7 +8,6 @@ paid or accrued within the taxable year on indebtedness.
 variable interest_deduction:
   imports:
     - 26/163/h#qualified_residence_interest
-    - 26/163/d/deductible_investment_interest#deductible_investment_interest
   entity: TaxUnit
   period: Year
   dtype: Money

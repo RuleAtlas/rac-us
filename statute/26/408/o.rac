@@ -2,7 +2,6 @@
 # and Section 219(b) - Maximum Amount of Deduction (Contribution Limits)
 variable contribution_limits:
   imports:
-    - 26/person/age#age
     - 26/32/c/2/A#earned_income
     - 26/1#filing_status
     - 26/62/a#adjusted_gross_income

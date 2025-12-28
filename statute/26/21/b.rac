@@ -10,12 +10,6 @@ adjusted gross income for the taxable year exceeds $15,000.
 variable applicable_percentage:
   imports:
     - 26/62/a#adjusted_gross_income
-    - 26/21/b/credit_rate#maximum_rate
-    - 26/21/b/credit_rate#minimum_rate
-    - 26/21/b/credit_rate#phase_down_threshold
-    - 26/21/b/credit_rate#phase_down_rate
-    - 26/21/b/credit_rate#phase_down_increment
-    - 26/21/b/credit_rate#arpa_complete_phaseout_threshold
   entity: TaxUnit
   period: Year
   dtype: Rate

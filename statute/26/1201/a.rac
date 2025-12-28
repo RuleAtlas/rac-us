@@ -8,15 +8,7 @@ applicable) exceeds 35 percent, then, in lieu of any such tax, there is hereby
 imposed a tax... computed as provided in paragraph (1), (2), or (3).
 """
 variable alternative_tax:
-  imports:
-    - 26/1222/net_capital_gain#net_capital_gain
-    - 26/11/b/corporate_income_tax#corporate_income_tax
-    - 26/1201/parameters/alternative_rate#alternative_rate
-    - 26/11/parameters/flat_rate#flat_rate
-    - 26/11/parameters/graduated_brackets#graduated_brackets
-    - 26/11/a/is_subject_to_corporate_tax#is_subject_to_corporate_tax
-    - 26/11/parameters/tcja_effective_year#tcja_effective_year
-  entity: Corporation
+    entity: Corporation
   period: Year
   dtype: Money
   unit: "USD"

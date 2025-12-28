@@ -1,14 +1,7 @@
 # 26 USC 3304(a)(4)-(7) - Unemployment Insurance Eligibility
 #
 variable eligibility:
-  imports:
-    - 26/3304/parameters/waiting_period_weeks#waiting_period_weeks
-    - 26/3304/parameters/extended_benefits_weeks#extended_benefits_weeks
-    - 26/3304/parameters/extended_benefits_high_unemployment_weeks#extended_benefits_high_unemployment_weeks
-    - 26/3304/benefit_computation/standard_maximum_weeks#standard_maximum_weeks
-    - 26/3304/benefit_computation/base_period_wages_cap_rate#base_period_wages_cap_rate
-    - 26/3304/benefit_computation/earnings_disregard_rate#earnings_disregard_rate
-  entity: Person
+    entity: Person
   period: Year
   dtype: Integer
   unit: "USD"

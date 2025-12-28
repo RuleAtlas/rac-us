@@ -14,8 +14,6 @@ year exceeds $10,000.
 """
 variable has_excessive_investment_income:
   imports:
-    - 26/61/a/4/interest_income#interest_income
-    - 26/61/a/7/dividend_income#dividend_income
     - 26/103#tax_exempt_interest
     - 26/32/i/2/C#net_rent_royalty_income
     - 26/1222/11#capital_gain_net_income

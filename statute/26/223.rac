@@ -41,13 +41,7 @@ benefits under title XVIII of the Social Security Act and for
 each month thereafter.
 """
 variable contribution_limits:
-  imports:
-    - 26/223/c/hdhp_coverage_type#hdhp_coverage_type
-    - 26/223/c/is_qualifying_hdhp#is_qualifying_hdhp
-    - 26/223/c/has_disqualifying_health_coverage#has_disqualifying_health_coverage
-    - 26/223/c/is_enrolled_in_medicare#is_enrolled_in_medicare
-    - 26/223/c/can_be_claimed_as_dependent#can_be_claimed_as_dependent
-  entity: Person
+    entity: Person
   period: Year
   dtype: Money
   unit: "USD"
@@ -74,17 +68,6 @@ variable hdhp_requirements:
 
 variable hsa_deduction:
   imports:
-    - 26/223/b/is_hsa_eligible#is_hsa_eligible
-    - 26/223/c/is_qualifying_hdhp#is_qualifying_hdhp
-    - 26/223/c/hdhp_coverage_type#hdhp_coverage_type
-    - 26/223/b/hsa_contributions_self#hsa_contributions_self
-    - 26/223/b/hsa_contributions_employer#hsa_contributions_employer
-    - 26/223/b/hsa_contribution_limit#hsa_contribution_limit
-    - 26/223/b/hsa_excess_contributions#hsa_excess_contributions
-    - 26/223/c/is_enrolled_in_medicare#is_enrolled_in_medicare
-    - 26/223/c/can_be_claimed_as_dependent#can_be_claimed_as_dependent
-    - 26/223/parameters#additional_tax.rate#hsa_additional_tax_rate
-    - 26/223/parameters#medicare_age as hsa_medicare_age
   entity: Person
   period: Year
   dtype: Money

@@ -3,7 +3,6 @@
 variable acp_annual_benefit:
   imports:
     - 47/1752/a/7#acp_benefit
-    - 47/1752/parameters/months_per_year#months_per_year
   entity: Household
   period: Year
   dtype: Money

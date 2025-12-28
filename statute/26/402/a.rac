@@ -13,7 +13,6 @@ year of the distributee in which distributed, under section 72
 variable distributions:
   imports:
     - 26/1#filing_status
-    - 26/person/age#age
     - 26/402/e/4#early_withdrawal_penalty_401k
   entity: Person
   period: Year

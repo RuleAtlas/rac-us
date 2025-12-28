@@ -6,15 +6,7 @@ For purposes of this part, the items of tax preference determined under
 this section are—
 """
 variable preferences:
-  imports:
-    - 26/103/private_activity_bond_interest#private_activity_bond_interest
-    - 26/613/percentage_depletion#percentage_depletion
-    - 26/612/cost_depletion#cost_depletion
-    - 26/263/c/intangible_drilling_costs#idc_deduction
-    - 26/263/c/idc_amortization_amount#idc_amortization
-    - 26/167/depreciation#regular_depreciation
-    - 26/168/amt_depreciation#amt_depreciation
-  entity: TaxUnit
+    entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"

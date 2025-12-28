@@ -10,13 +10,7 @@ shall be determined by using—
 (3) the applicable convention.
 """
 variable depreciation:
-  imports:
-    - 26/168/parameters/macrs_table_half_year#macrs_table_half_year
-    - 26/168/parameters/macrs_table_mid_quarter#macrs_table_mid_quarter
-    - 26/168/parameters/recovery_periods#recovery_periods
-    - 26/168/parameters/bonus_depreciation_rate#bonus_depreciation_rate
-    - 26/168/parameters/ads_recovery_periods#ads_recovery_periods
-  entity: Asset
+    entity: Asset
   period: Year
   dtype: Money
   unit: "USD"

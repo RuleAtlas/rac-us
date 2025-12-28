@@ -12,12 +12,7 @@ postpartum women, infants, and children who--
 (14) "postpartum women" - up to 6 months after pregnancy terminates
 """
 variable categorical:
-  imports:
-    - 42/1786/age/infant_max_years#infant_max_years
-    - 42/1786/age/child_max_years#child_max_years
-    - 42/1786/postpartum/max_months_non_breastfeeding#postpartum_max_months_non_breastfeeding
-    - 42/1786/postpartum/max_months_breastfeeding#postpartum_max_months_breastfeeding
-  entity: Person
+    entity: Person
   period: Month
   dtype: Boolean
   syntax: python

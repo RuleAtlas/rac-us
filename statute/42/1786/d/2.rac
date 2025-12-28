@@ -12,11 +12,7 @@ income guidelines prescribed by the Office of Management and Budget...
 family member... participates in... [SNAP, Medicaid, or TANF]
 """
 variable income:
-  imports:
-    - 42/1786/income/limit_pct_fpl#income_limit_pct_fpl
-    - 42/1786/fpl_monthly#fpl_monthly
-    - 42/1786/d/3/is_wic_adjunctively_eligible#is_wic_adjunctively_eligible
-  entity: Person
+    entity: Person
   period: Month
   dtype: Boolean
   syntax: python

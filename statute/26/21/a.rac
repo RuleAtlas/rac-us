@@ -18,7 +18,6 @@ variable child_dependent_care_credit:
     - 26/21/d#cdcc_earned_income_limit
     - 26/21/a#cdcc_expenses_paid
     - 26/26/a#tax_liability_before_credits
-    - 26/21/a/refundability#is_refundable
   entity: TaxUnit
   period: Year
   dtype: Money

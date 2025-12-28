@@ -6,9 +6,6 @@
 #
 variable self_employment_tax:
   imports:
-    - 26/1401/a/oasdi_rate#oasdi_rate
-    - 26/1401/b/hi_rate#hi_rate
-    - 26/1401/wage_base#social_security_wage_base
     - 26/1401/b/2#self_employment_additional_medicare_tax
   entity: Person
   period: Year

@@ -66,10 +66,7 @@ parameter weeks_per_year:
     1991-01-01: 52
 
 variable benefit:
-  imports:
-    - 42/9858/parameters/market_rates#market_rates
-    - 42/9858/parameters/payment_rates/target_percentile#target_percentile
-  entity: SPMUnit
+    entity: SPMUnit
   period: Year
   dtype: Money
   unit: "USD"
@@ -157,9 +154,6 @@ parameter copay_rate_5:
 
 variable copayment:
   imports:
-    - 42/9858/parameters/copayment/maximum_percent_of_income#maximum_percent_of_income
-    - 42/9858/parameters/copayment/minimum_weekly_fee#minimum_weekly_fee
-    - 42/9858/parameters/time_periods/weeks_per_year#weeks_per_year
   entity: SPMUnit
   period: Year
   dtype: Boolean
@@ -219,10 +213,6 @@ variable copayment:
 #
 variable eligibility:
   imports:
-    - 42/9858/parameters/age_limits/maximum_age#maximum_age
-    - 42/9858/parameters/age_limits/maximum_age_with_disability#maximum_age_with_disability
-    - 42/9858/parameters/income_eligibility/initial_limit_smi#initial_limit_smi
-    - 42/9858/parameters/asset_limits/federal_default#federal_default_asset_limit
   entity: SPMUnit
   period: Year
   dtype: Integer

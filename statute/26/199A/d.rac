@@ -30,12 +30,7 @@ specified service trade or business shall be taken into account...
 """
 variable sstb:
   imports:
-    - 26/63/taxable_income#taxable_income
     - 26/1#filing_status
-    - 26/199A/e/parameters#threshold_single
-    - 26/199A/e/parameters#threshold_joint
-    - 26/199A/e/parameters#phaseout_range_single
-    - 26/199A/e/parameters#phaseout_range_joint
   entity: TaxUnit
   period: Year
   dtype: Rate

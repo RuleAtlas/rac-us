@@ -7,7 +7,6 @@ allowed by section 74A (relating to exclusion for qualified tips).
 """
 variable tip_income_deduction:
   imports:
-    - 26/61/a/1/tips#tips
     - 26/1#filing_status
     - 26/62/a#adjusted_gross_income
     - 26/1402/a#self_employment_income

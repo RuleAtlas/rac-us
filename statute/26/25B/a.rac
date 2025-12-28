@@ -12,11 +12,6 @@ variable savers_credit:
   imports:
     - 26/25B/c#is_savers_credit_eligible
     - 26/25B/b#savers_credit_applicable_percentage
-    - 26/1/income_tax_before_credits#income_tax_before_credits
-    - 26/27/foreign_tax_credit#foreign_tax_credit
-    - 26/21/cdcc#cdcc
-    - 26/25A/b/american_opportunity_credit#non_refundable_american_opportunity_credit
-    - 26/25A/c/lifetime_learning_credit#lifetime_learning_credit
   entity: TaxUnit
   period: Year
   dtype: Money

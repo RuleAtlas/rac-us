@@ -14,7 +14,6 @@ gross income.
 variable early_withdrawal:
   imports:
     - 26/402/a#taxable_401k_distribution
-    - 26/person/age#age
     - 26/62/a#adjusted_gross_income
   entity: Person
   period: Year

@@ -6,10 +6,7 @@ text: """
 but less than $50 for such connected device...
 """
 variable acp_device_copay_valid:
-  imports:
-    - 47/1752/parameters/connected_device/min_copay#min_copay
-    - 47/1752/parameters/connected_device/max_copay#max_copay
-  entity: Household
+    entity: Household
   period: Month
   dtype: Boolean
   label: "ACP Device Copay Valid"
@@ -27,7 +24,6 @@ variable acp_device_eligible:
     - 47/1752/a/6#acp_eligible
     - 47/1752/a/8#acp_device_received
     - 47/1752/a/8#acp_device_copay_valid
-    - 47/1752/parameters/connected_device/max_reimbursement#max_reimbursement
   entity: Household
   period: Month
   dtype: Boolean
@@ -67,7 +63,6 @@ variable acp_device_received:
 variable acp_device_subsidy:
   imports:
     - 47/1752/a/8#acp_device_eligible
-    - 47/1752/parameters/connected_device/max_reimbursement#max_reimbursement
   entity: Household
   period: Month
   dtype: Money

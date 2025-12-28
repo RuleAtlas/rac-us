@@ -12,16 +12,6 @@ variable qualified_overtime_deduction:
   imports:
     - 26/1#filing_status
     - 26/62/a#adjusted_gross_income
-    - 26/911/foreign_earned_income_exclusion#foreign_earned_income_exclusion
-    - 26/931/guam_income_exclusion#guam_income_exclusion
-    - 26/933/american_samoa_income_exclusion#american_samoa_income_exclusion
-    - 26/225/parameters#max_deduction.single#max_deduction_single
-    - 26/225/parameters#max_deduction.joint#max_deduction_joint
-    - 26/225/parameters#phaseout.threshold.single#phaseout_threshold_single
-    - 26/225/parameters#phaseout.threshold.joint#phaseout_threshold_joint
-    - 26/225/parameters#phaseout.income_increment#phaseout_income_increment
-    - 26/225/parameters#phaseout.reduction_per_increment#phaseout_reduction_per_increment
-    - 26/225/parameters#termination.final_year#termination_final_year
   entity: TaxUnit
   period: Year
   dtype: Money

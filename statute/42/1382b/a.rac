@@ -16,11 +16,7 @@ be excluded--
 (10) burial spaces for the individual and spouse
 """
 variable resource_exclusions:
-  imports:
-    - 42/1382/parameters/resource_exclusions/life_insurance_face_value_limit#life_insurance_limit
-    - 42/1382/parameters/resource_exclusions/burial_funds_limit/individual#burial_funds_limit_individual
-    - 42/1382/parameters/resource_exclusions/burial_funds_limit/couple#burial_funds_limit_couple
-  entity: Person
+    entity: Person
   period: Month
   dtype: Money
   unit: "USD"

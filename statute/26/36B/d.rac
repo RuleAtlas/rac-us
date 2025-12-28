@@ -35,8 +35,6 @@ regular enrollment period for coverage during such calendar year.
 variable definitions:
   imports:
     - 26/62/a#adjusted_gross_income
-    - 26/36B/federal_poverty_level/2024/first_person#fpl_first_person
-    - 26/36B/federal_poverty_level/2024/additional_person#fpl_additional_person
 
 variable ptc_household_size:
   entity: TaxUnit

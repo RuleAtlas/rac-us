@@ -17,7 +17,6 @@ under section 151 (relating to personal exemptions).
 """
 variable nol_modifications:
   imports:
-    - 26/61/a/3/gains_from_property#capital_gains
     - 26/165#capital_losses
     - 26/151#personal_exemption
     - 26/63/c#standard_deduction

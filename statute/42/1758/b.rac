@@ -15,10 +15,7 @@ under a program funded by the McKinney-Vento Homeless Assistance Act...
 a runaway child... or a migratory child...
 """
 variable categorical_eligibility:
-  imports:
-    - 42/1758/b/school_meal_income_eligible_free#school_meal_income_eligible_free
-    - 42/1758/b/school_meal_income_eligible_reduced#school_meal_income_eligible_reduced
-  entity: Person
+    entity: Person
   period: Year
   dtype: Boolean
   formula: return receives_snap
@@ -26,11 +23,6 @@ variable categorical_eligibility:
 
 variable income_eligibility:
   imports:
-    - 42/1758/income_eligibility_guidelines/free_meal#free_meal_limit
-    - 42/1758/income_eligibility_guidelines/reduced_price_meal#reduced_price_limit
-    - 42/1758/income/free_meal_limit_pct_fpl#free_meal_limit_pct_fpl
-    - 42/1758/income/reduced_price_limit_pct_fpl#reduced_price_limit_pct_fpl
-    - 42/1758/fpl#fpl
   entity: Person
   period: Year
   dtype: Boolean

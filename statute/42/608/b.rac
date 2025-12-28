@@ -1,12 +1,7 @@
 # 42 USC 608 - TANF Benefit Calculation
 #
 variable benefit_calculation:
-  imports:
-    - 42/608/parameters/need_standard#need_standard
-    - 42/608/parameters/payment_standard#payment_standard
-    - 42/608/parameters/earned_income_disregard#earned_income_disregard
-    - 42/608/parameters/resource_limit#resource_limit
-  entity: TanfUnit
+    entity: TanfUnit
   period: Month
   dtype: Money
   syntax: python

@@ -11,8 +11,6 @@ subsection (a) shall not exceed --
 variable expense_limit:
   imports:
     - 26/21/e#num_cdcc_qualifying_individuals
-    - 26/21/c/expense_limits#one_qualifying_individual as one_qualifying_limit
-    - 26/21/c/expense_limits#two_or_more_qualifying_individuals as two_or_more_limit
   entity: TaxUnit
   period: Year
   dtype: Money

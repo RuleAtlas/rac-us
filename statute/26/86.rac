@@ -16,7 +16,6 @@ variable tax_unit_social_security:
 
 variable taxable_social_security:
   imports:
-    - 26/86/b/combined_income_for_ss_taxability#combined_income
     - 26/86#tax_unit_social_security
     - 26/1#filing_status
   entity: TaxUnit

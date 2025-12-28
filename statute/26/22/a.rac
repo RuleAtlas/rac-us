@@ -9,7 +9,6 @@ for such taxable year.
 """
 variable elderly_disabled_credit:
   imports:
-    - 26/22/b/applicable_percentage#applicable_percentage
     - 26/22/d#adjusted_sec22_amount
     - 26/22/e#num_sec22_qualified_individuals
     - 26/26/a#tax_liability_before_credits

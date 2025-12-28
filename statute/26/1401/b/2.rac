@@ -14,9 +14,7 @@ filing a separate return, $125,000, and
 """
 variable additional_medicare_tax:
   imports:
-    - 26/1401/self_employment_tax#net_self_employment_earnings
     - 26/1#filing_status
-    - 26/3121/a/irs_employment_income#irs_employment_income
 
 variable combined_medicare_income:
   entity: TaxUnit

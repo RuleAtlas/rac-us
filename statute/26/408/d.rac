@@ -10,7 +10,6 @@ the case may be, in the manner provided under section 72.
 """
 variable distributions:
   imports:
-    - 26/person/age#age
     - 26/62/a#adjusted_gross_income
   entity: Person
   period: Year
