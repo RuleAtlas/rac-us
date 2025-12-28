@@ -4,6 +4,15 @@ allowed as a credit against the tax imposed by this subtitle for any
 taxable year an amount equal to the premium assistance credit amount
 of the taxpayer for the taxable year.
 """
+
+input tax_unit_size:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "Tax Unit Size"
+  description: "Number of people in the tax unit (taxpayer + spouse + dependents)"
+  default: 1
+
 variable premium_tax_credit:
   imports:
     - 26/62/a#adjusted_gross_income

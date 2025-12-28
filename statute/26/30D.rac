@@ -4,6 +4,16 @@ tax imposed by this chapter for the taxable year an amount equal to the sum
 of the credit amounts determined under subsection (b) with respect to each
 new clean vehicle placed in service by the taxpayer during the taxable year.
 """
+
+input new_clean_vehicle_battery_capacity_kwh:
+  entity: TaxUnit
+  period: Year
+  dtype: Number
+  unit: "kWh"
+  label: "New Clean Vehicle Battery Capacity"
+  description: "Battery capacity in kilowatt-hours of new clean vehicle"
+  default: 0
+
 variable new_vehicle_credit:
   imports:
     - 26/1#filing_status

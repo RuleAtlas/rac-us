@@ -1,6 +1,15 @@
 text: """
 For purposes of this part—
 """
+
+input is_material_participant_farming:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Material Participation in Farming"
+  description: "Whether taxpayer materially participates in farming activity under Section 469"
+  default: false
+
 variable denial_of_losses:
   imports:
     - 26/1#filing_status

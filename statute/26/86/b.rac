@@ -4,6 +4,14 @@ For purposes of this section, the term "combined income" means the sum of-
 (1) the modified adjusted gross income of the taxpayer for such taxable year, plus
 (2) one-half of the social security benefits received during the taxable year.
 """
+
+parameter ss_fraction:
+  description: "Fraction of Social Security benefits added to combined income"
+  unit: rate
+  reference: "26 USC 86(b)(2)"
+  values:
+    1984-01-01: 0.5
+
 variable combined_income:
   imports:
     - 26/86/b#modified_agi
