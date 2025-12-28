@@ -47,14 +47,14 @@ variable student_loan_deduction:
 variable student_loan_interest_paid:
   entity: Person
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Claimed as Dependent"
   description: "Whether the individual can be claimed as a dependent by another taxpayer under Section 151"
 
 variable is_claimed_as_dependent:
   entity: TaxUnit
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Student Loan Interest Deduction Eligibility"
   description: "Whether the tax unit is eligible for the student loan interest deduction"
 

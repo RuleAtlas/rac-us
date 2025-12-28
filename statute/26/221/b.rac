@@ -41,7 +41,7 @@ variable qualified_loan:
     - 26/529/e/3/expenses#qualified_higher_education_expenses
   entity: Person
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Has Qualified Education Loan"
   description: "Whether the individual has a loan that qualifies under Section 221(d)(1)"
 
@@ -56,21 +56,21 @@ variable has_qualified_education_loan:
 variable qualified_higher_education_expenses_221:
   entity: Person
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Attends Eligible Educational Institution"
   description: "Whether the individual attends an institution eligible under Section 221"
 
 variable attends_eligible_educational_institution:
   entity: Person
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Qualified Loan Beneficiary"
   description: "Whether education expenses were for taxpayer, spouse, or dependent"
 
 variable is_qualified_loan_beneficiary:
   entity: Person
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Has Excluded Related-Party Loan"
   description: "Whether the loan is from a related person and thus excluded from Section 221"
   syntax: python
@@ -87,7 +87,7 @@ variable is_qualified_loan_beneficiary:
 variable has_excluded_related_party_loan:
   entity: Person
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Has Qualifying Refinanced Loan"
   description: "Whether a refinanced loan qualifies under Section 221(d)(1)"
 

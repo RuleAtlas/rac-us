@@ -3,7 +3,7 @@
 variable is_snap_abawd:
   entity: Person
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "Subject to SNAP ABAWD Requirements"
   description: "Whether individual is an Able-Bodied Adult Without Dependents subject to work requirements"
   syntax: python
@@ -24,7 +24,7 @@ variable is_snap_abawd:
 variable snap_abawd_work_requirement_met:
   entity: Person
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "SNAP ABAWD Work Requirement Met"
   description: "Whether ABAWD individual meets 80 hour/month work requirement"
   syntax: python

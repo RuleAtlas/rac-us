@@ -77,7 +77,7 @@ variable tanf_hours_in_core_activities:
 variable tanf_work_requirement_met:
   entity: Person
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "TANF Work Requirement Met"
   description: "Whether individual meets TANF work participation requirement"
   syntax: python
@@ -93,7 +93,7 @@ variable tanf_work_requirement_met:
 variable tanf_work_requirement_exempt:
   entity: Person
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "TANF Work Requirement Exempt"
   description: "Whether individual is exempt from TANF work requirements"
   syntax: python
@@ -121,7 +121,7 @@ variable tanf_work_requirement_exempt:
 variable tanf_teen_parent_education_required:
   entity: Person
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "TANF Teen Parent Education Required"
   description: "Whether teen parent must attend school or education program"
   syntax: python
@@ -136,7 +136,7 @@ variable tanf_teen_parent_education_required:
 variable tanf_teen_parent_education_met:
   entity: Person
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "TANF Teen Parent Education Requirement Met"
   description: "Whether teen parent meets education/training requirement"
   syntax: python
@@ -156,7 +156,7 @@ variable tanf_teen_parent_education_met:
 variable tanf_unit_work_requirement_met:
   entity: TanfUnit
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "TANF Unit Work Requirement Met"
   description: "Whether all non-exempt adults in TANF unit meet work requirements"
   syntax: python

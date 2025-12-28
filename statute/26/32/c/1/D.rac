@@ -13,6 +13,6 @@ such taxable year.
 variable is_nonresident_alien:
   entity: TaxUnit
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Is Nonresident Alien"
   description: "Whether taxpayer is a nonresident alien not electing US tax treatment, disqualifying from EITC per 26 USC §32(c)(1)(D)"

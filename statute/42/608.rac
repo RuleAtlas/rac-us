@@ -3,7 +3,7 @@
 variable tanf_work_sanction_applicable:
   entity: Person
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "TANF Work Sanction Applicable"
   description: "Whether work requirement sanction applies to individual"
   syntax: python
@@ -49,7 +49,7 @@ variable tanf_work_sanction_amount:
 variable tanf_full_family_sanction_applies:
   entity: TanfUnit
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "TANF Full-Family Sanction"
   description: "Whether full-family sanction terminates entire benefit"
   syntax: python
@@ -66,7 +66,7 @@ variable tanf_full_family_sanction_applies:
 variable tanf_child_support_cooperation_met:
   entity: TanfUnit
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "TANF Child Support Cooperation Met"
   description: "Whether unit cooperates with child support enforcement"
   syntax: python
@@ -105,7 +105,7 @@ variable tanf_child_support_sanction_amount:
 variable tanf_irp_required:
   entity: Person
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "TANF Individual Responsibility Plan Required"
   description: "Whether Individual Responsibility Plan is required"
   syntax: python
@@ -121,7 +121,7 @@ variable tanf_irp_required:
 variable tanf_irp_compliance:
   entity: Person
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "TANF IRP Compliance"
   description: "Whether individual complies with Individual Responsibility Plan"
   syntax: python
@@ -187,7 +187,7 @@ variable tanf_benefit_after_sanctions:
 variable tanf_work_good_cause:
   entity: Person
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "TANF Work Good Cause"
   description: "Whether good cause exists for work requirement non-compliance"
   syntax: python
@@ -212,7 +212,7 @@ variable tanf_work_good_cause:
 variable tanf_child_support_good_cause_exemption:
   entity: TanfUnit
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "TANF Child Support Good Cause"
   description: "Whether good cause exemption applies for child support cooperation"
   syntax: python

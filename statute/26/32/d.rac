@@ -13,7 +13,7 @@ variable is_mfs_filing_status:
   imports: [26/1#filing_status]
   entity: TaxUnit
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Is Married Filing Separately"
   description: "Whether filing status is MFS, disqualifying from EITC per 26 USC 32(d)"
   syntax: python

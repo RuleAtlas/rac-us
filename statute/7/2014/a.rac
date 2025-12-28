@@ -8,7 +8,7 @@ requirements of this section.
 variable snap_categorically_eligible:
   entity: Household
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "SNAP Categorically Eligible"
   description: "Whether household is categorically eligible through receipt of TANF, SSI, or GA"
   syntax: python
@@ -20,7 +20,7 @@ variable snap_categorically_eligible:
 variable snap_eligible:
   entity: Household
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "SNAP Eligible"
   description: "Whether household meets all SNAP eligibility requirements"
   syntax: python

@@ -9,6 +9,6 @@ valid identification number on the return of tax for the taxable year.
 variable missing_spouse_tin:
   entity: TaxUnit
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Missing Spouse SSN for EITC"
   description: "Whether taxpayer's spouse lacks a valid SSN for work when filing jointly, disqualifying from EITC per 26 USC §32(c)(1)(E)(ii) and §32(m)"

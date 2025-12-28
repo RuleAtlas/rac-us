@@ -8,6 +8,6 @@ elected to exclude any amount from gross income under section 911.
 variable has_foreign_earned_income:
   entity: TaxUnit
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Has Form 2555 Foreign Earned Income Exclusion"
   description: "Whether taxpayer has elected foreign earned income exclusion under 26 USC §911, disqualifying from EITC per 26 USC §32(c)(1)(C)"

@@ -19,7 +19,7 @@ variable is_qualifying_individual:
     - 26/21/e/qualifying_individual#child_age_limit
   entity: Person
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Is CDCC Qualifying Individual"
   description: "Whether person qualifies for purposes of Child and Dependent Care Credit per 26 USC 21(b)"
   syntax: python

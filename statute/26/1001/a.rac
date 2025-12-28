@@ -47,7 +47,7 @@ variable holding_period:
     - 26/1031/like_kind_exchange#is_like_kind_exchange
   entity: Asset
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Held Substantially Identical Long-Term"
   description: "Held substantially identical property long-term when short sale initiated"
   syntax: python
@@ -73,7 +73,7 @@ variable netting:
     - 26/1212/carryover#long_term_capital_loss_carryover
   entity: TaxUnit
   period: Year
-  dtype: Bool
+  dtype: Boolean
   unit: "USD"
   label: "Has Capital Loss Carryover"
   description: "Taxpayer has unused capital loss to carry forward"

@@ -26,7 +26,7 @@ variable snap_fpl_monthly:
 variable snap_gross_income_eligible:
   entity: Household
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "SNAP Gross Income Eligible"
   description: "Whether household passes 130% FPL gross income test (elderly/disabled exempt)"
   syntax: python
@@ -42,7 +42,7 @@ variable snap_gross_income_eligible:
 variable snap_net_income_eligible:
   entity: Household
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "SNAP Net Income Eligible"
   description: "Whether household passes 100% FPL net income test after deductions"
   syntax: python

@@ -28,7 +28,7 @@ variable snap_countable_resources:
 variable snap_resource_eligible:
   entity: Household
   period: Month
-  dtype: Bool
+  dtype: Boolean
   label: "SNAP Resource Eligible"
   description: "Whether household's countable resources are within SNAP limits"
   syntax: python

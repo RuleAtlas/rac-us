@@ -15,7 +15,7 @@ than one-half of such taxable year.
 variable meets_no_child_requirements:
   entity: TaxUnit
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Meets Childless EITC Requirements"
   description: "Whether individual meets age, dependency, and abode requirements for childless EITC per 26 USC §32(c)(1)(A)(ii)"
   syntax: python
