@@ -2,6 +2,14 @@ text: """
 (a) Corporations in general.—A tax is hereby imposed for each taxable year
 on the taxable income of every corporation.
 """
+
+input entity_type:
+  entity: Corporation
+  period: Year
+  dtype: Enum(EntityType)
+  label: "Entity Type"
+  description: "Legal entity type (C_CORPORATION, S_CORPORATION, PARTNERSHIP, etc.)"
+
 variable tax_imposed:
   entity: Corporation
   period: Year

@@ -50,6 +50,7 @@ variable agi_reduction:
 
 variable agi_threshold:
   imports:
+    - 26/2/b#filing_status
     - 26/22/d/reduction#agi_threshold_single
     - 26/22/d/reduction#agi_threshold_joint
     - 26/22/d/reduction#agi_threshold_separate

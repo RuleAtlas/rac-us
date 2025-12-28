@@ -11,6 +11,14 @@ for any dependent for the taxable year who is not a qualifying child
 by $500 for each such dependent.
 """
 
+input is_dependent:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Dependent"
+  description: "Whether the person is a dependent under Section 152"
+  default: false
+
 variable is_other_dependent:
   imports:
     - 26/24/c/1#is_ctc_qualifying_child

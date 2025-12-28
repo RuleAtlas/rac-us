@@ -2,6 +2,15 @@ text: """
 (3) LIMITATION.—An eligible household may receive only 1 affordable
 connectivity benefit under this section.
 """
+
+input is_enrolled_in_acp:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Enrolled in ACP"
+  description: "Whether household is already enrolled in ACP with another provider"
+  default: false
+
 variable acp_already_receiving:
   entity: Household
   period: Month

@@ -16,6 +16,14 @@ parameter qualifying_age_limit:
     2022-01-01: 17  # Reverted
     1997-01-01: 17  # Original TRA97
 
+input age:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Age"
+  description: "Age of the person at end of tax year"
+  default: 0
+
 variable is_ctc_qualifying_child:
   imports:
     - 26/152/c#is_qualifying_child

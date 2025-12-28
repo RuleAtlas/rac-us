@@ -12,6 +12,7 @@ shall not exceed the disability income received.
 """
 variable initial_amount:
   imports:
+    - 26/2/b#filing_status
     - 26/22/c#initial_amount_single
     - 26/22/c#initial_amount_joint_both
     - 26/22/c#initial_amount_separate

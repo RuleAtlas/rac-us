@@ -1,3 +1,145 @@
+# Inputs for TANF sanctions
+imports:
+  - 42/607#tanf_work_requirement_exempt
+  - 42/607#tanf_work_requirement_met
+
+input tanf_unit_adults:
+  entity: TanfUnit
+  period: Month
+  dtype: Integer
+  label: "TANF Unit Adults"
+  description: "Count of adults in TANF unit"
+  default: 1
+
+input tanf_unit_size:
+  entity: TanfUnit
+  period: Month
+  dtype: Integer
+  label: "TANF Unit Size"
+  description: "Total persons in TANF unit"
+  default: 1
+
+input tanf_benefit_amount:
+  entity: TanfUnit
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "TANF Benefit Amount"
+  description: "TANF benefit amount (for calculating sanctions)"
+  default: 0
+
+input tanf_benefit_amount_before_sanctions:
+  entity: TanfUnit
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "TANF Benefit Before Sanctions"
+  description: "TANF benefit amount before any sanctions applied"
+  default: 0
+
+input tanf_uses_full_family_work_sanction:
+  entity: TanfUnit
+  period: Month
+  dtype: Boolean
+  label: "Uses Full-Family Work Sanction"
+  description: "Whether state uses full-family sanction for work non-compliance"
+  default: false
+
+input cooperating_with_child_support_enforcement:
+  entity: TanfUnit
+  period: Month
+  dtype: Boolean
+  label: "Cooperating with Child Support"
+  description: "Whether cooperating with child support enforcement"
+  default: true
+
+input is_tanf_recipient:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Is TANF Recipient"
+  description: "Whether person is receiving TANF"
+  default: false
+
+input tanf_irp_terms_met:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "IRP Terms Met"
+  description: "Whether Individual Responsibility Plan terms are met"
+  default: true
+
+input tanf_sanction_level_input:
+  entity: Person
+  period: Month
+  dtype: Integer
+  label: "Sanction Level Input"
+  description: "Current progressive sanction level (0-3)"
+  default: 0
+
+input child_care_unavailable_good_cause:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Child Care Unavailable"
+  description: "Whether child care is unavailable as good cause"
+  default: false
+
+input domestic_violence_waiver:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Domestic Violence Waiver"
+  description: "Whether domestic violence waiver applies"
+  default: false
+
+input temporary_illness:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Temporary Illness"
+  description: "Whether temporary illness prevents work"
+  default: false
+
+input transportation_unavailable:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Transportation Unavailable"
+  description: "Whether transportation is unavailable for work"
+  default: false
+
+input domestic_violence_risk:
+  entity: TanfUnit
+  period: Month
+  dtype: Boolean
+  label: "Domestic Violence Risk"
+  description: "Whether domestic violence risk exists"
+  default: false
+
+input child_support_not_in_child_interest:
+  entity: TanfUnit
+  period: Month
+  dtype: Boolean
+  label: "Child Support Not in Interest"
+  description: "Whether child support pursuit not in child's best interest"
+  default: false
+
+input conception_from_assault:
+  entity: TanfUnit
+  period: Month
+  dtype: Boolean
+  label: "Conception from Assault"
+  description: "Whether child conceived from rape or incest"
+  default: false
+
+parameter child_support_noncompliance_rate:
+  description: "Minimum benefit reduction rate for child support non-cooperation"
+  values:
+    1996-01-01: 0.25
+  label: "Child Support Sanction Rate"
+  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
+
 variable tanf_work_sanction_applicable:
   entity: Person
   period: Month
@@ -94,10 +236,9 @@ variable tanf_child_support_sanction_amount:
   formula: |
     if tanf_child_support_cooperation_met:
         return 0
-    min_sanction_rate = parameter(gov.hhs.acf.tanf.sanctions.child_support_noncompliance_rate)
     # Federal minimum: At least 25% reduction
     # States may impose higher, including full termination
-    return tanf_benefit_amount * min_sanction_rate
+    return tanf_benefit_amount * child_support_noncompliance_rate
   default: 0
 
 variable tanf_irp_required:

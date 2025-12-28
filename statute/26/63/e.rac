@@ -25,6 +25,15 @@ though at the time of the filing of such consent the assessment
 of such deficiency would otherwise be prevented by the operation
 of any law or rule of law.
 """
+
+input is_ineligible_for_standard_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Ineligible for Standard Deduction"
+  description: "Whether taxpayer is ineligible for standard deduction (e.g., NRA, MFS spouse itemizes)"
+  default: false
+
 variable deduction_choice:
   imports:
     - 26/63/c#standard_deduction

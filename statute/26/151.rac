@@ -3,6 +3,16 @@ text: """
 exemptions provided by this section shall be allowed as deductions
 in computing taxable income.
 """
+
+parameter exemption_amount:
+  description: "Personal exemption amount per exemption"
+  unit: "USD"
+  reference: "26 USC 151"
+  values:
+    2018-01-01: 0  # Suspended by TCJA
+    2017-01-01: 4050
+    2016-01-01: 4050
+
 variable personal_exemption:
   entity: TaxUnit
   period: Year

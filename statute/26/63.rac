@@ -77,6 +77,14 @@ paragraphs (1) and (2) shall be applied by substituting "$750"
 for "$600".
 """
 
+input is_dependent:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Dependent Status"
+  description: "Whether the taxpayer can be claimed as a dependent on another return"
+  default: false
+
 # Main standard deduction variable
 variable standard_deduction:
   imports:

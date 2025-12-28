@@ -1,3 +1,174 @@
+# Inputs for ACP eligibility
+input household_size:
+  entity: Household
+  period: Month
+  dtype: Integer
+  label: "Household Size"
+  description: "Number of persons in household"
+  default: 1
+
+input gross_income:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Gross Income"
+  description: "Monthly gross household income"
+  default: 0
+
+input is_on_tribal_land:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "On Tribal Land"
+  description: "Whether household is located on Tribal land"
+  default: false
+
+input receives_snap:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives SNAP"
+  description: "Whether any member receives SNAP"
+  default: false
+
+input receives_medicaid:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives Medicaid"
+  description: "Whether any member receives Medicaid"
+  default: false
+
+input receives_ssi:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives SSI"
+  description: "Whether any member receives SSI"
+  default: false
+
+input receives_section_8:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives Section 8"
+  description: "Whether any member receives Section 8 housing"
+  default: false
+
+input receives_veterans_pension:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives Veterans Pension"
+  description: "Whether any member receives Veterans Pension"
+  default: false
+
+input receives_pell_grant:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives Pell Grant"
+  description: "Whether any member receives Federal Pell Grant"
+  default: false
+
+input receives_free_school_meals:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives Free School Meals"
+  description: "Whether any member receives free school meals"
+  default: false
+
+input receives_reduced_price_school_meals:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives Reduced Price Meals"
+  description: "Whether any member receives reduced price school meals"
+  default: false
+
+input receives_wic:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives WIC"
+  description: "Whether any member receives WIC"
+  default: false
+
+input receives_fdpir:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives FDPIR"
+  description: "Whether any member receives Food Distribution on Indian Reservations"
+  default: false
+
+input receives_bia_general_assistance:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives BIA General Assistance"
+  description: "Whether any member receives BIA general assistance"
+  default: false
+
+input receives_tribal_tanf:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives Tribal TANF"
+  description: "Whether any member receives Tribal TANF"
+  default: false
+
+input receives_head_start:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives Head Start"
+  description: "Whether any member receives Head Start"
+  default: false
+
+# Parameters
+parameter acp_standard_benefit:
+  description: "Standard monthly ACP benefit"
+  unit: "USD"
+  values:
+    2024-04-01: 0
+    2021-11-15: 30
+  label: "ACP Standard Benefit"
+  reference: "https://www.fcc.gov/acp"
+
+parameter fpg_limit:
+  description: "FPL percentage limit for ACP eligibility"
+  values:
+    2021-11-15: 2.0
+  label: "ACP FPL Limit"
+  reference: "https://www.fcc.gov/acp"
+
+parameter months_per_year:
+  description: "Months per year for annual conversion"
+  values:
+    2021-11-15: 12
+  label: "Months Per Year"
+
+parameter fpl_base:
+  description: "Annual FPL base for 1-person household"
+  unit: "USD"
+  values:
+    2024-01-01: 15060
+    2023-01-01: 14580
+  label: "FPL Base"
+  reference: "https://aspe.hhs.gov/poverty-guidelines"
+
+parameter fpl_additional_per_person:
+  description: "Annual FPL additional per person"
+  unit: "USD"
+  values:
+    2024-01-01: 5380
+    2023-01-01: 5140
+  label: "FPL Additional Per Person"
+  reference: "https://aspe.hhs.gov/poverty-guidelines"
+
 variable acp_categorically_eligible:
   imports:
     - 47/1752/a/6#acp_school_meal_eligible
@@ -49,10 +220,6 @@ variable acp_eligible:
   default: false
 
 variable acp_fpl_threshold:
-  imports:
-    - 47/1752/parameters/income/fpg_limit#fpg_limit
-    - 7/2014/c/fpl_by_household_size#fpl_by_household_size
-    - 47/1752/parameters/months_per_year#months_per_year
   entity: Household
   period: Month
   dtype: Money
@@ -61,10 +228,8 @@ variable acp_fpl_threshold:
   description: "200% of Federal Poverty Level for household size per 47 USC 1752(a)(6)(A)"
   syntax: python
   formula: |
-    base_fpl = fpl_by_household_size[1]
-    additional_per_person = fpl_by_household_size["additional_per_person"]
     extra_members = max(0, household_size - 1)
-    annual_fpl = base_fpl + (additional_per_person * extra_members)
+    annual_fpl = fpl_base + (fpl_additional_per_person * extra_members)
     # Return monthly threshold at 200% FPL
     return (annual_fpl * fpg_limit) / months_per_year
   default: 0
@@ -92,12 +257,7 @@ variable acp_lifeline_categorical_eligible:
   syntax: python
   formula: |
     # Lifeline qualifying programs per 47 CFR 54.409(b)
-    snap = any(members.receives_snap)
-    medicaid = any(members.receives_medicaid)
-    ssi = any(members.receives_ssi)
-    section_8 = any(members.receives_section_8)
-    veterans_pension = any(members.receives_veterans_pension)
-    return snap or medicaid or ssi or section_8 or veterans_pension
+    return receives_snap or receives_medicaid or receives_ssi or receives_section_8 or receives_veterans_pension
   default: false
 
 variable acp_on_tribal_land:
@@ -119,7 +279,7 @@ variable acp_pell_grant_eligible:
   syntax: python
   formula: |
     # At least one member received Pell Grant in current award year
-    return any(members.receives_pell_grant)
+    return receives_pell_grant
   default: false
 
 
@@ -132,7 +292,7 @@ variable acp_school_meal_eligible:
   syntax: python
   formula: |
     # At least one member approved for free or reduced price meals
-    return any(members.receives_free_school_meals) or any(members.receives_reduced_price_school_meals)
+    return receives_free_school_meals or receives_reduced_price_school_meals
   default: false
 
 
@@ -144,11 +304,7 @@ variable acp_tribal_program_eligible:
   description: "Eligible through tribal-specific programs per 47 CFR 54.409(b)(4)"
   syntax: python
   formula: |
-    fdpir = any(members.receives_fdpir)
-    bia = any(members.receives_bia_general_assistance)
-    tribal_tanf = any(members.receives_tribal_tanf)
-    head_start = any(members.receives_head_start)
-    return fdpir or bia or tribal_tanf or head_start
+    return receives_fdpir or receives_bia_general_assistance or receives_tribal_tanf or receives_head_start
   default: false
 
 
@@ -161,5 +317,5 @@ variable acp_wic_eligible:
   syntax: python
   formula: |
     # At least one member receives WIC
-    return any(members.receives_wic)
+    return receives_wic
   default: false

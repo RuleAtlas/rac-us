@@ -12,6 +12,15 @@ greater of--
 (B) the sum of $250 and such individual's earned income.
 """
 
+input earned_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Earned Income"
+  description: "Taxpayer's earned income for dependent standard deduction calculation"
+  default: 0
+
 variable dependent_standard_deduction:
   imports:
     - 26/63/c/5/dependent_minimum#dependent_minimum

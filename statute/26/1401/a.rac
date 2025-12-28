@@ -2,6 +2,16 @@
 
 # 26 USC 1401 - Tax on Self-Employment Income
 #
+
+input taxable_self_employment_income:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Taxable Self-Employment Income"
+  description: "Self-employment income subject to SE tax (gross * 0.9235)"
+  default: 0
+
 variable self_employment_tax:
   imports:
     - 26/1401/b/2#self_employment_additional_medicare_tax

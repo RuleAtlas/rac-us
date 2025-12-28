@@ -1,3 +1,36 @@
+input broadband_monthly_charge:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Broadband Monthly Charge"
+  description: "Monthly charge for broadband service"
+  default: 0
+
+parameter months_per_year:
+  description: "Months per year for annual conversion"
+  values:
+    2021-11-15: 12
+  label: "Months Per Year"
+
+parameter standard_benefit:
+  description: "Standard monthly ACP benefit"
+  unit: "USD"
+  values:
+    2024-04-01: 0
+    2021-11-15: 30
+  label: "ACP Standard Benefit"
+  reference: "https://www.fcc.gov/acp"
+
+parameter tribal_benefit:
+  description: "Tribal land monthly ACP benefit"
+  unit: "USD"
+  values:
+    2024-04-01: 0
+    2021-11-15: 75
+  label: "ACP Tribal Benefit"
+  reference: "https://www.fcc.gov/acp"
+
 variable acp_annual_benefit:
   imports:
     - 47/1752/a/7#acp_benefit
