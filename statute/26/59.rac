@@ -4,7 +4,7 @@ variable special_rules:
   imports:
     - 26/1#filing_status
     - 26/55/b/2#alternative_minimum_taxable_income as amti
-    - 26/55/a/amt#tentative_minimum_tax
+    - 26/55/a#tentative_minimum_tax
     - 26/1411/a#net_investment_income_tax as niit
   entity: TaxUnit
   period: Year

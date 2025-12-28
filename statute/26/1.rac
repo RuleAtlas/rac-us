@@ -66,7 +66,7 @@ variable total_federal_income_tax:
   imports:
     - 26/1#income_tax_before_credits
     - 26/1/h#capital_gains_tax
-    - 26/55/a/amt#alternative_minimum_tax
+    - 26/55/a#alternative_minimum_tax
     - 26/1411/net_investment_income_tax#net_investment_income_tax
     - 26/1401/self_employment_tax#self_employment_tax
     - 26/3101/b/2#additional_medicare_tax

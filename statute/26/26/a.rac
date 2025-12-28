@@ -10,7 +10,7 @@ year shall not exceed the excess (if any) of—
 variable tax_liability_before_credits:
   imports:
     - 26/1#income_tax_before_credits
-    - 26/55/a/amt#tentative_minimum_tax
+    - 26/55/a#tentative_minimum_tax
   entity: TaxUnit
   period: Year
   dtype: Money

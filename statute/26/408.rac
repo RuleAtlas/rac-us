@@ -9,8 +9,8 @@ beneficiaries...
 """
 variable ira_definitions:
   imports:
-    - 26/402/c/rmd#rmd_divisor
-    - 26/402/c/rmd#rmd_applicable_age
+    - 26/402/c#rmd_divisor
+    - 26/402/c#rmd_applicable_age
 
 variable traditional_ira_balance:
   entity: Person
