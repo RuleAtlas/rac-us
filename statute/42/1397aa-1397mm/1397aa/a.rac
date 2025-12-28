@@ -23,11 +23,49 @@ title XIX or... under a waiver...;
 (4) who is not covered under a group health plan or under health
 insurance coverage...
 """
+
+parameter max_age:
+  description: "Maximum age for CHIP eligibility (child must be under this age)"
+  unit: years
+  reference: "42 USC 1397jj(a)(1)"
+  values:
+    1997-08-05: 19  # CHIP enacted by Balanced Budget Act of 1997
+
 variable eligibility:
   entity: Person
   period: Year
   dtype: Boolean
   label: "CHIP Eligible (Any Pathway)"
-  description: "Person eligible through any CHIP pathway"
+  description: "Person eligible through any CHIP pathway based on age requirement"
   formula: return age < max_age
-  default: CHIPCategory.NONE
+  tests:
+    - name: "infant_eligible"
+      period: 2024-01
+      inputs:
+        age: 0
+      expect: true
+    - name: "child_age_10_eligible"
+      period: 2024-01
+      inputs:
+        age: 10
+      expect: true
+    - name: "teenager_age_17_eligible"
+      period: 2024-01
+      inputs:
+        age: 17
+      expect: true
+    - name: "age_18_eligible_boundary"
+      period: 2024-01
+      inputs:
+        age: 18
+      expect: true  # Under 19, still eligible
+    - name: "age_19_not_eligible_boundary"
+      period: 2024-01
+      inputs:
+        age: 19
+      expect: false  # At 19, no longer a child per statute
+    - name: "adult_age_25_not_eligible"
+      period: 2024-01
+      inputs:
+        age: 25
+      expect: false

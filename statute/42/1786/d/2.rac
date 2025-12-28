@@ -22,3 +22,57 @@ variable income:
     additional = fpl_monthly.additional_per_person
     extra_members = household_size - max_table_size
     return base + (additional * extra_members)
+  tests:
+    - name: single_person_household_fpl
+      period: 2024-01
+      inputs:
+        household_size: 1
+        max_table_size: 8
+        fpl_monthly.by_household_size: {1: 1_255, 2: 1_703, 3: 2_150, 4: 2_598, 5: 3_045, 6: 3_493, 7: 3_940, 8: 4_388}
+        fpl_monthly.additional_per_person: 448
+      expect: 1_255
+
+    - name: family_of_four_fpl
+      period: 2024-01
+      inputs:
+        household_size: 4
+        max_table_size: 8
+        fpl_monthly.by_household_size: {1: 1_255, 2: 1_703, 3: 2_150, 4: 2_598, 5: 3_045, 6: 3_493, 7: 3_940, 8: 4_388}
+        fpl_monthly.additional_per_person: 448
+      expect: 2_598
+
+    - name: max_table_size_household_fpl
+      period: 2024-01
+      inputs:
+        household_size: 8
+        max_table_size: 8
+        fpl_monthly.by_household_size: {1: 1_255, 2: 1_703, 3: 2_150, 4: 2_598, 5: 3_045, 6: 3_493, 7: 3_940, 8: 4_388}
+        fpl_monthly.additional_per_person: 448
+      expect: 4_388
+
+    - name: household_exceeds_max_table_size_by_one
+      period: 2024-01
+      inputs:
+        household_size: 9
+        max_table_size: 8
+        fpl_monthly.by_household_size: {1: 1_255, 2: 1_703, 3: 2_150, 4: 2_598, 5: 3_045, 6: 3_493, 7: 3_940, 8: 4_388}
+        fpl_monthly.additional_per_person: 448
+      expect: 4_836
+
+    - name: large_household_exceeds_max_table_size
+      period: 2024-01
+      inputs:
+        household_size: 12
+        max_table_size: 8
+        fpl_monthly.by_household_size: {1: 1_255, 2: 1_703, 3: 2_150, 4: 2_598, 5: 3_045, 6: 3_493, 7: 3_940, 8: 4_388}
+        fpl_monthly.additional_per_person: 448
+      expect: 6_180
+
+    - name: two_person_household_fpl
+      period: 2024-01
+      inputs:
+        household_size: 2
+        max_table_size: 8
+        fpl_monthly.by_household_size: {1: 1_255, 2: 1_703, 3: 2_150, 4: 2_598, 5: 3_045, 6: 3_493, 7: 3_940, 8: 4_388}
+        fpl_monthly.additional_per_person: 448
+      expect: 1_703

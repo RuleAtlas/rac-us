@@ -32,3 +32,82 @@ variable categorical:
         return "child"
     # No WIC category applies
     return "none"
+  tests:
+    - name: "Breastfeeding woman within eligibility period"
+      period: 2024-01
+      inputs:
+        is_breastfeeding: true
+        months_postpartum: 6
+        postpartum_max_months_breastfeeding: 12
+        is_pregnant: false
+        is_postpartum: false
+        age: 25
+        infant_max_years: 1
+        child_max_years: 5
+      expect: "breastfeeding_woman"
+
+    - name: "Pregnant woman receives pregnant category"
+      period: 2024-01
+      inputs:
+        is_breastfeeding: false
+        months_postpartum: 0
+        postpartum_max_months_breastfeeding: 12
+        is_pregnant: true
+        is_postpartum: false
+        age: 30
+        infant_max_years: 1
+        child_max_years: 5
+      expect: "pregnant_woman"
+
+    - name: "Postpartum non-breastfeeding woman within 6 months"
+      period: 2024-01
+      inputs:
+        is_breastfeeding: false
+        months_postpartum: 3
+        postpartum_max_months_breastfeeding: 12
+        postpartum_max_months_non_breastfeeding: 6
+        is_pregnant: false
+        is_postpartum: true
+        age: 28
+        infant_max_years: 1
+        child_max_years: 5
+      expect: "postpartum_woman"
+
+    - name: "Infant under 1 year old"
+      period: 2024-01
+      inputs:
+        is_breastfeeding: false
+        months_postpartum: 0
+        postpartum_max_months_breastfeeding: 12
+        is_pregnant: false
+        is_postpartum: false
+        age: 0
+        infant_max_years: 1
+        child_max_years: 5
+      expect: "infant"
+
+    - name: "Child between 1 and 5 years old"
+      period: 2024-01
+      inputs:
+        is_breastfeeding: false
+        months_postpartum: 0
+        postpartum_max_months_breastfeeding: 12
+        is_pregnant: false
+        is_postpartum: false
+        age: 3
+        infant_max_years: 1
+        child_max_years: 5
+      expect: "child"
+
+    - name: "Adult over 5 years with no qualifying status"
+      period: 2024-01
+      inputs:
+        is_breastfeeding: false
+        months_postpartum: 0
+        postpartum_max_months_breastfeeding: 12
+        is_pregnant: false
+        is_postpartum: false
+        age: 10
+        infant_max_years: 1
+        child_max_years: 5
+      expect: "none"

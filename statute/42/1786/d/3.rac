@@ -23,3 +23,44 @@ variable adjunctive:
     if household.receives_snap:
         return True
     return False
+  tests:
+    - name: snap_recipient_eligible
+      period: 2024-01
+      inputs:
+        receives_snap: true
+      expect: true
+
+    - name: household_snap_eligible
+      period: 2024-01
+      inputs:
+        receives_snap: false
+        household.receives_snap: true
+      expect: true
+
+    - name: no_snap_not_eligible
+      period: 2024-01
+      inputs:
+        receives_snap: false
+        household.receives_snap: false
+      expect: false
+
+    - name: both_person_and_household_snap
+      period: 2024-01
+      inputs:
+        receives_snap: true
+        household.receives_snap: true
+      expect: true
+
+    - name: person_snap_household_no_snap
+      period: 2024-01
+      inputs:
+        receives_snap: true
+        household.receives_snap: false
+      expect: true
+
+    - name: neither_person_nor_household_snap
+      period: 2024-01
+      inputs:
+        receives_snap: false
+        household.receives_snap: false
+      expect: false

@@ -26,6 +26,33 @@ under section 1916...
 cost sharing... the cumulative amount of which exceeds
 5 percent of a family's income for the year involved.
 """
+
+parameter cost_sharing_exempt_threshold:
+  description: "Income level (as % FPL) below which children are exempt from most cost-sharing"
+  unit: rate
+  source: "42 USC 1397cc(e)(3)(A)"
+  reference: "42 USC 1397cc(e)(3)(A)"
+  values:
+    2024-01-01: 150
+    1997-01-01: 150
+
+input is_chip_eligible:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "CHIP Eligible"
+  description: "Whether household contains CHIP-eligible children"
+  default: false
+
+input medicaid_income_level:
+  entity: Household
+  period: Year
+  dtype: Integer
+  unit: "percent"
+  label: "Income as Percent of FPL"
+  description: "Household income as a percentage of the federal poverty line"
+  default: 0
+
 variable cost_sharing:
   entity: Household
   period: Year
@@ -42,3 +69,40 @@ variable cost_sharing:
     income_pct_fpl = medicaid_income_level
     # Below 150% FPL: exempt from most cost-sharing
     return income_pct_fpl <= cost_sharing_exempt_threshold
+  tests:
+    - name: "Not CHIP eligible - cost sharing not applicable"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: false
+        medicaid_income_level: 100
+      expect: false
+    - name: "CHIP eligible at 100% FPL - exempt from cost sharing"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: true
+        medicaid_income_level: 100
+      expect: true
+    - name: "CHIP eligible at 150% FPL - exactly at threshold (exempt)"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: true
+        medicaid_income_level: 150
+      expect: true
+    - name: "CHIP eligible at 151% FPL - just above threshold (not exempt)"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: true
+        medicaid_income_level: 151
+      expect: false
+    - name: "CHIP eligible at 200% FPL - above threshold (not exempt)"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: true
+        medicaid_income_level: 200
+      expect: false
+    - name: "CHIP eligible at 0% FPL - well below threshold (exempt)"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: true
+        medicaid_income_level: 0
+      expect: true
