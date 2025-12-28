@@ -4,6 +4,35 @@ have an eligible spouse shall be payable at the rate of...
 (2) The benefit under this subchapter for an individual who has an
 eligible spouse shall be payable at the rate of...
 """
+
+input has_eligible_spouse:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Has Eligible Spouse"
+  description: "Whether person has SSI-eligible spouse"
+  default: false
+
+parameter fbr_individual:
+  description: "Federal Benefit Rate for individual without spouse"
+  unit: "USD"
+  period: Month
+  values:
+    2024-01-01: 943
+    2023-01-01: 914
+  label: "SSI FBR (Individual)"
+  reference: "https://www.ssa.gov/oact/cola/SSI.html"
+
+parameter fbr_couple:
+  description: "Federal Benefit Rate for couple"
+  unit: "USD"
+  period: Month
+  values:
+    2024-01-01: 1415
+    2023-01-01: 1371
+  label: "SSI FBR (Couple)"
+  reference: "https://www.ssa.gov/oact/cola/SSI.html"
+
 variable federal_benefit_rate:
   entity: Person
   period: Month

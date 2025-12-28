@@ -24,3 +24,76 @@ variable meets_no_child_requirements:
     # (III) Principal place of abode in US for more than half the year
     us_abode = has_us_principal_abode
     return meets_age and not_dependent and us_abode
+  tests:
+    - name: "Meets all requirements - age 30"
+      period: 2024-01
+      inputs:
+        age: 30
+        min_age: 25
+        max_age: 65
+        is_dependent_of_another: false
+        has_us_principal_abode: true
+      expect: true
+    - name: "Meets all requirements - age 25 (minimum)"
+      period: 2024-01
+      inputs:
+        age: 25
+        min_age: 25
+        max_age: 65
+        is_dependent_of_another: false
+        has_us_principal_abode: true
+      expect: true
+    - name: "Meets all requirements - age 64 (just under max)"
+      period: 2024-01
+      inputs:
+        age: 64
+        min_age: 25
+        max_age: 65
+        is_dependent_of_another: false
+        has_us_principal_abode: true
+      expect: true
+    - name: "Too young - age 24"
+      period: 2024-01
+      inputs:
+        age: 24
+        min_age: 25
+        max_age: 65
+        is_dependent_of_another: false
+        has_us_principal_abode: true
+      expect: false
+    - name: "Too old - age 65"
+      period: 2024-01
+      inputs:
+        age: 65
+        min_age: 25
+        max_age: 65
+        is_dependent_of_another: false
+        has_us_principal_abode: true
+      expect: false
+    - name: "Is dependent of another taxpayer"
+      period: 2024-01
+      inputs:
+        age: 30
+        min_age: 25
+        max_age: 65
+        is_dependent_of_another: true
+        has_us_principal_abode: true
+      expect: false
+    - name: "No US principal abode"
+      period: 2024-01
+      inputs:
+        age: 30
+        min_age: 25
+        max_age: 65
+        is_dependent_of_another: false
+        has_us_principal_abode: false
+      expect: false
+    - name: "Multiple disqualifications"
+      period: 2024-01
+      inputs:
+        age: 20
+        min_age: 25
+        max_age: 65
+        is_dependent_of_another: true
+        has_us_principal_abode: false
+      expect: false

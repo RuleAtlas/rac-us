@@ -8,6 +8,16 @@ text: """
 (b)(4): "if the individual... is blind or disabled, the first $65
 of earned income... plus one-half of the remainder
 """
+
+input general_exclusion:
+  entity: Person
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SSI General Income Exclusion"
+  description: "First $20 of income excluded from SSI"
+  default: 20
+
 variable income_exclusions:
   entity: Person
   period: Month

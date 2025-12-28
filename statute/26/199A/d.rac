@@ -25,8 +25,38 @@ deduction, or loss, and the W-2 wages and the unadjusted basis immediately
 after acquisition of qualified property, of the taxpayer allocable to such
 specified service trade or business shall be taken into account...
 """
+
+parameter threshold_single:
+  description: "QBI deduction threshold amount for single filers"
+  unit: "USD"
+  reference: "26 USC 199A(e)(2)"
+  values:
+    2018-01-01: 157500
+
+parameter threshold_joint:
+  description: "QBI deduction threshold amount for joint filers"
+  unit: "USD"
+  reference: "26 USC 199A(e)(2)"
+  values:
+    2018-01-01: 315000
+
+parameter phaseout_range_single:
+  description: "QBI deduction phaseout range for single filers"
+  unit: "USD"
+  reference: "26 USC 199A(d)(3)(A)"
+  values:
+    2018-01-01: 50000
+
+parameter phaseout_range_joint:
+  description: "QBI deduction phaseout range for joint filers"
+  unit: "USD"
+  reference: "26 USC 199A(d)(3)(A)"
+  values:
+    2018-01-01: 100000
+
 variable sstb:
   imports:
+    - 26/63/a#taxable_income
     - 26/1#filing_status
   entity: TaxUnit
   period: Year

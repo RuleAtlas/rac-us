@@ -4,6 +4,266 @@ text: """
 A State to which a grant is made under section 603 of this title
 for a fiscal year shall achieve the minimum participation rate...
 """
+
+# Inputs for TANF work requirements
+input is_tanf_single_parent:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Single Parent TANF Recipient"
+  description: "Whether person is single parent head of TANF unit"
+  default: false
+
+input is_tanf_two_parent_family:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Two-Parent TANF Family"
+  description: "Whether family is two-parent TANF unit"
+  default: false
+
+input receives_federal_childcare_assistance:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Receives Federal Childcare"
+  description: "Whether receiving federal childcare assistance"
+  default: false
+
+input has_child_under_1:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Has Child Under 1"
+  description: "Whether person has child under age 1"
+  default: false
+
+input is_single_parent:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Is Single Parent"
+  description: "Whether person is a single parent"
+  default: false
+
+input is_disabled_unable_to_work:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Disabled Unable to Work"
+  description: "Whether person is disabled and unable to work"
+  default: false
+
+input is_caring_for_disabled_family_member:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Caring for Disabled Family Member"
+  description: "Whether person is caring for a disabled family member"
+  default: false
+
+input is_pregnant:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Is Pregnant"
+  description: "Whether person is pregnant"
+  default: false
+
+input pregnancy_trimester:
+  entity: Person
+  period: Month
+  dtype: Integer
+  label: "Pregnancy Trimester"
+  description: "Current trimester of pregnancy (1, 2, or 3)"
+  default: 0
+
+input has_minor_child:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Has Minor Child"
+  description: "Whether person has a minor child"
+  default: false
+
+input has_high_school_diploma:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Has High School Diploma"
+  description: "Whether person has high school diploma or equivalent"
+  default: false
+
+input age:
+  entity: Person
+  period: Month
+  dtype: Integer
+  label: "Age"
+  description: "Age in years"
+  default: 0
+
+input is_enrolled_in_school:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Enrolled in School"
+  description: "Whether enrolled in school"
+  default: false
+
+input is_enrolled_in_ged_program:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Enrolled in GED Program"
+  description: "Whether enrolled in GED program"
+  default: false
+
+input is_enrolled_in_alternative_education:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Enrolled in Alternative Education"
+  description: "Whether enrolled in alternative education program"
+  default: false
+
+input work_hours_monthly:
+  entity: Person
+  period: Month
+  dtype: Integer
+  label: "Monthly Work Hours"
+  description: "Total work hours per month"
+  default: 0
+
+input work_hours_unsubsidized:
+  entity: Person
+  period: Week
+  dtype: Integer
+  label: "Unsubsidized Work Hours"
+  description: "Hours in unsubsidized employment"
+  default: 0
+
+input work_hours_subsidized_private:
+  entity: Person
+  period: Week
+  dtype: Integer
+  label: "Subsidized Private Work Hours"
+  description: "Hours in subsidized private sector employment"
+  default: 0
+
+input work_hours_subsidized_public:
+  entity: Person
+  period: Week
+  dtype: Integer
+  label: "Subsidized Public Work Hours"
+  description: "Hours in subsidized public sector employment"
+  default: 0
+
+input work_hours_work_experience:
+  entity: Person
+  period: Week
+  dtype: Integer
+  label: "Work Experience Hours"
+  description: "Hours in work experience programs"
+  default: 0
+
+input work_hours_on_the_job_training:
+  entity: Person
+  period: Week
+  dtype: Integer
+  label: "On-the-Job Training Hours"
+  description: "Hours in on-the-job training"
+  default: 0
+
+input work_hours_job_search_limited:
+  entity: Person
+  period: Week
+  dtype: Integer
+  label: "Job Search Hours"
+  description: "Hours in job search and readiness (subject to limits)"
+  default: 0
+
+input work_hours_community_service:
+  entity: Person
+  period: Week
+  dtype: Integer
+  label: "Community Service Hours"
+  description: "Hours in community service programs"
+  default: 0
+
+input work_hours_vocational:
+  entity: Person
+  period: Week
+  dtype: Integer
+  label: "Vocational Training Hours"
+  description: "Hours in vocational education (12-month limit)"
+  default: 0
+
+input tanf_infant_care_exemption_available:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Infant Care Exemption Available"
+  description: "Whether infant care exemption is available (up to 12 months lifetime)"
+  default: true
+
+input tanf_unit_adults:
+  entity: TanfUnit
+  period: Month
+  dtype: Integer
+  label: "TANF Unit Adults"
+  description: "Count of adults in TANF unit"
+  default: 1
+
+# Parameters for work requirements
+parameter young_child_age_threshold:
+  description: "Age threshold for young child exemption"
+  values:
+    1996-01-01: 6
+  label: "Young Child Age Threshold"
+  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
+
+parameter hours_single_parent_young_child:
+  description: "Weekly work hours for single parent with young child"
+  values:
+    1996-01-01: 20
+  label: "Single Parent Young Child Work Hours"
+  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
+
+parameter hours_single_parent:
+  description: "Weekly work hours for single parent"
+  values:
+    1996-01-01: 30
+  label: "Single Parent Work Hours"
+  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
+
+parameter hours_two_parent:
+  description: "Weekly work hours for two-parent families"
+  values:
+    1996-01-01: 35
+  label: "Two-Parent Work Hours"
+  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
+
+parameter hours_two_parent_with_childcare:
+  description: "Weekly work hours for two-parent families with federal childcare"
+  values:
+    1996-01-01: 55
+  label: "Two-Parent Work Hours (With Childcare)"
+  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
+
+parameter weeks_per_month:
+  description: "Average weeks per month for hour conversion"
+  values:
+    1996-01-01: 4.33
+  label: "Weeks Per Month"
+  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
+
+parameter teen_parent_max_age:
+  description: "Maximum age for teen parent requirements"
+  values:
+    1996-01-01: 20
+  label: "Teen Parent Maximum Age"
+  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
+
 variable tanf_required_work_hours_weekly:
   entity: Person
   period: Week
@@ -16,20 +276,20 @@ variable tanf_required_work_hours_weekly:
     # Not all TANF recipients have work requirements
     if tanf_work_requirement_exempt:
         return 0
-    young_child_age = parameter(gov.hhs.acf.tanf.work.young_child_age_threshold)
     # 607(c)(1)(A): Single parent or caretaker with child under 6
-    if is_tanf_single_parent and has_child_under_age(young_child_age):
-        return parameter(gov.hhs.acf.tanf.work.hours_single_parent_young_child)
+    # Note: has_child_under_age is approximated with has_child_under_1
+    if is_tanf_single_parent and has_child_under_1:
+        return hours_single_parent_young_child
     # 607(c)(1)(B): General single parent requirement
     if is_tanf_single_parent:
-        return parameter(gov.hhs.acf.tanf.work.hours_single_parent)
+        return hours_single_parent
     # 607(c)(2): Two-parent families
     if is_tanf_two_parent_family:
         # 607(c)(2)(B): Higher requirement if receiving federal child care
         if receives_federal_childcare_assistance:
-            return parameter(gov.hhs.acf.tanf.work.hours_two_parent_with_childcare)
-        elif not receives_federal_childcare_assistance:
-            return parameter(gov.hhs.acf.tanf.work.hours_two_parent)
+            return hours_two_parent_with_childcare
+        else:
+            return hours_two_parent
     return 0
   default: 0
 
@@ -123,9 +383,8 @@ variable tanf_teen_parent_education_required:
   description: "Whether teen parent must attend school or education program"
   syntax: python
   formula: |
-    max_age = parameter(gov.hhs.acf.tanf.age.teen_parent_max_age)
     # Minor parent without diploma/GED must attend school
-    if age < max_age and has_minor_child and not has_high_school_diploma:
+    if age < teen_parent_max_age and has_minor_child and not has_high_school_diploma:
         return True
     return False
   default: false

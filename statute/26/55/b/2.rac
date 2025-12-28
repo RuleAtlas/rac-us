@@ -6,6 +6,7 @@ of the taxpayer for the taxable year—
 """
 variable amti:
   imports:
+    - 26/63/a#taxable_income
     - 26/56#amt_adjustments
     - 26/57#amt_preferences
     - 26/59#amt_nol_deduction

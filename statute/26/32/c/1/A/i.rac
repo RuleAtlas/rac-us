@@ -38,3 +38,121 @@ variable is_eligible_individual:
         and not has_excessive_investment_income  # 32(i)
     )
     return meets_child_requirement and not_disqualified
+  tests:
+    - name: "Eligible with qualifying children"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 2
+        meets_no_child_requirements: false
+        is_qualifying_child_of_other: false
+        has_foreign_earned_income: false
+        is_nonresident_alien: false
+        missing_taxpayer_tin: false
+        missing_spouse_tin: false
+        has_excessive_investment_income: false
+        is_mfs_filing_status: false
+      expect: true
+    - name: "Eligible with no children but meets requirements"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        meets_no_child_requirements: true
+        is_qualifying_child_of_other: false
+        has_foreign_earned_income: false
+        is_nonresident_alien: false
+        missing_taxpayer_tin: false
+        missing_spouse_tin: false
+        has_excessive_investment_income: false
+        is_mfs_filing_status: false
+      expect: true
+    - name: "Ineligible - MFS filing status"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 2
+        meets_no_child_requirements: false
+        is_qualifying_child_of_other: false
+        has_foreign_earned_income: false
+        is_nonresident_alien: false
+        missing_taxpayer_tin: false
+        missing_spouse_tin: false
+        has_excessive_investment_income: false
+        is_mfs_filing_status: true
+      expect: false
+    - name: "Ineligible - qualifying child of another"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        meets_no_child_requirements: true
+        is_qualifying_child_of_other: true
+        has_foreign_earned_income: false
+        is_nonresident_alien: false
+        missing_taxpayer_tin: false
+        missing_spouse_tin: false
+        has_excessive_investment_income: false
+        is_mfs_filing_status: false
+      expect: false
+    - name: "Ineligible - has foreign earned income exclusion"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+        meets_no_child_requirements: false
+        is_qualifying_child_of_other: false
+        has_foreign_earned_income: true
+        is_nonresident_alien: false
+        missing_taxpayer_tin: false
+        missing_spouse_tin: false
+        has_excessive_investment_income: false
+        is_mfs_filing_status: false
+      expect: false
+    - name: "Ineligible - nonresident alien"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+        meets_no_child_requirements: false
+        is_qualifying_child_of_other: false
+        has_foreign_earned_income: false
+        is_nonresident_alien: true
+        missing_taxpayer_tin: false
+        missing_spouse_tin: false
+        has_excessive_investment_income: false
+        is_mfs_filing_status: false
+      expect: false
+    - name: "Ineligible - missing taxpayer TIN"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+        meets_no_child_requirements: false
+        is_qualifying_child_of_other: false
+        has_foreign_earned_income: false
+        is_nonresident_alien: false
+        missing_taxpayer_tin: true
+        missing_spouse_tin: false
+        has_excessive_investment_income: false
+        is_mfs_filing_status: false
+      expect: false
+    - name: "Ineligible - excessive investment income"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 2
+        meets_no_child_requirements: false
+        is_qualifying_child_of_other: false
+        has_foreign_earned_income: false
+        is_nonresident_alien: false
+        missing_taxpayer_tin: false
+        missing_spouse_tin: false
+        has_excessive_investment_income: true
+        is_mfs_filing_status: false
+      expect: false
+    - name: "Ineligible - no children and does not meet no-child requirements"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        meets_no_child_requirements: false
+        is_qualifying_child_of_other: false
+        has_foreign_earned_income: false
+        is_nonresident_alien: false
+        missing_taxpayer_tin: false
+        missing_spouse_tin: false
+        has_excessive_investment_income: false
+        is_mfs_filing_status: false
+      expect: false

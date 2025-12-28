@@ -2,8 +2,72 @@ text: """
 every individual who is... (A) is aged, blind, or disabled
 Per 42 USC 1382c(a)(1)(A), "aged" means attained age 65
 """
+
+input age:
+  entity: Person
+  period: Month
+  dtype: Integer
+  label: "Age"
+  description: "Age in years"
+  default: 0
+
+input is_us_citizen:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Is US Citizen"
+  description: "Whether person is a US citizen"
+  default: false
+
+input is_qualified_alien:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Is Qualified Alien"
+  description: "Whether person is a qualified alien for SSI purposes"
+  default: false
+
+input has_eligible_spouse:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Has Eligible Spouse"
+  description: "Whether person has SSI-eligible spouse"
+  default: false
+
+input countable_resources:
+  entity: Person
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Countable Resources"
+  description: "Total countable resources for SSI"
+  default: 0
+
+parameter age_threshold:
+  description: "Age threshold for SSI aged category"
+  values:
+    1974-01-01: 65
+  label: "SSI Age Threshold"
+  reference: "https://www.ssa.gov/ssi/eligibility"
+
+parameter resource_limit_individual:
+  description: "SSI resource limit for individual"
+  unit: "USD"
+  values:
+    2024-01-01: 2000
+  label: "SSI Resource Limit (Individual)"
+  reference: "https://www.ssa.gov/ssi/eligibility"
+
+parameter resource_limit_couple:
+  description: "SSI resource limit for couple"
+  unit: "USD"
+  values:
+    2024-01-01: 3000
+  label: "SSI Resource Limit (Couple)"
+  reference: "https://www.ssa.gov/ssi/eligibility"
+
 variable age_requirement:
-  imports: [42/1382/parameters/age/threshold#age_threshold]
   entity: Person
   period: Month
   dtype: Boolean
@@ -33,6 +97,8 @@ variable resource_test:
   syntax: python
   formula: |
     if has_eligible_spouse:
-        return resource_limit_couple
-    return resource_limit_individual
+        limit = resource_limit_couple
+    else:
+        limit = resource_limit_individual
+    return countable_resources <= limit
   default: False

@@ -175,6 +175,8 @@ variable adjusted_net_capital_gain:
   default: 0
 
 variable ordinary_income:
+  imports:
+    - 26/63/a#taxable_income
   entity: TaxUnit
   period: Year
   dtype: Money

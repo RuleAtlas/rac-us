@@ -35,6 +35,8 @@ variable income_tax:
     - 26/1#filing_status
 
 variable income_tax_before_credits:
+  imports:
+    - 26/63/a#taxable_income
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -49,6 +51,8 @@ variable income_tax_before_credits:
   default: 0
 
 variable income_tax_before_credits_vectorized:
+  imports:
+    - 26/63/a#taxable_income
   entity: TaxUnit
   period: Year
   dtype: Money

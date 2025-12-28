@@ -13,6 +13,102 @@ be excluded--
 (9) amounts set aside for burial up to $1,500
 (10) burial spaces for the individual and spouse
 """
+
+input total_resources:
+  entity: Person
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Total Resources"
+  description: "Total value of all resources"
+  default: 0
+
+input primary_residence_value:
+  entity: Person
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Primary Residence Value"
+  description: "Value of primary residence (excluded from SSI)"
+  default: 0
+
+input household_goods_value:
+  entity: Person
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Household Goods Value"
+  description: "Value of household goods and personal effects"
+  default: 0
+
+input automobile_value:
+  entity: Person
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Automobile Value"
+  description: "Value of one automobile"
+  default: 0
+
+input designated_burial_funds:
+  entity: Person
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Designated Burial Funds"
+  description: "Funds set aside for burial expenses"
+  default: 0
+
+input has_eligible_spouse:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Has Eligible Spouse"
+  description: "Whether person has SSI-eligible spouse"
+  default: false
+
+input life_insurance_face_value:
+  entity: Person
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Life Insurance Face Value"
+  description: "Total face value of life insurance policies"
+  default: 0
+
+input life_insurance_cash_value:
+  entity: Person
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Life Insurance Cash Value"
+  description: "Cash surrender value of life insurance policies"
+  default: 0
+
+parameter burial_funds_limit_individual:
+  description: "Maximum burial funds exclusion for individual"
+  unit: "USD"
+  values:
+    1974-01-01: 1500
+  label: "SSI Burial Funds Limit (Individual)"
+  reference: "https://www.ssa.gov/ssi/eligibility"
+
+parameter burial_funds_limit_couple:
+  description: "Maximum burial funds exclusion for couple"
+  unit: "USD"
+  values:
+    1974-01-01: 3000
+  label: "SSI Burial Funds Limit (Couple)"
+  reference: "https://www.ssa.gov/ssi/eligibility"
+
+parameter life_insurance_limit:
+  description: "Maximum face value of life insurance to qualify for exclusion"
+  unit: "USD"
+  values:
+    1974-01-01: 1500
+  label: "SSI Life Insurance Face Value Limit"
+  reference: "https://www.ssa.gov/ssi/eligibility"
+
 variable resource_exclusions:
   entity: Person
   period: Month

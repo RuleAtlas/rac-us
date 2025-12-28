@@ -17,3 +17,29 @@ variable is_mfs_filing_status:
   formula: |
     # MARRIED_FILING_SEPARATELY filing status disqualifies from EITC
     return filing_status == MARRIED_FILING_SEPARATELY
+  tests:
+    - name: "Married filing separately - disqualified"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+      expect: true
+    - name: "Single - not disqualified"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+      expect: false
+    - name: "Married filing jointly - not disqualified"
+      period: 2024-01
+      inputs:
+        filing_status: JOINT
+      expect: false
+    - name: "Head of household - not disqualified"
+      period: 2024-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+      expect: false
+    - name: "Surviving spouse - not disqualified"
+      period: 2024-01
+      inputs:
+        filing_status: SURVIVING_SPOUSE
+      expect: false

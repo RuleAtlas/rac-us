@@ -1,3 +1,53 @@
+input is_ssi_categorical_eligible:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "SSI Categorical Eligibility"
+  description: "Whether person is aged, blind, or disabled"
+  default: false
+
+input is_ssi_resource_eligible:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "SSI Resource Eligibility"
+  description: "Whether person's resources are within SSI limits"
+  default: false
+
+input is_ssi_citizenship_eligible:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "SSI Citizenship Eligibility"
+  description: "Whether person meets SSI citizenship requirements"
+  default: false
+
+input is_ssi_residency_eligible:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "SSI Residency Eligibility"
+  description: "Whether person meets SSI residency requirements"
+  default: true
+
+input applicable_fbr:
+  entity: Person
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Applicable FBR"
+  description: "Applicable Federal Benefit Rate based on individual/couple status"
+  default: 0
+
+input ssi_countable_income:
+  entity: Person
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SSI Countable Income"
+  description: "Countable income after exclusions for SSI"
+  default: 0
+
 variable ssi:
   entity: Person
   period: Month

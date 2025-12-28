@@ -1,3 +1,74 @@
+input age:
+  entity: Person
+  period: Month
+  dtype: Integer
+  label: "Age"
+  description: "Age in years"
+  default: 0
+
+input is_disabled:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Is Disabled"
+  description: "Whether person has a qualifying disability"
+  default: false
+
+input is_pregnant:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Is Pregnant"
+  description: "Whether person is currently pregnant"
+  default: false
+
+input has_dependent_child:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Has Dependent Child"
+  description: "Whether person is responsible for a dependent child"
+  default: false
+
+input work_hours_monthly:
+  entity: Person
+  period: Month
+  dtype: Integer
+  label: "Monthly Work Hours"
+  description: "Hours worked per month"
+  default: 0
+
+input in_snap_employment_training:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "In SNAP E&T Program"
+  description: "Whether enrolled in SNAP Employment & Training program"
+  default: false
+
+parameter abawd_min_age:
+  description: "Minimum age for ABAWD work requirements"
+  values:
+    1977-01-01: 18
+  label: "ABAWD Minimum Age"
+  reference: "https://www.fns.usda.gov/snap/work-requirements"
+
+parameter abawd_max_age:
+  description: "Maximum age for ABAWD work requirements"
+  values:
+    2025-10-01: 54
+    2024-10-01: 52
+    2023-10-01: 50
+  label: "ABAWD Maximum Age"
+  reference: "https://www.fns.usda.gov/snap/work-requirements"
+
+parameter abawd_work_hours:
+  description: "Required monthly work hours for ABAWD compliance"
+  values:
+    1977-01-01: 80
+  label: "ABAWD Monthly Work Hours"
+  reference: "https://www.fns.usda.gov/snap/work-requirements"
+
 variable is_snap_abawd:
   entity: Person
   period: Month
@@ -12,9 +83,7 @@ variable is_snap_abawd:
     # - Not responsible for dependent child
     # - Not pregnant
     # - Not exempt from work registration
-    min_age = parameter("gov.usda.fns.snap.abawd.min_age")
-    max_age = parameter("gov.usda.fns.snap.abawd.max_age")
-    in_age_range = age >= min_age and age <= max_age
+    in_age_range = age >= abawd_min_age and age <= abawd_max_age
     is_exempt = is_disabled or is_pregnant or has_dependent_child
     return in_age_range and not is_exempt
   default: false
@@ -32,8 +101,6 @@ variable snap_abawd_work_requirement_met:
         return True
     # Section 2015(o)(2): Must work 80+ hours/month
     # or participate in qualifying work program
-    hours_required = parameter("gov.usda.fns.snap.abawd.work_hours")
-    working = work_hours_monthly >= hours_required
-    in_program = in_snap_employment_training
-    return working or in_program
+    working = work_hours_monthly >= abawd_work_hours
+    return working or in_snap_employment_training
   default: true

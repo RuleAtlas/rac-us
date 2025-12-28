@@ -25,3 +25,68 @@ variable num_qualifying_children:
     )
     # For EITC parameter lookup, 3+ children use the same rates
     return min(count, 3)
+  tests:
+    - name: "No qualifying children"
+      period: 2024-01
+      inputs:
+        is_qualifying_child: [false, false]
+        child_is_married_filing_joint: [false, false]
+        child_meets_place_of_abode: [true, true]
+        child_has_valid_tin: [true, true]
+      expect: 0
+    - name: "One qualifying child"
+      period: 2024-01
+      inputs:
+        is_qualifying_child: [true, false]
+        child_is_married_filing_joint: [false, false]
+        child_meets_place_of_abode: [true, true]
+        child_has_valid_tin: [true, true]
+      expect: 1
+    - name: "Two qualifying children"
+      period: 2024-01
+      inputs:
+        is_qualifying_child: [true, true]
+        child_is_married_filing_joint: [false, false]
+        child_meets_place_of_abode: [true, true]
+        child_has_valid_tin: [true, true]
+      expect: 2
+    - name: "Three qualifying children"
+      period: 2024-01
+      inputs:
+        is_qualifying_child: [true, true, true]
+        child_is_married_filing_joint: [false, false, false]
+        child_meets_place_of_abode: [true, true, true]
+        child_has_valid_tin: [true, true, true]
+      expect: 3
+    - name: "Four children, capped at 3"
+      period: 2024-01
+      inputs:
+        is_qualifying_child: [true, true, true, true]
+        child_is_married_filing_joint: [false, false, false, false]
+        child_meets_place_of_abode: [true, true, true, true]
+        child_has_valid_tin: [true, true, true, true]
+      expect: 3  # Capped at 3 for EITC
+    - name: "Child disqualified - married filing joint"
+      period: 2024-01
+      inputs:
+        is_qualifying_child: [true, true]
+        child_is_married_filing_joint: [true, false]
+        child_meets_place_of_abode: [true, true]
+        child_has_valid_tin: [true, true]
+      expect: 1  # First child disqualified
+    - name: "Child disqualified - no abode"
+      period: 2024-01
+      inputs:
+        is_qualifying_child: [true, true]
+        child_is_married_filing_joint: [false, false]
+        child_meets_place_of_abode: [false, true]
+        child_has_valid_tin: [true, true]
+      expect: 1  # First child disqualified
+    - name: "Child disqualified - no valid TIN"
+      period: 2024-01
+      inputs:
+        is_qualifying_child: [true, true]
+        child_is_married_filing_joint: [false, false]
+        child_meets_place_of_abode: [true, true]
+        child_has_valid_tin: [false, true]
+      expect: 1  # First child disqualified

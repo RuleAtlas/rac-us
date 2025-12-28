@@ -32,3 +32,81 @@ variable credit_reduction_amount:
         adjusted_threshold = threshold
     # Reduction = rate × (income - threshold), but not below zero
     return max(0, rate * (income - adjusted_threshold))
+  tests:
+    - name: "No children, income below threshold"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        earned_income: 8000
+        adjusted_gross_income: 8000
+        filing_status: SINGLE
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        phaseout_amount: {0: 10330, 1: 22720, 2: 22720, 3: 22720}
+        joint_return_adjustment: 6920
+      expect: 0  # Income below threshold
+    - name: "No children, income at threshold"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        earned_income: 10330
+        adjusted_gross_income: 10330
+        filing_status: SINGLE
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        phaseout_amount: {0: 10330, 1: 22720, 2: 22720, 3: 22720}
+        joint_return_adjustment: 6920
+      expect: 0
+    - name: "No children, income $1000 above threshold"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        earned_income: 11330
+        adjusted_gross_income: 11330
+        filing_status: SINGLE
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        phaseout_amount: {0: 10330, 1: 22720, 2: 22720, 3: 22720}
+        joint_return_adjustment: 6920
+      expect: 76.50  # 0.0765 * 1000
+    - name: "One child, single, income in phaseout"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+        earned_income: 30000
+        adjusted_gross_income: 30000
+        filing_status: SINGLE
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        phaseout_amount: {0: 10330, 1: 22720, 2: 22720, 3: 22720}
+        joint_return_adjustment: 6920
+      expect: 1163.34  # 0.1598 * (30000 - 22720)
+    - name: "One child, joint filer gets higher threshold"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+        earned_income: 30000
+        adjusted_gross_income: 30000
+        filing_status: JOINT
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        phaseout_amount: {0: 10330, 1: 22720, 2: 22720, 3: 22720}
+        joint_return_adjustment: 6920
+      expect: 57.53  # 0.1598 * (30000 - 29640)
+    - name: "Two children, high income"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 2
+        earned_income: 50000
+        adjusted_gross_income: 50000
+        filing_status: SINGLE
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        phaseout_amount: {0: 10330, 1: 22720, 2: 22720, 3: 22720}
+        joint_return_adjustment: 6920
+      expect: 5751.17  # 0.2106 * (50000 - 22720)
+    - name: "AGI higher than earned income, uses AGI"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+        earned_income: 25000
+        adjusted_gross_income: 35000
+        filing_status: SINGLE
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        phaseout_amount: {0: 10330, 1: 22720, 2: 22720, 3: 22720}
+        joint_return_adjustment: 6920
+      expect: 1962.75  # 0.1598 * (35000 - 22720), uses AGI since higher

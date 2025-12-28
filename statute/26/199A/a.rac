@@ -9,8 +9,34 @@ to the lesser of—
 aggregate amount of the qualified cooperative dividends, of the taxpayer
 for the taxable year.
 """
+input net_capital_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Net Capital Gain"
+  description: "Net capital gain as defined in section 1(h)"
+  default: 0
+
+input qualified_coop_dividends:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Qualified Cooperative Dividends"
+  description: "Aggregate amount of qualified cooperative dividends"
+  default: 0
+
+parameter qbi_deduction_rate:
+  description: "Section 199A deduction rate"
+  unit: rate
+  reference: "26 USC 199A(a)(2)"
+  values:
+    2018-01-01: 0.20
+
 variable qbi_deduction:
   imports:
+    - 26/63/a#taxable_income
     - 26/1#filing_status
     - 26/199A/c#net_qualified_business_income
     - 26/199A/d#is_sstb

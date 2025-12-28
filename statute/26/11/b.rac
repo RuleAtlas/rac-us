@@ -3,6 +3,52 @@ text: """
 21 percent of taxable income.
 Pre-TCJA (1993-2017): Graduated rates from 15% to 35% with "bubble" rates
 """
+
+input taxable_income:
+  entity: Corporation
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Corporate Taxable Income"
+  description: "Corporation's taxable income"
+  default: 0
+
+input is_subject_to_corporate_tax:
+  entity: Corporation
+  period: Year
+  dtype: Boolean
+  label: "Subject to Corporate Tax"
+  description: "Whether the entity is a C corporation subject to corporate income tax"
+  default: false
+
+input tax_year:
+  entity: Corporation
+  period: Year
+  dtype: Integer
+  label: "Tax Year"
+  description: "The tax year being calculated"
+  default: 2024
+
+parameter flat_rate:
+  description: "Post-TCJA flat corporate income tax rate"
+  unit: rate
+  reference: "26 USC 11(b)"
+  values:
+    2018-01-01: 0.21
+
+parameter tcja_effective_year:
+  description: "Year when TCJA flat corporate rate took effect"
+  unit: year
+  values:
+    2017-01-01: 2018
+
+parameter graduated_brackets:
+  description: "Pre-TCJA graduated corporate tax brackets"
+  values:
+    1993-01-01:
+      thresholds: [0, 50000, 75000, 100000, 335000, 10000000, 15000000, 18333333]
+      rates: [0.15, 0.25, 0.34, 0.39, 0.34, 0.35, 0.38, 0.35]
+
 variable tax_amount:
   entity: Corporation
   period: Year

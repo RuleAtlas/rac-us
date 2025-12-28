@@ -11,6 +11,31 @@ variable child_tax_credit:
   formula: |
     # CTC is limited to tax liability per §26(a)
     return min(tentative_child_tax_credit, tax_liability_before_credits)
+  tests:
+    - name: "Credit less than tax liability"
+      period: 2024-01
+      inputs:
+        tentative_child_tax_credit: 4000
+        tax_liability_before_credits: 10000
+      expect: 4000
+    - name: "Tax liability limits credit"
+      period: 2024-01
+      inputs:
+        tentative_child_tax_credit: 6000
+        tax_liability_before_credits: 3000
+      expect: 3000
+    - name: "Zero tax liability"
+      period: 2024-01
+      inputs:
+        tentative_child_tax_credit: 4000
+        tax_liability_before_credits: 0
+      expect: 0
+    - name: "Equal amounts"
+      period: 2024-01
+      inputs:
+        tentative_child_tax_credit: 5000
+        tax_liability_before_credits: 5000
+      expect: 5000
 
 # 26 USC Section 24 - Child Tax Credit (Standalone Validation Version)
 #
@@ -194,6 +219,35 @@ variable ctc_phaseout_threshold:
     if filing_status == JOINT: return ctc_phaseout_threshold_joint
     if filing_status == SURVIVING_SPOUSE: return ctc_phaseout_threshold_joint
     return ctc_phaseout_threshold_single
+  tests:
+    - name: "Joint filers get higher threshold"
+      period: 2024-01
+      inputs:
+        filing_status: JOINT
+        ctc_phaseout_threshold_joint: 400000
+        ctc_phaseout_threshold_single: 200000
+      expect: 400000
+    - name: "Surviving spouse gets joint threshold"
+      period: 2024-01
+      inputs:
+        filing_status: SURVIVING_SPOUSE
+        ctc_phaseout_threshold_joint: 400000
+        ctc_phaseout_threshold_single: 200000
+      expect: 400000
+    - name: "Single filer"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        ctc_phaseout_threshold_joint: 400000
+        ctc_phaseout_threshold_single: 200000
+      expect: 200000
+    - name: "Head of household"
+      period: 2024-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        ctc_phaseout_threshold_joint: 400000
+        ctc_phaseout_threshold_single: 200000
+      expect: 200000
 
 variable ctc_before_phaseout:
   entity: TaxUnit
@@ -207,6 +261,39 @@ variable ctc_before_phaseout:
     let child_credit = num_qualifying_children * ctc_credit_amount
     let other_credit = num_other_dependents * ctc_other_dependent_amount
     return child_credit + other_credit
+  tests:
+    - name: "Two qualifying children, no other dependents"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 2
+        num_other_dependents: 0
+        ctc_credit_amount: 2000
+        ctc_other_dependent_amount: 500
+      expect: 4000  # 2 * 2000
+    - name: "One child, two other dependents"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+        num_other_dependents: 2
+        ctc_credit_amount: 2000
+        ctc_other_dependent_amount: 500
+      expect: 3000  # 1*2000 + 2*500
+    - name: "Only other dependents"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        num_other_dependents: 3
+        ctc_credit_amount: 2000
+        ctc_other_dependent_amount: 500
+      expect: 1500  # 3 * 500
+    - name: "No dependents"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        num_other_dependents: 0
+        ctc_credit_amount: 2000
+        ctc_other_dependent_amount: 500
+      expect: 0
 
 variable ctc_phaseout_reduction:
   entity: TaxUnit
@@ -220,6 +307,47 @@ variable ctc_phaseout_reduction:
     let excess = adjusted_gross_income - ctc_phaseout_threshold
     if excess <= 0 : 0
     else ceil(excess / ctc_phaseout_increment_param) * ctc_phaseout_rate
+  tests:
+    - name: "Income below threshold"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 350000
+        ctc_phaseout_threshold: 400000
+        ctc_phaseout_increment_param: 1000
+        ctc_phaseout_rate: 50
+      expect: 0
+    - name: "Income at threshold"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 400000
+        ctc_phaseout_threshold: 400000
+        ctc_phaseout_increment_param: 1000
+        ctc_phaseout_rate: 50
+      expect: 0
+    - name: "Income $1 over threshold"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 400001
+        ctc_phaseout_threshold: 400000
+        ctc_phaseout_increment_param: 1000
+        ctc_phaseout_rate: 50
+      expect: 50  # ceil(1/1000)*50 = 1*50
+    - name: "Income $10k over threshold"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 410000
+        ctc_phaseout_threshold: 400000
+        ctc_phaseout_increment_param: 1000
+        ctc_phaseout_rate: 50
+      expect: 500  # 10 * 50
+    - name: "Partial increment rounds up"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 401500
+        ctc_phaseout_threshold: 400000
+        ctc_phaseout_increment_param: 1000
+        ctc_phaseout_rate: 50
+      expect: 100  # ceil(1500/1000)*50 = 2*50
 
 variable total_child_tax_credit:
   entity: TaxUnit
@@ -229,6 +357,25 @@ variable total_child_tax_credit:
   label: "Total Child Tax Credit"
   description: "Total CTC per 26 USC Section 24 (sum of nonrefundable and refundable portions)"
   formula: return max(0, ctc_before_phaseout - ctc_phaseout_reduction)
+  tests:
+    - name: "No phaseout"
+      period: 2024-01
+      inputs:
+        ctc_before_phaseout: 4000
+        ctc_phaseout_reduction: 0
+      expect: 4000
+    - name: "Partial phaseout"
+      period: 2024-01
+      inputs:
+        ctc_before_phaseout: 4000
+        ctc_phaseout_reduction: 1000
+      expect: 3000
+    - name: "Full phaseout"
+      period: 2024-01
+      inputs:
+        ctc_before_phaseout: 4000
+        ctc_phaseout_reduction: 5000
+      expect: 0  # Floored at 0
 
 variable ctc_phase_in_earnings:
   entity: TaxUnit
@@ -241,6 +388,35 @@ variable ctc_phase_in_earnings:
   formula: |
     let excess = max(0, earned_income - actc_earned_income_threshold)
     return actc_refundable_rate * excess
+  tests:
+    - name: "Earned income below threshold"
+      period: 2024-01
+      inputs:
+        earned_income: 2000
+        actc_earned_income_threshold: 2500
+        actc_refundable_rate: 0.15
+      expect: 0
+    - name: "Earned income at threshold"
+      period: 2024-01
+      inputs:
+        earned_income: 2500
+        actc_earned_income_threshold: 2500
+        actc_refundable_rate: 0.15
+      expect: 0
+    - name: "Earned income above threshold"
+      period: 2024-01
+      inputs:
+        earned_income: 30000
+        actc_earned_income_threshold: 2500
+        actc_refundable_rate: 0.15
+      expect: 4125  # 0.15 * (30000 - 2500)
+    - name: "Low earned income"
+      period: 2024-01
+      inputs:
+        earned_income: 10000
+        actc_earned_income_threshold: 2500
+        actc_refundable_rate: 0.15
+      expect: 1125  # 0.15 * 7500
 
 variable ctc_social_security_excess:
   entity: TaxUnit
@@ -250,6 +426,31 @@ variable ctc_social_security_excess:
   label: "CTC Social Security Excess"
   description: "Social security taxes minus EITC per Section 24(d)(1)(B)(ii)"
   formula: return max(0, social_security_taxes - earned_income_credit)
+  tests:
+    - name: "SS taxes exceed EITC"
+      period: 2024-01
+      inputs:
+        social_security_taxes: 5000
+        earned_income_credit: 2000
+      expect: 3000
+    - name: "EITC exceeds SS taxes"
+      period: 2024-01
+      inputs:
+        social_security_taxes: 2000
+        earned_income_credit: 5000
+      expect: 0  # Floored at 0
+    - name: "No EITC"
+      period: 2024-01
+      inputs:
+        social_security_taxes: 4000
+        earned_income_credit: 0
+      expect: 4000
+    - name: "Equal amounts"
+      period: 2024-01
+      inputs:
+        social_security_taxes: 3000
+        earned_income_credit: 3000
+      expect: 0
 
 variable ctc_phase_in:
   entity: TaxUnit
@@ -262,6 +463,39 @@ variable ctc_phase_in:
   formula: |
     if num_qualifying_children < qualifying_children_ss_threshold : ctc_phase_in_earnings
     else max(ctc_phase_in_earnings, ctc_social_security_excess)
+  tests:
+    - name: "Less than 3 children, use earnings formula only"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 2
+        qualifying_children_ss_threshold: 3
+        ctc_phase_in_earnings: 3000
+        ctc_social_security_excess: 5000
+      expect: 3000  # Uses earnings formula only
+    - name: "3+ children, earnings formula higher"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 3
+        qualifying_children_ss_threshold: 3
+        ctc_phase_in_earnings: 4000
+        ctc_social_security_excess: 3000
+      expect: 4000  # max(4000, 3000)
+    - name: "3+ children, SS formula higher"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 4
+        qualifying_children_ss_threshold: 3
+        ctc_phase_in_earnings: 2000
+        ctc_social_security_excess: 5000
+      expect: 5000  # max(2000, 5000)
+    - name: "No children"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        qualifying_children_ss_threshold: 3
+        ctc_phase_in_earnings: 1000
+        ctc_social_security_excess: 0
+      expect: 1000
 
 variable ctc_refundable_maximum:
   entity: TaxUnit
@@ -271,6 +505,25 @@ variable ctc_refundable_maximum:
   label: "CTC Refundable Maximum"
   description: "Maximum refundable amount based on number of qualifying children"
   formula: return num_qualifying_children * actc_refundable_maximum
+  tests:
+    - name: "One child"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+        actc_refundable_maximum: 1700
+      expect: 1700
+    - name: "Two children"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 2
+        actc_refundable_maximum: 1700
+      expect: 3400
+    - name: "No children"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        actc_refundable_maximum: 1700
+      expect: 0
 
 variable refundable_ctc:
   entity: TaxUnit
@@ -291,6 +544,47 @@ variable refundable_ctc:
     let amount_ctc_would_increase = ctc_capped_by_increased_tax - ctc_capped_by_tax
     # Refundable is limited by max refundable per child and by potential increase
     return min(min(max_refundable, ctc), amount_ctc_would_increase)
+  tests:
+    - name: "Low tax liability, high ACTC potential"
+      period: 2024-01
+      inputs:
+        total_child_tax_credit: 4000
+        ctc_phase_in: 5000
+        tax_liability_before_credits: 500
+        ctc_refundable_maximum: 3400
+      expect: 3400  # Limited by max refundable
+    - name: "Phase-in limits refundable amount"
+      period: 2024-01
+      inputs:
+        total_child_tax_credit: 4000
+        ctc_phase_in: 2000
+        tax_liability_before_credits: 500
+        ctc_refundable_maximum: 3400
+      expect: 2000  # Limited by phase_in
+    - name: "CTC limits refundable amount"
+      period: 2024-01
+      inputs:
+        total_child_tax_credit: 1500
+        ctc_phase_in: 5000
+        tax_liability_before_credits: 0
+        ctc_refundable_maximum: 3400
+      expect: 1500  # Limited by total CTC available
+    - name: "High tax liability, no refundable needed"
+      period: 2024-01
+      inputs:
+        total_child_tax_credit: 4000
+        ctc_phase_in: 3000
+        tax_liability_before_credits: 10000
+        ctc_refundable_maximum: 3400
+      expect: 0  # CTC fully used against tax liability
+    - name: "Zero tax liability"
+      period: 2024-01
+      inputs:
+        total_child_tax_credit: 4000
+        ctc_phase_in: 4000
+        tax_liability_before_credits: 0
+        ctc_refundable_maximum: 3400
+      expect: 3400  # Limited by max refundable
 
 variable non_refundable_ctc:
   entity: TaxUnit
@@ -300,6 +594,25 @@ variable non_refundable_ctc:
   label: "Non-Refundable CTC"
   description: "Non-refundable portion of CTC"
   formula: return total_child_tax_credit - refundable_ctc
+  tests:
+    - name: "All non-refundable"
+      period: 2024-01
+      inputs:
+        total_child_tax_credit: 4000
+        refundable_ctc: 0
+      expect: 4000
+    - name: "Mixed refundable and non-refundable"
+      period: 2024-01
+      inputs:
+        total_child_tax_credit: 4000
+        refundable_ctc: 1500
+      expect: 2500
+    - name: "All refundable"
+      period: 2024-01
+      inputs:
+        total_child_tax_credit: 3000
+        refundable_ctc: 3000
+      expect: 0
 
 # 26 USC § 24 - Total Child Tax Credit
 #

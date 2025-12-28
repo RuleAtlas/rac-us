@@ -1,6 +1,60 @@
 # Standalone validation version - all logic inline (no imports)
 # Simplified for vectorization - no nested if/else
+
+input is_dependent:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Dependent Status"
+  description: "Whether the taxpayer can be claimed as a dependent on another return"
+  default: false
+
+input earned_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Earned Income"
+  description: "Taxpayer's earned income for dependent standard deduction calculation"
+  default: 0
+
+input max_age:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "Maximum Age in Tax Unit"
+  description: "Maximum age of taxpayer(s) for additional standard deduction"
+  default: 0
+
+input any_blind:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Any Blind"
+  description: "Whether any taxpayer in the unit is blind"
+  default: false
+
+input is_ineligible_for_standard_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Ineligible for Standard Deduction"
+  description: "Whether taxpayer is ineligible for standard deduction (e.g., NRA or spouse itemizes)"
+  default: false
+
 variable standard_deduction_standalone:
+  imports:
+    - 26/2/b#filing_status
+    - 26/63/c/2/basic_joint#basic_joint
+    - 26/63/c/2/basic_head_of_household#basic_head_of_household
+    - 26/63/c/2/basic_single#basic_single
+    - 26/63/c/5/dependent_minimum#dependent_minimum
+    - 26/63/c/5/dependent_earned_addon#dependent_earned_addon
+    - 26/63/f/1/additional_aged_married#additional_aged_married
+    - 26/63/f/1/additional_aged_unmarried#additional_aged_unmarried
+    - 26/63/f/2/additional_blind_married#additional_blind_married
+    - 26/63/f/2/additional_blind_unmarried#additional_blind_unmarried
+    - 26/63/f/1/aged_threshold#aged_threshold
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -37,6 +91,10 @@ variable standard_deduction_standalone:
   default: 0
 
 variable standard_deduction:
+  imports:
+    - 26/63/c/5#dependent_standard_deduction
+    - 26/63/c/2#basic_standard_deduction
+    - 26/63/f#additional_standard_deduction
   entity: TaxUnit
   period: Year
   dtype: Money

@@ -111,7 +111,6 @@ variable snap_countable_resources:
     # Add non-exempt financial assets
     financial = stocks + bonds + other_financial_assets
     # Section 2014(g)(2)(B): One vehicle excluded up to fair market value limit
-    vehicle_exclusion = parameter("gov.usda.fns.snap.resources.vehicle_exclusion")
     vehicle_excess = max(0, vehicle_fair_market_value - vehicle_exclusion)
     return liquid + financial + vehicle_excess
   default: 0
@@ -124,12 +123,10 @@ variable snap_resource_eligible:
   description: "Whether household's countable resources are within SNAP limits"
   syntax: python
   formula: |
-    base_limit = parameter("gov.usda.fns.snap.resources.limit")
-    elderly_disabled_limit = parameter("gov.usda.fns.snap.resources.elderly_disabled_limit")
     # Section 2014(g)(1)(B): Higher limit for elderly/disabled households
     if has_elderly_disabled:
-        limit = elderly_disabled_limit
+        limit = resource_limit_elderly_disabled
     else:
-        limit = base_limit
+        limit = resource_limit
     return snap_countable_resources <= limit
   default: false

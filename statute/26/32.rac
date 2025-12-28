@@ -1,4 +1,89 @@
+# Parameters for EITC credit rates and caps
+parameter credit_rate_0:
+  description: "EITC credit rate for taxpayers with no qualifying children"
+  unit: rate
+  values:
+    2024-01-01: 0.0765
+
+parameter credit_rate_1:
+  description: "EITC credit rate for taxpayers with one qualifying child"
+  unit: rate
+  values:
+    2024-01-01: 0.34
+
+parameter credit_rate_2:
+  description: "EITC credit rate for taxpayers with two qualifying children"
+  unit: rate
+  values:
+    2024-01-01: 0.40
+
+parameter credit_rate_3:
+  description: "EITC credit rate for taxpayers with three or more qualifying children"
+  unit: rate
+  values:
+    2024-01-01: 0.45
+
+parameter earned_income_cap_0:
+  description: "EITC earned income cap for taxpayers with no qualifying children"
+  unit: "USD"
+  values:
+    2024-01-01: 8260
+
+parameter earned_income_cap_1:
+  description: "EITC earned income cap for taxpayers with one qualifying child"
+  unit: "USD"
+  values:
+    2024-01-01: 12390
+
+parameter earned_income_cap_2:
+  description: "EITC earned income cap for taxpayers with two or more qualifying children"
+  unit: "USD"
+  values:
+    2024-01-01: 17400
+
+parameter phaseout_rate_0:
+  description: "EITC phaseout rate for taxpayers with no qualifying children"
+  unit: rate
+  values:
+    2024-01-01: 0.0765
+
+parameter phaseout_rate_1:
+  description: "EITC phaseout rate for taxpayers with one qualifying child"
+  unit: rate
+  values:
+    2024-01-01: 0.1598
+
+parameter phaseout_rate_2:
+  description: "EITC phaseout rate for taxpayers with two or more qualifying children"
+  unit: rate
+  values:
+    2024-01-01: 0.2106
+
+parameter phaseout_start_0:
+  description: "EITC phaseout start for taxpayers with no qualifying children"
+  unit: "USD"
+  values:
+    2024-01-01: 10330
+
+parameter phaseout_start_1:
+  description: "EITC phaseout start for taxpayers with qualifying children"
+  unit: "USD"
+  values:
+    2024-01-01: 22720
+
+parameter joint_adjustment:
+  description: "Additional phaseout threshold amount for joint filers"
+  unit: "USD"
+  values:
+    2024-01-01: 6920
+
 variable eitc_standalone:
+  imports:
+    - 26/32/c/3/A#num_qualifying_children
+    - 26/32/c/2/A#earned_income
+    - 26/62/a#adjusted_gross_income
+    - 26/2/b#filing_status
+    - 26/32/c/1/A/i#is_eligible_individual
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -171,6 +256,12 @@ variable eitc_standalone:
 # 26 USC 32 - Earned Income Credit (Validation Version)
 #
 variable eitc_validation:
+  imports:
+    - 26/32/c/3/A#num_qualifying_children
+    - 26/32/c/2/A#earned_income
+    - 26/62/a#adjusted_gross_income
+    - 26/2/b#filing_status
+    - 26/32/c/1/A/i#is_eligible_individual
   entity: TaxUnit
   period: Year
   dtype: Money

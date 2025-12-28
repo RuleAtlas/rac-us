@@ -35,3 +35,81 @@ variable has_excessive_investment_income:
         + net_passive_income           # §32(i)(2)(E)
     )
     return disqualified_income > disqualified_income_limit
+  tests:
+    - name: "No investment income"
+      period: 2024-01
+      inputs:
+        interest_income: 0
+        dividend_income: 0
+        tax_exempt_interest: 0
+        net_rent_royalty_income: 0
+        capital_gain_net_income: 0
+        net_passive_income: 0
+        disqualified_income_limit: 11600
+      expect: false
+    - name: "Investment income below limit"
+      period: 2024-01
+      inputs:
+        interest_income: 5000
+        dividend_income: 3000
+        tax_exempt_interest: 1000
+        net_rent_royalty_income: 0
+        capital_gain_net_income: 1000
+        net_passive_income: 0
+        disqualified_income_limit: 11600
+      expect: false  # Total = 10000, under limit
+    - name: "Investment income at limit"
+      period: 2024-01
+      inputs:
+        interest_income: 5000
+        dividend_income: 3000
+        tax_exempt_interest: 1600
+        net_rent_royalty_income: 1000
+        capital_gain_net_income: 1000
+        net_passive_income: 0
+        disqualified_income_limit: 11600
+      expect: false  # Total = 11600, at limit (not over)
+    - name: "Investment income exceeds limit"
+      period: 2024-01
+      inputs:
+        interest_income: 5000
+        dividend_income: 4000
+        tax_exempt_interest: 2000
+        net_rent_royalty_income: 1000
+        capital_gain_net_income: 500
+        net_passive_income: 0
+        disqualified_income_limit: 11600
+      expect: true  # Total = 12500, exceeds limit
+    - name: "High investment income disqualifies"
+      period: 2024-01
+      inputs:
+        interest_income: 10000
+        dividend_income: 5000
+        tax_exempt_interest: 2000
+        net_rent_royalty_income: 3000
+        capital_gain_net_income: 5000
+        net_passive_income: 2000
+        disqualified_income_limit: 11600
+      expect: true  # Total = 27000, well over limit
+    - name: "Only capital gains"
+      period: 2024-01
+      inputs:
+        interest_income: 0
+        dividend_income: 0
+        tax_exempt_interest: 0
+        net_rent_royalty_income: 0
+        capital_gain_net_income: 15000
+        net_passive_income: 0
+        disqualified_income_limit: 11600
+      expect: true  # Capital gains alone exceed limit
+    - name: "Only passive income"
+      period: 2024-01
+      inputs:
+        interest_income: 0
+        dividend_income: 0
+        tax_exempt_interest: 0
+        net_rent_royalty_income: 0
+        capital_gain_net_income: 0
+        net_passive_income: 12000
+        disqualified_income_limit: 11600
+      expect: true
