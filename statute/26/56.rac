@@ -2,6 +2,24 @@ text: """
 In determining the amount of the alternative minimum taxable income for any
 taxable year, the following adjustments shall apply to taxable income...
 """
+
+input uses_standard_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Uses Standard Deduction"
+  description: "Whether the taxpayer uses the standard deduction"
+  default: true
+
+input state_local_taxes:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "State and Local Taxes"
+  description: "State and local taxes deducted as itemized deduction"
+  default: 0
+
 variable adjustments:
   imports:
     - 26/63/c#standard_deduction

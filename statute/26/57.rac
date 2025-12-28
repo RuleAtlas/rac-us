@@ -2,6 +2,25 @@ text: """
 For purposes of this part, the items of tax preference determined under
 this section are—
 """
+
+input percentage_depletion:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Percentage Depletion"
+  description: "Depletion deduction computed using percentage method"
+  default: 0
+
+input cost_depletion:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Cost Depletion"
+  description: "Depletion deduction computed using cost method (adjusted basis)"
+  default: 0
+
 variable preferences:
   entity: TaxUnit
   period: Year

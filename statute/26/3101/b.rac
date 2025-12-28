@@ -5,6 +5,23 @@ hereby imposed on the income of every individual a tax equal to 1.45 percent
 of the wages (as defined in section 3121(a)) received by him with respect to
 employment (as defined in section 3121(b)).
 """
+
+input irs_employment_income:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Employment Income"
+  description: "Wages, salaries, and tips subject to employment taxes"
+  default: 0
+
+parameter employee_rate:
+  description: "Employee Medicare tax rate"
+  unit: rate
+  reference: "26 USC 3101(b)(1)"
+  values:
+    1986-01-01: 0.0145
+
 variable medicare_tax:
   entity: Person
   period: Year

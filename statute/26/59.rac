@@ -1,3 +1,21 @@
+input foreign_source_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Foreign Source Income"
+  description: "Income from foreign sources"
+  default: 0
+
+input worldwide_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Worldwide Income"
+  description: "Total worldwide income"
+  default: 0
+
 variable special_rules:
   imports:
     - 26/1#filing_status
