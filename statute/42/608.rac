@@ -368,3 +368,386 @@ variable tanf_child_support_good_cause_exemption:
         return True
     return False
   default: false
+  tests:
+    # tanf_work_sanction_applicable tests
+    - name: "Work sanction not applicable when exempt"
+      period: 2024-01
+      inputs:
+        tanf_work_requirement_exempt: true
+        tanf_work_requirement_met: false
+      expect: false
+      variable: tanf_work_sanction_applicable
+
+    - name: "Work sanction not applicable when requirement met"
+      period: 2024-01
+      inputs:
+        tanf_work_requirement_exempt: false
+        tanf_work_requirement_met: true
+      expect: false
+      variable: tanf_work_sanction_applicable
+
+    - name: "Work sanction applicable when not meeting requirement and no good cause"
+      period: 2024-01
+      inputs:
+        tanf_work_requirement_exempt: false
+        tanf_work_requirement_met: false
+        tanf_work_good_cause: false
+      expect: true
+      variable: tanf_work_sanction_applicable
+
+    - name: "Work sanction not applicable with good cause"
+      period: 2024-01
+      inputs:
+        tanf_work_requirement_exempt: false
+        tanf_work_requirement_met: false
+        tanf_work_good_cause: true
+      expect: false
+      variable: tanf_work_sanction_applicable
+
+    # tanf_work_sanction_amount tests
+    - name: "No work sanction when no one is sanctioned"
+      period: 2024-01
+      inputs:
+        tanf_work_sanction_applicable: false
+        tanf_benefit_amount: 600
+        tanf_unit_size: 3
+      expect: 0
+      variable: tanf_work_sanction_amount
+
+    - name: "Pro-rata sanction for one adult out of three"
+      period: 2024-01
+      inputs:
+        tanf_work_sanction_applicable: true
+        tanf_benefit_amount: 600
+        tanf_unit_size: 3
+      expect: 200
+      variable: tanf_work_sanction_amount
+
+    - name: "Pro-rata sanction for single adult"
+      period: 2024-01
+      inputs:
+        tanf_work_sanction_applicable: true
+        tanf_benefit_amount: 400
+        tanf_unit_size: 1
+      expect: 400
+      variable: tanf_work_sanction_amount
+
+    - name: "Pro-rata sanction for family of four with two sanctioned"
+      period: 2024-01
+      inputs:
+        tanf_work_sanction_applicable: true
+        tanf_benefit_amount: 800
+        tanf_unit_size: 4
+      expect: 400
+      variable: tanf_work_sanction_amount
+
+    # tanf_full_family_sanction_applies tests
+    - name: "Full-family sanction when state uses it and adult sanctioned"
+      period: 2024-01
+      inputs:
+        tanf_work_sanction_applicable: true
+        tanf_uses_full_family_work_sanction: true
+      expect: true
+      variable: tanf_full_family_sanction_applies
+
+    - name: "No full-family sanction when no adult sanctioned"
+      period: 2024-01
+      inputs:
+        tanf_work_sanction_applicable: false
+        tanf_uses_full_family_work_sanction: true
+      expect: false
+      variable: tanf_full_family_sanction_applies
+
+    - name: "No full-family sanction when state does not use it"
+      period: 2024-01
+      inputs:
+        tanf_work_sanction_applicable: true
+        tanf_uses_full_family_work_sanction: false
+      expect: false
+      variable: tanf_full_family_sanction_applies
+
+    # tanf_child_support_cooperation_met tests
+    - name: "Unit meets cooperation requirement"
+      period: 2024-01
+      inputs:
+        cooperating_with_child_support_enforcement: true
+        tanf_child_support_good_cause_exemption: false
+      expect: true
+      variable: tanf_child_support_cooperation_met
+
+    - name: "Unit fails cooperation requirement"
+      period: 2024-01
+      inputs:
+        cooperating_with_child_support_enforcement: false
+        tanf_child_support_good_cause_exemption: false
+      expect: false
+      variable: tanf_child_support_cooperation_met
+
+    - name: "Unit exempted from cooperation via good cause"
+      period: 2024-01
+      inputs:
+        cooperating_with_child_support_enforcement: false
+        tanf_child_support_good_cause_exemption: true
+      expect: true
+      variable: tanf_child_support_cooperation_met
+
+    # tanf_child_support_sanction_amount tests
+    - name: "No sanction when cooperation requirement met"
+      period: 2024-01
+      inputs:
+        tanf_child_support_cooperation_met: true
+        tanf_benefit_amount: 600
+      expect: 0
+      variable: tanf_child_support_sanction_amount
+
+    - name: "25% reduction for child support non-cooperation"
+      period: 2024-01
+      inputs:
+        tanf_child_support_cooperation_met: false
+        tanf_benefit_amount: 400
+        child_support_noncompliance_rate: 0.25
+      expect: 100
+      variable: tanf_child_support_sanction_amount
+
+    - name: "25% reduction applied to larger benefit"
+      period: 2024-01
+      inputs:
+        tanf_child_support_cooperation_met: false
+        tanf_benefit_amount: 1000
+        child_support_noncompliance_rate: 0.25
+      expect: 250
+      variable: tanf_child_support_sanction_amount
+
+    # tanf_irp_required tests
+    - name: "IRP required for non-exempt TANF recipient"
+      period: 2024-01
+      inputs:
+        is_tanf_recipient: true
+        tanf_work_requirement_exempt: false
+      expect: true
+      variable: tanf_irp_required
+
+    - name: "IRP not required for exempt TANF recipient"
+      period: 2024-01
+      inputs:
+        is_tanf_recipient: true
+        tanf_work_requirement_exempt: true
+      expect: false
+      variable: tanf_irp_required
+
+    - name: "IRP not required for non-recipient"
+      period: 2024-01
+      inputs:
+        is_tanf_recipient: false
+        tanf_work_requirement_exempt: false
+      expect: false
+      variable: tanf_irp_required
+
+    # tanf_irp_compliance tests
+    - name: "IRP compliance automatic when not required"
+      period: 2024-01
+      inputs:
+        tanf_irp_required: false
+        tanf_irp_terms_met: false
+      expect: true
+      variable: tanf_irp_compliance
+
+    - name: "IRP compliance depends on terms when required"
+      period: 2024-01
+      inputs:
+        tanf_irp_required: true
+        tanf_irp_terms_met: true
+      expect: true
+      variable: tanf_irp_compliance
+
+    - name: "IRP non-compliance when terms not met"
+      period: 2024-01
+      inputs:
+        tanf_irp_required: true
+        tanf_irp_terms_met: false
+      expect: false
+      variable: tanf_irp_compliance
+
+    # tanf_sanction_level tests
+    - name: "No sanction at level 0"
+      period: 2024-01
+      inputs:
+        tanf_sanction_level_input: 0
+      expect: 0
+      variable: tanf_sanction_level
+
+    - name: "Level 1 sanction (25% reduction)"
+      period: 2024-01
+      inputs:
+        tanf_sanction_level_input: 1
+      expect: 1
+      variable: tanf_sanction_level
+
+    - name: "Level 3 sanction (full termination)"
+      period: 2024-01
+      inputs:
+        tanf_sanction_level_input: 3
+      expect: 3
+      variable: tanf_sanction_level
+
+    # tanf_total_sanction_amount tests
+    - name: "No total sanctions when no compliance issues"
+      period: 2024-01
+      inputs:
+        tanf_work_sanction_amount: 0
+        tanf_child_support_sanction_amount: 0
+        tanf_full_family_sanction_applies: false
+        tanf_benefit_amount_before_sanctions: 600
+      expect: 0
+      variable: tanf_total_sanction_amount
+
+    - name: "Combined sanctions from work and child support"
+      period: 2024-01
+      inputs:
+        tanf_work_sanction_amount: 150
+        tanf_child_support_sanction_amount: 100
+        tanf_full_family_sanction_applies: false
+        tanf_benefit_amount_before_sanctions: 600
+      expect: 250
+      variable: tanf_total_sanction_amount
+
+    - name: "Full-family sanction overrides other sanctions"
+      period: 2024-01
+      inputs:
+        tanf_work_sanction_amount: 100
+        tanf_child_support_sanction_amount: 75
+        tanf_full_family_sanction_applies: true
+        tanf_benefit_amount_before_sanctions: 600
+      expect: 600
+      variable: tanf_total_sanction_amount
+
+    - name: "Combined sanctions capped at benefit amount"
+      period: 2024-01
+      inputs:
+        tanf_work_sanction_amount: 400
+        tanf_child_support_sanction_amount: 300
+        tanf_full_family_sanction_applies: false
+        tanf_benefit_amount_before_sanctions: 500
+      expect: 500
+      variable: tanf_total_sanction_amount
+
+    # tanf_benefit_after_sanctions tests
+    - name: "Benefit unchanged when no sanctions"
+      period: 2024-01
+      inputs:
+        tanf_benefit_amount_before_sanctions: 600
+        tanf_total_sanction_amount: 0
+      expect: 600
+      variable: tanf_benefit_after_sanctions
+
+    - name: "Benefit reduced by work sanction"
+      period: 2024-01
+      inputs:
+        tanf_benefit_amount_before_sanctions: 600
+        tanf_total_sanction_amount: 150
+      expect: 450
+      variable: tanf_benefit_after_sanctions
+
+    - name: "Benefit reduced to zero by full sanctions"
+      period: 2024-01
+      inputs:
+        tanf_benefit_amount_before_sanctions: 600
+        tanf_total_sanction_amount: 600
+      expect: 0
+      variable: tanf_benefit_after_sanctions
+
+    - name: "Benefit never negative"
+      period: 2024-01
+      inputs:
+        tanf_benefit_amount_before_sanctions: 300
+        tanf_total_sanction_amount: 500
+      expect: 0
+      variable: tanf_benefit_after_sanctions
+
+    # tanf_work_good_cause tests
+    - name: "Child care unavailable is good cause"
+      period: 2024-01
+      inputs:
+        child_care_unavailable_good_cause: true
+        domestic_violence_waiver: false
+        temporary_illness: false
+        transportation_unavailable: false
+      expect: true
+      variable: tanf_work_good_cause
+
+    - name: "Domestic violence is good cause"
+      period: 2024-01
+      inputs:
+        child_care_unavailable_good_cause: false
+        domestic_violence_waiver: true
+        temporary_illness: false
+        transportation_unavailable: false
+      expect: true
+      variable: tanf_work_good_cause
+
+    - name: "Temporary illness is good cause"
+      period: 2024-01
+      inputs:
+        child_care_unavailable_good_cause: false
+        domestic_violence_waiver: false
+        temporary_illness: true
+        transportation_unavailable: false
+      expect: true
+      variable: tanf_work_good_cause
+
+    - name: "Transportation unavailable is good cause"
+      period: 2024-01
+      inputs:
+        child_care_unavailable_good_cause: false
+        domestic_violence_waiver: false
+        temporary_illness: false
+        transportation_unavailable: true
+      expect: true
+      variable: tanf_work_good_cause
+
+    - name: "No good cause when all conditions false"
+      period: 2024-01
+      inputs:
+        child_care_unavailable_good_cause: false
+        domestic_violence_waiver: false
+        temporary_illness: false
+        transportation_unavailable: false
+      expect: false
+      variable: tanf_work_good_cause
+
+    # tanf_child_support_good_cause_exemption tests
+    - name: "Domestic violence risk is good cause"
+      period: 2024-01
+      inputs:
+        domestic_violence_risk: true
+        child_support_not_in_child_interest: false
+        conception_from_assault: false
+      expect: true
+      variable: tanf_child_support_good_cause_exemption
+
+    - name: "Child's best interest not served is good cause"
+      period: 2024-01
+      inputs:
+        domestic_violence_risk: false
+        child_support_not_in_child_interest: true
+        conception_from_assault: false
+      expect: true
+      variable: tanf_child_support_good_cause_exemption
+
+    - name: "Conception from assault is good cause"
+      period: 2024-01
+      inputs:
+        domestic_violence_risk: false
+        child_support_not_in_child_interest: false
+        conception_from_assault: true
+      expect: true
+      variable: tanf_child_support_good_cause_exemption
+
+    - name: "No good cause when all conditions false"
+      period: 2024-01
+      inputs:
+        domestic_violence_risk: false
+        child_support_not_in_child_interest: false
+        conception_from_assault: false
+      expect: false
+      variable: tanf_child_support_good_cause_exemption

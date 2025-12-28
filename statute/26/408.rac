@@ -4,6 +4,143 @@ text: """
 the United States for the exclusive benefit of an individual or his
 beneficiaries...
 """
+
+parameter traditional_ira_contribution_limit:
+  description: "Annual contribution limit for traditional IRA accounts"
+  unit: "USD"
+  source: "26 USC 219(b) and IRC Notice 2023-91"
+  reference: "IRC Section 219(b) - Maximum Amount of Deduction"
+  values:
+    2024-01-01: 7000
+    2023-01-01: 6500
+    2022-01-01: 6000
+
+parameter traditional_ira_contribution_limit_age50plus:
+  description: "Annual contribution limit for traditional IRA accounts for individuals age 50+"
+  unit: "USD"
+  source: "26 USC 219(b) and IRC Notice 2023-91"
+  reference: "IRC Section 219(b) - Catch-up contributions"
+  values:
+    2024-01-01: 8000
+    2023-01-01: 7500
+    2022-01-01: 7000
+
+parameter simple_ira_contribution_limit:
+  description: "Annual contribution limit for SIMPLE IRA accounts (employee deferral)"
+  unit: "USD"
+  source: "26 USC 408(p)"
+  reference: "IRC Section 408(p)(2)(A)(i)"
+  values:
+    2024-01-01: 16000
+    2023-01-01: 15500
+    2022-01-01: 14000
+
+parameter simple_ira_contribution_limit_age50plus:
+  description: "Annual contribution limit for SIMPLE IRA accounts for individuals age 50+ (catch-up)"
+  unit: "USD"
+  source: "26 USC 408(p)"
+  reference: "IRC Section 408(p)(2)(C)"
+  values:
+    2024-01-01: 19500
+    2023-01-01: 19000
+    2022-01-01: 17500
+
+parameter sep_ira_contribution_rate:
+  description: "Maximum annual SEP IRA contribution as percentage of net self-employment income"
+  unit: rate
+  source: "26 USC 408(k)"
+  reference: "IRC Section 408(k)"
+  values:
+    1977-01-01: 0.20
+
+parameter roth_ira_contribution_phase_out_mfj_low:
+  description: "Lower MAGI threshold for Roth IRA deduction phaseout (Married Filing Jointly)"
+  unit: "USD"
+  source: "26 USC 408A(c)(3)(C) and IRC Notice 2023-91"
+  reference: "IRC Section 408A - Roth IRAs"
+  values:
+    2024-01-01: 230000
+    2023-01-01: 218000
+    2022-01-01: 204000
+
+parameter roth_ira_contribution_phase_out_mfj_high:
+  description: "Upper MAGI threshold for Roth IRA deduction phaseout (Married Filing Jointly)"
+  unit: "USD"
+  source: "26 USC 408A(c)(3)(C) and IRC Notice 2023-91"
+  reference: "IRC Section 408A - Roth IRAs"
+  values:
+    2024-01-01: 240000
+    2023-01-01: 228000
+    2022-01-01: 214000
+
+parameter roth_ira_contribution_phase_out_single_low:
+  description: "Lower MAGI threshold for Roth IRA deduction phaseout (Single filer)"
+  unit: "USD"
+  source: "26 USC 408A(c)(3)(C) and IRC Notice 2023-91"
+  reference: "IRC Section 408A - Roth IRAs"
+  values:
+    2024-01-01: 146000
+    2023-01-01: 138000
+    2022-01-01: 129000
+
+parameter roth_ira_contribution_phase_out_single_high:
+  description: "Upper MAGI threshold for Roth IRA deduction phaseout (Single filer)"
+  unit: "USD"
+  source: "26 USC 408A(c)(3)(C) and IRC Notice 2023-91"
+  reference: "IRC Section 408A - Roth IRAs"
+  values:
+    2024-01-01: 161000
+    2023-01-01: 153000
+    2022-01-01: 144000
+
+parameter traditional_ira_deduction_phase_out_mfj_low:
+  description: "Lower AGI threshold for traditional IRA deduction phaseout (Married Filing Jointly, covered by workplace plan)"
+  unit: "USD"
+  source: "26 USC 219(g) and IRC Notice 2023-91"
+  reference: "IRC Section 219(g) - Deduction limitations"
+  values:
+    2024-01-01: 77000
+    2023-01-01: 73000
+    2022-01-01: 68000
+
+parameter traditional_ira_deduction_phase_out_mfj_high:
+  description: "Upper AGI threshold for traditional IRA deduction phaseout (Married Filing Jointly, covered by workplace plan)"
+  unit: "USD"
+  source: "26 USC 219(g) and IRC Notice 2023-91"
+  reference: "IRC Section 219(g) - Deduction limitations"
+  values:
+    2024-01-01: 87000
+    2023-01-01: 83000
+    2022-01-01: 78000
+
+parameter traditional_ira_deduction_phase_out_single_low:
+  description: "Lower AGI threshold for traditional IRA deduction phaseout (Single filer, covered by workplace plan)"
+  unit: "USD"
+  source: "26 USC 219(g) and IRC Notice 2023-91"
+  reference: "IRC Section 219(g) - Deduction limitations"
+  values:
+    2024-01-01: 46000
+    2023-01-01: 43800
+    2022-01-01: 40500
+
+parameter traditional_ira_deduction_phase_out_single_high:
+  description: "Upper AGI threshold for traditional IRA deduction phaseout (Single filer, covered by workplace plan)"
+  unit: "USD"
+  source: "26 USC 219(g) and IRC Notice 2023-91"
+  reference: "IRC Section 219(g) - Deduction limitations"
+  values:
+    2024-01-01: 56000
+    2023-01-01: 53800
+    2022-01-01: 50500
+
+parameter early_withdrawal_penalty_rate:
+  description: "Additional tax rate on early IRA distributions (before age 59.5)"
+  unit: rate
+  source: "26 USC 72(t)"
+  reference: "IRC Section 72(t) - Early distribution penalty"
+  values:
+    1977-01-01: 0.10
+
 variable ira_definitions:
   imports:
     - 26/402/c#rmd_divisor
@@ -17,6 +154,22 @@ variable traditional_ira_balance:
   label: "Traditional IRA Balance"
   description: "Total balance in all traditional IRA accounts"
   default: 0
+  tests:
+    - name: "No balance"
+      period: 2024
+      inputs:
+        traditional_ira_balance: 0
+      expect: 0
+    - name: "Positive balance"
+      period: 2024
+      inputs:
+        traditional_ira_balance: 50000
+      expect: 50000
+    - name: "Large balance"
+      period: 2024
+      inputs:
+        traditional_ira_balance: 500000
+      expect: 500000
 
 variable roth_ira_balance:
   entity: Person
@@ -26,6 +179,22 @@ variable roth_ira_balance:
   label: "Roth IRA Balance"
   description: "Total balance in all Roth IRA accounts"
   default: 0
+  tests:
+    - name: "No Roth IRA balance"
+      period: 2024
+      inputs:
+        roth_ira_balance: 0
+      expect: 0
+    - name: "Positive Roth balance"
+      period: 2024
+      inputs:
+        roth_ira_balance: 75000
+      expect: 75000
+    - name: "Large Roth balance"
+      period: 2024
+      inputs:
+        roth_ira_balance: 250000
+      expect: 250000
 
 variable birth_year:
   entity: Person
@@ -45,6 +214,25 @@ variable ira_rmd_applicable_age:
     # Same rules as 401(k) - reuses rmd_applicable_age from 402/c/rmd
     return rmd_applicable_age
   default: 0
+  tests:
+    - name: "Younger than RMD age"
+      period: 2024
+      inputs:
+        birth_year: 1970
+        age: 54
+      expect: 0
+    - name: "At RMD age boundary (2024: age 73)"
+      period: 2024
+      inputs:
+        birth_year: 1951
+        age: 73
+      expect: 73
+    - name: "Above RMD age"
+      period: 2024
+      inputs:
+        birth_year: 1945
+        age: 79
+      expect: 73
 
 variable is_ira_reached_rmd_age:
   entity: Person
@@ -54,6 +242,25 @@ variable is_ira_reached_rmd_age:
   description: "Whether individual has reached IRA required minimum distribution age"
   formula: return age >= ira_rmd_applicable_age
   default: false
+  tests:
+    - name: "Young person not at RMD age"
+      period: 2024
+      inputs:
+        age: 45
+        birth_year: 1979
+      expect: false
+    - name: "Person at RMD age (73 in 2024)"
+      period: 2024
+      inputs:
+        age: 73
+        birth_year: 1951
+      expect: true
+    - name: "Elderly person well past RMD age"
+      period: 2024
+      inputs:
+        age: 82
+        birth_year: 1942
+      expect: true
 
 variable ira_prior_year_balance:
   entity: Person
@@ -63,6 +270,22 @@ variable ira_prior_year_balance:
   label: "IRA Prior Year Balance"
   description: "Total IRA account balance as of December 31 of prior year"
   default: 0
+  tests:
+    - name: "New account, no prior balance"
+      period: 2024
+      inputs:
+        ira_prior_year_balance: 0
+      expect: 0
+    - name: "Moderate prior year balance"
+      period: 2024
+      inputs:
+        ira_prior_year_balance: 100000
+      expect: 100000
+    - name: "Large prior year balance at retirement"
+      period: 2024
+      inputs:
+        ira_prior_year_balance: 750000
+      expect: 750000
 
 variable ira_required_minimum_distribution:
   entity: Person
@@ -83,6 +306,49 @@ variable ira_required_minimum_distribution:
     # Reuses rmd_divisor from 401(k) rules (same table)
     return ira_prior_year_balance / rmd_divisor
   default: 0
+  tests:
+    - name: "No RMD - person under age 73"
+      period: 2024
+      inputs:
+        age: 60
+        birth_year: 1964
+        ira_prior_year_balance: 100000
+      expect: 0
+    - name: "No RMD - no account balance despite being at RMD age"
+      period: 2024
+      inputs:
+        age: 75
+        birth_year: 1949
+        ira_prior_year_balance: 0
+      expect: 0
+    - name: "RMD calculation - age 73 with $200,000 balance"
+      period: 2024
+      inputs:
+        age: 73
+        birth_year: 1951
+        ira_prior_year_balance: 200000
+      expect: 7518
+    - name: "RMD calculation - age 75 with $350,000 balance"
+      period: 2024
+      inputs:
+        age: 75
+        birth_year: 1949
+        ira_prior_year_balance: 350000
+      expect: 10769
+    - name: "RMD calculation - age 82 with $500,000 balance"
+      period: 2024
+      inputs:
+        age: 82
+        birth_year: 1942
+        ira_prior_year_balance: 500000
+      expect: 16393
+    - name: "Large RMD - age 90 with $1,000,000 balance"
+      period: 2024
+      inputs:
+        age: 90
+        birth_year: 1934
+        ira_prior_year_balance: 1000000
+      expect: 34483
 
 variable has_simple_ira:
   entity: Person
@@ -91,6 +357,17 @@ variable has_simple_ira:
   label: "Has SIMPLE IRA"
   description: "Whether individual has a SIMPLE IRA (higher contribution limits)"
   default: false
+  tests:
+    - name: "No SIMPLE IRA"
+      period: 2024
+      inputs:
+        has_simple_ira: false
+      expect: false
+    - name: "Has SIMPLE IRA"
+      period: 2024
+      inputs:
+        has_simple_ira: true
+      expect: true
 
 variable has_sep_ira:
   entity: Person
@@ -99,6 +376,17 @@ variable has_sep_ira:
   label: "Has SEP IRA"
   description: "Whether individual has a SEP IRA (self-employed)"
   default: false
+  tests:
+    - name: "No SEP IRA"
+      period: 2024
+      inputs:
+        has_sep_ira: false
+      expect: false
+    - name: "Has SEP IRA (self-employed)"
+      period: 2024
+      inputs:
+        has_sep_ira: true
+      expect: true
 
 variable total_ira_balance:
   entity: Person
@@ -108,3 +396,34 @@ variable total_ira_balance:
   label: "Total IRA Balance"
   description: "Combined balance of all traditional and Roth IRAs"
   formula: return traditional_ira_balance + roth_ira_balance
+  tests:
+    - name: "No IRAs"
+      period: 2024
+      inputs:
+        traditional_ira_balance: 0
+        roth_ira_balance: 0
+      expect: 0
+    - name: "Traditional IRA only"
+      period: 2024
+      inputs:
+        traditional_ira_balance: 150000
+        roth_ira_balance: 0
+      expect: 150000
+    - name: "Roth IRA only"
+      period: 2024
+      inputs:
+        traditional_ira_balance: 0
+        roth_ira_balance: 100000
+      expect: 100000
+    - name: "Combined traditional and Roth IRAs"
+      period: 2024
+      inputs:
+        traditional_ira_balance: 200000
+        roth_ira_balance: 150000
+      expect: 350000
+    - name: "Both IRAs maxed out"
+      period: 2024
+      inputs:
+        traditional_ira_balance: 500000
+        roth_ira_balance: 300000
+      expect: 800000

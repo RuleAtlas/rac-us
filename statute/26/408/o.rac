@@ -1,4 +1,31 @@
 # and Section 219(b) - Maximum Amount of Deduction (Contribution Limits)
+
+parameter contribution_limit_excess_tax_rate:
+  description: "Excise tax rate on excess IRA contributions"
+  unit: rate
+  source: "26 USC 4973"
+  reference: "IRC Section 4973 - Tax on excess contributions"
+  values:
+    1977-01-01: 0.06
+
+input traditional_ira_contributions:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Traditional IRA Contributions"
+  description: "Amount contributed to traditional IRA accounts during the year"
+  default: 0
+
+input roth_ira_contributions:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Roth IRA Contributions"
+  description: "Amount contributed to Roth IRA accounts during the year"
+  default: 0
+
 variable contribution_limits:
   imports:
     - 26/32/c/2/A#earned_income
@@ -10,5 +37,60 @@ variable contribution_limits:
   unit: "USD"
   label: "Excess Contribution Penalty"
   description: "6% excise tax on excess IRA contributions left in account"
-  formula: return traditional_ira_contributions + roth_ira_contributions
+  syntax: python
+  formula: |
+    total_contributions = traditional_ira_contributions + roth_ira_contributions
+    # Determine applicable limit based on age and account type
+    if age >= 50:
+        limit = 8000  # 2024 limit for age 50+
+    else:
+        limit = 7000  # 2024 limit for under 50
+
+    if total_contributions > limit:
+        excess = total_contributions - limit
+        return excess * contribution_limit_excess_tax_rate
+    return 0
   default: 0
+  tests:
+    - name: "No contributions"
+      period: 2024
+      inputs:
+        traditional_ira_contributions: 0
+        roth_ira_contributions: 0
+        age: 45
+      expect: 0
+    - name: "At limit - under 50"
+      period: 2024
+      inputs:
+        traditional_ira_contributions: 5000
+        roth_ira_contributions: 2000
+        age: 40
+      expect: 0
+    - name: "Excess contributions - under 50"
+      period: 2024
+      inputs:
+        traditional_ira_contributions: 5000
+        roth_ira_contributions: 3000
+        age: 45
+      expect: 60
+    - name: "At limit - age 50+"
+      period: 2024
+      inputs:
+        traditional_ira_contributions: 6000
+        roth_ira_contributions: 2000
+        age: 52
+      expect: 0
+    - name: "Excess contributions - age 50+"
+      period: 2024
+      inputs:
+        traditional_ira_contributions: 5000
+        roth_ira_contributions: 4000
+        age: 55
+      expect: 60
+    - name: "Significant excess - both account types"
+      period: 2024
+      inputs:
+        traditional_ira_contributions: 10000
+        roth_ira_contributions: 5000
+        age: 48
+      expect: 180

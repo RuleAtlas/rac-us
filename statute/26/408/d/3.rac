@@ -12,21 +12,78 @@ retirement annuity (other than an endowment contract) for the
 benefit of such individual not later than the 60th day after the
 day on which he receives the payment or distribution...
 """
+
+parameter rollover_deadline_days:
+  description: "Number of days allowed to complete a rollover"
+  unit: days
+  source: "26 USC 408(d)(3)(A)(i)"
+  reference: "IRC Section 408(d)(3) - Rollover contribution rules"
+  values:
+    1977-01-01: 60
+
+parameter rollover_once_per_months:
+  description: "Minimum months between non-direct rollover distributions from same IRA"
+  unit: months
+  source: "26 USC 408(d)(3)(B)"
+  reference: "IRC Section 408(d)(3)(B) - One rollover per 12 months"
+  values:
+    2013-01-01: 12
+
+input is_ira_direct_transfer:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is IRA Direct Transfer"
+  description: "Whether distribution is a direct trustee-to-trustee transfer"
+  default: false
+
+input has_prior_12_month_rollover:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Had Prior 12-Month Rollover"
+  description: "Whether individual completed a non-direct rollover in prior 12 months"
+  default: false
+
 variable rollovers:
   imports: [26/408/d#traditional_ira_distribution]
   entity: Person
   period: Year
-  dtype: Money
-  unit: "USD"
-  label: "Net IRA Distribution After Rollover"
-  description: "IRA distribution amount remaining taxable after valid rollover"
+  dtype: Boolean
+  label: "Is Valid IRA Rollover"
+  description: "Whether rollover meets statutory requirements"
   syntax: python
   formula: |
-    # Direct transfers always permitted
+    # Direct transfers always permitted - unlimited
     if is_ira_direct_transfer:
         return True
     # 60-day rollover limited to once per 12 months
     if has_prior_12_month_rollover:
         return False
     return True
-  default: 0
+  default: false
+  tests:
+    - name: "Direct trustee-to-trustee transfer (always valid)"
+      period: 2024
+      inputs:
+        is_ira_direct_transfer: true
+        has_prior_12_month_rollover: true
+      expect: true
+    - name: "First 60-day rollover (no prior rollover)"
+      period: 2024
+      inputs:
+        is_ira_direct_transfer: false
+        has_prior_12_month_rollover: false
+      expect: true
+    - name: "Second 60-day rollover within 12 months (invalid)"
+      period: 2024
+      inputs:
+        is_ira_direct_transfer: false
+        has_prior_12_month_rollover: true
+      expect: false
+    - name: "Multiple direct transfers allowed"
+      period: 2024
+      inputs:
+        is_ira_direct_transfer: true
+        has_prior_12_month_rollover: true
+      expect: true

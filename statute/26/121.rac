@@ -4,6 +4,118 @@ during the 5-year period ending on the date of the sale or exchange, such
 property has been owned and used by the taxpayer as the taxpayer's principal
 residence for periods aggregating 2 years or more.
 """
+
+# IRC 121 Parameters (statutory exclusion limits and periods)
+parameter single_limit:
+  description: "Maximum exclusion for single taxpayer or married filing separately"
+  unit: currency-USD
+  source: "26 USC 121(a)"
+  values:
+    1997-05-07: 250000
+
+parameter joint_limit:
+  description: "Maximum exclusion for married filing jointly"
+  unit: currency-USD
+  source: "26 USC 121(b)"
+  values:
+    1997-05-07: 500000
+
+parameter ownership_required:
+  description: "Years of ownership required in 5-year lookback period"
+  unit: years
+  source: "26 USC 121(a)"
+  values:
+    1997-05-07: 2
+
+parameter use_required:
+  description: "Years of use as principal residence required in 5-year lookback period"
+  unit: years
+  source: "26 USC 121(a)"
+  values:
+    1997-05-07: 2
+
+parameter waiting_period:
+  description: "Years since prior exclusion claimed (once-every-2-years limitation)"
+  unit: years
+  source: "26 USC 121(b)(3)"
+  values:
+    1997-05-07: 2
+
+# Inputs for IRC 121 calculation
+input years_owned:
+  entity: TaxUnit
+  period: Year
+  dtype: Number
+  label: "Years Owned"
+  description: "Number of years property was owned by taxpayer in 5-year lookback"
+  default: 0
+
+input years_used_as_residence:
+  entity: TaxUnit
+  period: Year
+  dtype: Number
+  label: "Years Used as Residence"
+  description: "Number of years property was used as principal residence in 5-year lookback"
+  default: 0
+
+input prior_exclusion_claimed:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Prior Exclusion Claimed"
+  description: "Whether taxpayer claimed Section 121 exclusion in prior 2 years"
+  default: false
+
+input years_since_last_exclusion:
+  entity: TaxUnit
+  period: Year
+  dtype: Number
+  label: "Years Since Last Exclusion"
+  description: "Years elapsed since prior Section 121 exclusion claim (if applicable)"
+  default: 3
+
+input qualifies_for_reduced_exclusion:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Qualifies for Reduced Exclusion"
+  description: "Whether taxpayer qualifies for partial exclusion under 121(c) (unforeseen circumstances)"
+  default: false
+
+input realized_gain_on_residence:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Realized Gain on Residence"
+  description: "Amount of gain realized on sale or exchange of principal residence"
+  default: 0
+
+input depreciation_after_1997:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Depreciation After May 6, 1997"
+  description: "Amount of depreciation deductions taken after May 6, 1997 (Section 1250 property)"
+  default: 0
+
+input spouse_meets_use_test:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Spouse Meets Use Test"
+  description: "Whether spouse meets 2-year use requirement (married filing jointly)"
+  default: false
+
+input spouse_prior_exclusion_claimed:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Spouse Prior Exclusion Claimed"
+  description: "Whether spouse claimed Section 121 exclusion in prior 2 years"
+  default: false
+
 variable principal_residence_exclusion:
   imports: [26/1#filing_status]
   entity: TaxUnit
@@ -12,16 +124,158 @@ variable principal_residence_exclusion:
   unit: "USD"
   label: "Principal Residence Gain Exclusion"
   description: "Amount of gain from sale of principal residence excluded from gross income per 26 USC 121"
+  syntax: python
+  formula: |
+    # The exclusion is the lesser of:
+    # 1. The applicable exclusion limit (based on filing status and full requirements met)
+    # 2. The excludable gain (gain minus depreciation recapture)
+    return min(applicable_exclusion_limit, excludable_gain)
+  default: 0
+  tests:
+    - name: "Single filer, full requirements met, gain within limit"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        meets_full_requirements: true
+        applicable_exclusion_limit: 250000
+        excludable_gain: 200000
+      expect: 200000
+    - name: "Single filer, full requirements met, gain exceeds limit"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        meets_full_requirements: true
+        applicable_exclusion_limit: 250000
+        excludable_gain: 400000
+      expect: 250000
+    - name: "Single filer, does not meet requirements"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        meets_full_requirements: false
+        applicable_exclusion_limit: 0
+        excludable_gain: 200000
+      expect: 0
+    - name: "Married filing jointly, full requirements met, gain within limit"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_full_requirements: true
+        applicable_exclusion_limit: 500000
+        excludable_gain: 400000
+      expect: 400000
+    - name: "Married filing jointly, full requirements met, gain exceeds limit"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_full_requirements: true
+        applicable_exclusion_limit: 500000
+        excludable_gain: 600000
+      expect: 500000
+    - name: "Married filing separately, reduced exclusion"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        meets_full_requirements: false
+        applicable_exclusion_limit: 125000
+        excludable_gain: 100000
+      expect: 100000
+    - name: "Head of household, full requirements met"
+      period: 2024-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        meets_full_requirements: true
+        applicable_exclusion_limit: 250000
+        excludable_gain: 180000
+      expect: 180000
+    - name: "Zero gain excludable (depreciation recapture equals gain)"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        meets_full_requirements: true
+        applicable_exclusion_limit: 250000
+        excludable_gain: 0
+      expect: 0
+    - name: "Negative excludable gain (all depreciation)"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        meets_full_requirements: true
+        applicable_exclusion_limit: 250000
+        excludable_gain: 0
+      expect: 0
 
 variable meets_ownership_test:
   dtype: Boolean
   description: "Whether taxpayer meets 2-year ownership requirement"
   formula: return years_owned >= ownership_required
+  tests:
+    - name: "Exactly 2 years owned"
+      period: 2024-01
+      inputs:
+        years_owned: 2
+      expect: true
+    - name: "More than 2 years owned"
+      period: 2024-01
+      inputs:
+        years_owned: 5
+      expect: true
+    - name: "Less than 2 years owned"
+      period: 2024-01
+      inputs:
+        years_owned: 1
+      expect: false
+    - name: "No years owned"
+      period: 2024-01
+      inputs:
+        years_owned: 0
+      expect: false
+    - name: "Just under 2 years (1.99 years)"
+      period: 2024-01
+      inputs:
+        years_owned: 1.99
+      expect: false
+    - name: "Much longer than 2 years"
+      period: 2024-01
+      inputs:
+        years_owned: 10
+      expect: true
 
 variable meets_use_test:
   dtype: Boolean
   description: "Whether taxpayer meets 2-year use requirement"
   formula: return years_used_as_residence >= use_required
+  tests:
+    - name: "Exactly 2 years used as residence"
+      period: 2024-01
+      inputs:
+        years_used_as_residence: 2
+      expect: true
+    - name: "More than 2 years used as residence"
+      period: 2024-01
+      inputs:
+        years_used_as_residence: 3
+      expect: true
+    - name: "Less than 2 years used as residence"
+      period: 2024-01
+      inputs:
+        years_used_as_residence: 1
+      expect: false
+    - name: "No years used as residence"
+      period: 2024-01
+      inputs:
+        years_used_as_residence: 0
+      expect: false
+    - name: "Rented out during tenure (0.5 years used)"
+      period: 2024-01
+      inputs:
+        years_used_as_residence: 0.5
+      expect: false
+    - name: "Long ownership but only 1 year as residence"
+      period: 2024-01
+      inputs:
+        years_used_as_residence: 1
+      expect: false
 
 variable meets_frequency_test:
   dtype: Boolean
@@ -29,13 +283,93 @@ variable meets_frequency_test:
   syntax: python
   formula: |
     if not prior_exclusion_claimed:
-    return true
+      return true
     return years_since_last_exclusion >= waiting_period
+  tests:
+    - name: "No prior exclusion claimed"
+      period: 2024-01
+      inputs:
+        prior_exclusion_claimed: false
+        years_since_last_exclusion: 0
+      expect: true
+    - name: "Prior exclusion claimed, exactly 2 years since"
+      period: 2024-01
+      inputs:
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 2
+      expect: true
+    - name: "Prior exclusion claimed, more than 2 years since"
+      period: 2024-01
+      inputs:
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 3
+      expect: true
+    - name: "Prior exclusion claimed, less than 2 years since"
+      period: 2024-01
+      inputs:
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 1
+      expect: false
+    - name: "Prior exclusion claimed, 0 years since (just claimed)"
+      period: 2024-01
+      inputs:
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 0
+      expect: false
+    - name: "Long time since prior exclusion"
+      period: 2024-01
+      inputs:
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 10
+      expect: true
 
 variable meets_full_requirements:
   dtype: Boolean
   description: "Whether taxpayer fully qualifies for exclusion"
   formula: return meets_ownership_test and meets_use_test and meets_frequency_test
+  tests:
+    - name: "All requirements met"
+      period: 2024-01
+      inputs:
+        meets_ownership_test: true
+        meets_use_test: true
+        meets_frequency_test: true
+      expect: true
+    - name: "Fails ownership test"
+      period: 2024-01
+      inputs:
+        meets_ownership_test: false
+        meets_use_test: true
+        meets_frequency_test: true
+      expect: false
+    - name: "Fails use test"
+      period: 2024-01
+      inputs:
+        meets_ownership_test: true
+        meets_use_test: false
+        meets_frequency_test: true
+      expect: false
+    - name: "Fails frequency test"
+      period: 2024-01
+      inputs:
+        meets_ownership_test: true
+        meets_use_test: true
+        meets_frequency_test: false
+      expect: false
+    - name: "Fails all tests"
+      period: 2024-01
+      inputs:
+        meets_ownership_test: false
+        meets_use_test: false
+        meets_frequency_test: false
+      expect: false
+    - name: "Fails ownership and use tests"
+      period: 2024-01
+      inputs:
+        meets_ownership_test: false
+        meets_use_test: false
+        meets_frequency_test: true
+      expect: false
 
 variable qualifies_for_joint_limit:
   dtype: Boolean
@@ -43,7 +377,7 @@ variable qualifies_for_joint_limit:
   syntax: python
   formula: |
     if filing_status != JOINT:
-    return false
+      return false
     # Either spouse meets ownership (we assume primary taxpayer's ownership)
     either_spouse_owns = meets_ownership_test
     # Both spouses must meet use test
@@ -51,6 +385,77 @@ variable qualifies_for_joint_limit:
     # Neither spouse used exclusion in prior 2 years
     neither_used_recently = meets_frequency_test and not spouse_prior_exclusion_claimed
     return either_spouse_owns and both_spouses_used and neither_used_recently
+  tests:
+    - name: "Single filer (not married filing jointly)"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        meets_ownership_test: true
+        meets_use_test: true
+        spouse_meets_use_test: true
+        meets_frequency_test: true
+        spouse_prior_exclusion_claimed: false
+      expect: false
+    - name: "Married filing jointly, all conditions met"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_ownership_test: true
+        meets_use_test: true
+        spouse_meets_use_test: true
+        meets_frequency_test: true
+        spouse_prior_exclusion_claimed: false
+      expect: true
+    - name: "Married filing jointly, primary spouse fails ownership"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_ownership_test: false
+        meets_use_test: true
+        spouse_meets_use_test: true
+        meets_frequency_test: true
+        spouse_prior_exclusion_claimed: false
+      expect: false
+    - name: "Married filing jointly, primary spouse fails use test"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_ownership_test: true
+        meets_use_test: false
+        spouse_meets_use_test: true
+        meets_frequency_test: true
+        spouse_prior_exclusion_claimed: false
+      expect: false
+    - name: "Married filing jointly, spouse fails use test"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_ownership_test: true
+        meets_use_test: true
+        spouse_meets_use_test: false
+        meets_frequency_test: true
+        spouse_prior_exclusion_claimed: false
+      expect: false
+    - name: "Married filing jointly, primary spouse failed frequency test"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_ownership_test: true
+        meets_use_test: true
+        spouse_meets_use_test: true
+        meets_frequency_test: false
+        spouse_prior_exclusion_claimed: false
+      expect: false
+    - name: "Married filing jointly, spouse claimed exclusion recently"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_ownership_test: true
+        meets_use_test: true
+        spouse_meets_use_test: true
+        meets_frequency_test: true
+        spouse_prior_exclusion_claimed: true
+      expect: false
 
 variable reduced_exclusion_fraction:
   dtype: Rate
@@ -58,9 +463,9 @@ variable reduced_exclusion_fraction:
   syntax: python
   formula: |
     if meets_full_requirements:
-    return 1.0
+      return 1.0
     if not qualifies_for_reduced_exclusion:
-    return 0.0
+      return 0.0
     # Fraction = shorter of (ownership/use time) or (time since last exclusion)
     # divided by required period (2 years)
     # Ownership fraction
@@ -69,11 +474,86 @@ variable reduced_exclusion_fraction:
     use_fraction = min(years_used_as_residence / use_required, 1.0)
     # Frequency fraction (if applicable)
     if prior_exclusion_claimed:
-    frequency_fraction = min(years_since_last_exclusion / waiting_period, 1.0)
+      frequency_fraction = min(years_since_last_exclusion / waiting_period, 1.0)
     else:
-    frequency_fraction = 1.0
+      frequency_fraction = 1.0
     # Take the minimum of all applicable fractions
     return min(ownership_fraction, use_fraction, frequency_fraction)
+  tests:
+    - name: "Meets full requirements (100% exclusion)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: true
+        qualifies_for_reduced_exclusion: false
+        years_owned: 2
+        years_used_as_residence: 2
+        prior_exclusion_claimed: false
+      expect: 1.0
+    - name: "Does not qualify for reduced exclusion (0%)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: false
+        years_owned: 1
+        years_used_as_residence: 1
+        prior_exclusion_claimed: false
+      expect: 0.0
+    - name: "1 year of ownership and use (50% of 2 years required)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: true
+        years_owned: 1
+        years_used_as_residence: 1
+        prior_exclusion_claimed: false
+      expect: 0.5
+    - name: "1.5 years of ownership and use (75% of 2 years)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: true
+        years_owned: 1.5
+        years_used_as_residence: 1.5
+        prior_exclusion_claimed: false
+      expect: 0.75
+    - name: "1 year ownership, 1.5 years use (ownership is limiting at 50%)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: true
+        years_owned: 1
+        years_used_as_residence: 1.5
+        prior_exclusion_claimed: false
+      expect: 0.5
+    - name: "1 year since last exclusion (50% of 2 year waiting period)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: true
+        years_owned: 2
+        years_used_as_residence: 2
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 1
+      expect: 0.5
+    - name: "Unforeseen circumstances: 0.5 years owned and used"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: true
+        years_owned: 0.5
+        years_used_as_residence: 0.5
+        prior_exclusion_claimed: false
+      expect: 0.25
+    - name: "All factors limiting (1 year own, 0.5 use, 1 year since)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: true
+        years_owned: 1
+        years_used_as_residence: 0.5
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 1
+      expect: 0.25
 
 variable applicable_exclusion_limit:
   dtype: Money
@@ -83,11 +563,60 @@ variable applicable_exclusion_limit:
   formula: |
     # Determine base limit
     if qualifies_for_joint_limit:
-    base_limit = joint_limit
+      base_limit = joint_limit
     else:
-    base_limit = single_limit
+      base_limit = single_limit
     # Apply reduced exclusion fraction if not fully meeting requirements
     return base_limit * reduced_exclusion_fraction
+  tests:
+    - name: "Single filer, full exclusion (100%)"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: false
+        reduced_exclusion_fraction: 1.0
+      expect: 250000
+    - name: "Single filer, 50% exclusion"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: false
+        reduced_exclusion_fraction: 0.5
+      expect: 125000
+    - name: "Single filer, no exclusion (0%)"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: false
+        reduced_exclusion_fraction: 0.0
+      expect: 0
+    - name: "Married filing jointly, full exclusion (100%)"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: true
+        reduced_exclusion_fraction: 1.0
+      expect: 500000
+    - name: "Married filing jointly, 50% exclusion (unforeseen circumstances)"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: true
+        reduced_exclusion_fraction: 0.5
+      expect: 250000
+    - name: "Married filing jointly, 25% exclusion"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: true
+        reduced_exclusion_fraction: 0.25
+      expect: 125000
+    - name: "Married filing jointly, no exclusion (0%)"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: true
+        reduced_exclusion_fraction: 0.0
+      expect: 0
+    - name: "Single filer, 75% exclusion"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: false
+        reduced_exclusion_fraction: 0.75
+      expect: 187500
 
 variable excludable_gain:
   dtype: Money
@@ -99,3 +628,58 @@ variable excludable_gain:
     # It is taxed as unrecaptured Section 1250 gain (25% rate)
     return max(0, realized_gain_on_residence - depreciation_after_1997)
   default: 0
+  tests:
+    - name: "No gain realized"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 0
+        depreciation_after_1997: 0
+      expect: 0
+    - name: "Gain with no depreciation"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 200000
+        depreciation_after_1997: 0
+      expect: 200000
+    - name: "Gain exceeds depreciation recapture"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 300000
+        depreciation_after_1997: 50000
+      expect: 250000
+    - name: "Depreciation equals realized gain (no excludable gain)"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 100000
+        depreciation_after_1997: 100000
+      expect: 0
+    - name: "Depreciation exceeds realized gain (capped at 0)"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 50000
+        depreciation_after_1997: 150000
+      expect: 0
+    - name: "Large gain with moderate depreciation"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 500000
+        depreciation_after_1997: 75000
+      expect: 425000
+    - name: "Rental property converted to primary residence"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 400000
+        depreciation_after_1997: 125000
+      expect: 275000
+    - name: "Small depreciation on large gain"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 600000
+        depreciation_after_1997: 10000
+      expect: 590000
+    - name: "Depreciation before 1997 (not recaptured)"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 200000
+        depreciation_after_1997: 0
+      expect: 200000

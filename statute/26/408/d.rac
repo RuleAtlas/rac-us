@@ -5,6 +5,15 @@ amount paid or distributed out of an individual retirement plan
 shall be included in gross income by the payee or distributee, as
 the case may be, in the manner provided under section 72.
 """
+
+parameter early_withdrawal_penalty_threshold_age:
+  description: "Age at which early withdrawal penalty no longer applies"
+  unit: years
+  source: "26 USC 72(t)"
+  reference: "IRC Section 72(t) - Early distributions from IRAs"
+  values:
+    1977-01-01: 59.5
+
 variable distributions:
   imports:
     - 26/62/a#adjusted_gross_income
@@ -31,3 +40,39 @@ variable distributions:
     nontaxable_amount = traditional_ira_distribution * nontaxable_ratio
     return traditional_ira_distribution - nontaxable_amount
   default: 0
+  tests:
+    - name: "No distribution"
+      period: 2024
+      inputs:
+        traditional_ira_distribution: 0
+        traditional_ira_basis: 10000
+        traditional_ira_total_value: 100000
+      expect: 0
+    - name: "Distribution with no basis (all taxable)"
+      period: 2024
+      inputs:
+        traditional_ira_distribution: 5000
+        traditional_ira_basis: 0
+        traditional_ira_total_value: 50000
+      expect: 5000
+    - name: "Distribution with basis ratio 1:2"
+      period: 2024
+      inputs:
+        traditional_ira_distribution: 10000
+        traditional_ira_basis: 50000
+        traditional_ira_total_value: 100000
+      expect: 5000
+    - name: "Distribution with basis ratio 1:3 (after-tax contributions)"
+      period: 2024
+      inputs:
+        traditional_ira_distribution: 12000
+        traditional_ira_basis: 30000
+        traditional_ira_total_value: 90000
+      expect: 8000
+    - name: "Small distribution, high basis"
+      period: 2024
+      inputs:
+        traditional_ira_distribution: 2000
+        traditional_ira_basis: 50000
+        traditional_ira_total_value: 60000
+      expect: 1667
