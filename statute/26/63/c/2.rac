@@ -36,38 +36,28 @@ variable basic_standard_deduction:
     # 63(c)(2)(C): Single or married filing separately
     return basic_single
   tests:
-    - name: "Single filer 2024"
-      period: 2024-01
+    - name: "Single filer (base 1988)"
+      period: 1988-01
       inputs:
         filing_status: SINGLE
-      expect: 14600
-    - name: "Married filing jointly 2024"
-      period: 2024-01
+      expect: 3000
+    - name: "Married filing jointly (base 1988)"
+      period: 1988-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-      expect: 29200
-    - name: "Head of household 2024"
-      period: 2024-01
+      expect: 5000
+    - name: "Head of household (base 1988)"
+      period: 1988-01
       inputs:
         filing_status: HEAD_OF_HOUSEHOLD
-      expect: 21900
-    - name: "Married filing separately 2024"
-      period: 2024-01
+      expect: 4400
+    - name: "Married filing separately (base 1988)"
+      period: 1988-01
       inputs:
         filing_status: MARRIED_FILING_SEPARATELY
-      expect: 14600
-    - name: "Surviving spouse 2024"
-      period: 2024-01
+      expect: 3000
+    - name: "Surviving spouse (base 1988)"
+      period: 1988-01
       inputs:
         filing_status: QUALIFYING_WIDOW
-      expect: 29200
-    - name: "Single filer 2023"
-      period: 2023-01
-      inputs:
-        filing_status: SINGLE
-      expect: 13850
-    - name: "MFJ pre-TCJA 2017"
-      period: 2017-01
-      inputs:
-        filing_status: MARRIED_FILING_JOINTLY
-      expect: 12700
+      expect: 5000

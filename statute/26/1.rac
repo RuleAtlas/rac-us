@@ -15,9 +15,22 @@ There is hereby imposed on the taxable income of every individual...
 a tax determined in accordance with the following table
 """
 
+# Federal income tax brackets (base statutory values from TCJA 2017)
+# Thresholds indexed annually per IRC 1(f); base 2018 values here
+# Current indexed values in IRS Rev. Proc. guidance files
 parameter brackets:
+  description: "Federal income tax brackets"
+  indexed_by: statute/26/1/f
   values:
-    # TODO: add values
+    # TCJA base thresholds (2018)
+    thresholds:
+      single: [0, 9525, 38700, 82500, 157500, 200000, 500000]
+      married_filing_jointly: [0, 19050, 77400, 165000, 315000, 400000, 600000]
+      married_filing_separately: [0, 9525, 38700, 82500, 157500, 200000, 300000]
+      head_of_household: [0, 13600, 51800, 82500, 157500, 200000, 500000]
+      qualifying_widow: [0, 19050, 77400, 165000, 315000, 400000, 600000]
+    # Rates are statutory (TCJA)
+    rates: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
 
 variable income_tax:
   imports:

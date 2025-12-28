@@ -1,6 +1,6 @@
 # 26 USC 63(c)(2)(A) - Basic Standard Deduction for Joint Returns
 #
-# Reference: IRC Section 63(c)(2)(A), (c)(4) inflation adjustment
+# Reference: IRC Section 63(c)(2)(A), indexed per (c)(4)
 
 text: """
 (c)(2)(A) 200 percent of the dollar amount in effect under subparagraph (C)
@@ -9,32 +9,11 @@ for the taxable year in the case of--
 (ii) a surviving spouse (as defined in section 2(a)).
 """
 
+# Base statutory value from TRA86
+# Indexed values in guidance files (IRS Rev. Proc.)
 parameter basic_joint:
   description: "Basic standard deduction for married filing jointly or surviving spouse"
-  unit: USD
-  reference: "26 USC 63(c)(2)(A), Rev. Proc. 2023-34"
+  unit: "USD"
+  indexed_by: statute/26/63/c/4
   values:
-    2024-01-01: 29200
-    2023-01-01: 27700
-    2022-01-01: 25900
-    2021-01-01: 25100
-    2020-01-01: 24800
-    2019-01-01: 24400
-    2018-01-01: 24000
-    2017-01-01: 12700
-    2016-01-01: 12600
-    2015-01-01: 12600
-    2014-01-01: 12400
-    2013-01-01: 12200
-    2012-01-01: 11900
-    2011-01-01: 11600
-    2010-01-01: 11400
-    2009-01-01: 11400
-    2008-01-01: 10900
-    2007-01-01: 10700
-    2006-01-01: 10300
-    2005-01-01: 10000
-    2004-01-01: 9700
-    2003-01-01: 9500
     1988-01-01: 5000
-    1987-01-01: 3760

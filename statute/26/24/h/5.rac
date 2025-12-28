@@ -11,14 +11,11 @@ to any qualifying child shall not exceed $1,400.
 In the case of a taxable year beginning after 2018...
 """
 
+# Base statutory value from TCJA
+# Indexed values in IRS guidance files
 parameter refundable_max:
   description: "Maximum refundable CTC (ACTC) per qualifying child under TCJA"
-  unit: USD
-  reference: "26 USC 24(h)(5)(A)"
+  unit: "USD"
+  indexed_by: statute/26/24/h/5/B
   values:
-    2026-01-01: 1000   # TCJA sunset
-    2024-01-01: 1700   # Inflation adjusted
-    2023-01-01: 1600   # Inflation adjusted
-    2022-01-01: 1500   # Inflation adjusted
-    2021-01-01: 1400   # ARP special rules
-    2018-01-01: 1400   # TCJA base
+    2018-01-01: 1400

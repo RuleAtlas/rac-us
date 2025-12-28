@@ -1,6 +1,6 @@
 # 26 USC 63(c)(2)(C) - Basic Standard Deduction for Single/MFS
 #
-# Reference: IRC Section 63(c)(2)(C), (c)(4) inflation adjustment
+# Reference: IRC Section 63(c)(2)(C), indexed per (c)(4)
 
 text: """
 (c)(2)(C) $3,000 in the case of an individual who is not--
@@ -9,32 +9,11 @@ text: """
 This includes single filers and married filing separately.
 """
 
+# Base statutory value from IRC 63(c)(2)(C)
+# Indexed values in guidance files (IRS Rev. Proc.)
 parameter basic_single:
   description: "Basic standard deduction for single or married filing separately"
-  unit: USD
-  reference: "26 USC 63(c)(2)(C), Rev. Proc. 2023-34"
+  unit: "USD"
+  indexed_by: statute/26/63/c/4
   values:
-    2024-01-01: 14600
-    2023-01-01: 13850
-    2022-01-01: 12950
-    2021-01-01: 12550
-    2020-01-01: 12400
-    2019-01-01: 12200
-    2018-01-01: 12000
-    2017-01-01: 6350
-    2016-01-01: 6300
-    2015-01-01: 6300
-    2014-01-01: 6200
-    2013-01-01: 6100
-    2012-01-01: 5950
-    2011-01-01: 5800
-    2010-01-01: 5700
-    2009-01-01: 5700
-    2008-01-01: 5450
-    2007-01-01: 5350
-    2006-01-01: 5150
-    2005-01-01: 5000
-    2004-01-01: 4850
-    2003-01-01: 4750
     1988-01-01: 3000
-    1987-01-01: 2540
