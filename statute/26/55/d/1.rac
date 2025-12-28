@@ -12,29 +12,25 @@ The term "exemption amount" means—
 (C) in the case of a married individual filing a separate return, $66,650.
 """
 
+# Base TCJA values (2018) - indexed annually
+# Current values in IRS guidance files
 parameter exemption_joint:
   description: "AMT exemption for married filing jointly"
-  unit: USD
+  unit: "USD"
+  indexed_by: statute/26/55/d/4
   values:
-    2024-01-01: 133300
-    2023-01-01: 126500
-    2022-01-01: 118100
     2018-01-01: 109400
 
 parameter exemption_single:
   description: "AMT exemption for single filers"
-  unit: USD
+  unit: "USD"
+  indexed_by: statute/26/55/d/4
   values:
-    2024-01-01: 85700
-    2023-01-01: 81300
-    2022-01-01: 75900
     2018-01-01: 70300
 
 parameter exemption_married_separate:
   description: "AMT exemption for married filing separately"
-  unit: USD
+  unit: "USD"
+  indexed_by: statute/26/55/d/4
   values:
-    2024-01-01: 66650
-    2023-01-01: 63250
-    2022-01-01: 59050
     2018-01-01: 54700
