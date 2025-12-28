@@ -89,6 +89,285 @@ variable standard_deduction_standalone:
     total = (basic_final + additional) * (1 - is_ineligible_for_standard_deduction)
     return total
   default: 0
+  tests:
+    # ============================================================================
+    # BASIC STANDARD DEDUCTION BY FILING STATUS (non-dependent, non-elderly/blind)
+    # ============================================================================
+    - name: "Single filer - basic standard deduction only"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        max_age: 40
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 3_000  # basic_single = $3,000
+
+    - name: "Joint filer - basic standard deduction only"
+      period: 1988-01
+      inputs:
+        filing_status: JOINT
+        is_dependent: false
+        max_age: 50
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 5_000  # basic_joint = $5,000
+
+    - name: "Head of household - basic standard deduction only"
+      period: 1988-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        is_dependent: false
+        max_age: 45
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 4_400  # basic_head_of_household = $4,400
+
+    # ============================================================================
+    # ELDERLY TAXPAYERS (age 65+) - ADDITIONAL DEDUCTION
+    # ============================================================================
+    - name: "Single filer aged 65 - gets unmarried elderly additional"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        max_age: 65
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 3_750  # 3000 + 750 (additional_aged_unmarried)
+
+    - name: "Single filer aged 70 - elderly additional applies"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        max_age: 70
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 3_750  # 3000 + 750
+
+    - name: "Joint filer aged 65 - gets married elderly additional"
+      period: 1988-01
+      inputs:
+        filing_status: JOINT
+        is_dependent: false
+        max_age: 65
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 5_600  # 5000 + 600 (additional_aged_married)
+
+    - name: "Head of household aged 65 - gets unmarried elderly additional"
+      period: 1988-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        is_dependent: false
+        max_age: 65
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 5_150  # 4400 + 750 (additional_aged_unmarried)
+
+    - name: "Single filer aged 64 - just below threshold, no additional"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        max_age: 64
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 3_000  # No additional for age < 65
+
+    # ============================================================================
+    # BLIND TAXPAYERS - ADDITIONAL DEDUCTION
+    # ============================================================================
+    - name: "Single blind filer - gets unmarried blind additional"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        max_age: 40
+        any_blind: true
+        is_ineligible_for_standard_deduction: false
+      expect: 3_750  # 3000 + 750 (additional_blind_unmarried)
+
+    - name: "Joint filer blind - gets married blind additional"
+      period: 1988-01
+      inputs:
+        filing_status: JOINT
+        is_dependent: false
+        max_age: 50
+        any_blind: true
+        is_ineligible_for_standard_deduction: false
+      expect: 5_600  # 5000 + 600 (additional_blind_married)
+
+    - name: "Head of household blind - gets unmarried blind additional"
+      period: 1988-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        is_dependent: false
+        max_age: 45
+        any_blind: true
+        is_ineligible_for_standard_deduction: false
+      expect: 5_150  # 4400 + 750 (additional_blind_unmarried)
+
+    # ============================================================================
+    # BOTH ELDERLY AND BLIND - COMBINED ADDITIONAL DEDUCTIONS
+    # ============================================================================
+    - name: "Single filer aged 65 and blind - both additionals"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        max_age: 65
+        any_blind: true
+        is_ineligible_for_standard_deduction: false
+      expect: 4_500  # 3000 + 750 + 750 = 4500
+
+    - name: "Joint filer aged 65 and blind - both additionals (married rates)"
+      period: 1988-01
+      inputs:
+        filing_status: JOINT
+        is_dependent: false
+        max_age: 65
+        any_blind: true
+        is_ineligible_for_standard_deduction: false
+      expect: 6_200  # 5000 + 600 + 600 = 6200
+
+    - name: "Head of household aged 70 and blind - both additionals (unmarried rates)"
+      period: 1988-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        is_dependent: false
+        max_age: 70
+        any_blind: true
+        is_ineligible_for_standard_deduction: false
+      expect: 5_900  # 4400 + 750 + 750 = 5900
+
+    # ============================================================================
+    # DEPENDENT TAXPAYERS - LIMITED DEDUCTION PER 63(c)(5)
+    # ============================================================================
+    - name: "Dependent with zero earned income - minimum deduction"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        earned_income: 0
+        max_age: 20
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 500  # dependent_minimum = $500
+
+    - name: "Dependent with low earned income - formula below minimum"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        earned_income: 100
+        max_age: 20
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 500  # min($500, max($500, $500 + $100 + $250)) = min($500, $850) = $500 floor
+
+    - name: "Dependent with moderate earned income - formula applies"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        earned_income: 1_000
+        max_age: 18
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 1_750  # min($3000, max($500, $500 + $1000 + $250)) = min($3000, $1750) = $1750
+
+    - name: "Dependent with high earned income - capped at basic"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        earned_income: 5_000
+        max_age: 22
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 3_000  # min($3000, $500 + $5000 + $250) = min($3000, $5750) = $3000
+
+    - name: "Dependent aged 65 with earned income - gets both dep and aged additional"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        earned_income: 2_000
+        max_age: 65
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 3_500  # dep_deduction = min($3000, $2750) = $2750, plus $750 aged = $3500
+
+    - name: "Dependent blind with earned income - gets both dep and blind additional"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        earned_income: 1_500
+        max_age: 20
+        any_blind: true
+        is_ineligible_for_standard_deduction: false
+      expect: 3_000  # dep_deduction = min($3000, $2250) = $2250, plus $750 blind = $3000
+
+    # ============================================================================
+    # INELIGIBLE TAXPAYERS - ZERO DEDUCTION PER 63(c)(6)
+    # ============================================================================
+    - name: "Ineligible single filer - zero deduction"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        max_age: 40
+        any_blind: false
+        is_ineligible_for_standard_deduction: true
+      expect: 0
+
+    - name: "Ineligible joint filer aged and blind - still zero"
+      period: 1988-01
+      inputs:
+        filing_status: JOINT
+        is_dependent: false
+        max_age: 70
+        any_blind: true
+        is_ineligible_for_standard_deduction: true
+      expect: 0  # Ineligibility overrides all other calculations
+
+    - name: "Ineligible dependent - zero deduction"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        earned_income: 2_000
+        max_age: 20
+        any_blind: false
+        is_ineligible_for_standard_deduction: true
+      expect: 0
+
+    # ============================================================================
+    # EDGE CASES AND BOUNDARY VALUES
+    # ============================================================================
+    - name: "Zero age (newborn) - no elderly additional"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        max_age: 0
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 3_000
+
+    - name: "Dependent with earned income exactly at minimum"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        earned_income: 0
+        max_age: 16
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 500  # Just the minimum
 
 variable standard_deduction:
   imports:
@@ -109,3 +388,164 @@ variable standard_deduction:
     if is_ineligible_for_standard_deduction:
         return 0
     return basic + additional_standard_deduction
+  tests:
+    # ============================================================================
+    # BASIC STANDARD DEDUCTION BY FILING STATUS (modular version)
+    # ============================================================================
+    - name: "Modular: Single filer basic deduction"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        max_age: 35
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 3_000
+
+    - name: "Modular: Joint filer basic deduction"
+      period: 1988-01
+      inputs:
+        filing_status: JOINT
+        is_dependent: false
+        max_age: 45
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 5_000
+
+    - name: "Modular: Head of household basic deduction"
+      period: 1988-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        is_dependent: false
+        max_age: 40
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 4_400
+
+    # ============================================================================
+    # ELDERLY (65+) - ADDITIONAL AMOUNTS
+    # ============================================================================
+    - name: "Modular: Single elderly - unmarried additional"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        max_age: 65
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 3_750  # 3000 + 750
+
+    - name: "Modular: Joint elderly - married additional"
+      period: 1988-01
+      inputs:
+        filing_status: JOINT
+        is_dependent: false
+        max_age: 68
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 5_600  # 5000 + 600
+
+    # ============================================================================
+    # BLIND - ADDITIONAL AMOUNTS
+    # ============================================================================
+    - name: "Modular: Single blind - unmarried additional"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        max_age: 30
+        any_blind: true
+        is_ineligible_for_standard_deduction: false
+      expect: 3_750  # 3000 + 750
+
+    - name: "Modular: Joint blind - married additional"
+      period: 1988-01
+      inputs:
+        filing_status: JOINT
+        is_dependent: false
+        max_age: 40
+        any_blind: true
+        is_ineligible_for_standard_deduction: false
+      expect: 5_600  # 5000 + 600
+
+    # ============================================================================
+    # BOTH ELDERLY AND BLIND
+    # ============================================================================
+    - name: "Modular: Single elderly and blind - both additionals"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        max_age: 72
+        any_blind: true
+        is_ineligible_for_standard_deduction: false
+      expect: 4_500  # 3000 + 750 + 750
+
+    - name: "Modular: Joint elderly and blind - both married additionals"
+      period: 1988-01
+      inputs:
+        filing_status: JOINT
+        is_dependent: false
+        max_age: 65
+        any_blind: true
+        is_ineligible_for_standard_deduction: false
+      expect: 6_200  # 5000 + 600 + 600
+
+    # ============================================================================
+    # DEPENDENT TAXPAYERS
+    # ============================================================================
+    - name: "Modular: Dependent zero income - minimum"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        earned_income: 0
+        max_age: 17
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 500
+
+    - name: "Modular: Dependent with earned income"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        earned_income: 1_200
+        max_age: 19
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 1_950  # min(3000, max(500, 500 + 1200 + 250)) = min(3000, 1950) = 1950
+
+    - name: "Modular: Dependent capped at basic"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        earned_income: 10_000
+        max_age: 21
+        any_blind: false
+        is_ineligible_for_standard_deduction: false
+      expect: 3_000  # Capped at basic_single
+
+    # ============================================================================
+    # INELIGIBLE
+    # ============================================================================
+    - name: "Modular: Ineligible returns zero"
+      period: 1988-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        max_age: 40
+        any_blind: false
+        is_ineligible_for_standard_deduction: true
+      expect: 0
+
+    - name: "Modular: Ineligible elderly blind still zero"
+      period: 1988-01
+      inputs:
+        filing_status: JOINT
+        is_dependent: false
+        max_age: 70
+        any_blind: true
+        is_ineligible_for_standard_deduction: true
+      expect: 0

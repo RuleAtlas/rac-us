@@ -36,6 +36,57 @@ variable employer_social_security_tax:
     # Employer rate matches employee rate
     taxable_wages = min(irs_employment_income, wage_base)
     return taxable_wages * employer_rate
+  tests:
+    - name: "Zero wages - no tax"
+      period: 2024
+      inputs:
+        irs_employment_income: 0
+      expect: 0
+    - name: "Low wages - full 6.2% applies"
+      period: 2024
+      inputs:
+        irs_employment_income: 50_000
+      expect: 3_100  # 50,000 * 0.062 = 3,100
+    - name: "Moderate wages below wage base"
+      period: 2024
+      inputs:
+        irs_employment_income: 100_000
+      expect: 6_200  # 100,000 * 0.062 = 6,200
+    - name: "Wages exactly at wage base"
+      period: 2024
+      inputs:
+        irs_employment_income: 168_600
+      expect: 10_453.20  # 168,600 * 0.062 = 10,453.20
+    - name: "Wages above wage base - capped at wage base"
+      period: 2024
+      inputs:
+        irs_employment_income: 200_000
+      expect: 10_453.20  # min(200,000, 168,600) * 0.062 = 10,453.20
+    - name: "High earner - tax capped at wage base"
+      period: 2024
+      inputs:
+        irs_employment_income: 500_000
+      expect: 10_453.20  # min(500,000, 168,600) * 0.062 = 10,453.20
+    - name: "Wages slightly above wage base"
+      period: 2024
+      inputs:
+        irs_employment_income: 170_000
+      expect: 10_453.20  # min(170,000, 168,600) * 0.062 = 10,453.20
+    - name: "Wages slightly below wage base"
+      period: 2024
+      inputs:
+        irs_employment_income: 165_000
+      expect: 10_230  # 165,000 * 0.062 = 10,230
+    - name: "Minimum wage worker annual income"
+      period: 2024
+      inputs:
+        irs_employment_income: 15_080  # ~$7.25/hr * 2080 hrs
+      expect: 934.96  # 15,080 * 0.062 = 934.96
+    - name: "2023 wage base - lower cap applies"
+      period: 2023
+      inputs:
+        irs_employment_income: 200_000
+      expect: 9_932.40  # min(200,000, 160,200) * 0.062 = 9,932.40
 
 
 
@@ -57,3 +108,46 @@ variable employer_fica_tax:
   formula: |
     # Total employer FICA = Social Security (capped) + Medicare (uncapped)
     return employer_social_security_tax + employer_medicare_tax
+  tests:
+    - name: "Zero wages - no FICA tax"
+      period: 2024
+      inputs:
+        employer_social_security_tax: 0
+        employer_medicare_tax: 0
+      expect: 0
+    - name: "Low wages - combined 7.65% rate"
+      period: 2024
+      inputs:
+        employer_social_security_tax: 3_100  # 50,000 * 0.062
+        employer_medicare_tax: 725  # 50,000 * 0.0145
+      expect: 3_825  # 50,000 * 0.0765
+    - name: "Moderate wages below wage base"
+      period: 2024
+      inputs:
+        employer_social_security_tax: 6_200  # 100,000 * 0.062
+        employer_medicare_tax: 1_450  # 100,000 * 0.0145
+      expect: 7_650  # 100,000 * 0.0765
+    - name: "Wages at wage base"
+      period: 2024
+      inputs:
+        employer_social_security_tax: 10_453.20  # 168,600 * 0.062
+        employer_medicare_tax: 2_444.70  # 168,600 * 0.0145
+      expect: 12_897.90  # SS capped + uncapped Medicare
+    - name: "Wages above wage base - SS capped, Medicare uncapped"
+      period: 2024
+      inputs:
+        employer_social_security_tax: 10_453.20  # Capped at 168,600 * 0.062
+        employer_medicare_tax: 2_900  # 200,000 * 0.0145
+      expect: 13_353.20  # SS capped at 10,453.20 + uncapped Medicare
+    - name: "High earner - SS capped, Medicare continues"
+      period: 2024
+      inputs:
+        employer_social_security_tax: 10_453.20  # Capped at wage base
+        employer_medicare_tax: 7_250  # 500,000 * 0.0145
+      expect: 17_703.20  # SS maxed out, Medicare grows with wages
+    - name: "Minimum wage worker annual FICA"
+      period: 2024
+      inputs:
+        employer_social_security_tax: 934.96  # 15,080 * 0.062
+        employer_medicare_tax: 218.66  # 15,080 * 0.0145
+      expect: 1_153.62  # 15,080 * 0.0765

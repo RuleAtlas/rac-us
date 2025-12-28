@@ -9,7 +9,24 @@ dependent care assistance with respect to dependent care services provided
 during a taxable year shall not exceed $5,000 ($2,500 in the case of a
 separate return by a married individual).
 """
-variable exclusion:
+
+parameter exclusion_limit:
+  description: "Maximum DCAP exclusion for most filing statuses"
+  unit: USD
+  reference: "26 USC 129(a)(2)"
+  values:
+    2024-01-01: 5_000
+    1981-01-01: 5_000
+
+parameter exclusion_limit_mfs:
+  description: "Maximum DCAP exclusion for married filing separately"
+  unit: USD
+  reference: "26 USC 129(a)(2)"
+  values:
+    2024-01-01: 2_500
+    1981-01-01: 2_500
+
+variable dcap_taxable_amount:
   imports:
     - 26/21/e#num_cdcc_qualifying_individuals
     - 26/129/b#dcap_earned_income_limit
@@ -23,17 +40,169 @@ variable exclusion:
   description: "Dependent care assistance benefits that exceed the exclusion and are taxable"
   syntax: python
   formula: |
-    # No qualifying individuals = no exclusion
-    if num_cdcc_qualifying_individuals == 0:
+    # No benefits received = nothing taxable
+    if dcap_benefits_received == 0:
         return 0
-    # MFS gets half the limit
+    # No qualifying individuals = full amount is taxable (no exclusion allowed)
+    if num_cdcc_qualifying_individuals == 0:
+        return dcap_benefits_received
+    # Determine statutory exclusion limit based on filing status
+    # MFS gets half the limit per 129(a)(2)
     if filing_status == MARRIED_FILING_SEPARATELY:
-        return exclusion_limit_mfs
-    # All other statuses get the full limit
-    return exclusion_limit
+        statutory_limit = exclusion_limit_mfs
+    else:
+        statutory_limit = exclusion_limit
+    # 129(b): Earned income limit applies - lesser of statutory limit and earned income limit
+    applicable_limit = min(statutory_limit, dcap_earned_income_limit)
+    # Taxable amount = benefits received minus the allowed exclusion
+    return max(0, dcap_benefits_received - applicable_limit)
   default: 0
+  tests:
+    - name: "No benefits received - zero taxable"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 0
+        num_cdcc_qualifying_individuals: 1
+        filing_status: SINGLE
+        dcap_earned_income_limit: 50_000
+      expect: 0
 
-variable inputs:
+    - name: "No qualifying individuals - full amount taxable"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 3_000
+        num_cdcc_qualifying_individuals: 0
+        filing_status: SINGLE
+        dcap_earned_income_limit: 50_000
+      expect: 3_000
+
+    - name: "Single filer - benefits below limit - zero taxable"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 3_000
+        num_cdcc_qualifying_individuals: 1
+        filing_status: SINGLE
+        dcap_earned_income_limit: 40_000
+      expect: 0
+
+    - name: "Single filer - benefits at limit - zero taxable"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 1
+        filing_status: SINGLE
+        dcap_earned_income_limit: 40_000
+      expect: 0
+
+    - name: "Single filer - benefits exceed limit - excess is taxable"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 7_500
+        num_cdcc_qualifying_individuals: 1
+        filing_status: SINGLE
+        dcap_earned_income_limit: 40_000
+      expect: 2_500
+
+    - name: "Married filing jointly - benefits below limit"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 4_000
+        num_cdcc_qualifying_individuals: 2
+        filing_status: MARRIED_FILING_JOINTLY
+        dcap_earned_income_limit: 60_000
+      expect: 0
+
+    - name: "Married filing jointly - benefits exceed limit"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 8_000
+        num_cdcc_qualifying_individuals: 2
+        filing_status: MARRIED_FILING_JOINTLY
+        dcap_earned_income_limit: 60_000
+      expect: 3_000
+
+    - name: "Married filing separately - half limit applies"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 1
+        filing_status: MARRIED_FILING_SEPARATELY
+        dcap_earned_income_limit: 30_000
+      expect: 2_500
+
+    - name: "Married filing separately - benefits at reduced limit"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 2_500
+        num_cdcc_qualifying_individuals: 1
+        filing_status: MARRIED_FILING_SEPARATELY
+        dcap_earned_income_limit: 30_000
+      expect: 0
+
+    - name: "Married filing separately - benefits below reduced limit"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 1_500
+        num_cdcc_qualifying_individuals: 1
+        filing_status: MARRIED_FILING_SEPARATELY
+        dcap_earned_income_limit: 30_000
+      expect: 0
+
+    - name: "Head of household - full limit applies"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 6_500
+        num_cdcc_qualifying_individuals: 1
+        filing_status: HEAD_OF_HOUSEHOLD
+        dcap_earned_income_limit: 35_000
+      expect: 1_500
+
+    - name: "Earned income limit binding - low earner"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 1
+        filing_status: SINGLE
+        dcap_earned_income_limit: 3_000
+      expect: 2_000
+
+    - name: "Earned income limit binding - married low earner spouse"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 2
+        filing_status: MARRIED_FILING_JOINTLY
+        dcap_earned_income_limit: 4_000
+      expect: 1_000
+
+    - name: "MFS with earned income limit more restrictive"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 1
+        filing_status: MARRIED_FILING_SEPARATELY
+        dcap_earned_income_limit: 2_000
+      expect: 3_000
+
+    - name: "Zero earned income - full benefits taxable"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 1
+        filing_status: SINGLE
+        dcap_earned_income_limit: 0
+      expect: 5_000
+
+    - name: "Large benefits - significant excess"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 10_000
+        num_cdcc_qualifying_individuals: 2
+        filing_status: MARRIED_FILING_JOINTLY
+        dcap_earned_income_limit: 75_000
+      expect: 5_000
+
+variable dcap_benefits_received:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -41,3 +210,169 @@ variable inputs:
   label: "DCAP Benefits Received"
   description: "Employer-provided dependent care assistance received during the year"
   default: 0
+
+variable dcap_exclusion_amount:
+  imports:
+    - 26/21/e#num_cdcc_qualifying_individuals
+    - 26/129/b#dcap_earned_income_limit
+    - 26/1#filing_status
+    - 26/129/a#dcap_benefits_received
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "DCAP Exclusion Amount"
+  description: "Amount of DCAP benefits that can be excluded from gross income"
+  syntax: python
+  formula: |
+    # No benefits received = no exclusion
+    if dcap_benefits_received == 0:
+        return 0
+    # No qualifying individuals = no exclusion allowed
+    if num_cdcc_qualifying_individuals == 0:
+        return 0
+    # Determine statutory exclusion limit based on filing status
+    if filing_status == MARRIED_FILING_SEPARATELY:
+        statutory_limit = exclusion_limit_mfs
+    else:
+        statutory_limit = exclusion_limit
+    # 129(b): Earned income limit applies
+    applicable_limit = min(statutory_limit, dcap_earned_income_limit)
+    # Exclusion = lesser of benefits received and applicable limit
+    return min(dcap_benefits_received, applicable_limit)
+  default: 0
+  tests:
+    - name: "No benefits received - zero exclusion"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 0
+        num_cdcc_qualifying_individuals: 1
+        filing_status: SINGLE
+        dcap_earned_income_limit: 50_000
+      expect: 0
+
+    - name: "No qualifying individuals - zero exclusion"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 0
+        filing_status: SINGLE
+        dcap_earned_income_limit: 50_000
+      expect: 0
+
+    - name: "Single filer - benefits below limit - full exclusion"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 3_000
+        num_cdcc_qualifying_individuals: 1
+        filing_status: SINGLE
+        dcap_earned_income_limit: 40_000
+      expect: 3_000
+
+    - name: "Single filer - benefits at limit - full exclusion"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 1
+        filing_status: SINGLE
+        dcap_earned_income_limit: 40_000
+      expect: 5_000
+
+    - name: "Single filer - benefits exceed limit - capped exclusion"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 7_500
+        num_cdcc_qualifying_individuals: 1
+        filing_status: SINGLE
+        dcap_earned_income_limit: 40_000
+      expect: 5_000
+
+    - name: "Married filing jointly - benefits at limit"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 2
+        filing_status: MARRIED_FILING_JOINTLY
+        dcap_earned_income_limit: 60_000
+      expect: 5_000
+
+    - name: "Married filing jointly - benefits exceed limit"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 8_000
+        num_cdcc_qualifying_individuals: 2
+        filing_status: MARRIED_FILING_JOINTLY
+        dcap_earned_income_limit: 60_000
+      expect: 5_000
+
+    - name: "Married filing separately - reduced limit applies"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 1
+        filing_status: MARRIED_FILING_SEPARATELY
+        dcap_earned_income_limit: 30_000
+      expect: 2_500
+
+    - name: "Married filing separately - benefits below reduced limit"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 1_500
+        num_cdcc_qualifying_individuals: 1
+        filing_status: MARRIED_FILING_SEPARATELY
+        dcap_earned_income_limit: 30_000
+      expect: 1_500
+
+    - name: "Head of household - full limit applies"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 6_500
+        num_cdcc_qualifying_individuals: 1
+        filing_status: HEAD_OF_HOUSEHOLD
+        dcap_earned_income_limit: 35_000
+      expect: 5_000
+
+    - name: "Earned income limit binding - low earner"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 1
+        filing_status: SINGLE
+        dcap_earned_income_limit: 3_000
+      expect: 3_000
+
+    - name: "Earned income limit binding - married couple"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 2
+        filing_status: MARRIED_FILING_JOINTLY
+        dcap_earned_income_limit: 4_000
+      expect: 4_000
+
+    - name: "MFS with earned income more restrictive than statutory"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 1
+        filing_status: MARRIED_FILING_SEPARATELY
+        dcap_earned_income_limit: 2_000
+      expect: 2_000
+
+    - name: "Zero earned income - zero exclusion"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 5_000
+        num_cdcc_qualifying_individuals: 1
+        filing_status: SINGLE
+        dcap_earned_income_limit: 0
+      expect: 0
+
+    - name: "Large benefits - exclusion capped at limit"
+      period: 2024
+      inputs:
+        dcap_benefits_received: 10_000
+        num_cdcc_qualifying_individuals: 2
+        filing_status: MARRIED_FILING_JOINTLY
+        dcap_earned_income_limit: 75_000
+      expect: 5_000

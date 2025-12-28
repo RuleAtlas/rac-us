@@ -35,6 +35,81 @@ variable employee_social_security_tax:
     # Social Security tax applies only up to the wage base cap
     taxable_wages = min(irs_employment_income, wage_base)
     return taxable_wages * employee_rate
+  tests:
+    # Normal cases - wages below wage base
+    - name: "Median income earner - wages below wage base"
+      period: 2024
+      inputs:
+        irs_employment_income: 60_000
+        wage_base: 168_600
+        employee_rate: 0.062
+      expect: 3_720
+    - name: "Higher income earner - still below wage base"
+      period: 2024
+      inputs:
+        irs_employment_income: 100_000
+        wage_base: 168_600
+        employee_rate: 0.062
+      expect: 6_200
+    - name: "Low wage earner"
+      period: 2024
+      inputs:
+        irs_employment_income: 25_000
+        wage_base: 168_600
+        employee_rate: 0.062
+      expect: 1_550
+    # Edge cases - at and around wage base
+    - name: "Wages exactly at wage base - maximum taxable"
+      period: 2024
+      inputs:
+        irs_employment_income: 168_600
+        wage_base: 168_600
+        employee_rate: 0.062
+      expect: 10_453.20
+    - name: "Wages exceed wage base - capped at maximum"
+      period: 2024
+      inputs:
+        irs_employment_income: 200_000
+        wage_base: 168_600
+        employee_rate: 0.062
+      expect: 10_453.20
+    - name: "High earner - well above wage base"
+      period: 2024
+      inputs:
+        irs_employment_income: 500_000
+        wage_base: 168_600
+        employee_rate: 0.062
+      expect: 10_453.20
+    # Edge cases - zero and minimal wages
+    - name: "Zero wages - no tax"
+      period: 2024
+      inputs:
+        irs_employment_income: 0
+        wage_base: 168_600
+        employee_rate: 0.062
+      expect: 0
+    - name: "Minimal wages - $1"
+      period: 2024
+      inputs:
+        irs_employment_income: 1
+        wage_base: 168_600
+        employee_rate: 0.062
+      expect: 0.062
+    # Different year with different wage base
+    - name: "2023 wage base - wages at cap"
+      period: 2023
+      inputs:
+        irs_employment_income: 160_200
+        wage_base: 160_200
+        employee_rate: 0.062
+      expect: 9_932.40
+    - name: "2023 wage base - wages exceed cap"
+      period: 2023
+      inputs:
+        irs_employment_income: 180_000
+        wage_base: 160_200
+        employee_rate: 0.062
+      expect: 9_932.40
 
 
 
@@ -57,3 +132,57 @@ variable employee_fica_tax:
     # Sum of Social Security (6.2%) and Medicare (1.45%) employee taxes
     # Note: Additional Medicare Tax (0.9%) is computed separately in 3101(b)(2)
     return employee_social_security_tax + employee_medicare_tax
+  tests:
+    # Normal cases - wages below wage base (full 7.65% = 6.2% + 1.45%)
+    - name: "Median income earner - full FICA rate applies"
+      period: 2024
+      inputs:
+        employee_social_security_tax: 3_720
+        employee_medicare_tax: 870
+      expect: 4_590
+    - name: "Low wage earner - both taxes apply"
+      period: 2024
+      inputs:
+        employee_social_security_tax: 1_550
+        employee_medicare_tax: 362.50
+      expect: 1_912.50
+    - name: "Higher income below wage base"
+      period: 2024
+      inputs:
+        employee_social_security_tax: 6_200
+        employee_medicare_tax: 1_450
+      expect: 7_650
+    # Edge case - wages at wage base
+    - name: "Wages at wage base - maximum SS plus full Medicare"
+      period: 2024
+      inputs:
+        employee_social_security_tax: 10_453.20
+        employee_medicare_tax: 2_444.70
+      expect: 12_897.90
+    # High earners - SS capped but Medicare continues
+    - name: "High earner - SS capped, Medicare on all wages"
+      period: 2024
+      inputs:
+        employee_social_security_tax: 10_453.20
+        employee_medicare_tax: 2_900
+      expect: 13_353.20
+    - name: "Very high earner - SS capped, Medicare higher"
+      period: 2024
+      inputs:
+        employee_social_security_tax: 10_453.20
+        employee_medicare_tax: 7_250
+      expect: 17_703.20
+    # Edge cases - zero wages
+    - name: "Zero wages - no FICA tax"
+      period: 2024
+      inputs:
+        employee_social_security_tax: 0
+        employee_medicare_tax: 0
+      expect: 0
+    # Minimal wages
+    - name: "Minimal wages - small combined tax"
+      period: 2024
+      inputs:
+        employee_social_security_tax: 0.062
+        employee_medicare_tax: 0.0145
+      expect: 0.0765
