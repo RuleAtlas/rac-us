@@ -24,8 +24,7 @@ variable self_employment_tax:
   syntax: python
   formula: |
     # taxable_self_employment_income from PE is already gross * 0.9235
-    result = max(0, taxable_self_employment_income)
-    return result
+    return max(0, taxable_self_employment_income)
 
 variable base_self_employment_tax:
   entity: Person

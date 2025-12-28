@@ -134,11 +134,8 @@ variable snap_allotment:
     # Must be eligible to receive benefits
     if not snap_eligible:
         return 0
-    calculated = snap_calculated_benefit
-    minimum = snap_minimum_benefit
-    maximum = snap_max_allotment
     # Apply minimum benefit floor for 1-2 person households
-    benefit = max(calculated, minimum)
+    benefit = max(snap_calculated_benefit, snap_minimum_benefit)
     # Cannot exceed maximum allotment
-    return max(0, min(benefit, maximum))
+    return max(0, min(benefit, snap_max_allotment))
   default: 0

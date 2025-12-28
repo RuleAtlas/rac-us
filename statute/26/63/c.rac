@@ -107,7 +107,5 @@ variable standard_deduction:
         basic = basic_standard_deduction
     # Section 63(c)(6): Ineligible filers get 0, others get basic + additional
     if is_ineligible_for_standard_deduction:
-        result = 0
-    else:
-        result = basic + additional_standard_deduction
-    return result
+        return 0
+    return basic + additional_standard_deduction

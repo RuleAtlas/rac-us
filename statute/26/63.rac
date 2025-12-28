@@ -108,10 +108,8 @@ variable standard_deduction:
         basic = basic_standard_deduction
     # 63(c)(6): Check for ineligibility (MFS spouse itemizes, NRA, etc.)
     if is_ineligible_for_standard_deduction:
-        result = 0
-    else:
-        result = basic + additional_standard_deduction
-    return result
+        return 0
+    return basic + additional_standard_deduction
   tests:
     - name: "Single filer 2024"
       period: 2024-01

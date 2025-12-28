@@ -61,9 +61,6 @@ variable acp_total_value:
   description: "Total annual value of ACP benefits (broadband + device)"
   syntax: python
   formula: |
-    # Annual broadband benefit
-    broadband_value = acp_annual_benefit
-    # One-time device subsidy (if eligible)
-    device_value = acp_device_subsidy
-    return broadband_value + device_value
+    # Annual broadband benefit + one-time device subsidy (if eligible)
+    return acp_annual_benefit + acp_device_subsidy
   default: 0

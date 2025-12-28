@@ -136,10 +136,8 @@ variable eitc_standalone:
     # Final credit = phase-in minus phase-out, but not below zero
     # Eligibility check: ineligible individuals get 0
     if is_eligible_individual:
-        result = max(0, phase_in_amount - phase_out_amount)
-    else:
-        result = 0
-    return result
+        return max(0, phase_in_amount - phase_out_amount)
+    return 0
   default: 0
   tests:
     - name: "Single, no children, $8000 earned income"
@@ -314,8 +312,6 @@ variable eitc_validation:
     # Final credit = phase-in minus phase-out, but not below zero
     # Eligibility check: ineligible individuals get 0
     if is_eligible_individual:
-        result = max(0, phase_in_amount - phase_out_amount)
-    else:
-        result = 0
-    return result
+        return max(0, phase_in_amount - phase_out_amount)
+    return 0
   default: 0

@@ -8,26 +8,26 @@ the dwelling unit... exceeds the greatest of--
 the portion of such payments which is specifically designated
 by such agency to meet the housing costs of the family.
 """
-variable hcv_contribution_30_adjusted:
+variable hcv_adjusted_income_contribution:
   entity: Household
   period: Month
   dtype: Money
   unit: "USD"
-  label: "HCV 30% Adjusted Income Contribution"
-  description: "30% of monthly adjusted income per 24 CFR 5.628(a)(1)"
+  label: "HCV Adjusted Income Contribution"
+  description: "Share of monthly adjusted income per 24 CFR 5.628(a)(1)"
   syntax: python
   formula: |
     rate = parameter(gov.hud.hcv.tenant_contribution.income_rate)
     return round(hcv_monthly_adjusted_income * rate)
   default: 0
 
-variable hcv_contribution_10_gross:
+variable hcv_gross_income_contribution:
   entity: Household
   period: Month
   dtype: Money
   unit: "USD"
-  label: "HCV 10% Gross Income Contribution"
-  description: "10% of monthly gross income per 24 CFR 5.628(a)(2)"
+  label: "HCV Gross Income Contribution"
+  description: "Share of monthly gross income per 24 CFR 5.628(a)(2)"
   syntax: python
   formula: |
     rate = parameter(gov.hud.hcv.tenant_contribution.gross_income_rate)
@@ -73,12 +73,12 @@ variable hcv_total_tenant_payment:
   syntax: python
   formula: |
     # Per 24 CFR 5.628, TTP = greatest of:
-    # (A) 30% of adjusted monthly income
-    # (B) 10% of monthly gross income
+    # (A) Share of adjusted monthly income
+    # (B) Share of monthly gross income
     # (C) Welfare rent (if applicable)
     # (D) Minimum rent
-    ttp_adjusted = hcv_contribution_30_adjusted
-    ttp_gross = hcv_contribution_10_gross
+    ttp_adjusted = hcv_adjusted_income_contribution
+    ttp_gross = hcv_gross_income_contribution
     ttp_welfare = hcv_welfare_rent
     ttp_minimum = hcv_minimum_rent
     # Take the greatest

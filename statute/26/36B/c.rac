@@ -34,8 +34,7 @@ variable ptc_filing_status_eligible:
   formula: |
     # Married filing separately is generally ineligible
     # Exception: Victims of domestic abuse or spousal abandonment (not modeled)
-    result = filing_status != "separate"
-    return result
+    return filing_status != "separate"
 
 variable ptc_income_eligible:
   entity: TaxUnit
@@ -63,8 +62,7 @@ variable ptc_not_dependent:
   syntax: python
   formula: |
     # Taxpayer cannot be claimed as dependent by another
-    result = not is_tax_unit_dependent
-    return result
+    return not is_tax_unit_dependent
 
 variable is_applicable_taxpayer:
   entity: TaxUnit

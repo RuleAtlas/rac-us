@@ -72,9 +72,7 @@ variable acp_benefit:
     return 0
     # Benefit is lesser of actual charge or maximum benefit
     # "in an amount equal to such amount charged, but not more than..."
-    max_benefit = acp_max_benefit
-    actual_charge = broadband_monthly_charge
-    return min(actual_charge, max_benefit)
+    return min(broadband_monthly_charge, acp_max_benefit)
   default: 0
 
 

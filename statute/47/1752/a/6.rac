@@ -183,12 +183,7 @@ variable acp_categorically_eligible:
   description: "Eligible through any qualifying program per 47 USC 1752(a)(6)(B)-(F)"
   syntax: python
   formula: |
-    school_meal = acp_school_meal_eligible
-    pell = acp_pell_grant_eligible
-    wic = acp_wic_eligible
-    lifeline = acp_lifeline_categorical_eligible
-    tribal = acp_tribal_program_eligible
-    return school_meal or pell or wic or lifeline or tribal
+    return acp_school_meal_eligible or acp_pell_grant_eligible or acp_wic_eligible or acp_lifeline_categorical_eligible or acp_tribal_program_eligible
   default: false
 
 # 47 USC 1752(a)(6) - Overall ACP Eligibility

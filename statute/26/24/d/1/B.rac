@@ -79,8 +79,7 @@ variable actc_ss_tax_formula:
     max_refundable = refundable_max * num_ctc_qualifying_children
     # Zero out if less than 3 children (vectorized)
     applies = (num_ctc_qualifying_children >= qualifying_children_threshold)
-    result = min(ss_excess, max_refundable) * applies
-    return result
+    return min(ss_excess, max_refundable) * applies
 
 variable additional_child_tax_credit:
   imports:

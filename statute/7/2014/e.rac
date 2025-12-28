@@ -121,12 +121,7 @@ variable snap_pre_shelter_deductions:
   syntax: python
   formula: |
     # Sum all deductions that apply before shelter
-    earned_ded = snap_earned_income_deduction
-    std_ded = snap_standard_deduction
-    care_ded = snap_dependent_care_deduction
-    support_ded = snap_child_support_deduction
-    medical_ded = snap_medical_expense_deduction
-    return earned_ded + std_ded + care_ded + support_ded + medical_ded
+    return snap_earned_income_deduction + snap_standard_deduction + snap_dependent_care_deduction + snap_child_support_deduction + snap_medical_expense_deduction
   default: 0
 
 variable snap_adjusted_income:
@@ -169,9 +164,7 @@ variable snap_net_income:
   description: "Monthly income after all SNAP deductions, used for benefit calculation"
   syntax: python
   formula: |
-    adjusted = snap_adjusted_income
-    shelter_ded = snap_shelter_deduction
-    return max(0, adjusted - shelter_ded)
+    return max(0, snap_adjusted_income - snap_shelter_deduction)
   default: 0
 
 variable snap_total_deductions:

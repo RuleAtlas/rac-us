@@ -14,12 +14,11 @@ variable efc:
     qualifies_auto_zero = adjusted_gross_income <= efc_params.automatic_zero
     # Apply automatic zero if eligible (Formula B never gets auto-zero)
     if qualifies_auto_zero and (formula_type != B):
-        result = 0
+        return 0
     elif formula_type == A:
-        result = max(0, head_contribution + dependent_contribution)
+        return max(0, head_contribution + dependent_contribution)
     else:
-        result = max(0, head_contribution)
-    return result
+        return max(0, head_contribution)
   default: 0
 
 

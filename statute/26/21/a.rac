@@ -27,10 +27,8 @@ variable child_dependent_care_credit:
     limited_expenses = min(cdcc_expenses_paid, cdcc_maximum_expense_limit, cdcc_earned_income_limit)
     # No qualifying individuals = no credit
     if num_cdcc_qualifying_individuals == 0:
-        result = 0
-    else:
-        result = limited_expenses
-    return result
+        return 0
+    return limited_expenses
   default: 0
 
 variable inputs:

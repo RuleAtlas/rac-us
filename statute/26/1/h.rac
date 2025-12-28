@@ -1,3 +1,5 @@
+# 26 USC Section 1(h) - Maximum Capital Gains Rate
+#
 # Provides preferential tax rates for net capital gain and qualified dividend income.
 # Three-tier rate structure: 0%, 15%, and 20% based on taxable income brackets.
 
@@ -28,7 +30,6 @@ capital gain (determined without regard to this paragraph) increased by qualifie
 """
 
 # === INPUTS ===
-# User-provided values for capital gains and qualified dividends
 
 input long_term_capital_gains:
   entity: TaxUnit
@@ -58,90 +59,24 @@ input qualified_dividends:
   default: 0
 
 # === PARAMETERS ===
-# Capital gains rate thresholds by filing status
-# Base TCJA 2018 values - indexed annually per 1(h)(1)(D)
-# Current indexed values in IRS guidance files
+# Capital gains brackets - similar structure to ordinary income brackets in Section 1
+# Base TCJA 2018 values - indexed annually per 1(h)(1)
 
-parameter zero_rate_threshold_single:
-  description: "Maximum taxable income for 0% capital gains rate - single filers"
-  unit: "USD"
+parameter capital_gains_brackets:
+  description: "Capital gains rate brackets by filing status"
+  reference: "26 USC 1(h)(1)(B)-(D)"
   indexed_by: statute/26/1/h
   values:
-    2018-01-01: 38600
-
-parameter zero_rate_threshold_joint:
-  description: "Maximum taxable income for 0% capital gains rate - married filing jointly"
-  unit: "USD"
-  indexed_by: statute/26/1/h
-  values:
-    2018-01-01: 77200
-
-parameter zero_rate_threshold_separate:
-  description: "Maximum taxable income for 0% capital gains rate - married filing separately"
-  unit: "USD"
-  indexed_by: statute/26/1/h
-  values:
-    2018-01-01: 38600
-
-parameter zero_rate_threshold_hoh:
-  description: "Maximum taxable income for 0% capital gains rate - head of household"
-  unit: "USD"
-  indexed_by: statute/26/1/h
-  values:
-    2018-01-01: 51700
-
-# 15% rate threshold (where 20% begins)
-
-parameter fifteen_rate_threshold_single:
-  description: "Maximum taxable income for 15% capital gains rate - single filers"
-  unit: "USD"
-  indexed_by: statute/26/1/h
-  values:
-    2018-01-01: 425800
-
-parameter fifteen_rate_threshold_joint:
-  description: "Maximum taxable income for 15% capital gains rate - married filing jointly"
-  unit: "USD"
-  indexed_by: statute/26/1/h
-  values:
-    2018-01-01: 479000
-
-parameter fifteen_rate_threshold_separate:
-  description: "Maximum taxable income for 15% capital gains rate - married filing separately"
-  unit: "USD"
-  indexed_by: statute/26/1/h
-  values:
-    2018-01-01: 239500
-
-parameter fifteen_rate_threshold_hoh:
-  description: "Maximum taxable income for 15% capital gains rate - head of household"
-  unit: "USD"
-  indexed_by: statute/26/1/h
-  values:
-    2018-01-01: 452400
-
-# Capital gains rates
-
-parameter zero_rate:
-  description: "Capital gains rate for taxpayers in lower brackets"
-  unit: rate
-  reference: "26 USC 1(h)(1)(B)"
-  values:
-    2003-01-01: 0.00
-
-parameter fifteen_rate:
-  description: "Capital gains rate for taxpayers in middle brackets"
-  unit: rate
-  reference: "26 USC 1(h)(1)(C)"
-  values:
-    2003-01-01: 0.15
-
-parameter twenty_rate:
-  description: "Capital gains rate for taxpayers in highest bracket"
-  unit: rate
-  reference: "26 USC 1(h)(1)(D)"
-  values:
-    2013-01-01: 0.20
+    # TCJA base thresholds (2018)
+    # First threshold is where 0% ends, second is where 15% ends
+    thresholds:
+      single: [0, 38600, 425800]
+      married_filing_jointly: [0, 77200, 479000]
+      married_filing_separately: [0, 38600, 239500]
+      head_of_household: [0, 51700, 452400]
+      qualifying_widow: [0, 77200, 479000]
+    # Rates: 0% up to first threshold, 15% up to second, 20% above
+    rates: [0.00, 0.15, 0.20]
 
 # === VARIABLES ===
 
@@ -156,8 +91,7 @@ variable net_capital_gain:
   formula: |
     # Net capital gain = LTCG - STCL, but cannot be negative here
     # Short-term gains are taxed as ordinary income, not preferential
-    result = max(0, long_term_capital_gains)
-    return result
+    return max(0, long_term_capital_gains)
   default: 0
 
 variable adjusted_net_capital_gain:
@@ -170,11 +104,10 @@ variable adjusted_net_capital_gain:
   syntax: python
   formula: |
     # Section 1(h)(11)(A): net capital gain increased by qualified dividend income
-    result = net_capital_gain + qualified_dividends
-    return result
+    return net_capital_gain + qualified_dividends
   default: 0
 
-variable ordinary_income:
+variable ordinary_income_for_cap_gains:
   imports:
     - 26/63/a#taxable_income
   entity: TaxUnit
@@ -186,110 +119,13 @@ variable ordinary_income:
   syntax: python
   formula: |
     # Ordinary income = taxable income - preferential income
-    result = max(0, taxable_income - adjusted_net_capital_gain)
-    return result
-  default: 0
-
-variable zero_rate_threshold:
-  imports:
-    - 26/1#filing_status
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "0% Rate Threshold"
-  description: "Maximum taxable income for 0% capital gains rate based on filing status"
-  syntax: python
-  formula: |
-    if filing_status == JOINT:
-        return zero_rate_threshold_joint
-    elif filing_status == SURVIVING_SPOUSE:
-        return zero_rate_threshold_joint
-    elif filing_status == SEPARATE:
-        return zero_rate_threshold_separate
-    elif filing_status == HEAD_OF_HOUSEHOLD:
-        return zero_rate_threshold_hoh
-    else:
-        return zero_rate_threshold_single
-  default: 0
-
-variable fifteen_rate_threshold:
-  imports:
-    - 26/1#filing_status
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "15% Rate Threshold"
-  description: "Maximum taxable income for 15% capital gains rate based on filing status"
-  syntax: python
-  formula: |
-    if filing_status == JOINT:
-        return fifteen_rate_threshold_joint
-    elif filing_status == SURVIVING_SPOUSE:
-        return fifteen_rate_threshold_joint
-    elif filing_status == SEPARATE:
-        return fifteen_rate_threshold_separate
-    elif filing_status == HEAD_OF_HOUSEHOLD:
-        return fifteen_rate_threshold_hoh
-    else:
-        return fifteen_rate_threshold_single
-  default: 0
-
-variable capital_gains_zero_rate_amount:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "Capital Gains Taxed at 0%"
-  description: "Amount of adjusted net capital gain taxed at 0% per Section 1(h)(1)(B)"
-  syntax: python
-  formula: |
-    # Section 1(h)(1)(B): 0% on ANCG up to (threshold - ordinary_income)
-    # Room in 0% bracket = threshold minus ordinary income
-    room_in_zero_bracket = max(0, zero_rate_threshold - ordinary_income)
-    # Amount taxed at 0% is lesser of room in bracket or total ANCG
-    result = min(room_in_zero_bracket, adjusted_net_capital_gain)
-    return result
-  default: 0
-
-variable capital_gains_fifteen_rate_amount:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "Capital Gains Taxed at 15%"
-  description: "Amount of adjusted net capital gain taxed at 15% per Section 1(h)(1)(C)"
-  syntax: python
-  formula: |
-    # Remaining ANCG after 0% bracket
-    remaining_ancg = adjusted_net_capital_gain - capital_gains_zero_rate_amount
-    if remaining_ancg <= 0:
-        return 0
-    # Room in 15% bracket = (15% threshold - 0% threshold) adjusted for ordinary income position
-    # Start point is max(ordinary_income, zero_rate_threshold)
-    start_point = max(ordinary_income, zero_rate_threshold)
-    room_in_fifteen_bracket = max(0, fifteen_rate_threshold - start_point)
-    # Amount taxed at 15% is lesser of room in bracket or remaining ANCG
-    result = min(room_in_fifteen_bracket, remaining_ancg)
-    return result
-  default: 0
-
-variable capital_gains_twenty_rate_amount:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "Capital Gains Taxed at 20%"
-  description: "Amount of adjusted net capital gain taxed at 20% per Section 1(h)(1)(D)"
-  syntax: python
-  formula: |
-    # Everything beyond the 15% bracket is taxed at 20%
-    result = max(0, adjusted_net_capital_gain - capital_gains_zero_rate_amount - capital_gains_fifteen_rate_amount)
-    return result
+    # Capital gains "stack" on top of ordinary income for bracket purposes
+    return max(0, taxable_income - adjusted_net_capital_gain)
   default: 0
 
 variable capital_gains_tax:
+  imports:
+    - 26/1#filing_status
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -298,14 +134,16 @@ variable capital_gains_tax:
   description: "Federal income tax on net capital gain and qualified dividends at preferential rates per 26 USC 1(h)"
   syntax: python
   formula: |
-    # Section 1(h): Three-tier preferential rate structure
-    # 0% rate on amount in subparagraph (B)
-    tax_at_zero = capital_gains_zero_rate_amount * zero_rate
-    # 15% rate on amount in subparagraph (C)
-    tax_at_fifteen = capital_gains_fifteen_rate_amount * fifteen_rate
-    # 20% rate on remainder per subparagraph (D)
-    tax_at_twenty = capital_gains_twenty_rate_amount * twenty_rate
-    return tax_at_zero + tax_at_fifteen + tax_at_twenty
+    # Section 1(h): Capital gains "stack" on top of ordinary income
+    # Use marginal_agg with start_from to begin at ordinary income position
+    if adjusted_net_capital_gain <= 0:
+        return 0
+    return marginal_agg(
+        adjusted_net_capital_gain,
+        capital_gains_brackets,
+        threshold_by=filing_status,
+        start_from=ordinary_income_for_cap_gains
+    )
   default: 0
   tests:
     - name: "Single filer, $30k taxable income, $10k LTCG, fully in 0% bracket"
@@ -315,7 +153,8 @@ variable capital_gains_tax:
         long_term_capital_gains: 10000
         qualified_dividends: 0
         filing_status: SINGLE
-      # Ordinary = $30k - $10k = $20k. Room in 0% = $38,600 - $20,000 = $18,600
+      # Ordinary = $30k - $10k = $20k. Start at $20k in brackets.
+      # 0% bracket goes to $38,600. Room = $18,600.
       # All $10k fits in 0% bracket. Tax = $0
       expect: 0
     - name: "Single filer, $50k taxable income, $20k LTCG, spans 0% and 15%"
@@ -325,8 +164,9 @@ variable capital_gains_tax:
         long_term_capital_gains: 20000
         qualified_dividends: 0
         filing_status: SINGLE
-      # Ordinary = $50k - $20k = $30k. Room in 0% = $38,600 - $30,000 = $8,600
-      # At 0%: $8,600. At 15%: $20,000 - $8,600 = $11,400
+      # Ordinary = $50k - $20k = $30k. Start at $30k.
+      # 0% bracket goes to $38,600. Room = $8,600 at 0%.
+      # Remaining $11,400 at 15%.
       # Tax = $0 + $11,400 * 0.15 = $1,710
       expect: 1710
     - name: "Joint filer, $500k taxable income, $50k ANCG, spans 15% and 20%"
@@ -336,10 +176,10 @@ variable capital_gains_tax:
         long_term_capital_gains: 30000
         qualified_dividends: 20000
         filing_status: JOINT
-      # Ordinary = $500k - $50k = $450k. 0% threshold joint = $77,200
+      # Ordinary = $500k - $50k = $450k. Start at $450k.
+      # 0% threshold joint = $77,200 (already passed)
       # 15% threshold joint = $479,000
-      # Room at 0%: max(0, $77,200 - $450,000) = $0
-      # Room at 15%: max(0, $479,000 - max($450,000, $77,200)) = $29,000
+      # Room at 15%: $479,000 - $450,000 = $29,000
       # At 15%: $29,000. At 20%: $50,000 - $29,000 = $21,000
       # Tax = $29,000 * 0.15 + $21,000 * 0.20 = $4,350 + $4,200 = $8,550
       expect: 8550
@@ -350,9 +190,9 @@ variable capital_gains_tax:
         long_term_capital_gains: 15000
         qualified_dividends: 5000
         filing_status: HEAD_OF_HOUSEHOLD
-      # Ordinary = $60k - $20k = $40k. 0% threshold HOH = $51,700
-      # Room in 0% = $51,700 - $40,000 = $11,700
-      # At 0%: $11,700. At 15%: $20,000 - $11,700 = $8,300
+      # Ordinary = $60k - $20k = $40k. Start at $40k.
+      # 0% threshold HOH = $51,700. Room = $11,700 at 0%.
+      # Remaining $8,300 at 15%.
       # Tax = $0 + $8,300 * 0.15 = $1,245
       expect: 1245
     - name: "MFS, $250k taxable income, $20k LTCG, spans 15% and 20%"
@@ -362,9 +202,9 @@ variable capital_gains_tax:
         long_term_capital_gains: 20000
         qualified_dividends: 0
         filing_status: SEPARATE
-      # Ordinary = $250k - $20k = $230k. 15% threshold MFS = $239,500
-      # Room at 15%: $239,500 - $230,000 = $9,500
-      # At 15%: $9,500. At 20%: $20,000 - $9,500 = $10,500
+      # Ordinary = $250k - $20k = $230k. Start at $230k.
+      # 15% threshold MFS = $239,500. Room = $9,500 at 15%.
+      # Remaining $10,500 at 20%.
       # Tax = $9,500 * 0.15 + $10,500 * 0.20 = $1,425 + $2,100 = $3,525
       expect: 3525
 
@@ -379,7 +219,7 @@ variable qualified_dividend_tax:
   formula: |
     # Pro-rate the preferential tax between cap gains and qualified dividends
     if adjusted_net_capital_gain > 0:
-      return capital_gains_tax * (qualified_dividends / adjusted_net_capital_gain)
+        return capital_gains_tax * (qualified_dividends / adjusted_net_capital_gain)
     return 0
   default: 0
 
@@ -394,6 +234,6 @@ variable net_capital_gain_tax:
   formula: |
     # Pro-rate the preferential tax between cap gains and qualified dividends
     if adjusted_net_capital_gain > 0:
-      return capital_gains_tax * (net_capital_gain / adjusted_net_capital_gain)
+        return capital_gains_tax * (net_capital_gain / adjusted_net_capital_gain)
     return 0
   default: 0
