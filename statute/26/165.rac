@@ -1,38 +1,137 @@
 text: """
-(f) Capital losses.-- Losses from sales or exchanges of capital assets
-shall be allowed only to the extent allowed in sections 1211 and 1212.
+§165. Losses
+(a) General rule.—There shall be allowed as a deduction any loss sustained
+during the taxable year and not compensated for by insurance or otherwise.
+
+(b) Amount of deduction.—For purposes of subsection (a), the following rules
+shall apply:
+  (1) The loss of an individual shall be limited to the loss sustained during
+  the taxable year of any one single occurrence with respect to each such
+  occurrence by $100 or the loss sustained, whichever is the smaller; and
+  (2) In the case of a loss described in paragraph (1), the aggregate of the
+  losses in a taxable year shall be limited to the excess of such losses over
+  10 percent of adjusted gross income.
+
+(h) Federally declared disasters.—In the case of any loss the primary
+personal residence is located in an area designated by the Federal Government
+as a disaster area, paragraph (b) shall not apply.
 """
-variable capital_losses:
-  imports: [26/61/a/3/gains_from_property#capital_gains]
 
-variable capital_losses:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "Capital Losses"
-  description: "Losses from sales or exchanges of capital assets"
-  default: 0
-
-parameter capital_loss_limit:
-  description: "Maximum capital loss deduction per year (Section 1211(b))"
+parameter casualty_loss_floor:
+  description: "Per-event floor on individual casualty losses per 26 USC §165(b)(1)"
   unit: "USD"
   values:
-    1978-01-01: 3000
+    2018-01-01: 100
+    1998-01-01: 500
+    1991-01-01: 100
 
-variable capital_loss_deduction:
+parameter agi_floor_rate:
+  description: "AGI threshold rate for aggregate casualty losses per 26 USC §165(b)(2)"
+  unit: "rate"
+  values:
+    1984-01-01: 0.10
+
+variable casualty_loss_per_event:
+  imports:
+    - 26/62/a#adjusted_gross_income
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
-  label: "Capital Loss Deduction"
-  description: "Deductible capital loss (limited to $3,000)"
+  label: "Casualty Loss Per Event"
+  description: "Loss from a single casualty or theft event after applying $100 floor per 26 USC §165(b)(1)"
   syntax: python
   formula: |
-    net_loss = capital_losses - capital_gains
-    if net_loss <= 0:
-        return 0
-    # Limited to $3,000 for non-MFS, $1,500 for MFS
-    # Simplified - using standard limit
-    return min(capital_loss_limit, net_loss)
+    # Individual loss limited by the $100 floor
+    # Loss is the lesser of: actual loss amount or loss sustained minus floor
+    if casualty_loss_amount <= 0:
+      return 0
+    return max(casualty_loss_amount - casualty_loss_floor, 0)
   default: 0
+  tests:
+    - name: "Loss exceeds floor - deductible amount"
+      inputs:
+        casualty_loss_amount: 1500
+        casualty_loss_floor: 100
+      expect: 1400
+    - name: "Loss below floor - no deduction"
+      inputs:
+        casualty_loss_amount: 75
+        casualty_loss_floor: 100
+      expect: 0
+    - name: "Loss equals floor - no deduction"
+      inputs:
+        casualty_loss_amount: 100
+        casualty_loss_floor: 100
+      expect: 0
+
+variable total_casualty_loss_before_agi_limit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Total Casualty Loss Before AGI Limitation"
+  description: "Sum of all casualty losses from multiple events after $100 floor but before 10% AGI limitation per 26 USC §165(b)(2)"
+  syntax: python
+  formula: |
+    # Sum all casualty losses from multiple events in the year
+    # Each event was already subject to the $100 floor
+    return sum(casualty_loss_per_event)
+  default: 0
+  tests:
+    - name: "Multiple casualty events"
+      inputs:
+        casualty_loss_per_event: [500, 800, 300]
+      expect: 1600
+    - name: "Single casualty event"
+      inputs:
+        casualty_loss_per_event: [1200]
+      expect: 1200
+    - name: "No casualty losses"
+      inputs:
+        casualty_loss_per_event: []
+      expect: 0
+
+variable casualty_loss_deduction:
+  imports:
+    - 26/62/a#adjusted_gross_income
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Casualty Loss Deduction"
+  description: "Deductible casualty and theft loss limited by 10% AGI floor per 26 USC §165(b)(2), except for federally declared disasters per §165(h)"
+  syntax: python
+  formula: |
+    # If in federally declared disaster area, no AGI limitation applies
+    if federally_declared_disaster:
+      return total_casualty_loss_before_agi_limit
+    # Otherwise, apply 10% AGI floor to aggregate losses
+    agi_threshold = adjusted_gross_income * agi_floor_rate
+    aggregate_losses = total_casualty_loss_before_agi_limit
+    if aggregate_losses <= agi_threshold:
+      return 0
+    return aggregate_losses - agi_threshold
+  default: 0
+  tests:
+    - name: "Standard case - losses exceed 10% AGI threshold"
+      inputs:
+        adjusted_gross_income: 50000
+        total_casualty_loss_before_agi_limit: 8000
+        federally_declared_disaster: false
+        agi_floor_rate: 0.10
+      expect: 3000
+    - name: "Standard case - losses below 10% AGI threshold"
+      inputs:
+        adjusted_gross_income: 100000
+        total_casualty_loss_before_agi_limit: 5000
+        federally_declared_disaster: false
+        agi_floor_rate: 0.10
+      expect: 0
+    - name: "Federally declared disaster - no AGI limitation"
+      inputs:
+        adjusted_gross_income: 100000
+        total_casualty_loss_before_agi_limit: 3000
+        federally_declared_disaster: true
+        agi_floor_rate: 0.10
+      expect: 3000

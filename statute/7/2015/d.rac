@@ -87,6 +87,27 @@ variable is_snap_abawd:
     is_exempt = is_disabled or is_pregnant or has_dependent_child
     return in_age_range and not is_exempt
   default: false
+  tests:
+    - name: "25-year-old able-bodied no dependents (ABAWD subject)"
+      period: 2024-01
+      inputs: {age: 25, is_disabled: false, is_pregnant: false, has_dependent_child: false}
+      expect: true
+    - name: "35-year-old with dependent child (exempt from ABAWD)"
+      period: 2024-01
+      inputs: {age: 35, is_disabled: false, is_pregnant: true, has_dependent_child: false}
+      expect: false  # Pregnant exemption
+    - name: "45-year-old disabled (exempt from ABAWD)"
+      period: 2024-01
+      inputs: {age: 45, is_disabled: true, is_pregnant: false, has_dependent_child: false}
+      expect: false
+    - name: "17-year-old below age range (exempt)"
+      period: 2024-01
+      inputs: {age: 17, is_disabled: false, is_pregnant: false, has_dependent_child: false}
+      expect: false
+    - name: "55-year-old above age range (exempt)"
+      period: 2024-01
+      inputs: {age: 55, is_disabled: false, is_pregnant: false, has_dependent_child: false}
+      expect: false
 
 variable snap_abawd_work_requirement_met:
   entity: Person
@@ -104,3 +125,28 @@ variable snap_abawd_work_requirement_met:
     working = work_hours_monthly >= abawd_work_hours
     return working or in_snap_employment_training
   default: true
+  tests:
+    - name: "ABAWD individual meets work requirement"
+      period: 2024-01
+      inputs: {age: 30, is_disabled: false, is_pregnant: false, has_dependent_child: false, work_hours_monthly: 80, in_snap_employment_training: false}
+      expect: true  # 80 hours meets requirement
+    - name: "ABAWD individual exceeds work requirement"
+      period: 2024-01
+      inputs: {age: 30, is_disabled: false, is_pregnant: false, has_dependent_child: false, work_hours_monthly: 100, in_snap_employment_training: false}
+      expect: true
+    - name: "ABAWD individual below work hours but in E&T"
+      period: 2024-01
+      inputs: {age: 30, is_disabled: false, is_pregnant: false, has_dependent_child: false, work_hours_monthly: 50, in_snap_employment_training: true}
+      expect: true  # E&T fulfills requirement
+    - name: "ABAWD individual fails work requirement"
+      period: 2024-01
+      inputs: {age: 30, is_disabled: false, is_pregnant: false, has_dependent_child: false, work_hours_monthly: 79, in_snap_employment_training: false}
+      expect: false
+    - name: "Non-ABAWD (age 60) automatically meets requirement"
+      period: 2024-01
+      inputs: {age: 60, is_disabled: false, is_pregnant: false, has_dependent_child: false, work_hours_monthly: 0, in_snap_employment_training: false}
+      expect: true
+    - name: "Person with dependent child (exempt from ABAWD) meets requirement"
+      period: 2024-01
+      inputs: {age: 30, is_disabled: false, is_pregnant: false, has_dependent_child: true, work_hours_monthly: 0, in_snap_employment_training: false}
+      expect: true

@@ -29,6 +29,63 @@ variable itemized_taxable_income_deductions:
     charity = charitable_deduction           # 170: Subject to AGI limits
     return medical + salt + interest + charity
   default: 0
+  tests:
+    - name: "No itemized deductions (all zero)"
+      period: 2024-01
+      inputs:
+        medical_expense_deduction: 0
+        salt_deduction: 0
+        interest_deduction: 0
+        charitable_deduction: 0
+      expect: 0
+    - name: "Medical expenses only"
+      period: 2024-01
+      inputs:
+        medical_expense_deduction: 5000
+        salt_deduction: 0
+        interest_deduction: 0
+        charitable_deduction: 0
+      expect: 5000
+    - name: "SALT deduction only (capped at $10K)"
+      period: 2024-01
+      inputs:
+        medical_expense_deduction: 0
+        salt_deduction: 10000
+        interest_deduction: 0
+        charitable_deduction: 0
+      expect: 10000
+    - name: "Mortgage interest only"
+      period: 2024-01
+      inputs:
+        medical_expense_deduction: 0
+        salt_deduction: 0
+        interest_deduction: 8000
+        charitable_deduction: 0
+      expect: 8000
+    - name: "Charitable contributions only"
+      period: 2024-01
+      inputs:
+        medical_expense_deduction: 0
+        salt_deduction: 0
+        interest_deduction: 0
+        charitable_deduction: 3000
+      expect: 3000
+    - name: "All itemized deductions combined"
+      period: 2024-01
+      inputs:
+        medical_expense_deduction: 5000
+        salt_deduction: 10000
+        interest_deduction: 8000
+        charitable_deduction: 3000
+      expect: 26000
+    - name: "Substantial medical and SALT deductions"
+      period: 2024-01
+      inputs:
+        medical_expense_deduction: 8500
+        salt_deduction: 10000
+        interest_deduction: 6500
+        charitable_deduction: 2000
+      expect: 27000
 
 variable total_itemized_deductions:
   entity: TaxUnit
@@ -41,3 +98,20 @@ variable total_itemized_deductions:
   formula: |
     return itemized_taxable_income_deductions
   default: 0
+  tests:
+    - name: "Total alias reflects itemized deductions (zero)"
+      period: 2024-01
+      inputs:
+        medical_expense_deduction: 0
+        salt_deduction: 0
+        interest_deduction: 0
+        charitable_deduction: 0
+      expect: 0
+    - name: "Total alias reflects itemized deductions (nonzero)"
+      period: 2024-01
+      inputs:
+        medical_expense_deduction: 5000
+        salt_deduction: 10000
+        interest_deduction: 8000
+        charitable_deduction: 3000
+      expect: 26000

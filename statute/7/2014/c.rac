@@ -82,6 +82,19 @@ variable snap_fpl_monthly:
     extra_members = max(0, household_size - 1)
     return fpl_base + (fpl_additional_per_person * extra_members)
   default: 0
+  tests:
+    - name: "Single person household"
+      period: 2024-01
+      inputs: {household_size: 1}
+      expect: 1255  # Base only
+    - name: "Two-person household"
+      period: 2024-01
+      inputs: {household_size: 2}
+      expect: 1695  # 1255 + 440
+    - name: "Four-person household"
+      period: 2024-01
+      inputs: {household_size: 4}
+      expect: 2575  # 1255 + (440 * 3)
 
 variable snap_gross_income_eligible:
   entity: Household
@@ -97,6 +110,27 @@ variable snap_gross_income_eligible:
     gross_limit = snap_fpl_monthly * gross_income_limit_pct
     return gross_income <= gross_limit
   default: false
+  tests:
+    - name: "Income at 130% FPL limit for 1-person household"
+      period: 2024-01
+      inputs: {household_size: 1, gross_income: 1631.50, has_elderly_disabled: false}
+      expect: true  # 1255 * 1.30 = 1631.50
+    - name: "Income exceeds 130% FPL for 1-person household"
+      period: 2024-01
+      inputs: {household_size: 1, gross_income: 1632, has_elderly_disabled: false}
+      expect: false
+    - name: "Income exceeds limit but household has elderly/disabled"
+      period: 2024-01
+      inputs: {household_size: 1, gross_income: 5000, has_elderly_disabled: true}
+      expect: true  # Categorical exemption
+    - name: "4-person household at 130% FPL limit"
+      period: 2024-01
+      inputs: {household_size: 4, gross_income: 3347.50, has_elderly_disabled: false}
+      expect: true  # 2575 * 1.30 = 3347.50
+    - name: "4-person household exceeds limit"
+      period: 2024-01
+      inputs: {household_size: 4, gross_income: 3348, has_elderly_disabled: false}
+      expect: false
 
 variable snap_net_income_eligible:
   entity: Household
@@ -109,3 +143,24 @@ variable snap_net_income_eligible:
     net_limit = snap_fpl_monthly * net_income_limit_pct
     return snap_net_income <= net_limit
   default: false
+  tests:
+    - name: "Net income at 100% FPL limit for 1-person household"
+      period: 2024-01
+      inputs: {household_size: 1, snap_net_income: 1255, has_elderly_disabled: false}
+      expect: true
+    - name: "Net income exceeds 100% FPL for 1-person household"
+      period: 2024-01
+      inputs: {household_size: 1, snap_net_income: 1256, has_elderly_disabled: false}
+      expect: false
+    - name: "Net income at 100% FPL limit for 2-person household"
+      period: 2024-01
+      inputs: {household_size: 2, snap_net_income: 1695, has_elderly_disabled: false}
+      expect: true  # 1255 + 440
+    - name: "Net income below limit"
+      period: 2024-01
+      inputs: {household_size: 3, snap_net_income: 1000, has_elderly_disabled: false}
+      expect: true
+    - name: "Zero net income"
+      period: 2024-01
+      inputs: {household_size: 2, snap_net_income: 0, has_elderly_disabled: false}
+      expect: true

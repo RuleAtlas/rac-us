@@ -114,6 +114,23 @@ variable snap_countable_resources:
     vehicle_excess = max(0, vehicle_fair_market_value - vehicle_exclusion)
     return liquid + financial + vehicle_excess
   default: 0
+  tests:
+    - name: "Liquid assets only, no vehicle"
+      period: 2024-01
+      inputs: {bank_accounts: 1000, cash_on_hand: 500, stocks: 0, bonds: 0, other_financial_assets: 0, vehicle_fair_market_value: 0}
+      expect: 1500
+    - name: "Vehicle within exclusion limit"
+      period: 2024-01
+      inputs: {bank_accounts: 500, cash_on_hand: 0, stocks: 0, bonds: 0, other_financial_assets: 0, vehicle_fair_market_value: 4650}
+      expect: 500  # Vehicle not counted (at exclusion limit)
+    - name: "Vehicle exceeds exclusion by $500"
+      period: 2024-01
+      inputs: {bank_accounts: 0, cash_on_hand: 0, stocks: 0, bonds: 0, other_financial_assets: 0, vehicle_fair_market_value: 5150}
+      expect: 500  # Only excess above $4,650 counts
+    - name: "All asset types combined"
+      period: 2024-01
+      inputs: {bank_accounts: 1000, cash_on_hand: 200, stocks: 500, bonds: 300, other_financial_assets: 400, vehicle_fair_market_value: 5000}
+      expect: 2700  # 1000+200+500+300+400+350 vehicle excess
 
 variable snap_resource_eligible:
   entity: Household
@@ -130,3 +147,24 @@ variable snap_resource_eligible:
         limit = resource_limit
     return snap_countable_resources <= limit
   default: false
+  tests:
+    - name: "Regular household at resource limit"
+      period: 2024-01
+      inputs: {bank_accounts: 2750, cash_on_hand: 0, stocks: 0, bonds: 0, other_financial_assets: 0, vehicle_fair_market_value: 0, has_elderly_disabled: false}
+      expect: true  # At $2,750 limit
+    - name: "Regular household exceeds resource limit"
+      period: 2024-01
+      inputs: {bank_accounts: 2751, cash_on_hand: 0, stocks: 0, bonds: 0, other_financial_assets: 0, vehicle_fair_market_value: 0, has_elderly_disabled: false}
+      expect: false
+    - name: "Elderly/disabled household at higher limit"
+      period: 2024-01
+      inputs: {bank_accounts: 4250, cash_on_hand: 0, stocks: 0, bonds: 0, other_financial_assets: 0, vehicle_fair_market_value: 0, has_elderly_disabled: true}
+      expect: true  # At $4,250 limit
+    - name: "Elderly/disabled household exceeds higher limit"
+      period: 2024-01
+      inputs: {bank_accounts: 4251, cash_on_hand: 0, stocks: 0, bonds: 0, other_financial_assets: 0, vehicle_fair_market_value: 0, has_elderly_disabled: true}
+      expect: false
+    - name: "Regular household well below limit"
+      period: 2024-01
+      inputs: {bank_accounts: 1000, cash_on_hand: 500, stocks: 300, bonds: 200, other_financial_assets: 0, vehicle_fair_market_value: 0, has_elderly_disabled: false}
+      expect: true

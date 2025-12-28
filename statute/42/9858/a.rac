@@ -89,6 +89,61 @@ variable benefit:
     # School-age: preschool_max_years and above
     return CCDFAgeGroup.SCHOOL_AGE
   default: 0
+  tests:
+    - name: "Infant (12 months) in center-based care"
+      period: 2024-01
+      inputs:
+        age: 1
+        is_ccdf_home_based: false
+      expect: INFANT
+    - name: "Infant (18 months) in center-based care at threshold"
+      period: 2024-01
+      inputs:
+        age: 1.5
+        is_ccdf_home_based: false
+      expect: INFANT
+    - name: "Toddler (20 months) in center-based care"
+      period: 2024-01
+      inputs:
+        age: 1.666
+        is_ccdf_home_based: false
+      expect: TODDLER
+    - name: "Infant (20 months) in home-based care"
+      period: 2024-01
+      inputs:
+        age: 1.666
+        is_ccdf_home_based: true
+      expect: INFANT
+    - name: "Toddler (24 months) in home-based care at threshold"
+      period: 2024-01
+      inputs:
+        age: 2
+        is_ccdf_home_based: true
+      expect: TODDLER
+    - name: "Preschooler (3 years) in any care type"
+      period: 2024-01
+      inputs:
+        age: 3
+        is_ccdf_home_based: false
+      expect: PRESCHOOLER
+    - name: "Preschooler (5 years) near maximum age"
+      period: 2024-01
+      inputs:
+        age: 5
+        is_ccdf_home_based: true
+      expect: PRESCHOOLER
+    - name: "School-age (6 years) at preschool maximum"
+      period: 2024-01
+      inputs:
+        age: 6
+        is_ccdf_home_based: false
+      expect: SCHOOL_AGE
+    - name: "School-age (10 years) in any care type"
+      period: 2024-01
+      inputs:
+        age: 10
+        is_ccdf_home_based: true
+      expect: SCHOOL_AGE
 
 
 # ---- Merged from copayment.rac ----
@@ -150,6 +205,19 @@ parameter copay_rate_5:
   values:
     2015-01-01: 0.25
 
+parameter maximum_percent_of_income:
+  description: "Federal maximum copay as percentage of family income"
+  unit: rate
+  values:
+    2014-09-30: 0.07
+
+parameter minimum_weekly_fee:
+  description: "Minimum copay fee per week"
+  unit: "USD"
+  period: Week
+  values:
+    2014-09-30: 1
+
 variable copayment:
   imports:
   entity: SPMUnit
@@ -203,12 +271,88 @@ variable copayment:
     # Copay is minimum of calculated and max, but at least the minimum fee
     copay_before_floor = min(calculated_copay, max_copay)
     return max(copay_before_floor, min_annual_fee)
+  tests:
+    - name: "Family at poverty level - copay waived"
+      period: 2024-01
+      inputs:
+        ccdf_income: 20000
+        spm_unit_fpg: 20000
+        ccdf_income_to_smi_ratio: 0.5
+      expect: 0
+    - name: "Family below poverty level - copay waived"
+      period: 2024-01
+      inputs:
+        ccdf_income: 15000
+        spm_unit_fpg: 20000
+        ccdf_income_to_smi_ratio: 0.4
+      expect: 0
+    - name: "Income at 50% SMI (lowest bracket)"
+      period: 2024-01
+      inputs:
+        ccdf_income: 35000
+        spm_unit_fpg: 20000
+        ccdf_income_to_smi_ratio: 0.5
+      expect: 750
+    - name: "Income at 65% SMI (second bracket)"
+      period: 2024-01
+      inputs:
+        ccdf_income: 45500
+        spm_unit_fpg: 20000
+        ccdf_income_to_smi_ratio: 0.65
+      expect: 2550
+    - name: "Income at 75% SMI (third bracket)"
+      period: 2024-01
+      inputs:
+        ccdf_income: 52500
+        spm_unit_fpg: 20000
+        ccdf_income_to_smi_ratio: 0.75
+      expect: 4875
+    - name: "Income at 85% SMI (fourth bracket) - maximum allowed"
+      period: 2024-01
+      inputs:
+        ccdf_income: 59500
+        spm_unit_fpg: 20000
+        ccdf_income_to_smi_ratio: 0.85
+      expect: 7900
+    - name: "Income above 85% SMI (ineligible bracket)"
+      period: 2024-01
+      inputs:
+        ccdf_income: 70000
+        spm_unit_fpg: 20000
+        ccdf_income_to_smi_ratio: 1.0
+      expect: 4900
+    - name: "Low income with 7% cap applied"
+      period: 2024-01
+      inputs:
+        ccdf_income: 30000
+        spm_unit_fpg: 18000
+        ccdf_income_to_smi_ratio: 0.45
+      expect: 2100
 
 
 # ---- Merged from eligibility.rac ----
 
 # 42 USC 9858 - Child Care and Development Fund (CCDF) Eligibility
 #
+
+parameter maximum_age:
+  description: "Standard maximum age for CCDF eligibility"
+  unit: year
+  values:
+    1990-01-01: 13
+
+parameter maximum_age_with_disability:
+  description: "Maximum age for CCDF eligibility with disability"
+  unit: year
+  values:
+    1990-01-01: 19
+
+parameter smi_income_limit_pct:
+  description: "State Median Income threshold for CCDF income eligibility"
+  unit: rate
+  values:
+    2014-09-30: 0.85
+
 variable eligibility:
   imports:
   entity: SPMUnit
@@ -232,6 +376,61 @@ variable eligibility:
     elif not has_disability:
         age_limit = standard_limit
     return age < age_limit
+  tests:
+    - name: "Infant (6 months) eligible - standard age"
+      period: 2024-01
+      inputs:
+        age: 0
+        is_disabled: false
+      expect: true
+    - name: "Toddler (2 years) eligible - standard age"
+      period: 2024-01
+      inputs:
+        age: 2
+        is_disabled: false
+      expect: true
+    - name: "Preschooler (5 years) eligible - standard age"
+      period: 2024-01
+      inputs:
+        age: 5
+        is_disabled: false
+      expect: true
+    - name: "School-age (12 years) eligible - standard age"
+      period: 2024-01
+      inputs:
+        age: 12
+        is_disabled: false
+      expect: true
+    - name: "Age 13 ineligible - exceeds standard limit"
+      period: 2024-01
+      inputs:
+        age: 13
+        is_disabled: false
+      expect: false
+    - name: "Age 14 ineligible unless disabled"
+      period: 2024-01
+      inputs:
+        age: 14
+        is_disabled: false
+      expect: false
+    - name: "Age 14 eligible with disability"
+      period: 2024-01
+      inputs:
+        age: 14
+        is_disabled: true
+      expect: true
+    - name: "Age 18 eligible with disability - below 19 limit"
+      period: 2024-01
+      inputs:
+        age: 18
+        is_disabled: true
+      expect: true
+    - name: "Age 19 ineligible even with disability - exceeds limit"
+      period: 2024-01
+      inputs:
+        age: 19
+        is_disabled: true
+      expect: false
 
 
 # ---- Merged from index.rac ----
