@@ -20,6 +20,61 @@ variable efc:
     else:
         return max(0, head_contribution)
   default: 0
+  tests:
+    - name: "Formula A (dependent) - qualifies for auto-zero"
+      period: 2024
+      inputs:
+        pell_grant_formula: A
+        adjusted_gross_income: 20000
+        efc_params.automatic_zero: 30000
+        head_contribution: 5000
+        dependent_contribution: 2000
+      expect: 0
+    - name: "Formula A (dependent) - normal calculation"
+      period: 2024
+      inputs:
+        pell_grant_formula: A
+        adjusted_gross_income: 80000
+        efc_params.automatic_zero: 30000
+        head_contribution: 8000
+        dependent_contribution: 1500
+      expect: 9500
+    - name: "Formula B (independent, no deps) - auto-zero not applied"
+      period: 2024
+      inputs:
+        pell_grant_formula: B
+        adjusted_gross_income: 20000
+        efc_params.automatic_zero: 30000
+        head_contribution: 3000
+        dependent_contribution: 0
+      expect: 3000
+    - name: "Formula C (independent with deps) - qualifies for auto-zero"
+      period: 2024
+      inputs:
+        pell_grant_formula: C
+        adjusted_gross_income: 25000
+        efc_params.automatic_zero: 30000
+        head_contribution: 4000
+        dependent_contribution: 0
+      expect: 0
+    - name: "Formula A with negative head contribution"
+      period: 2024
+      inputs:
+        pell_grant_formula: A
+        adjusted_gross_income: 50000
+        efc_params.automatic_zero: 30000
+        head_contribution: -1000
+        dependent_contribution: 500
+      expect: 0
+    - name: "High income dependent student"
+      period: 2024
+      inputs:
+        pell_grant_formula: A
+        adjusted_gross_income: 150000
+        efc_params.automatic_zero: 30000
+        head_contribution: 15000
+        dependent_contribution: 3500
+      expect: 18500
 
 
 
@@ -105,6 +160,85 @@ variable award:
     final_cap = min(coa, max_award)
     return min(final_cap, max(0, uncapped_award))
   default: 9
+  tests:
+    - name: "EFC methodology - full year enrollment"
+      period: 2024
+      inputs:
+        uses_efc: true
+        uses_sai: false
+        cost_of_attendance: 10000
+        pell_grant_efc: 2000
+        months_in_school: 12
+        amount_params.min: 25
+        amount_params.max: 7000
+        enrollment_params.months_in_school_year: 12
+        pell_grant_eligibility_type: CALCULATED
+      expect: 8000
+    - name: "EFC methodology - half-year enrollment (6 months)"
+      period: 2024
+      inputs:
+        uses_efc: true
+        uses_sai: false
+        cost_of_attendance: 10000
+        pell_grant_efc: 2000
+        months_in_school: 6
+        amount_params.min: 25
+        amount_params.max: 7000
+        enrollment_params.months_in_school_year: 12
+        pell_grant_eligibility_type: CALCULATED
+      expect: 4000
+    - name: "SAI methodology - ineligible student"
+      period: 2024
+      inputs:
+        uses_efc: false
+        uses_sai: true
+        cost_of_attendance: 10000
+        pell_grant_sai: 15000
+        pell_grant_eligibility_type: INELIGIBLE
+        months_in_school: 12
+        amount_params.min: 25
+        amount_params.max: 7000
+        enrollment_params.months_in_school_year: 12
+      expect: 0
+    - name: "SAI methodology - maximum eligible"
+      period: 2024
+      inputs:
+        uses_efc: false
+        uses_sai: true
+        cost_of_attendance: 10000
+        pell_grant_sai: 0
+        pell_grant_eligibility_type: MAXIMUM
+        months_in_school: 12
+        amount_params.min: 25
+        amount_params.max: 7000
+        enrollment_params.months_in_school_year: 12
+      expect: 7000
+    - name: "Award below minimum (not disbursed)"
+      period: 2024
+      inputs:
+        uses_efc: true
+        uses_sai: false
+        cost_of_attendance: 10000
+        pell_grant_efc: 9990
+        months_in_school: 12
+        amount_params.min: 25
+        amount_params.max: 7000
+        enrollment_params.months_in_school_year: 12
+        pell_grant_eligibility_type: CALCULATED
+      expect: 0
+    - name: "Award capped at maximum"
+      period: 2024
+      inputs:
+        uses_efc: true
+        uses_sai: false
+        cost_of_attendance: 15000
+        pell_grant_efc: 1000
+        months_in_school: 12
+        amount_params.min: 25
+        amount_params.max: 7000
+        enrollment_params.months_in_school_year: 12
+        pell_grant_eligibility_type: CALCULATED
+      expect: 7000
 
 
 # ---- Merged from dependent_contribution.rac ----
@@ -147,6 +281,85 @@ variable dependent_contribution:
     # Total contribution
     return available_income + asset_contribution
   default: 0
+  tests:
+    - name: "Dependent student - income below allowance"
+      period: 2024
+      inputs:
+        pell_grant_formula: A
+        student_income: 2000
+        student_assets: 1000
+        dependent_params.ipa: 4000
+        dependent_params.income_assessment_rate: 0.50
+        dependent_params.asset_assessment_rate: 0.20
+        head_available_income: 0
+        dependent_other_allowances: 500
+        simplified_formula_applies: false
+      expect: 0
+    - name: "Dependent student - income assessment"
+      period: 2024
+      inputs:
+        pell_grant_formula: A
+        student_income: 8000
+        student_assets: 2000
+        dependent_params.ipa: 4000
+        dependent_params.income_assessment_rate: 0.50
+        dependent_params.asset_assessment_rate: 0.20
+        head_available_income: 0
+        dependent_other_allowances: 500
+        simplified_formula_applies: false
+      expect: 2200
+    - name: "Dependent student - income with negative parent contribution"
+      period: 2024
+      inputs:
+        pell_grant_formula: A
+        student_income: 5000
+        student_assets: 3000
+        dependent_params.ipa: 4000
+        dependent_params.income_assessment_rate: 0.50
+        dependent_params.asset_assessment_rate: 0.20
+        head_available_income: -2000
+        dependent_other_allowances: 0
+        simplified_formula_applies: false
+      expect: 1300
+    - name: "Independent student (Formula B) - returns 0"
+      period: 2024
+      inputs:
+        pell_grant_formula: B
+        student_income: 10000
+        student_assets: 5000
+        dependent_params.ipa: 4000
+        dependent_params.income_assessment_rate: 0.50
+        dependent_params.asset_assessment_rate: 0.20
+        head_available_income: 0
+        dependent_other_allowances: 0
+        simplified_formula_applies: false
+      expect: 0
+    - name: "Dependent student - simplified formula (no assets)"
+      period: 2024
+      inputs:
+        pell_grant_formula: A
+        student_income: 8000
+        student_assets: 5000
+        dependent_params.ipa: 4000
+        dependent_params.income_assessment_rate: 0.50
+        dependent_params.asset_assessment_rate: 0.20
+        head_available_income: 0
+        dependent_other_allowances: 0
+        simplified_formula_applies: true
+      expect: 2000
+    - name: "Dependent student with multiple allowances"
+      period: 2024
+      inputs:
+        pell_grant_formula: A
+        student_income: 6000
+        student_assets: 4000
+        dependent_params.ipa: 3000
+        dependent_params.income_assessment_rate: 0.50
+        dependent_params.asset_assessment_rate: 0.20
+        head_available_income: 0
+        dependent_other_allowances: 1500
+        simplified_formula_applies: false
+      expect: 800
 
 
 # ---- Merged from eligibility.rac ----
@@ -204,6 +417,85 @@ variable eligibility:
     income_eligible = (pell_grant_efc >= 0) | (pell_grant_sai <= sai_limits.max_sai)
     return basic_eligible & income_eligible
   default: false
+  tests:
+    - name: "Fully eligible student"
+      period: 2024
+      inputs:
+        is_enrolled_in_higher_education: true
+        has_high_school_credential: true
+        is_citizen_or_eligible_noncitizen: true
+        maintains_satisfactory_progress: true
+        is_not_in_default: true
+        has_valid_ssn: true
+        pell_grant_efc: 3000
+        pell_grant_sai: 2000
+        sai_limits.max_sai: 15000
+      expect: true
+    - name: "Not enrolled in higher education"
+      period: 2024
+      inputs:
+        is_enrolled_in_higher_education: false
+        has_high_school_credential: true
+        is_citizen_or_eligible_noncitizen: true
+        maintains_satisfactory_progress: true
+        is_not_in_default: true
+        has_valid_ssn: true
+        pell_grant_efc: 3000
+        pell_grant_sai: 2000
+        sai_limits.max_sai: 15000
+      expect: false
+    - name: "Missing high school credential"
+      period: 2024
+      inputs:
+        is_enrolled_in_higher_education: true
+        has_high_school_credential: false
+        is_citizen_or_eligible_noncitizen: true
+        maintains_satisfactory_progress: true
+        is_not_in_default: true
+        has_valid_ssn: true
+        pell_grant_efc: 3000
+        pell_grant_sai: 2000
+        sai_limits.max_sai: 15000
+      expect: false
+    - name: "In default on federal student loan"
+      period: 2024
+      inputs:
+        is_enrolled_in_higher_education: true
+        has_high_school_credential: true
+        is_citizen_or_eligible_noncitizen: true
+        maintains_satisfactory_progress: true
+        is_not_in_default: false
+        has_valid_ssn: true
+        pell_grant_efc: 3000
+        pell_grant_sai: 2000
+        sai_limits.max_sai: 15000
+      expect: false
+    - name: "High SAI exceeds limit"
+      period: 2024
+      inputs:
+        is_enrolled_in_higher_education: true
+        has_high_school_credential: true
+        is_citizen_or_eligible_noncitizen: true
+        maintains_satisfactory_progress: true
+        is_not_in_default: true
+        has_valid_ssn: true
+        pell_grant_efc: 100000
+        pell_grant_sai: 20000
+        sai_limits.max_sai: 15000
+      expect: false
+    - name: "Valid SSN required"
+      period: 2024
+      inputs:
+        is_enrolled_in_higher_education: true
+        has_high_school_credential: true
+        is_citizen_or_eligible_noncitizen: true
+        maintains_satisfactory_progress: true
+        is_not_in_default: true
+        has_valid_ssn: false
+        pell_grant_efc: 3000
+        pell_grant_sai: 2000
+        sai_limits.max_sai: 15000
+      expect: false
 
 
 # ---- Merged from eligibility_type.rac ----
@@ -251,6 +543,67 @@ variable eligibility_type:
     if agi_to_fpg <= min_threshold: return MINIMUM
     return CALCULATED
   default: INELIGIBLE
+  tests:
+    - name: "Dependent single - MAXIMUM (very low income)"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 10000
+        federal_poverty_guidelines: 35000
+        is_dependent_student: true
+        filing_status: SINGLE
+        fpg_fraction.max_pell_limits.DEPENDENT_SINGLE: 0.40
+        fpg_fraction.min_pell_limits.DEPENDENT_SINGLE: 1.50
+      expect: MAXIMUM
+    - name: "Dependent single - CALCULATED (low-middle income)"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 25000
+        federal_poverty_guidelines: 35000
+        is_dependent_student: true
+        filing_status: SINGLE
+        fpg_fraction.max_pell_limits.DEPENDENT_SINGLE: 0.40
+        fpg_fraction.min_pell_limits.DEPENDENT_SINGLE: 1.50
+      expect: CALCULATED
+    - name: "Dependent single - INELIGIBLE (high income)"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 60000
+        federal_poverty_guidelines: 35000
+        is_dependent_student: true
+        filing_status: SINGLE
+        fpg_fraction.max_pell_limits.DEPENDENT_SINGLE: 0.40
+        fpg_fraction.min_pell_limits.DEPENDENT_SINGLE: 1.50
+      expect: INELIGIBLE
+    - name: "Dependent married - MAXIMUM"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 12000
+        federal_poverty_guidelines: 40000
+        is_dependent_student: true
+        filing_status: MARRIED_FILING_JOINTLY
+        fpg_fraction.max_pell_limits.DEPENDENT_NOT_SINGLE: 0.35
+        fpg_fraction.min_pell_limits.DEPENDENT_NOT_SINGLE: 1.40
+      expect: MAXIMUM
+    - name: "Independent single - CALCULATED"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 30000
+        federal_poverty_guidelines: 40000
+        is_dependent_student: false
+        filing_status: SINGLE
+        fpg_fraction.max_pell_limits.INDEPENDENT_SINGLE: 0.50
+        fpg_fraction.min_pell_limits.INDEPENDENT_SINGLE: 2.00
+      expect: CALCULATED
+    - name: "Independent not single - MAXIMUM"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 20000
+        federal_poverty_guidelines: 50000
+        is_dependent_student: false
+        filing_status: MARRIED_FILING_JOINTLY
+        fpg_fraction.max_pell_limits.INDEPENDENT_NOT_SINGLE: 0.45
+        fpg_fraction.min_pell_limits.INDEPENDENT_NOT_SINGLE: 1.80
+      expect: MAXIMUM
 
 
 # ---- Merged from formula_type.rac ----
@@ -282,6 +635,49 @@ variable formula_type:
     # Independent with dependents = Formula C
     return C
   default: A
+  tests:
+    - name: "Formula A - dependent student"
+      period: 2024
+      inputs:
+        is_tax_unit_head: false
+        is_tax_unit_spouse: false
+        has_dependents: true
+      expect: A
+    - name: "Formula B - independent, no dependents, head of household"
+      period: 2024
+      inputs:
+        is_tax_unit_head: true
+        is_tax_unit_spouse: false
+        has_dependents: false
+      expect: B
+    - name: "Formula C - independent with dependents, head of household"
+      period: 2024
+      inputs:
+        is_tax_unit_head: true
+        is_tax_unit_spouse: false
+        has_dependents: true
+      expect: C
+    - name: "Formula B - independent, no dependents, spouse"
+      period: 2024
+      inputs:
+        is_tax_unit_head: false
+        is_tax_unit_spouse: true
+        has_dependents: false
+      expect: B
+    - name: "Formula C - independent with dependents, spouse"
+      period: 2024
+      inputs:
+        is_tax_unit_head: false
+        is_tax_unit_spouse: true
+        has_dependents: true
+      expect: C
+    - name: "Formula A - dependent with dependents"
+      period: 2024
+      inputs:
+        is_tax_unit_head: false
+        is_tax_unit_spouse: false
+        has_dependents: true
+      expect: A
 
 
 # ---- Merged from head_contribution.rac ----
@@ -330,6 +726,77 @@ variable head_contribution:
     if formula_type == B: return aai
     return total_contribution / in_college
   default: 0
+  tests:
+    - name: "Formula A - two children in college"
+      period: 2024
+      inputs:
+        pell_grant_formula: A
+        adjusted_gross_income: 60000
+        total_assets: 10000
+        head_allowances: 5000
+        head_params.income_assessment_rate: {A: 0.22, B: 0.22, C: 0.34}
+        head_params.asset_assessment_rate: {A: 0.05, B: 0.07, C: 0.07}
+        head_params.negative_rate: -0.075
+        head_params.min_contribution: 0
+        dependents_in_college: 2
+        simplified_formula_applies: false
+      expect: 3025
+    - name: "Formula B - independent no dependents"
+      period: 2024
+      inputs:
+        pell_grant_formula: B
+        adjusted_gross_income: 40000
+        total_assets: 5000
+        head_allowances: 3000
+        head_params.income_assessment_rate: {A: 0.22, B: 0.22, C: 0.34}
+        head_params.asset_assessment_rate: {A: 0.05, B: 0.07, C: 0.07}
+        head_params.negative_rate: -0.075
+        head_params.min_contribution: 0
+        dependents_in_college: 1
+        simplified_formula_applies: false
+      expect: 9485
+    - name: "Formula C - independent with dependents"
+      period: 2024
+      inputs:
+        pell_grant_formula: C
+        adjusted_gross_income: 50000
+        total_assets: 8000
+        head_allowances: 4000
+        head_params.income_assessment_rate: {A: 0.22, B: 0.22, C: 0.34}
+        head_params.asset_assessment_rate: {A: 0.05, B: 0.07, C: 0.07}
+        head_params.negative_rate: -0.075
+        head_params.min_contribution: 0
+        dependents_in_college: 2
+        simplified_formula_applies: false
+      expect: 4591
+    - name: "Head contribution - simplified formula (no assets)"
+      period: 2024
+      inputs:
+        pell_grant_formula: A
+        adjusted_gross_income: 55000
+        total_assets: 15000
+        head_allowances: 4000
+        head_params.income_assessment_rate: {A: 0.22, B: 0.22, C: 0.34}
+        head_params.asset_assessment_rate: {A: 0.05, B: 0.07, C: 0.07}
+        head_params.negative_rate: -0.075
+        head_params.min_contribution: 0
+        dependents_in_college: 1
+        simplified_formula_applies: true
+      expect: 5126
+    - name: "Low income with negative AAI"
+      period: 2024
+      inputs:
+        pell_grant_formula: A
+        adjusted_gross_income: 20000
+        total_assets: 1000
+        head_allowances: 25000
+        head_params.income_assessment_rate: {A: 0.22, B: 0.22, C: 0.34}
+        head_params.asset_assessment_rate: {A: 0.05, B: 0.07, C: 0.07}
+        head_params.negative_rate: -0.075
+        head_params.min_contribution: 0
+        dependents_in_college: 1
+        simplified_formula_applies: false
+      expect: 0
 
 
 # ---- Merged from simplified_applies.rac ----
@@ -366,3 +833,100 @@ variable simplified_applies:
     formula_available = simplified_params.applies
     return income_eligible & receives_benefits & formula_available
   default: false
+  tests:
+    - name: "Qualifies for simplified formula - SNAP recipient, low income"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 25000
+        receives_ssi: false
+        receives_snap: true
+        receives_tanf: false
+        receives_free_lunch: false
+        receives_medicaid: false
+        simplified_params.income_limit: 50000
+        simplified_params.applies: true
+      expect: true
+    - name: "Qualifies - TANF recipient, below income limit"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 30000
+        receives_ssi: false
+        receives_snap: false
+        receives_tanf: true
+        receives_free_lunch: false
+        receives_medicaid: false
+        simplified_params.income_limit: 50000
+        simplified_params.applies: true
+      expect: true
+    - name: "Qualifies - SSI recipient, income limit not applicable"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 15000
+        receives_ssi: true
+        receives_snap: false
+        receives_tanf: false
+        receives_free_lunch: false
+        receives_medicaid: false
+        simplified_params.income_limit: 50000
+        simplified_params.applies: true
+      expect: true
+    - name: "Does not qualify - income exceeds limit"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 60000
+        receives_ssi: false
+        receives_snap: true
+        receives_tanf: false
+        receives_free_lunch: false
+        receives_medicaid: false
+        simplified_params.income_limit: 50000
+        simplified_params.applies: true
+      expect: false
+    - name: "Does not qualify - no qualifying benefits"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 25000
+        receives_ssi: false
+        receives_snap: false
+        receives_tanf: false
+        receives_free_lunch: false
+        receives_medicaid: false
+        simplified_params.income_limit: 50000
+        simplified_params.applies: true
+      expect: false
+    - name: "Does not qualify - formula not available (phased out 2024+)"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 25000
+        receives_ssi: false
+        receives_snap: true
+        receives_tanf: false
+        receives_free_lunch: false
+        receives_medicaid: false
+        simplified_params.income_limit: 50000
+        simplified_params.applies: false
+      expect: false
+    - name: "Qualifies - Medicaid recipient"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 35000
+        receives_ssi: false
+        receives_snap: false
+        receives_tanf: false
+        receives_free_lunch: false
+        receives_medicaid: true
+        simplified_params.income_limit: 50000
+        simplified_params.applies: true
+      expect: true
+    - name: "Qualifies - free lunch and SNAP (multiple benefits)"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 20000
+        receives_ssi: false
+        receives_snap: true
+        receives_tanf: false
+        receives_free_lunch: true
+        receives_medicaid: false
+        simplified_params.income_limit: 50000
+        simplified_params.applies: true
+      expect: true

@@ -192,9 +192,9 @@ variable total_ira_deduction:
     return sum(members.ira_deduction)
 
 
-examples:
+tests:
   - name: "Under 50, no employer plan, full contribution"
-  period: 2018-01
+    period: 2018-01
     inputs:
       person:
         age: 35
@@ -205,7 +205,7 @@ examples:
       ira_deduction: 5500
 
   - name: "Age 50+, catch-up eligible"
-  period: 2018-01
+    period: 2018-01
     inputs:
       person:
         age: 55
@@ -217,13 +217,114 @@ examples:
       ira_deduction: 6500
 
   - name: "With employer plan, mid-phaseout"
-  period: 2018-01
+    period: 2018-01
     inputs:
       person:
         age: 40
         traditional_ira_contributions: 5500
         has_retirement_plan_at_work: true
-        adjusted_gross_income: 68000  # Midpoint of 63k-73k
+        adjusted_gross_income: 68000
     outputs:
       ira_phaseout_ratio: 0.5
       ira_deduction: 2750
+
+  - name: "No contributions"
+    period: 2018-01
+    inputs:
+      person:
+        age: 40
+        traditional_ira_contributions: 0
+        has_retirement_plan_at_work: false
+        adjusted_gross_income: 50000
+    outputs:
+      ira_deduction_before_phaseout: 0
+      ira_deduction: 0
+
+  - name: "Contribution exceeds limit"
+    period: 2018-01
+    inputs:
+      person:
+        age: 40
+        traditional_ira_contributions: 10000
+        has_retirement_plan_at_work: false
+        adjusted_gross_income: 100000
+    outputs:
+      ira_deduction_before_phaseout: 5500
+      ira_deduction: 5500
+
+  - name: "Age 50+ with full catch-up"
+    period: 2018-01
+    inputs:
+      person:
+        age: 50
+        traditional_ira_contributions: 6500
+        has_retirement_plan_at_work: false
+        adjusted_gross_income: 120000
+    outputs:
+      ira_contribution_limit: 6500
+      ira_deduction: 6500
+
+  - name: "Age 55+ with catch-up and high AGI"
+    period: 2018-01
+    inputs:
+      person:
+        age: 65
+        traditional_ira_contributions: 6500
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 80000
+    outputs:
+      ira_contribution_limit: 6500
+      ira_phaseout_ratio: 0.5
+      ira_deduction: 3250
+
+  - name: "Employer plan, income below phase-out"
+    period: 2018-01
+    inputs:
+      person:
+        age: 35
+        traditional_ira_contributions: 5500
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 50000
+    outputs:
+      ira_phaseout_ratio: 0
+      ira_deduction: 5500
+
+  - name: "Employer plan, income above phase-out (fully phased out)"
+    period: 2018-01
+    inputs:
+      person:
+        age: 40
+        traditional_ira_contributions: 5500
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 100000
+    outputs:
+      ira_phaseout_ratio: 1
+      ira_deduction: 0
+
+  - name: "Employer plan, income at phase-out start"
+    period: 2018-01
+    inputs:
+      person:
+        age: 35
+        traditional_ira_contributions: 5500
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 63000
+    outputs:
+      ira_phaseout_ratio: 0
+      ira_deduction: 5500
+
+  - name: "Tax unit aggregation with two people"
+    period: 2018-01
+    inputs:
+      tax_unit:
+        members:
+          - age: 40
+            traditional_ira_contributions: 5500
+            has_retirement_plan_at_work: false
+            adjusted_gross_income: 75000
+          - age: 35
+            traditional_ira_contributions: 3000
+            has_retirement_plan_at_work: true
+            adjusted_gross_income: 60000
+    outputs:
+      total_ira_deduction: 8500

@@ -44,6 +44,40 @@ variable food_package:
     else:
         return "none"
   default: "none"
+  tests:
+    - name: "Not WIC eligible returns no package"
+      inputs: {is_wic_eligible: false}
+      expect: "none"
+    - name: "Child eligible receives Package III"
+      inputs: {is_wic_eligible: true, wic_category: "child"}
+      expect: "III"
+    - name: "Pregnant woman eligible receives Package IV"
+      inputs: {is_wic_eligible: true, wic_category: "pregnant_woman"}
+      expect: "IV"
+    - name: "Fully breastfeeding woman receives Package VII"
+      inputs: {is_wic_eligible: true, wic_category: "breastfeeding_woman", is_fully_breastfeeding: true}
+      expect: "VII"
+    - name: "Partially breastfeeding woman receives Package IV"
+      inputs: {is_wic_eligible: true, wic_category: "breastfeeding_woman", is_fully_breastfeeding: false}
+      expect: "IV"
+    - name: "Fully breastfeeding postpartum woman receives Package VI"
+      inputs: {is_wic_eligible: true, wic_category: "postpartum_woman", is_breastfeeding: true, is_fully_breastfeeding: true}
+      expect: "VI"
+    - name: "Partially breastfeeding postpartum woman receives Package IV"
+      inputs: {is_wic_eligible: true, wic_category: "postpartum_woman", is_breastfeeding: true, is_fully_breastfeeding: false}
+      expect: "IV"
+    - name: "Non-breastfeeding postpartum woman receives Package V"
+      inputs: {is_wic_eligible: true, wic_category: "postpartum_woman", is_breastfeeding: false}
+      expect: "V"
+    - name: "Fully breastfed infant receives Package I"
+      inputs: {is_wic_eligible: true, wic_category: "infant", is_fully_breastfed: true}
+      expect: "I"
+    - name: "Formula-fed infant receives Package II"
+      inputs: {is_wic_eligible: true, wic_category: "infant", is_fully_breastfed: false}
+      expect: "II"
+    - name: "Invalid category returns no package"
+      inputs: {is_wic_eligible: true, wic_category: "invalid"}
+      expect: "none"
 
 
 parameter priority_by_category:
@@ -79,6 +113,28 @@ variable wic_priority_level:
     if category == "postpartum_woman":
         return priority_by_category.postpartum_woman
     return 0
+  tests:
+    - name: "Not WIC eligible has zero priority"
+      inputs: {is_wic_eligible: false}
+      expect: 0
+    - name: "Pregnant woman receives priority by category parameter"
+      inputs: {is_wic_eligible: true, wic_category: "pregnant_woman"}
+      expect: 1
+    - name: "Breastfeeding woman receives priority by category parameter"
+      inputs: {is_wic_eligible: true, wic_category: "breastfeeding_woman"}
+      expect: 2
+    - name: "Infant receives priority by category parameter"
+      inputs: {is_wic_eligible: true, wic_category: "infant"}
+      expect: 3
+    - name: "Child receives priority by category parameter"
+      inputs: {is_wic_eligible: true, wic_category: "child"}
+      expect: 4
+    - name: "Postpartum woman receives priority by category parameter"
+      inputs: {is_wic_eligible: true, wic_category: "postpartum_woman"}
+      expect: 5
+    - name: "Unknown category has zero priority"
+      inputs: {is_wic_eligible: true, wic_category: "unknown"}
+      expect: 0
 
 variable wic_priority_description:
   entity: Person
@@ -102,6 +158,22 @@ variable wic_priority_description:
     if priority == priority_ranges.lower_max:
         return "Priority VII - Homeless/migrant certification"
     return "Not eligible for WIC"
+  tests:
+    - name: "Priority level 1 returns Priority I description"
+      inputs: {wic_priority_level: 1}
+      expect: "Priority I - High-risk pregnant/breastfeeding women and infants"
+    - name: "Priority level at standard_min returns Priority IV description"
+      inputs: {wic_priority_level: 3}
+      expect: "Priority IV - Pregnant/breastfeeding women and infants"
+    - name: "Priority level at standard_max returns Priority V description"
+      inputs: {wic_priority_level: 4}
+      expect: "Priority V - Children at dietary risk"
+    - name: "Priority level 0 returns not eligible message"
+      inputs: {wic_priority_level: 0}
+      expect: "Not eligible for WIC"
+    - name: "Unknown priority level returns not eligible message"
+      inputs: {wic_priority_level: 99}
+      expect: "Not eligible for WIC"
 
 variable is_wic_high_priority:
   entity: Person
@@ -111,6 +183,25 @@ variable is_wic_high_priority:
   formula: |
     priority = wic_priority_level
     return priority >= 1 and priority <= priority_ranges.high_max
+  tests:
+    - name: "Priority 1 is high priority"
+      inputs: {wic_priority_level: 1}
+      expect: true
+    - name: "Priority 2 is high priority"
+      inputs: {wic_priority_level: 2}
+      expect: true
+    - name: "Priority 3 is high priority"
+      inputs: {wic_priority_level: 3}
+      expect: true
+    - name: "Priority 0 is not high priority"
+      inputs: {wic_priority_level: 0}
+      expect: false
+    - name: "Priority 4 may be outside high priority range"
+      inputs: {wic_priority_level: 4}
+      expect: false
+    - name: "Priority 5 is not high priority"
+      inputs: {wic_priority_level: 5}
+      expect: false
 
 variable is_wic_standard_priority:
   entity: Person
@@ -120,6 +211,25 @@ variable is_wic_standard_priority:
   formula: |
     priority = wic_priority_level
     return priority >= priority_ranges.standard_min and priority <= priority_ranges.standard_max
+  tests:
+    - name: "Priority 3 is standard priority (at standard_min)"
+      inputs: {wic_priority_level: 3}
+      expect: true
+    - name: "Priority 4 is standard priority (at standard_max)"
+      inputs: {wic_priority_level: 4}
+      expect: true
+    - name: "Priority 2 is not standard priority (below standard_min)"
+      inputs: {wic_priority_level: 2}
+      expect: false
+    - name: "Priority 5 is not standard priority (above standard_max)"
+      inputs: {wic_priority_level: 5}
+      expect: false
+    - name: "Priority 0 is not standard priority"
+      inputs: {wic_priority_level: 0}
+      expect: false
+    - name: "Priority 1 is not standard priority"
+      inputs: {wic_priority_level: 1}
+      expect: false
 
 variable is_wic_lower_priority:
   entity: Person
@@ -129,3 +239,22 @@ variable is_wic_lower_priority:
   formula: |
     priority = wic_priority_level
     return priority >= priority_ranges.lower_min and priority <= priority_ranges.lower_max
+  tests:
+    - name: "Priority 5 is lower priority (at lower_min)"
+      inputs: {wic_priority_level: 5}
+      expect: true
+    - name: "Priority 6 is lower priority (at lower_max)"
+      inputs: {wic_priority_level: 6}
+      expect: true
+    - name: "Priority 4 is not lower priority (below lower_min)"
+      inputs: {wic_priority_level: 4}
+      expect: false
+    - name: "Priority 7 is not lower priority (above lower_max)"
+      inputs: {wic_priority_level: 7}
+      expect: false
+    - name: "Priority 0 is not lower priority"
+      inputs: {wic_priority_level: 0}
+      expect: false
+    - name: "Priority 3 is not lower priority"
+      inputs: {wic_priority_level: 3}
+      expect: false

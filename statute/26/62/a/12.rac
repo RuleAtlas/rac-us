@@ -2,13 +2,72 @@ text: """
 (12) Health savings account deduction.—The deduction allowed by
 section 223.
 """
-variable hsa_deduction:
+
+input has_hdhp:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Covered by HDHP"
+  description: "Whether taxpayer is covered by a High Deductible Health Plan"
+  default: False
+
+input hsa_coverage_type:
+  entity: TaxUnit
+  period: Year
+  dtype: Enum[self_only, family]
+  label: "HSA Coverage Type"
+  description: "Self-only or family coverage under HDHP"
+  default: self_only
+
+input hsa_contributions:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
-  label: "Total HSA Deduction"
-  description: "Combined HSA deduction for tax unit"
+  label: "HSA Contributions"
+  description: "Amount contributed to HSA during tax year"
+  default: 0
+
+input age:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "Age"
+  description: "Age of primary taxpayer"
+  default: 30
+
+parameter self_only_limit:
+  description: "HSA contribution limit for self-only coverage"
+  unit: "USD"
+  values:
+    2018-01-01: 3450
+    2024-01-01: 4150
+
+parameter family_limit:
+  description: "HSA contribution limit for family coverage"
+  unit: "USD"
+  values:
+    2018-01-01: 6900
+    2024-01-01: 8300
+
+parameter catch_up_age:
+  description: "Age at which catch-up contributions allowed (55+)"
+  values:
+    2003-01-01: 55
+
+parameter catch_up_amount:
+  description: "HSA catch-up contribution for age 55+"
+  unit: "USD"
+  values:
+    2003-01-01: 1000
+
+variable hsa_contribution_limit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "HSA Contribution Limit"
+  description: "Maximum allowable HSA contribution including catch-up"
   syntax: python
   formula: |
     # Must have HDHP to contribute
@@ -23,3 +82,137 @@ variable hsa_deduction:
     if age >= catch_up_age:
       return base_limit + catch_up_amount
     return base_limit
+
+variable hsa_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Total HSA Deduction"
+  description: "Combined HSA deduction for tax unit"
+  syntax: python
+  formula: |
+    # Must have HDHP to contribute
+    if not has_hdhp:
+      return 0
+    # Cannot deduct more than contributed or the annual limit
+    limit = hsa_contribution_limit
+    return min(hsa_contributions, limit)
+
+tests:
+  - name: "Self-only coverage, under age 55, at limit"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        has_hdhp: true
+        hsa_coverage_type: self_only
+        hsa_contributions: 4150
+        age: 40
+    outputs:
+      hsa_contribution_limit: 4150
+      hsa_deduction: 4150
+
+  - name: "Self-only coverage with catch-up at age 55"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        has_hdhp: true
+        hsa_coverage_type: self_only
+        hsa_contributions: 5150
+        age: 55
+    outputs:
+      hsa_contribution_limit: 5150
+      hsa_deduction: 5150
+
+  - name: "Family coverage, under age 55"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        has_hdhp: true
+        hsa_coverage_type: family
+        hsa_contributions: 8300
+        age: 45
+    outputs:
+      hsa_contribution_limit: 8300
+      hsa_deduction: 8300
+
+  - name: "Family coverage with catch-up at age 65"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        has_hdhp: true
+        hsa_coverage_type: family
+        hsa_contributions: 9300
+        age: 65
+    outputs:
+      hsa_contribution_limit: 9300
+      hsa_deduction: 9300
+
+  - name: "No HDHP, no deduction allowed"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        has_hdhp: false
+        hsa_coverage_type: self_only
+        hsa_contributions: 4150
+        age: 40
+    outputs:
+      hsa_contribution_limit: 0
+      hsa_deduction: 0
+
+  - name: "Contributions below limit"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        has_hdhp: true
+        hsa_coverage_type: self_only
+        hsa_contributions: 2000
+        age: 40
+    outputs:
+      hsa_deduction: 2000
+
+  - name: "Contributions exceed limit, capped"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        has_hdhp: true
+        hsa_coverage_type: self_only
+        hsa_contributions: 6000
+        age: 40
+    outputs:
+      hsa_deduction: 4150
+
+  - name: "Zero contributions"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        has_hdhp: true
+        hsa_coverage_type: family
+        hsa_contributions: 0
+        age: 50
+    outputs:
+      hsa_deduction: 0
+
+  - name: "2018 limits, self-only"
+    period: 2018-01
+    inputs:
+      tax_unit:
+        has_hdhp: true
+        hsa_coverage_type: self_only
+        hsa_contributions: 3450
+        age: 40
+    outputs:
+      hsa_contribution_limit: 3450
+      hsa_deduction: 3450
+
+  - name: "2018 limits, family with catch-up"
+    period: 2018-01
+    inputs:
+      tax_unit:
+        has_hdhp: true
+        hsa_coverage_type: family
+        hsa_contributions: 7900
+        age: 55
+    outputs:
+      hsa_contribution_limit: 7900
+      hsa_deduction: 7900

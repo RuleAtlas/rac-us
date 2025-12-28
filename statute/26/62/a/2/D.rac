@@ -13,6 +13,23 @@ education), computer equipment (including related software
 and services), other equipment, and supplementary materials
 used by the eligible educator in the classroom.
 """
+input is_eligible_educator:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Eligible Educator"
+  description: "Whether taxpayer is an eligible educator (K-12 teacher/instructor)"
+  default: False
+
+input educator_expenses:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Educator Expenses"
+  description: "Qualified out-of-pocket expenses for classroom supplies and professional development"
+  default: 0
+
 variable educator_expense_deduction:
   entity: TaxUnit
   period: Year
@@ -25,4 +42,85 @@ variable educator_expense_deduction:
     # Only eligible educators can claim this deduction
     if not is_eligible_educator:
       return 0
-    return educator_expenses
+    # Cannot deduct more than the maximum allowed
+    return min(educator_expenses, max_deduction)
+
+parameter max_deduction:
+  description: "Maximum educator expense deduction per taxpayer per year"
+  unit: "USD"
+  values:
+    2002-01-01: 250
+    2018-01-01: 300
+
+tests:
+  - name: "Eligible educator with qualifying expenses below limit"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        is_eligible_educator: true
+        educator_expenses: 250
+    outputs:
+      educator_expense_deduction: 250
+
+  - name: "Eligible educator with expenses above limit"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        is_eligible_educator: true
+        educator_expenses: 500
+    outputs:
+      educator_expense_deduction: 300
+
+  - name: "Eligible educator with no expenses"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        is_eligible_educator: true
+        educator_expenses: 0
+    outputs:
+      educator_expense_deduction: 0
+
+  - name: "Non-educator cannot claim deduction"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        is_eligible_educator: false
+        educator_expenses: 400
+    outputs:
+      educator_expense_deduction: 0
+
+  - name: "Educator with exactly limit amount (2018+)"
+    period: 2018-01
+    inputs:
+      tax_unit:
+        is_eligible_educator: true
+        educator_expenses: 300
+    outputs:
+      educator_expense_deduction: 300
+
+  - name: "Educator limit was lower in 2002"
+    period: 2002-01
+    inputs:
+      tax_unit:
+        is_eligible_educator: true
+        educator_expenses: 300
+    outputs:
+      educator_expense_deduction: 250
+
+  - name: "Educator with minimal expenses"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        is_eligible_educator: true
+        educator_expenses: 50
+    outputs:
+      educator_expense_deduction: 50
+
+  - name: "Large expenses capped at maximum"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        is_eligible_educator: true
+        educator_expenses: 1000
+    outputs:
+      educator_expense_deduction: 300

@@ -68,6 +68,37 @@ variable rmd_applicable_age:
     # Use cut() to look up applicable age from birth year thresholds
     return cut(birth_year, rmd_birth_year_thresholds)
   default: 0
+  tests:
+    - name: "Birth year 1950 (age 72 under SECURE 1.0)"
+      period: 2024
+      inputs:
+        birth_year: 1950
+      expect: 72
+    - name: "Birth year 1951 (age 72)"
+      period: 2024
+      inputs:
+        birth_year: 1951
+      expect: 72
+    - name: "Birth year 1952 (age 73 under SECURE 2.0)"
+      period: 2024
+      inputs:
+        birth_year: 1952
+      expect: 73
+    - name: "Birth year 1960 (age 73)"
+      period: 2024
+      inputs:
+        birth_year: 1960
+      expect: 73
+    - name: "Birth year 1961 onwards (age 75 under SECURE 2.0)"
+      period: 2024
+      inputs:
+        birth_year: 1961
+      expect: 75
+    - name: "Birth year 1970 (age 75)"
+      period: 2024
+      inputs:
+        birth_year: 1970
+      expect: 75
 
 variable has_reached_rmd_age:
   entity: Person
@@ -77,6 +108,43 @@ variable has_reached_rmd_age:
   description: "Whether individual has reached required minimum distribution age"
   formula: return age >= rmd_applicable_age
   default: false
+  tests:
+    - name: "Age 72, RMD age 72 (reached)"
+      period: 2024
+      inputs:
+        age: 72
+        rmd_applicable_age: 72
+      expect: true
+    - name: "Age 71, RMD age 72 (not reached)"
+      period: 2024
+      inputs:
+        age: 71
+        rmd_applicable_age: 72
+      expect: false
+    - name: "Age 73, RMD age 73 (reached)"
+      period: 2024
+      inputs:
+        age: 73
+        rmd_applicable_age: 73
+      expect: true
+    - name: "Age 75, RMD age 73 (exceeded)"
+      period: 2024
+      inputs:
+        age: 75
+        rmd_applicable_age: 73
+      expect: true
+    - name: "Age 74, RMD age 75 (not reached)"
+      period: 2024
+      inputs:
+        age: 74
+        rmd_applicable_age: 75
+      expect: false
+    - name: "Age 75, RMD age 75 (reached)"
+      period: 2024
+      inputs:
+        age: 75
+        rmd_applicable_age: 75
+      expect: true
 
 variable is_rmd_required:
   entity: Person
@@ -97,6 +165,71 @@ variable is_rmd_required:
         return False
     return True
   default: false
+  tests:
+    - name: "Basic case: reached RMD age, not working, has balance"
+      period: 2024
+      inputs:
+        has_reached_rmd_age: true
+        is_still_working_for_plan_sponsor: false
+        is_5_percent_owner: false
+        prior_year_401k_balance: 100000
+      expect: true
+    - name: "Not reached RMD age yet"
+      period: 2024
+      inputs:
+        has_reached_rmd_age: false
+        is_still_working_for_plan_sponsor: false
+        is_5_percent_owner: false
+        prior_year_401k_balance: 100000
+      expect: false
+    - name: "Still-working exception: working and not 5% owner"
+      period: 2024
+      inputs:
+        has_reached_rmd_age: true
+        is_still_working_for_plan_sponsor: true
+        is_5_percent_owner: false
+        prior_year_401k_balance: 100000
+      expect: false
+    - name: "Still-working exception does not apply: 5% owner"
+      period: 2024
+      inputs:
+        has_reached_rmd_age: true
+        is_still_working_for_plan_sponsor: true
+        is_5_percent_owner: true
+        prior_year_401k_balance: 100000
+      expect: true
+    - name: "No account balance"
+      period: 2024
+      inputs:
+        has_reached_rmd_age: true
+        is_still_working_for_plan_sponsor: false
+        is_5_percent_owner: false
+        prior_year_401k_balance: 0
+      expect: false
+    - name: "Negative account balance"
+      period: 2024
+      inputs:
+        has_reached_rmd_age: true
+        is_still_working_for_plan_sponsor: false
+        is_5_percent_owner: false
+        prior_year_401k_balance: -1000
+      expect: false
+    - name: "Retired with 5% ownership (still-working exception does not apply)"
+      period: 2024
+      inputs:
+        has_reached_rmd_age: true
+        is_still_working_for_plan_sponsor: false
+        is_5_percent_owner: true
+        prior_year_401k_balance: 500000
+      expect: true
+    - name: "Small account balance"
+      period: 2024
+      inputs:
+        has_reached_rmd_age: true
+        is_still_working_for_plan_sponsor: false
+        is_5_percent_owner: false
+        prior_year_401k_balance: 1
+      expect: true
 
 variable rmd_divisor:
   entity: Person
@@ -109,6 +242,47 @@ variable rmd_divisor:
     # Use cut() to look up divisor from Uniform Lifetime Table
     return cut(age, uniform_lifetime_table)
   default: 0
+  tests:
+    - name: "Age 72 (start of RMDs under prior law)"
+      period: 2024
+      inputs:
+        age: 72
+      expect: 27.4
+    - name: "Age 73"
+      period: 2024
+      inputs:
+        age: 73
+      expect: 26.5
+    - name: "Age 80 (mid-range)"
+      period: 2024
+      inputs:
+        age: 80
+      expect: 19.4
+    - name: "Age 85"
+      period: 2024
+      inputs:
+        age: 85
+      expect: 15.2
+    - name: "Age 90"
+      period: 2024
+      inputs:
+        age: 90
+      expect: 11.5
+    - name: "Age 95"
+      period: 2024
+      inputs:
+        age: 95
+      expect: 9.5
+    - name: "Age 100 (advanced age)"
+      period: 2024
+      inputs:
+        age: 100
+      expect: 5.6
+    - name: "Age 110 (very advanced age)"
+      period: 2024
+      inputs:
+        age: 110
+      expect: 2.0
 
 variable required_minimum_distribution:
   entity: Person
@@ -124,6 +298,56 @@ variable required_minimum_distribution:
     # RMD = Prior year balance / Life expectancy divisor
     return prior_year_401k_balance / rmd_divisor
   default: 0
+  tests:
+    - name: "RMD not required (age not reached)"
+      period: 2024
+      inputs:
+        is_rmd_required: false
+        prior_year_401k_balance: 100000
+        rmd_divisor: 27.4
+      expect: 0
+    - name: "Age 72 with $500,000 balance"
+      period: 2024
+      inputs:
+        is_rmd_required: true
+        prior_year_401k_balance: 500000
+        rmd_divisor: 27.4
+      expect: 18248.18
+    - name: "Age 73 with $300,000 balance"
+      period: 2024
+      inputs:
+        is_rmd_required: true
+        prior_year_401k_balance: 300000
+        rmd_divisor: 26.5
+      expect: 11320.75
+    - name: "Age 80 with $250,000 balance"
+      period: 2024
+      inputs:
+        is_rmd_required: true
+        prior_year_401k_balance: 250000
+        rmd_divisor: 19.4
+      expect: 12886.60
+    - name: "Age 85 with $1,000,000 balance"
+      period: 2024
+      inputs:
+        is_rmd_required: true
+        prior_year_401k_balance: 1000000
+        rmd_divisor: 15.2
+      expect: 65789.47
+    - name: "Age 90 with modest balance"
+      period: 2024
+      inputs:
+        is_rmd_required: true
+        prior_year_401k_balance: 100000
+        rmd_divisor: 11.5
+      expect: 8695.65
+    - name: "Age 100 with large balance"
+      period: 2024
+      inputs:
+        is_rmd_required: true
+        prior_year_401k_balance: 2000000
+        rmd_divisor: 5.6
+      expect: 357142.86
 
 variable rmd_shortfall_penalty:
   entity: Person
@@ -137,3 +361,16 @@ variable rmd_shortfall_penalty:
     # Input: Actual distribution taken
     # For now, assume full compliance
     return 0
+  tests:
+    - name: "Full compliance: no penalty"
+      period: 2024
+      inputs: {}
+      expect: 0
+    - name: "Placeholder: assumes full compliance"
+      period: 2024
+      inputs: {}
+      expect: 0
+    - name: "RMD penalty will depend on shortfall percentage (future implementation)"
+      period: 2024
+      inputs: {}
+      expect: 0

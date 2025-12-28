@@ -6,10 +6,138 @@ individuals.—In the case of an individual who is an employee within
 the meaning of section 401(c)(1), the deduction allowed by section 404.
 """
 
+input self_employment_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Self-Employment Income"
+  description: "Net self-employment income (Schedule C)"
+  default: 0
+
+input self_employed_pension_contributions:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Self-Employed Pension Contributions"
+  description: "Contributions to SEP, SIMPLE, Solo 401(k), or other qualified self-employed plans"
+  default: 0
+
+parameter sep_contribution_rate:
+  description: "Maximum contribution rate for SEP plans (25% of net self-employment income)"
+  values:
+    1996-01-01: 0.25
+
+parameter solo_401k_employee_limit:
+  description: "Employee deferral limit for Solo 401(k) plans"
+  unit: "USD"
+  values:
+    2018-01-01: 18500
+    2024-01-01: 23500
+
+parameter solo_401k_employer_limit:
+  description: "Employer contribution limit for Solo 401(k) plans (25% of net SE income)"
+  values:
+    1996-01-01: 0.25
+
+variable self_employed_pension_limit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Self-Employed Pension Contribution Limit"
+  description: "Maximum deductible pension contribution based on self-employment income"
+  syntax: python
+  formula: |
+    # Maximum is generally 25% of net self-employment income
+    # Capped at annual limits for specific plan types
+    max_contribution = self_employment_income * sep_contribution_rate
+    return min(max_contribution, solo_401k_employee_limit + int(solo_401k_employer_limit * self_employment_income))
+
 variable self_employed_pension_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: USD
+  unit: "USD"
   label: "Self-Employed Pension Deduction"
   description: "Contributions to SEP, SIMPLE, or qualified plans by self-employed per 26 USC 62(a)(6)"
+  syntax: python
+  formula: |
+    # Cannot deduct more than contributed or the annual limit
+    limit = self_employed_pension_limit
+    return min(self_employed_pension_contributions, limit)
+
+tests:
+  - name: "SEP contribution at limit"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        self_employment_income: 100000
+        self_employed_pension_contributions: 25000
+    outputs:
+      self_employed_pension_deduction: 25000
+
+  - name: "No self-employment income"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        self_employment_income: 0
+        self_employed_pension_contributions: 10000
+    outputs:
+      self_employed_pension_limit: 0
+      self_employed_pension_deduction: 0
+
+  - name: "Contribution below limit"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        self_employment_income: 100000
+        self_employed_pension_contributions: 15000
+    outputs:
+      self_employed_pension_deduction: 15000
+
+  - name: "Contribution exceeds limit, capped"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        self_employment_income: 100000
+        self_employed_pension_contributions: 35000
+    outputs:
+      self_employed_pension_deduction: 25000
+
+  - name: "High self-employment income"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        self_employment_income: 200000
+        self_employed_pension_contributions: 50000
+    outputs:
+      self_employed_pension_deduction: 50000
+
+  - name: "Low self-employment income"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        self_employment_income: 30000
+        self_employed_pension_contributions: 7500
+    outputs:
+      self_employed_pension_deduction: 7500
+
+  - name: "25% of SE income rule"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        self_employment_income: 80000
+        self_employed_pension_contributions: 20000
+    outputs:
+      self_employed_pension_deduction: 20000
+
+  - name: "No contributions"
+    period: 2024-01
+    inputs:
+      tax_unit:
+        self_employment_income: 100000
+        self_employed_pension_contributions: 0
+    outputs:
+      self_employed_pension_deduction: 0
