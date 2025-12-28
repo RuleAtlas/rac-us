@@ -11,6 +11,22 @@ input taxable_self_employment_income:
   label: "Taxable Self-Employment Income"
   description: "Self-employment income subject to SE tax (gross * 0.9235)"
   default: 0
+  tests:
+    - name: "Typical self-employed income"
+      period: 2024
+      inputs:
+        taxable_self_employment_income: 50000
+      expect: 50000
+    - name: "Zero self-employment income"
+      period: 2024
+      inputs:
+        taxable_self_employment_income: 0
+      expect: 0
+    - name: "High self-employment income"
+      period: 2024
+      inputs:
+        taxable_self_employment_income: 200000
+      expect: 200000
 
 variable self_employment_tax:
   imports:
@@ -25,6 +41,22 @@ variable self_employment_tax:
   formula: |
     # taxable_self_employment_income from PE is already gross * 0.9235
     return max(0, taxable_self_employment_income)
+  tests:
+    - name: "Positive self-employment income"
+      period: 2024
+      inputs:
+        taxable_self_employment_income: 75000
+      expect: 75000
+    - name: "Negative income returns zero"
+      period: 2024
+      inputs:
+        taxable_self_employment_income: -10000
+      expect: 0
+    - name: "Zero income"
+      period: 2024
+      inputs:
+        taxable_self_employment_income: 0
+      expect: 0
 
 variable base_self_employment_tax:
   entity: Person
@@ -34,6 +66,25 @@ variable base_self_employment_tax:
   label: "Base Self-Employment Tax"
   description: "OASDI + base HI taxes on self-employment income per 1401(a) and 1401(b)(1)"
   formula: return self_employment_social_security_tax + self_employment_medicare_tax
+  tests:
+    - name: "Social Security (12.4%) and Medicare (2.9%) combined"
+      period: 2024
+      inputs:
+        self_employment_social_security_tax: 6200
+        self_employment_medicare_tax: 1450
+      expect: 7650
+    - name: "Zero SE taxes when no income"
+      period: 2024
+      inputs:
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+      expect: 0
+    - name: "High earner with wage base limit on SS"
+      period: 2024
+      inputs:
+        self_employment_social_security_tax: 9932.40
+        self_employment_medicare_tax: 2900
+      expect: 12832.40
 
 variable self_employment_tax:
   entity: Person
@@ -48,3 +99,19 @@ variable self_employment_tax:
     # Note: Additional Medicare Tax (0.9% above threshold) is calculated
     # separately at TaxUnit level and added in final tax computation
     return base_self_employment_tax
+  tests:
+    - name: "Standard SE tax calculation for moderate income"
+      period: 2024
+      inputs:
+        base_self_employment_tax: 8900
+      expect: 8900
+    - name: "High earner with substantial SE tax"
+      period: 2024
+      inputs:
+        base_self_employment_tax: 15732.40
+      expect: 15732.40
+    - name: "Zero SE tax when no self-employment income"
+      period: 2024
+      inputs:
+        base_self_employment_tax: 0
+      expect: 0

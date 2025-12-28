@@ -20,6 +20,63 @@ variable adjusted_section_22_amount:
     after_agi = max(0, after_nontaxable - sec22_agi_reduction)
     return after_agi
   default: 0
+  tests:
+    - name: "No qualified individuals, no adjustment"
+      period: 2024-01-01
+      inputs:
+        sec22_initial_amount: 0
+        sec22_nontaxable_reduction: 0
+        sec22_agi_reduction: 0
+      expect: 0
+    - name: "Initial amount with no reductions"
+      period: 2024-01-01
+      inputs:
+        sec22_initial_amount: 5000
+        sec22_nontaxable_reduction: 0
+        sec22_agi_reduction: 0
+      expect: 5000
+    - name: "Initial amount reduced by nontaxable income only"
+      period: 2024-01-01
+      inputs:
+        sec22_initial_amount: 5000
+        sec22_nontaxable_reduction: 1500
+        sec22_agi_reduction: 0
+      expect: 3500
+    - name: "Initial amount reduced by AGI excess only"
+      period: 2024-01-01
+      inputs:
+        sec22_initial_amount: 5000
+        sec22_nontaxable_reduction: 0
+        sec22_agi_reduction: 1000
+      expect: 4000
+    - name: "Initial amount with both reductions applied"
+      period: 2024-01-01
+      inputs:
+        sec22_initial_amount: 5000
+        sec22_nontaxable_reduction: 1500
+        sec22_agi_reduction: 1000
+      expect: 2500
+    - name: "Reductions exceed initial amount, capped at zero"
+      period: 2024-01-01
+      inputs:
+        sec22_initial_amount: 5000
+        sec22_nontaxable_reduction: 3000
+        sec22_agi_reduction: 3000
+      expect: 0
+    - name: "Joint return both qualified, higher initial amount"
+      period: 2024-01-01
+      inputs:
+        sec22_initial_amount: 7500
+        sec22_nontaxable_reduction: 2000
+        sec22_agi_reduction: 1500
+      expect: 4000
+    - name: "Married filing separately, lowest initial amount"
+      period: 2024-01-01
+      inputs:
+        sec22_initial_amount: 3750
+        sec22_nontaxable_reduction: 500
+        sec22_agi_reduction: 500
+      expect: 2750
 
 # 26 USC 22(d)(2) - AGI Reduction
 #
@@ -46,6 +103,49 @@ variable agi_reduction:
     # Reduction is 50% of excess
     return excess_agi * agi_reduction_rate
   default: 0
+  tests:
+    - name: "AGI below threshold, no reduction"
+      period: 2024-01-01
+      inputs:
+        adjusted_gross_income: 5000
+        sec22_agi_threshold: 7500
+        agi_reduction_rate: 0.5
+      expect: 0
+    - name: "AGI equal to threshold, no reduction"
+      period: 2024-01-01
+      inputs:
+        adjusted_gross_income: 7500
+        sec22_agi_threshold: 7500
+        agi_reduction_rate: 0.5
+      expect: 0
+    - name: "AGI exceeds threshold by $2000, 50% reduction"
+      period: 2024-01-01
+      inputs:
+        adjusted_gross_income: 9500
+        sec22_agi_threshold: 7500
+        agi_reduction_rate: 0.5
+      expect: 1000
+    - name: "Significant AGI excess with 50% reduction rate"
+      period: 2024-01-01
+      inputs:
+        adjusted_gross_income: 15000
+        sec22_agi_threshold: 7500
+        agi_reduction_rate: 0.5
+      expect: 3750
+    - name: "High income single filer"
+      period: 2024-01-01
+      inputs:
+        adjusted_gross_income: 20000
+        sec22_agi_threshold: 7500
+        agi_reduction_rate: 0.5
+      expect: 6250
+    - name: "Joint return higher threshold"
+      period: 2024-01-01
+      inputs:
+        adjusted_gross_income: 15000
+        sec22_agi_threshold: 10000
+        agi_reduction_rate: 0.5
+      expect: 2500
 
 
 variable agi_threshold:
@@ -67,6 +167,47 @@ variable agi_threshold:
     # Single, head of household, surviving spouse
     return agi_threshold_single
   default: 7500
+  tests:
+    - name: "Single filer, standard threshold"
+      period: 2024-01-01
+      inputs:
+        filing_status: SINGLE
+        agi_threshold_single: 7500
+        agi_threshold_joint: 10000
+        agi_threshold_separate: 5000
+      expect: 7500
+    - name: "Head of household, uses single threshold"
+      period: 2024-01-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        agi_threshold_single: 7500
+        agi_threshold_joint: 10000
+        agi_threshold_separate: 5000
+      expect: 7500
+    - name: "Surviving spouse, uses single threshold"
+      period: 2024-01-01
+      inputs:
+        filing_status: SURVIVING_SPOUSE
+        agi_threshold_single: 7500
+        agi_threshold_joint: 10000
+        agi_threshold_separate: 5000
+      expect: 7500
+    - name: "Married filing jointly, higher threshold"
+      period: 2024-01-01
+      inputs:
+        filing_status: JOINT
+        agi_threshold_single: 7500
+        agi_threshold_joint: 10000
+        agi_threshold_separate: 5000
+      expect: 10000
+    - name: "Married filing separately, lowest threshold"
+      period: 2024-01-01
+      inputs:
+        filing_status: SEPARATE
+        agi_threshold_single: 7500
+        agi_threshold_joint: 10000
+        agi_threshold_separate: 5000
+      expect: 5000
 
 
 variable nontaxable_reduction:
@@ -90,3 +231,76 @@ variable nontaxable_reduction:
     disability_reduction = taxable_disability_income
     return social_security_reduction + pension_reduction + disability_reduction
   default: 0
+  tests:
+    - name: "No reduction income, all zero"
+      period: 2024-01-01
+      inputs:
+        nontaxable_social_security: 0
+        nontaxable_railroad_retirement: 0
+        taxable_pension_annuity: 0
+        taxable_disability_income: 0
+      expect: 0
+    - name: "Nontaxable Social Security only"
+      period: 2024-01-01
+      inputs:
+        nontaxable_social_security: 2000
+        nontaxable_railroad_retirement: 0
+        taxable_pension_annuity: 0
+        taxable_disability_income: 0
+      expect: 2000
+    - name: "Nontaxable railroad retirement only"
+      period: 2024-01-01
+      inputs:
+        nontaxable_social_security: 0
+        nontaxable_railroad_retirement: 1500
+        taxable_pension_annuity: 0
+        taxable_disability_income: 0
+      expect: 1500
+    - name: "Taxable pension/annuity only"
+      period: 2024-01-01
+      inputs:
+        nontaxable_social_security: 0
+        nontaxable_railroad_retirement: 0
+        taxable_pension_annuity: 3000
+        taxable_disability_income: 0
+      expect: 3000
+    - name: "Taxable disability income only"
+      period: 2024-01-01
+      inputs:
+        nontaxable_social_security: 0
+        nontaxable_railroad_retirement: 0
+        taxable_pension_annuity: 0
+        taxable_disability_income: 2500
+      expect: 2500
+    - name: "Social Security and railroad retirement combined"
+      period: 2024-01-01
+      inputs:
+        nontaxable_social_security: 2000
+        nontaxable_railroad_retirement: 1000
+        taxable_pension_annuity: 0
+        taxable_disability_income: 0
+      expect: 3000
+    - name: "Pensions and disability combined"
+      period: 2024-01-01
+      inputs:
+        nontaxable_social_security: 0
+        nontaxable_railroad_retirement: 0
+        taxable_pension_annuity: 2500
+        taxable_disability_income: 1500
+      expect: 4000
+    - name: "All reduction types combined"
+      period: 2024-01-01
+      inputs:
+        nontaxable_social_security: 2000
+        nontaxable_railroad_retirement: 1000
+        taxable_pension_annuity: 1500
+        taxable_disability_income: 1000
+      expect: 5500
+    - name: "Large reduction amounts"
+      period: 2024-01-01
+      inputs:
+        nontaxable_social_security: 3000
+        nontaxable_railroad_retirement: 2000
+        taxable_pension_annuity: 4000
+        taxable_disability_income: 3000
+      expect: 12000

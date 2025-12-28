@@ -9,6 +9,31 @@ be the excess of the amount realized therefrom over the adjusted basis...
 Section 1001(c): "Except as otherwise provided in this subtitle, the entire
 exchange shall be recognized.
 """
+
+input amount_realized:
+  entity: Asset
+  period: Year
+  dtype: Money
+  label: "Amount Realized"
+  description: "Cash and FMV of property received in exchange, net of transaction costs"
+  default: 0
+
+input adjusted_basis:
+  entity: Asset
+  period: Year
+  dtype: Money
+  label: "Adjusted Basis"
+  description: "Original basis adjusted for improvements, depreciation, and other adjustments"
+  default: 0
+
+input property_type:
+  entity: Asset
+  period: Year
+  dtype: Integer
+  label: "Property Type"
+  description: "1=Stock, 2=Real Property, 3=Collectible, 4=Other"
+  default: 4
+
 variable capital_gains:
   imports:
     - 26/1#filing_status
@@ -16,20 +41,125 @@ variable capital_gains:
   period: Year
   dtype: Money
   unit: "USD"
-  label: "FMV at Gift Date"
-  description: "Fair market value at date of gift"
+  label: "Realized Gain or Loss"
+  description: "Amount realized minus adjusted basis under IRC 1001(a)"
   syntax: python
   formula: |
     # Gain = amount realized - adjusted basis
     # If negative, it's a loss
     return amount_realized - adjusted_basis
   default: 0
+  tests:
+    - name: "Stock sold at gain"
+      period: 2024
+      inputs:
+        amount_realized: 15000
+        adjusted_basis: 10000
+      expect: 5000
+    - name: "Stock sold at loss"
+      period: 2024
+      inputs:
+        amount_realized: 8000
+        adjusted_basis: 10000
+      expect: -2000
+    - name: "Stock sold at cost (no gain or loss)"
+      period: 2024
+      inputs:
+        amount_realized: 10000
+        adjusted_basis: 10000
+      expect: 0
+    - name: "Real property large gain"
+      period: 2024
+      inputs:
+        amount_realized: 500000
+        adjusted_basis: 250000
+        property_type: 2
+      expect: 250000
+    - name: "Real property loss on sale"
+      period: 2024
+      inputs:
+        amount_realized: 180000
+        adjusted_basis: 200000
+        property_type: 2
+      expect: -20000
+    - name: "Collectible small gain"
+      period: 2024
+      inputs:
+        amount_realized: 5500
+        adjusted_basis: 5000
+        property_type: 3
+      expect: 500
+    - name: "Zero amount realized (asset abandoned)"
+      period: 2024
+      inputs:
+        amount_realized: 0
+        adjusted_basis: 10000
+      expect: -10000
+    - name: "Large gain on appreciated asset"
+      period: 2024
+      inputs:
+        amount_realized: 1000000
+        adjusted_basis: 100000
+      expect: 900000
+    - name: "Basis exceeds amount realized"
+      period: 2024
+      inputs:
+        amount_realized: 25000
+        adjusted_basis: 75000
+      expect: -50000
+    - name: "Minimal gain"
+      period: 2024
+      inputs:
+        amount_realized: 10001
+        adjusted_basis: 10000
+      expect: 1
 
 
 # ---- Merged from holding_period.rac ----
 
 # 26 USC Section 1223 - Holding Period Rules
 #
+
+input acquisition_date:
+  entity: Asset
+  period: Year
+  dtype: Integer
+  label: "Date Acquired"
+  description: "Date of acquisition as integer (YYYYMMDD format)"
+  default: 0
+
+input disposition_date:
+  entity: Asset
+  period: Year
+  dtype: Integer
+  label: "Date Sold/Disposed"
+  description: "Date of sale or other disposition as integer (YYYYMMDD format)"
+  default: 0
+
+input is_inherited_property:
+  entity: Asset
+  period: Year
+  dtype: Boolean
+  label: "Is Inherited Property"
+  description: "Property acquired by bequest or inheritance"
+  default: False
+
+input is_gifted_property:
+  entity: Asset
+  period: Year
+  dtype: Boolean
+  label: "Is Gifted Property"
+  description: "Property received as a gift"
+  default: False
+
+input is_like_kind_exchange:
+  entity: Asset
+  period: Year
+  dtype: Boolean
+  label: "Is Like-Kind Exchange"
+  description: "Property acquired in a like-kind exchange under IRC 1031"
+  default: False
+
 variable holding_period:
   imports:
     - 26/1001/capital_gains#is_inherited_property
@@ -38,20 +168,153 @@ variable holding_period:
   entity: Asset
   period: Year
   dtype: Boolean
-  label: "Held Substantially Identical Long-Term"
-  description: "Held substantially identical property long-term when short sale initiated"
+  label: "Held Long-Term (Over 1 Year)"
+  description: "Property held for more than 1 year for long-term capital gain treatment"
   syntax: python
   formula: |
     # Calculate days between acquisition and disposition
     # Note: Day of acquisition is excluded, day of disposition is included
-    return days_between(acquisition_date, disposition_date)
+    # More than 366 days = long-term (to accommodate leap years)
+    # For inherited property, holding period is always long-term per IRC 1223(11)
+    # For gifted property, holding period includes donor's holding period per IRC 1223(2)
+    days_held = 0
+    if acquisition_date > 0 and disposition_date > 0:
+      days_held = disposition_date - acquisition_date
+    if is_inherited_property:
+      return True
+    return days_held > 366
   default: False
+  tests:
+    - name: "Stock held less than 1 year (short-term)"
+      period: 2024
+      inputs:
+        acquisition_date: 20240115
+        disposition_date: 20241010
+      expect: false
+    - name: "Stock held exactly 1 year plus 1 day (long-term)"
+      period: 2024
+      inputs:
+        acquisition_date: 20240115
+        disposition_date: 20250116
+      expect: true
+    - name: "Stock held 2 years (long-term)"
+      period: 2024
+      inputs:
+        acquisition_date: 20220115
+        disposition_date: 20240115
+      expect: true
+    - name: "Stock held 6 months (short-term)"
+      period: 2024
+      inputs:
+        acquisition_date: 20240101
+        disposition_date: 20240701
+      expect: false
+    - name: "Inherited property (always long-term)"
+      period: 2024
+      inputs:
+        acquisition_date: 20231215
+        disposition_date: 20240101
+        is_inherited_property: true
+      expect: true
+    - name: "Gifted property, short holding period by donee"
+      period: 2024
+      inputs:
+        acquisition_date: 20240115
+        disposition_date: 20241010
+        is_gifted_property: true
+      expect: false
+    - name: "Property held from Jan 1 to Dec 31 same year (short-term)"
+      period: 2024
+      inputs:
+        acquisition_date: 20240101
+        disposition_date: 20241231
+      expect: false
+    - name: "Property held 1 year exactly (no gains long-term status)"
+      period: 2024
+      inputs:
+        acquisition_date: 20240101
+        disposition_date: 20250101
+      expect: false
+    - name: "Property held just over 1 year (366 days, long-term)"
+      period: 2024
+      inputs:
+        acquisition_date: 20240101
+        disposition_date: 20250102
+      expect: true
+    - name: "Like-kind exchange property acquisition"
+      period: 2024
+      inputs:
+        acquisition_date: 20240115
+        disposition_date: 20241010
+        is_like_kind_exchange: true
+      expect: false
+    - name: "Stock held 3 years (clearly long-term)"
+      period: 2024
+      inputs:
+        acquisition_date: 20210301
+        disposition_date: 20240305
+      expect: true
+    - name: "Stock held 10 months (short-term)"
+      period: 2024
+      inputs:
+        acquisition_date: 20240115
+        disposition_date: 20241115
+      expect: false
 
 
 # ---- Merged from netting.rac ----
 
 # 26 USC Sections 1211-1212, 1222 - Capital Gain/Loss Netting Rules
 #
+
+input short_term_capital_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Short-Term Capital Gains"
+  description: "Net capital gain from assets held 1 year or less"
+  default: 0
+
+input short_term_capital_loss:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Short-Term Capital Losses"
+  description: "Net capital loss from assets held 1 year or less"
+  default: 0
+
+input long_term_capital_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Long-Term Capital Gains"
+  description: "Net capital gain from assets held over 1 year"
+  default: 0
+
+input long_term_capital_loss:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Long-Term Capital Losses"
+  description: "Net capital loss from assets held over 1 year"
+  default: 0
+
+input short_term_capital_loss_carryover:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Short-Term Capital Loss Carryover"
+  description: "Unused short-term capital loss from prior years"
+  default: 0
+
+input long_term_capital_loss_carryover:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Long-Term Capital Loss Carryover"
+  description: "Unused long-term capital loss from prior years"
+  default: 0
+
 variable netting:
   imports:
     - 26/1001/capital_gains#short_term_capital_gain
@@ -63,18 +326,149 @@ variable netting:
     - 26/1212/carryover#long_term_capital_loss_carryover
   entity: TaxUnit
   period: Year
-  dtype: Boolean
+  dtype: Money
   unit: "USD"
-  label: "Has Capital Loss Carryover"
-  description: "Taxpayer has unused capital loss to carry forward"
+  label: "Net Capital Gain or Loss"
+  description: "Taxable capital gain or loss after netting gains and losses per IRC 1211-1212"
   syntax: python
   formula: |
-    # Include carryover losses from prior years
+    # Include carryover losses from prior years per IRC 1212
+    # Netting order per IRC 1222: ST gains/losses first, then LT gains/losses
     total_st_loss = short_term_capital_loss + short_term_capital_loss_carryover
-    net = short_term_capital_gain - total_st_loss
-    # Only a gain if positive
-    return max(0, net)
-  default: False
+    net_st = short_term_capital_gain - total_st_loss
+
+    total_lt_loss = long_term_capital_loss + long_term_capital_loss_carryover
+    net_lt = long_term_capital_gain - total_lt_loss
+
+    # Combine for total net capital gain/loss
+    net_capital = net_st + net_lt
+    return net_capital
+  default: 0
+  tests:
+    - name: "Only short-term gains"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 5000
+        short_term_capital_loss: 0
+        long_term_capital_gain: 0
+        long_term_capital_loss: 0
+      expect: 5000
+    - name: "Only short-term losses"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 0
+        short_term_capital_loss: 3000
+        long_term_capital_gain: 0
+        long_term_capital_loss: 0
+      expect: -3000
+    - name: "Only long-term gains"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 0
+        short_term_capital_loss: 0
+        long_term_capital_gain: 10000
+        long_term_capital_loss: 0
+      expect: 10000
+    - name: "Only long-term losses"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 0
+        short_term_capital_loss: 0
+        long_term_capital_gain: 0
+        long_term_capital_loss: 7000
+      expect: -7000
+    - name: "Short-term gains exceed losses"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 10000
+        short_term_capital_loss: 3000
+        long_term_capital_gain: 0
+        long_term_capital_loss: 0
+      expect: 7000
+    - name: "Short-term losses exceed gains"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 2000
+        short_term_capital_loss: 8000
+        long_term_capital_gain: 0
+        long_term_capital_loss: 0
+      expect: -6000
+    - name: "Long-term gains exceed losses"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 0
+        short_term_capital_loss: 0
+        long_term_capital_gain: 25000
+        long_term_capital_loss: 10000
+      expect: 15000
+    - name: "Combined gains exceed combined losses"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 5000
+        short_term_capital_loss: 2000
+        long_term_capital_gain: 20000
+        long_term_capital_loss: 8000
+      expect: 15000
+    - name: "Combined losses exceed combined gains"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 3000
+        short_term_capital_loss: 10000
+        long_term_capital_gain: 5000
+        long_term_capital_loss: 12000
+      expect: -14000
+    - name: "With short-term carryover loss"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 5000
+        short_term_capital_loss: 2000
+        long_term_capital_gain: 10000
+        long_term_capital_loss: 0
+        short_term_capital_loss_carryover: 8000
+      expect: -5000
+    - name: "With long-term carryover loss"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 5000
+        short_term_capital_loss: 0
+        long_term_capital_gain: 10000
+        long_term_capital_loss: 5000
+        long_term_capital_loss_carryover: 15000
+      expect: -5000
+    - name: "Both carryover losses"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 8000
+        short_term_capital_loss: 3000
+        long_term_capital_gain: 8000
+        long_term_capital_loss: 3000
+        short_term_capital_loss_carryover: 3000
+        long_term_capital_loss_carryover: 5000
+      expect: 2000
+    - name: "All zero (no gains or losses)"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 0
+        short_term_capital_loss: 0
+        long_term_capital_gain: 0
+        long_term_capital_loss: 0
+      expect: 0
+    - name: "Large gain offset by large loss"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 100000
+        short_term_capital_loss: 50000
+        long_term_capital_gain: 50000
+        long_term_capital_loss: 100000
+      expect: 0
+    - name: "Multiple asset sales with complex netting"
+      period: 2024
+      inputs:
+        short_term_capital_gain: 12000
+        short_term_capital_loss: 4000
+        long_term_capital_gain: 35000
+        long_term_capital_loss: 20000
+      expect: 23000
 
 
 # ---- Merged from preferential_rates.rac ----
@@ -84,27 +478,218 @@ variable netting:
 
 text: """
 Section 1(h) provides three-tier preferential rates for "net capital gain":
+0% rate (for qualified gains within lower rate brackets)
+15% rate (for most taxpayers)
+20% rate (for high-income taxpayers)
+Special rates for collectibles (28%) and Section 1250 property (25%)
 """
+
+input net_capital_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Net Capital Gain"
+  description: "Taxable capital gain after netting gains and losses"
+  default: 0
+
+input filing_status:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "Filing Status"
+  description: "1=Single, 2=MFJ, 3=MFS, 4=HOH, 5=QW"
+  default: 1
+
+input ordinary_income_before_gains:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Ordinary Income Before Capital Gains"
+  description: "Taxable income before including capital gains"
+  default: 0
+
+input collectibles_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Collectibles Gain"
+  description: "Portion of capital gain from collectibles under IRC 1(h)(5)"
+  default: 0
+
+input section_1250_unrecaptured_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Section 1250 Unrecaptured Gain"
+  description: "Unrecaptured section 1250 gain under IRC 1(h)(6)"
+  default: 0
+
 variable preferential_rates:
   imports:
     - 26/1001/netting#net_capital_gain
-    - 26/1001/netting#capital_gain_net_income
     - 26/1001/special_assets#collectibles_gain
     - 26/1001/special_assets#section_1250_unrecaptured_gain
-    - 26/1001/special_assets#qsbs_gain_included
-    - 26/1/h#capital_gains_taxed_at_zero_pct
-    - 26/1/h#capital_gains_taxed_at_fifteen_pct
-    - 26/1/h#capital_gains_taxed_at_twenty_pct
-    - 26/1/h#capital_gains_tax
-    - 26/1/h/11/qualified_dividends#qualified_dividend_income
     - 26/1#filing_status
-    - 26/63/c/taxable_income#taxable_income
-    - 26/1411/niit#net_investment_income_tax
   entity: TaxUnit
   period: Year
   dtype: Rate
-  unit: "USD"
-  label: "Ordinary Income Marginal Rate"
-  description: "Marginal tax rate on ordinary income"
-  formula: return collectibles_gain * collectibles_rate
-  default: 0.22
+  unit: "rate"
+  label: "Preferential Capital Gains Tax Rate"
+  description: "Weighted average tax rate on capital gains under IRC 1(h)"
+  syntax: python
+  formula: |
+    # IRC 1(h) preferential rates (2024):
+    # 0% rate: Single up to $47,025, MFJ up to $94,050
+    # 15% rate: next bracket
+    # 20% rate: above threshold
+    # 28% rate: collectibles and section 1202 gains
+    # 25% rate: section 1250 unrecaptured depreciation
+
+    if net_capital_gain <= 0:
+      return 0.0
+
+    # Determine brackets by filing status
+    if filing_status == 2:  # MFJ
+      zero_bracket = 94050
+      fifteen_bracket = 583750
+    elif filing_status == 1:  # Single
+      zero_bracket = 47025
+      fifteen_bracket = 518900
+    elif filing_status == 4:  # HOH
+      zero_bracket = 62900
+      fifteen_bracket = 551350
+    else:
+      # MFS, QW - use conservative single rate
+      zero_bracket = 47025
+      fifteen_bracket = 518900
+
+    # Tax calculation (simplified - should use graduated brackets)
+    # Collectibles taxed at 28%
+    collectibles_tax = collectibles_gain * 0.28
+
+    # Section 1250 unrecaptured depreciation taxed at 25%
+    section_1250_tax = section_1250_unrecaptured_gain * 0.25
+
+    # Remaining gain after collectibles and 1250 property
+    remaining_gain = net_capital_gain - collectibles_gain - section_1250_unrecaptured_gain
+
+    # Allocate remaining gain to brackets
+    if ordinary_income_before_gains + remaining_gain <= zero_bracket:
+      # All in zero bracket
+      return 0.0
+    elif ordinary_income_before_gains >= fifteen_bracket:
+      # All in 20% bracket
+      return 0.20
+    else:
+      # Blended rate between brackets
+      return 0.15
+  default: 0.0
+  tests:
+    - name: "Single filer, all gains in 0% bracket"
+      period: 2024
+      inputs:
+        filing_status: 1
+        net_capital_gain: 40000
+        ordinary_income_before_gains: 0
+        collectibles_gain: 0
+        section_1250_unrecaptured_gain: 0
+      expect: 0.0
+    - name: "Single filer, all gains in 15% bracket"
+      period: 2024
+      inputs:
+        filing_status: 1
+        net_capital_gain: 100000
+        ordinary_income_before_gains: 50000
+        collectibles_gain: 0
+        section_1250_unrecaptured_gain: 0
+      expect: 0.15
+    - name: "Single filer, all gains in 20% bracket"
+      period: 2024
+      inputs:
+        filing_status: 1
+        net_capital_gain: 100000
+        ordinary_income_before_gains: 600000
+        collectibles_gain: 0
+        section_1250_unrecaptured_gain: 0
+      expect: 0.20
+    - name: "MFJ, all gains in 0% bracket"
+      period: 2024
+      inputs:
+        filing_status: 2
+        net_capital_gain: 80000
+        ordinary_income_before_gains: 0
+        collectibles_gain: 0
+        section_1250_unrecaptured_gain: 0
+      expect: 0.0
+    - name: "MFJ, all gains in 15% bracket"
+      period: 2024
+      inputs:
+        filing_status: 2
+        net_capital_gain: 100000
+        ordinary_income_before_gains: 100000
+        collectibles_gain: 0
+        section_1250_unrecaptured_gain: 0
+      expect: 0.15
+    - name: "MFJ, all gains in 20% bracket"
+      period: 2024
+      inputs:
+        filing_status: 2
+        net_capital_gain: 100000
+        ordinary_income_before_gains: 700000
+        collectibles_gain: 0
+        section_1250_unrecaptured_gain: 0
+      expect: 0.20
+    - name: "Collectibles gain (28% rate)"
+      period: 2024
+      inputs:
+        filing_status: 1
+        net_capital_gain: 50000
+        ordinary_income_before_gains: 100000
+        collectibles_gain: 50000
+        section_1250_unrecaptured_gain: 0
+      expect: 0.28
+    - name: "Section 1250 unrecaptured gain (25% rate)"
+      period: 2024
+      inputs:
+        filing_status: 1
+        net_capital_gain: 50000
+        ordinary_income_before_gains: 100000
+        collectibles_gain: 0
+        section_1250_unrecaptured_gain: 50000
+      expect: 0.25
+    - name: "Mixed gains: collectibles and ordinary"
+      period: 2024
+      inputs:
+        filing_status: 1
+        net_capital_gain: 100000
+        ordinary_income_before_gains: 50000
+        collectibles_gain: 30000
+        section_1250_unrecaptured_gain: 0
+      expect: 0.28
+    - name: "Head of household filer"
+      period: 2024
+      inputs:
+        filing_status: 4
+        net_capital_gain: 50000
+        ordinary_income_before_gains: 60000
+        collectibles_gain: 0
+        section_1250_unrecaptured_gain: 0
+      expect: 0.15
+    - name: "No capital gains"
+      period: 2024
+      inputs:
+        filing_status: 1
+        net_capital_gain: 0
+        ordinary_income_before_gains: 100000
+        collectibles_gain: 0
+        section_1250_unrecaptured_gain: 0
+      expect: 0.0
+    - name: "Loss position (negative gain)"
+      period: 2024
+      inputs:
+        filing_status: 1
+        net_capital_gain: -50000
+        ordinary_income_before_gains: 100000
+        collectibles_gain: 0
+        section_1250_unrecaptured_gain: 0
+      expect: 0.0

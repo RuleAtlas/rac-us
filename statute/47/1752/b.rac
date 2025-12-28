@@ -22,6 +22,17 @@ variable acp_already_receiving:
     # Input variable tracked via National Lifeline Accountability Database
     return is_enrolled_in_acp
   default: false
+  tests:
+    - name: "Household already enrolled in ACP"
+      period: 2024-01
+      inputs:
+        is_enrolled_in_acp: true
+      expect: true
+    - name: "Household not enrolled in ACP"
+      period: 2024-01
+      inputs:
+        is_enrolled_in_acp: false
+      expect: false
 
 
 variable acp_enrollment_eligible:
@@ -37,12 +48,23 @@ variable acp_enrollment_eligible:
   formula: |
     # Must be eligible for ACP
     if not acp_eligible:
-    return false
+      return false
     # Cannot already be receiving benefit
     if acp_already_receiving:
-    return false
+      return false
     return true
   default: false
+  tests:
+    - name: "Eligible and not already receiving"
+      period: 2024-01
+      inputs:
+        is_enrolled_in_acp: false
+      expect: true
+    - name: "Eligible but already receiving from another provider"
+      period: 2024-01
+      inputs:
+        is_enrolled_in_acp: true
+      expect: false
 
 
 # ---- Merged from acp_total_value.rac ----
@@ -64,3 +86,29 @@ variable acp_total_value:
     # Annual broadband benefit + one-time device subsidy (if eligible)
     return acp_annual_benefit + acp_device_subsidy
   default: 0
+  tests:
+    - name: "Only broadband benefit (no device)"
+      inputs:
+        acp_annual_benefit: 360
+        acp_device_subsidy: 0
+      expect: 360
+    - name: "Broadband and device subsidy"
+      inputs:
+        acp_annual_benefit: 360
+        acp_device_subsidy: 100
+      expect: 460
+    - name: "Device subsidy only"
+      inputs:
+        acp_annual_benefit: 0
+        acp_device_subsidy: 100
+      expect: 100
+    - name: "No benefits"
+      inputs:
+        acp_annual_benefit: 0
+        acp_device_subsidy: 0
+      expect: 0
+    - name: "Tribal benefit with device"
+      inputs:
+        acp_annual_benefit: 900
+        acp_device_subsidy: 100
+      expect: 1000

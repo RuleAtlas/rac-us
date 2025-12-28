@@ -46,6 +46,27 @@ variable acp_annual_benefit:
     # Note: ACP benefit ended April 2024
     return acp_benefit * months_per_year
   default: 0
+  tests:
+    - name: "Standard monthly benefit annualized"
+      period: 2024-01
+      inputs:
+        broadband_monthly_charge: 50
+      expect: 360
+    - name: "Tribal benefit annualized"
+      period: 2024-01
+      inputs:
+        broadband_monthly_charge: 80
+      expect: 900
+    - name: "No benefit when ineligible"
+      period: 2024-01
+      inputs:
+        broadband_monthly_charge: 30
+      expect: 0
+    - name: "Program inactive (zero benefit)"
+      period: 2024-04
+      inputs:
+        broadband_monthly_charge: 50
+      expect: 0
 
 # 47 USC 1752(a)(7) - ACP Monthly Benefit Amount
 #
@@ -69,11 +90,42 @@ variable acp_benefit:
   formula: |
     # Must be eligible to receive benefit
     if not acp_eligible:
-    return 0
+      return 0
     # Benefit is lesser of actual charge or maximum benefit
     # "in an amount equal to such amount charged, but not more than..."
     return min(broadband_monthly_charge, acp_max_benefit)
   default: 0
+  tests:
+    - name: "Charge less than standard benefit"
+      period: 2024-01
+      inputs:
+        broadband_monthly_charge: 20
+      expect: 20
+    - name: "Charge exceeds standard benefit"
+      period: 2024-01
+      inputs:
+        broadband_monthly_charge: 50
+      expect: 30
+    - name: "Charge equals standard benefit"
+      period: 2024-01
+      inputs:
+        broadband_monthly_charge: 30
+      expect: 30
+    - name: "Charge less than tribal benefit"
+      period: 2024-01
+      inputs:
+        broadband_monthly_charge: 50
+      expect: 50
+    - name: "Charge exceeds tribal benefit"
+      period: 2024-01
+      inputs:
+        broadband_monthly_charge: 100
+      expect: 75
+    - name: "Ineligible household"
+      period: 2024-01
+      inputs:
+        broadband_monthly_charge: 30
+      expect: 0
 
 
 variable acp_max_benefit:
@@ -90,6 +142,27 @@ variable acp_max_benefit:
   syntax: python
   formula: |
     if acp_on_tribal_land:
-    return tribal_benefit
+      return tribal_benefit
     return standard_benefit
   default: 0
+  tests:
+    - name: "Standard benefit (not on tribal land)"
+      period: 2024-01
+      inputs:
+        is_on_tribal_land: false
+      expect: 30
+    - name: "Tribal benefit (on tribal land)"
+      period: 2024-01
+      inputs:
+        is_on_tribal_land: true
+      expect: 75
+    - name: "Program ended (zero benefit)"
+      period: 2024-04
+      inputs:
+        is_on_tribal_land: false
+      expect: 0
+    - name: "Program ended on tribal land (zero benefit)"
+      period: 2024-04
+      inputs:
+        is_on_tribal_land: true
+      expect: 0

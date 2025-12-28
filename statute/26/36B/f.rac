@@ -18,6 +18,104 @@ family involved for the taxable year, the amount of the increase
 under subparagraph (A) shall in no event exceed the applicable
 dollar amount determined in accordance with the following table...
 """
+parameter repay_cap_under_200_single:
+  description: "Maximum excess APTC repayment for single filers under 200% FPL"
+  unit: USD
+  reference: "26 USC 36B(f)(2)(B)"
+  values:
+    2024-01-01: 300
+    2023-01-01: 300
+    2022-01-01: 300
+
+parameter repay_cap_under_200_joint:
+  description: "Maximum excess APTC repayment for joint filers under 200% FPL"
+  unit: USD
+  reference: "26 USC 36B(f)(2)(B)"
+  values:
+    2024-01-01: 600
+    2023-01-01: 600
+    2022-01-01: 600
+
+parameter repay_cap_200_300_single:
+  description: "Maximum excess APTC repayment for single filers 200-300% FPL"
+  unit: USD
+  reference: "26 USC 36B(f)(2)(B)"
+  values:
+    2024-01-01: 750
+    2023-01-01: 750
+    2022-01-01: 750
+
+parameter repay_cap_200_300_joint:
+  description: "Maximum excess APTC repayment for joint filers 200-300% FPL"
+  unit: USD
+  reference: "26 USC 36B(f)(2)(B)"
+  values:
+    2024-01-01: 1500
+    2023-01-01: 1500
+    2022-01-01: 1500
+
+parameter repay_cap_300_400_single:
+  description: "Maximum excess APTC repayment for single filers 300-400% FPL"
+  unit: USD
+  reference: "26 USC 36B(f)(2)(B)"
+  values:
+    2024-01-01: 1200
+    2023-01-01: 1200
+    2022-01-01: 1200
+
+parameter repay_cap_300_400_joint:
+  description: "Maximum excess APTC repayment for joint filers 300-400% FPL"
+  unit: USD
+  reference: "26 USC 36B(f)(2)(B)"
+  values:
+    2024-01-01: 2400
+    2023-01-01: 2400
+    2022-01-01: 2400
+
+parameter no_repayment_cap:
+  description: "No repayment cap for taxpayers at or above 400% FPL"
+  unit: USD
+  reference: "26 USC 36B(f)(2)(B)"
+  values:
+    2024-01-01: 999999
+    2023-01-01: 999999
+    2022-01-01: 999999
+
+parameter bracket_200_pct:
+  description: "200% of federal poverty line threshold"
+  unit: rate
+  reference: "26 USC 36B(f)(2)(B)"
+  values:
+    2024-01-01: 2.0
+    2023-01-01: 2.0
+    2022-01-01: 2.0
+
+parameter bracket_300_pct:
+  description: "300% of federal poverty line threshold"
+  unit: rate
+  reference: "26 USC 36B(f)(2)(B)"
+  values:
+    2024-01-01: 3.0
+    2023-01-01: 3.0
+    2022-01-01: 3.0
+
+parameter bracket_400_pct:
+  description: "400% of federal poverty line threshold"
+  unit: rate
+  reference: "26 USC 36B(f)(2)(B)"
+  values:
+    2024-01-01: 4.0
+    2023-01-01: 4.0
+    2022-01-01: 4.0
+
+input household_income_pct_fpl:
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  label: "Household Income as % of Federal Poverty Line"
+  description: "Household income expressed as percentage of FPL for family size"
+  default: 2.5
+
 variable reconciliation:
   imports:
     - 26/36B/a#premium_tax_credit
@@ -31,6 +129,19 @@ variable advance_ptc:
   label: "Advance Premium Tax Credit"
   description: "Advance payments of PTC made during year per 26 USC 36B(f)(1)"
   default: 0
+  tests:
+    - name: "No advance payments"
+      inputs:
+        advance_ptc: 0
+      expect: 0
+    - name: "Advance payments during year"
+      inputs:
+        advance_ptc: 4800
+      expect: 4800
+    - name: "Large advance payment"
+      inputs:
+        advance_ptc: 8500
+      expect: 8500
 
 variable net_ptc_adjustment:
   entity: TaxUnit
@@ -46,6 +157,27 @@ variable net_ptc_adjustment:
     # Positive = Additional credit due (taxpayer gets refund)
     # Negative = Excess advance (taxpayer owes repayment)
     return actual_credit - advance
+  tests:
+    - name: "Actual equals advance (no adjustment)"
+      inputs:
+        premium_tax_credit: 4800
+        advance_ptc: 4800
+      expect: 0
+    - name: "Actual exceeds advance (refund due)"
+      inputs:
+        premium_tax_credit: 5500
+        advance_ptc: 4800
+      expect: 700
+    - name: "Advance exceeds actual (repayment owed)"
+      inputs:
+        premium_tax_credit: 4000
+        advance_ptc: 4800
+      expect: -800
+    - name: "Large excess advance payment"
+      inputs:
+        premium_tax_credit: 3000
+        advance_ptc: 8500
+      expect: -5500
 
 variable excess_aptc_repayment_cap:
   entity: TaxUnit
@@ -77,6 +209,47 @@ variable excess_aptc_repayment_cap:
         return repay_cap_300_400_joint
     else:
         return repay_cap_300_400_single
+  tests:
+    - name: "Single filer under 200% FPL"
+      inputs:
+        household_income_pct_fpl: 1.5
+        filing_status: "single"
+      expect: 300
+    - name: "Joint filer under 200% FPL"
+      inputs:
+        household_income_pct_fpl: 1.8
+        filing_status: "joint"
+      expect: 600
+    - name: "Single filer 200-300% FPL"
+      inputs:
+        household_income_pct_fpl: 2.5
+        filing_status: "single"
+      expect: 750
+    - name: "Joint filer 200-300% FPL"
+      inputs:
+        household_income_pct_fpl: 2.8
+        filing_status: "joint"
+      expect: 1500
+    - name: "Single filer 300-400% FPL"
+      inputs:
+        household_income_pct_fpl: 3.5
+        filing_status: "single"
+      expect: 1200
+    - name: "Joint filer 300-400% FPL"
+      inputs:
+        household_income_pct_fpl: 3.9
+        filing_status: "joint"
+      expect: 2400
+    - name: "Single filer at 400% FPL (no cap)"
+      inputs:
+        household_income_pct_fpl: 4.0
+        filing_status: "single"
+      expect: 999999
+    - name: "Joint filer above 400% FPL (no cap)"
+      inputs:
+        household_income_pct_fpl: 5.0
+        filing_status: "joint"
+      expect: 999999
 
 variable excess_advance_ptc_repayment:
   entity: TaxUnit
@@ -96,6 +269,32 @@ variable excess_advance_ptc_repayment:
     # Apply repayment cap for those below 400% FPL
     cap = excess_aptc_repayment_cap
     return min(excess, cap)
+  tests:
+    - name: "No excess advance (actual > advance)"
+      inputs:
+        net_ptc_adjustment: 500
+        excess_aptc_repayment_cap: 300
+      expect: 0
+    - name: "No excess advance (equal)"
+      inputs:
+        net_ptc_adjustment: 0
+        excess_aptc_repayment_cap: 300
+      expect: 0
+    - name: "Small excess advance below cap"
+      inputs:
+        net_ptc_adjustment: -200
+        excess_aptc_repayment_cap: 300
+      expect: 200
+    - name: "Excess advance hits repayment cap"
+      inputs:
+        net_ptc_adjustment: -1000
+        excess_aptc_repayment_cap: 750
+      expect: 750
+    - name: "Large excess advance with no cap"
+      inputs:
+        net_ptc_adjustment: -5500
+        excess_aptc_repayment_cap: 999999
+      expect: 5500
 
 variable additional_ptc_refund:
   entity: TaxUnit
@@ -109,3 +308,20 @@ variable additional_ptc_refund:
     adjustment = net_ptc_adjustment
     # If positive, taxpayer is owed additional credit
     return max(0, adjustment)
+  tests:
+    - name: "No additional refund (actual = advance)"
+      inputs:
+        net_ptc_adjustment: 0
+      expect: 0
+    - name: "No refund (excess advance)"
+      inputs:
+        net_ptc_adjustment: -500
+      expect: 0
+    - name: "Small additional refund"
+      inputs:
+        net_ptc_adjustment: 300
+      expect: 300
+    - name: "Large additional refund"
+      inputs:
+        net_ptc_adjustment: 1200
+      expect: 1200

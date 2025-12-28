@@ -22,6 +22,77 @@ variable is_qualified_individual:
     is_disabled_and_under_65 = is_permanently_disabled and taxpayer_age < elderly_age_threshold
     return is_elderly or is_disabled_and_under_65
   default: False
+  tests:
+    - name: "Age 65, qualifies as elderly"
+      period: 2024-01-01
+      inputs:
+        age: 65
+        is_permanently_disabled: false
+        elderly_age_threshold: 65
+      expect: true
+    - name: "Age 70, qualifies as elderly"
+      period: 2024-01-01
+      inputs:
+        age: 70
+        is_permanently_disabled: false
+        elderly_age_threshold: 65
+      expect: true
+    - name: "Age 64, does not qualify as elderly"
+      period: 2024-01-01
+      inputs:
+        age: 64
+        is_permanently_disabled: false
+        elderly_age_threshold: 65
+      expect: false
+    - name: "Age 50, disabled, qualifies"
+      period: 2024-01-01
+      inputs:
+        age: 50
+        is_permanently_disabled: true
+        elderly_age_threshold: 65
+      expect: true
+    - name: "Age 60, disabled, qualifies"
+      period: 2024-01-01
+      inputs:
+        age: 60
+        is_permanently_disabled: true
+        elderly_age_threshold: 65
+      expect: true
+    - name: "Age 65, disabled, qualifies (elderly takes precedence)"
+      period: 2024-01-01
+      inputs:
+        age: 65
+        is_permanently_disabled: true
+        elderly_age_threshold: 65
+      expect: true
+    - name: "Age 64, not disabled, does not qualify"
+      period: 2024-01-01
+      inputs:
+        age: 64
+        is_permanently_disabled: false
+        elderly_age_threshold: 65
+      expect: false
+    - name: "Age 64, disabled, qualifies under disability"
+      period: 2024-01-01
+      inputs:
+        age: 64
+        is_permanently_disabled: true
+        elderly_age_threshold: 65
+      expect: true
+    - name: "Age 20, not disabled, does not qualify"
+      period: 2024-01-01
+      inputs:
+        age: 20
+        is_permanently_disabled: false
+        elderly_age_threshold: 65
+      expect: false
+    - name: "Age 20, disabled, qualifies"
+      period: 2024-01-01
+      inputs:
+        age: 20
+        is_permanently_disabled: true
+        elderly_age_threshold: 65
+      expect: true
 
 variable num_qualified_individuals:
   imports: [26/22/e#is_sec22_qualified_individual]
@@ -35,3 +106,49 @@ variable num_qualified_individuals:
     # Sum the boolean values of is_qualified for head and spouse
     return sum(is_sec22_qualified_individual)
   default: 0
+  tests:
+    - name: "Single filer, no qualifying individuals"
+      period: 2024-01-01
+      inputs:
+        is_sec22_qualified_individual: [false]
+      expect: 0
+    - name: "Single filer, qualifies"
+      period: 2024-01-01
+      inputs:
+        is_sec22_qualified_individual: [true]
+      expect: 1
+    - name: "Married filing jointly, head only qualifies"
+      period: 2024-01-01
+      inputs:
+        is_sec22_qualified_individual: [true, false]
+      expect: 1
+    - name: "Married filing jointly, spouse only qualifies"
+      period: 2024-01-01
+      inputs:
+        is_sec22_qualified_individual: [false, true]
+      expect: 1
+    - name: "Married filing jointly, both qualify"
+      period: 2024-01-01
+      inputs:
+        is_sec22_qualified_individual: [true, true]
+      expect: 2
+    - name: "Married filing jointly, neither qualifies"
+      period: 2024-01-01
+      inputs:
+        is_sec22_qualified_individual: [false, false]
+      expect: 0
+    - name: "Widow/widower, qualifies"
+      period: 2024-01-01
+      inputs:
+        is_sec22_qualified_individual: [true]
+      expect: 1
+    - name: "Head of household, qualifies"
+      period: 2024-01-01
+      inputs:
+        is_sec22_qualified_individual: [true]
+      expect: 1
+    - name: "Head of household, does not qualify"
+      period: 2024-01-01
+      inputs:
+        is_sec22_qualified_individual: [false]
+      expect: 0
