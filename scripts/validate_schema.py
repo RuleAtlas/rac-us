@@ -61,6 +61,17 @@ ENTITY_PATTERN = re.compile(r"^\s*entity:\s*(\w+)")
 # Period type declarations only - exclude date-like values (2024-01, etc.)
 PERIOD_PATTERN = re.compile(r"^\s*period:\s*(Year|Month|Week|Day|[A-Z][a-z]+)$")
 DTYPE_PATTERN = re.compile(r"^\s*dtype:\s*(\w+)")
+# Parameter declarations
+PARAMETER_PATTERN = re.compile(r"^parameter\s+(\w+):")
+# Legislation-specific naming anti-patterns (should be time-varying instead)
+LEGISLATION_ANTIPATTERNS = [
+    (r"pre_tcja|post_tcja|tcja_", "TCJA"),
+    (r"pre_aca|post_aca|aca_", "ACA"),
+    (r"pre_arpa|post_arpa|arpa_", "ARPA"),
+    (r"pre_arra|post_arra|arra_", "ARRA"),
+    (r"pre_tra|post_tra|tra97_|tra01_", "TRA"),
+    (r"_2017_|_2018_|_2019_|_2020_|_2021_|_2022_|_2023_|_2024_", "year"),
+]
 FORMULA_START = re.compile(r"^\s*formula:\s*\|")
 FORMULA_LINE = re.compile(r"^\s{4,}")  # Indented lines in formula
 
@@ -134,6 +145,17 @@ def validate_file(filepath: Path) -> list[str]:
         stripped = line.strip()
         if stripped.startswith('#'):
             continue
+
+        # Check parameter names for legislation-specific anti-patterns
+        param_match = PARAMETER_PATTERN.match(stripped)
+        if param_match:
+            param_name = param_match.group(1)
+            for pattern, legislation in LEGISLATION_ANTIPATTERNS:
+                if re.search(pattern, param_name, re.IGNORECASE):
+                    errors.append(
+                        f"{filepath}:{lineno}: parameter '{param_name}' references {legislation} - "
+                        f"use time-varying values instead (e.g., 2017-12-15: new_value)"
+                    )
 
         # Validate entity values
         entity_match = ENTITY_PATTERN.match(line)
