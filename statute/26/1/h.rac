@@ -1,49 +1,314 @@
 # 26 USC Section 1(h) - Maximum Capital Gains Rate
 #
+# Provides preferential tax rates for net capital gain and qualified dividend income.
+# Three-tier rate structure: 0%, 15%, and 20% based on taxable income brackets.
 
 text: """
-If a taxpayer has a net capital gain for any taxable year, the tax imposed
-by this section for such taxable year shall not exceed the sum of...
-Per Section 1(h)(11)(A): "For purposes of this section, the term 'net capital
-increased by qualified dividend income.
+(h) Maximum capital gains rate.--
+(1) In general.--If a taxpayer has a net capital gain for any taxable year, the tax imposed
+by this section for such taxable year shall not exceed the sum of--
+(A) a tax computed at the rates and in the same manner as if this subsection had not been
+enacted on the greater of--
+(i) taxable income reduced by the net capital gain; or
+(ii) the lesser of-- (I) the amount of taxable income taxed at a rate below 25 percent; or
+(II) taxable income reduced by the adjusted net capital gain;
+(B) 0 percent of so much of the adjusted net capital gain (or, if less, taxable income) as
+does not exceed the excess (if any) of-- (i) the amount of taxable income which would
+(without regard to this paragraph) be taxed at a rate below 25 percent, over
+(ii) the taxable income reduced by the adjusted net capital gain;
+(C) 15 percent of the lesser of-- (i) so much of the adjusted net capital gain (or, if less,
+taxable income) as exceeds the amount on which a tax is determined under subparagraph (B), or
+(ii) the excess of-- (I) the amount of taxable income which would (without regard to this
+paragraph) be taxed at a rate below 39.6 percent, over (II) the sum of the amounts on which
+a tax is determined under subparagraphs (A) and (B),
+(D) 20 percent of the adjusted net capital gain (or, if less, taxable income) in excess of
+the amount on which tax is determined under subparagraphs (B) and (C),
+...
+(11) Dividends taxed as net capital gain.--
+(A) In general.--For purposes of this subsection, the term "net capital gain" means net
+capital gain (determined without regard to this paragraph) increased by qualified dividend income.
 """
-variable capital_gains_tax:
-  imports:
-    - 26/63/c/taxable_income#taxable_income
-    - 26/1#filing_status
-    - 26/1222/11/net_capital_gain#net_capital_gain
-    - 26/1/h/11#qualified_dividend_income
 
-variable preferential_income:
+# === INPUTS ===
+# User-provided values for capital gains and qualified dividends
+
+input long_term_capital_gains:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
-  label: "Net Capital Gain for Preferential Rate Purposes"
-  description: "Net capital gain plus qualified dividend income per 26 USC Section 1(h)(11)(A)"
-  formula: |
-    # Section 1(h)(11)(A): net capital gain increased by qualified dividend income
-    return net_capital_gain + qualified_dividend_income
+  label: "Long-Term Capital Gains"
+  description: "Net long-term capital gains from sale of assets held more than one year"
   default: 0
 
-variable ordinary_income_for_brackets:
+input short_term_capital_gains:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Short-Term Capital Gains"
+  description: "Net short-term capital gains from sale of assets held one year or less"
+  default: 0
+
+input qualified_dividends:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Qualified Dividends"
+  description: "Qualified dividend income eligible for preferential rates per Section 1(h)(11)"
+  default: 0
+
+# === PARAMETERS ===
+# Capital gains rate thresholds by filing status (indexed for inflation annually)
+# These are the top of the 0% rate bracket (where 15% begins)
+# Per Rev. Proc. 2023-34 for 2024 tax year
+
+parameter zero_rate_threshold_single:
+  description: "Maximum taxable income for 0% capital gains rate - single filers"
+  unit: USD
+  reference: "26 USC 1(h)(1)(B); Rev. Proc. 2023-34"
+  values:
+    2024-01-01: 47025
+    2023-01-01: 44625
+    2022-01-01: 41675
+    2021-01-01: 40400
+    2020-01-01: 40000
+
+parameter zero_rate_threshold_joint:
+  description: "Maximum taxable income for 0% capital gains rate - married filing jointly"
+  unit: USD
+  reference: "26 USC 1(h)(1)(B); Rev. Proc. 2023-34"
+  values:
+    2024-01-01: 94050
+    2023-01-01: 89250
+    2022-01-01: 83350
+    2021-01-01: 80800
+    2020-01-01: 80000
+
+parameter zero_rate_threshold_separate:
+  description: "Maximum taxable income for 0% capital gains rate - married filing separately"
+  unit: USD
+  reference: "26 USC 1(h)(1)(B); Rev. Proc. 2023-34"
+  values:
+    2024-01-01: 47025
+    2023-01-01: 44625
+    2022-01-01: 41675
+    2021-01-01: 40400
+    2020-01-01: 40000
+
+parameter zero_rate_threshold_hoh:
+  description: "Maximum taxable income for 0% capital gains rate - head of household"
+  unit: USD
+  reference: "26 USC 1(h)(1)(B); Rev. Proc. 2023-34"
+  values:
+    2024-01-01: 63000
+    2023-01-01: 59750
+    2022-01-01: 55800
+    2021-01-01: 54100
+    2020-01-01: 53600
+
+# 15% rate threshold (where 20% begins)
+
+parameter fifteen_rate_threshold_single:
+  description: "Maximum taxable income for 15% capital gains rate - single filers"
+  unit: USD
+  reference: "26 USC 1(h)(1)(C); Rev. Proc. 2023-34"
+  values:
+    2024-01-01: 518900
+    2023-01-01: 492300
+    2022-01-01: 459750
+    2021-01-01: 445850
+    2020-01-01: 441450
+
+parameter fifteen_rate_threshold_joint:
+  description: "Maximum taxable income for 15% capital gains rate - married filing jointly"
+  unit: USD
+  reference: "26 USC 1(h)(1)(C); Rev. Proc. 2023-34"
+  values:
+    2024-01-01: 583750
+    2023-01-01: 553850
+    2022-01-01: 517200
+    2021-01-01: 501600
+    2020-01-01: 496600
+
+parameter fifteen_rate_threshold_separate:
+  description: "Maximum taxable income for 15% capital gains rate - married filing separately"
+  unit: USD
+  reference: "26 USC 1(h)(1)(C); Rev. Proc. 2023-34"
+  values:
+    2024-01-01: 291850
+    2023-01-01: 276900
+    2022-01-01: 258600
+    2021-01-01: 250800
+    2020-01-01: 248300
+
+parameter fifteen_rate_threshold_hoh:
+  description: "Maximum taxable income for 15% capital gains rate - head of household"
+  unit: USD
+  reference: "26 USC 1(h)(1)(C); Rev. Proc. 2023-34"
+  values:
+    2024-01-01: 551350
+    2023-01-01: 523050
+    2022-01-01: 488500
+    2021-01-01: 473750
+    2020-01-01: 469050
+
+# Capital gains rates
+
+parameter zero_rate:
+  description: "Capital gains rate for taxpayers in lower brackets"
+  unit: rate
+  reference: "26 USC 1(h)(1)(B)"
+  values:
+    2003-01-01: 0.00
+
+parameter fifteen_rate:
+  description: "Capital gains rate for taxpayers in middle brackets"
+  unit: rate
+  reference: "26 USC 1(h)(1)(C)"
+  values:
+    2003-01-01: 0.15
+
+parameter twenty_rate:
+  description: "Capital gains rate for taxpayers in highest bracket"
+  unit: rate
+  reference: "26 USC 1(h)(1)(D)"
+  values:
+    2013-01-01: 0.20
+
+# === VARIABLES ===
+
+variable net_capital_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Net Capital Gain"
+  description: "Net long-term capital gains after netting with short-term losses per 26 USC 1222"
+  formula: |
+    # Net capital gain = LTCG - STCL, but cannot be negative here
+    # Short-term gains are taxed as ordinary income, not preferential
+    return max(0, long_term_capital_gains)
+  default: 0
+
+variable adjusted_net_capital_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Adjusted Net Capital Gain"
+  description: "Net capital gain plus qualified dividends per Section 1(h)(11)(A)"
+  formula: |
+    # Section 1(h)(11)(A): net capital gain increased by qualified dividend income
+    return net_capital_gain + qualified_dividends
+  default: 0
+
+variable ordinary_income:
+  imports:
+    - 26/63/c/taxable_income#taxable_income
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
   label: "Ordinary Income for Bracket Positioning"
-  description: "Taxable income minus preferential income, used to determine bracket starting position"
-  formula: return max(0, taxable_income - preferential_income)
+  description: "Taxable income minus adjusted net capital gain, used to determine bracket starting position"
+  formula: |
+    # Ordinary income = taxable income - preferential income
+    return max(0, taxable_income - adjusted_net_capital_gain)
   default: 0
 
-variable preferential_rate_tax:
+variable zero_rate_threshold:
+  imports:
+    - 26/1#filing_status
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
-  label: "Preferential Rate Tax"
-  description: "Federal income tax on net capital gain and qualified dividends at preferential rates per 26 USC Section 1(h)"
-  formula: return marginal_agg(preferential_income, brackets, threshold_by=filing_status, offset=ordinary_income_for_brackets)
+  label: "0% Rate Threshold"
+  description: "Maximum taxable income for 0% capital gains rate based on filing status"
+  formula: |
+    if filing_status == JOINT:
+      return zero_rate_threshold_joint
+    if filing_status == SURVIVING_SPOUSE:
+      return zero_rate_threshold_joint
+    if filing_status == SEPARATE:
+      return zero_rate_threshold_separate
+    if filing_status == HEAD_OF_HOUSEHOLD:
+      return zero_rate_threshold_hoh
+    return zero_rate_threshold_single
+  default: 0
+
+variable fifteen_rate_threshold:
+  imports:
+    - 26/1#filing_status
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "15% Rate Threshold"
+  description: "Maximum taxable income for 15% capital gains rate based on filing status"
+  formula: |
+    if filing_status == JOINT:
+      return fifteen_rate_threshold_joint
+    if filing_status == SURVIVING_SPOUSE:
+      return fifteen_rate_threshold_joint
+    if filing_status == SEPARATE:
+      return fifteen_rate_threshold_separate
+    if filing_status == HEAD_OF_HOUSEHOLD:
+      return fifteen_rate_threshold_hoh
+    return fifteen_rate_threshold_single
+  default: 0
+
+variable capital_gains_zero_rate_amount:
+  imports:
+    - 26/63/c/taxable_income#taxable_income
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Capital Gains Taxed at 0%"
+  description: "Amount of adjusted net capital gain taxed at 0% per Section 1(h)(1)(B)"
+  formula: |
+    # Section 1(h)(1)(B): 0% on ANCG up to (threshold - ordinary_income)
+    # Room in 0% bracket = threshold minus ordinary income
+    room_in_zero_bracket = max(0, zero_rate_threshold - ordinary_income)
+    # Amount taxed at 0% is lesser of room in bracket or total ANCG
+    return min(room_in_zero_bracket, adjusted_net_capital_gain)
+  default: 0
+
+variable capital_gains_fifteen_rate_amount:
+  imports:
+    - 26/63/c/taxable_income#taxable_income
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Capital Gains Taxed at 15%"
+  description: "Amount of adjusted net capital gain taxed at 15% per Section 1(h)(1)(C)"
+  formula: |
+    # Remaining ANCG after 0% bracket
+    remaining_ancg = adjusted_net_capital_gain - capital_gains_zero_rate_amount
+    if remaining_ancg <= 0:
+      return 0
+    # Room in 15% bracket = (15% threshold - 0% threshold) adjusted for ordinary income position
+    # Start point is max(ordinary_income, zero_rate_threshold)
+    start_point = max(ordinary_income, zero_rate_threshold)
+    room_in_fifteen_bracket = max(0, fifteen_rate_threshold - start_point)
+    # Amount taxed at 15% is lesser of room in bracket or remaining ANCG
+    return min(room_in_fifteen_bracket, remaining_ancg)
+  default: 0
+
+variable capital_gains_twenty_rate_amount:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Capital Gains Taxed at 20%"
+  description: "Amount of adjusted net capital gain taxed at 20% per Section 1(h)(1)(D)"
+  formula: |
+    # Everything beyond the 15% bracket is taxed at 20%
+    return max(0, adjusted_net_capital_gain - capital_gains_zero_rate_amount - capital_gains_fifteen_rate_amount)
   default: 0
 
 variable capital_gains_tax:
@@ -52,13 +317,77 @@ variable capital_gains_tax:
   dtype: Money
   unit: "USD"
   label: "Capital Gains Tax"
-  description: "Federal income tax on net capital gain at preferential rates per 26 USC Section 1(h)"
+  description: "Federal income tax on net capital gain and qualified dividends at preferential rates per 26 USC 1(h)"
   formula: |
-    # Pro-rate the preferential tax between cap gains and qualified dividends
-    if preferential_income > 0:
-    return preferential_rate_tax * (net_capital_gain / preferential_income)
-    return 0
+    # Section 1(h): Three-tier preferential rate structure
+    # 0% rate on amount in subparagraph (B)
+    tax_at_zero = capital_gains_zero_rate_amount * zero_rate
+    # 15% rate on amount in subparagraph (C)
+    tax_at_fifteen = capital_gains_fifteen_rate_amount * fifteen_rate
+    # 20% rate on remainder per subparagraph (D)
+    tax_at_twenty = capital_gains_twenty_rate_amount * twenty_rate
+    return tax_at_zero + tax_at_fifteen + tax_at_twenty
   default: 0
+  tests:
+    - name: "Single filer, $40k taxable income, $10k LTCG, fully in 0% bracket"
+      period: 2024-01
+      inputs:
+        taxable_income: 40000
+        long_term_capital_gains: 10000
+        qualified_dividends: 0
+        filing_status: SINGLE
+      # Ordinary = $40k - $10k = $30k. Room in 0% = $47,025 - $30,000 = $17,025
+      # All $10k fits in 0% bracket. Tax = $0
+      expect: 0
+    - name: "Single filer, $60k taxable income, $20k LTCG, spans 0% and 15%"
+      period: 2024-01
+      inputs:
+        taxable_income: 60000
+        long_term_capital_gains: 20000
+        qualified_dividends: 0
+        filing_status: SINGLE
+      # Ordinary = $60k - $20k = $40k. Room in 0% = $47,025 - $40,000 = $7,025
+      # At 0%: $7,025. At 15%: $20,000 - $7,025 = $12,975
+      # Tax = $0 + $12,975 * 0.15 = $1,946.25 -> $1,946
+      expect: 1946
+    - name: "Joint filer, $600k taxable income, $50k ANCG, spans 15% and 20%"
+      period: 2024-01
+      inputs:
+        taxable_income: 600000
+        long_term_capital_gains: 30000
+        qualified_dividends: 20000
+        filing_status: JOINT
+      # Ordinary = $600k - $50k = $550k. 0% threshold joint = $94,050
+      # 15% threshold joint = $583,750
+      # Room at 0%: max(0, $94,050 - $550,000) = $0
+      # Room at 15%: max(0, $583,750 - max($550,000, $94,050)) = $33,750
+      # At 15%: $33,750. At 20%: $50,000 - $33,750 = $16,250
+      # Tax = $33,750 * 0.15 + $16,250 * 0.20 = $5,062.50 + $3,250 = $8,312.50
+      expect: 8312
+    - name: "Head of household, $100k taxable income, $40k ANCG"
+      period: 2024-01
+      inputs:
+        taxable_income: 100000
+        long_term_capital_gains: 30000
+        qualified_dividends: 10000
+        filing_status: HEAD_OF_HOUSEHOLD
+      # Ordinary = $100k - $40k = $60k. 0% threshold HOH = $63,000
+      # Room in 0% = $63,000 - $60,000 = $3,000
+      # At 0%: $3,000. At 15%: $40,000 - $3,000 = $37,000
+      # Tax = $0 + $37,000 * 0.15 = $5,550
+      expect: 5550
+    - name: "MFS, $300k taxable income, $20k LTCG, spans 15% and 20%"
+      period: 2024-01
+      inputs:
+        taxable_income: 300000
+        long_term_capital_gains: 20000
+        qualified_dividends: 0
+        filing_status: SEPARATE
+      # Ordinary = $300k - $20k = $280k. 15% threshold MFS = $291,850
+      # Room at 15%: $291,850 - $280,000 = $11,850
+      # At 15%: $11,850. At 20%: $20,000 - $11,850 = $8,150
+      # Tax = $11,850 * 0.15 + $8,150 * 0.20 = $1,777.50 + $1,630 = $3,407.50
+      expect: 3407
 
 variable qualified_dividend_tax:
   entity: TaxUnit
@@ -66,23 +395,24 @@ variable qualified_dividend_tax:
   dtype: Money
   unit: "USD"
   label: "Qualified Dividend Tax"
-  description: "Federal income tax on qualified dividend income at preferential rates per 26 USC Section 1(h)(11)"
+  description: "Federal income tax on qualified dividend income at preferential rates per Section 1(h)(11)"
   formula: |
     # Pro-rate the preferential tax between cap gains and qualified dividends
-    if preferential_income > 0:
-    return preferential_rate_tax * (qualified_dividend_income / preferential_income)
+    if adjusted_net_capital_gain > 0:
+      return capital_gains_tax * (qualified_dividends / adjusted_net_capital_gain)
     return 0
   default: 0
 
-variable preferential_rate_tax_vectorized:
+variable net_capital_gain_tax:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
-  label: "Preferential Rate Tax (Vectorized)"
-  description: "Vectorized implementation for microsimulation"
+  label: "Net Capital Gain Tax"
+  description: "Federal income tax on net capital gain (excluding qualified dividends) at preferential rates"
   formula: |
-    pref_income = net_capital_gain + qualified_dividend_income
-    ord_income = maximum(0, taxable_income - pref_income)
-    return marginal_agg(pref_income, brackets, threshold_by=filing_status, offset=ord_income)
+    # Pro-rate the preferential tax between cap gains and qualified dividends
+    if adjusted_net_capital_gain > 0:
+      return capital_gains_tax * (net_capital_gain / adjusted_net_capital_gain)
+    return 0
   default: 0

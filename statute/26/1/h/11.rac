@@ -1,41 +1,68 @@
-# 26 USC Section 1(h)(11)(B) - Qualified Dividend Income Definition
+# 26 USC Section 1(h)(11) - Qualified Dividend Income
 #
+# Qualified dividends are taxed at the same preferential rates as long-term capital gains.
 
 text: """
-The term 'qualified dividend income' means dividends received during
-the taxable year from—
-(i) domestic corporations, and
-(ii) qualified foreign corporations.
+(11) Dividends taxed as net capital gain.--
+(A) In general.--For purposes of this subsection, the term "net capital gain" means net
+capital gain (determined without regard to this paragraph) increased by qualified dividend income.
+(B) Qualified dividend income.--For purposes of this paragraph--
+(i) In general.--The term "qualified dividend income" means dividends received during
+the taxable year from--
+(I) domestic corporations, and
+(II) qualified foreign corporations.
+(ii) Certain dividends excluded.--Such term shall not include--
+(I) any dividend from a corporation which for the taxable year of the corporation
+in which the distribution is made, or the preceding taxable year, is a corporation
+exempt from tax under section 501 or 521,
+(II) any amount allowed as a deduction under section 591 (relating to deduction
+for dividends paid by mutual savings banks, etc.), and
+(III) any dividend described in section 404(k).
+(iii) Coordination with section 246(c).--Such term shall not include any dividend
+on any share of stock-- (I) with respect to which the holding period requirements of
+section 246(c) are not met...
 """
-variable is_qualified_dividend:
-  imports:
-    - 26/1/h/11/holding_period_days#holding_period_days
-    - 26/1/h/11/B/i/is_domestic_corporation#is_domestic_corporation
-    - 26/1/h/11/B/ii/is_qualified_foreign_corporation#is_qualified_foreign_corporation
-    - 26/1/h/11/B/iii/I/is_from_tax_exempt_org#is_from_tax_exempt_org
-    - 26/1/h/11/B/iii/II/is_employer_securities_deductible#is_employer_securities_deductible
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Is Qualified Dividend"
-  description: "Whether a dividend payment qualifies for preferential capital gains tax rates per 26 USC Section 1(h)(11)(B)"
-  formula: |
-    # Corporation must be domestic or qualified foreign
-    from_qualified_corp = is_domestic_corporation or is_qualified_foreign_corporation
-    # Must meet holding period requirement (> 60 days within 121-day window)
-    meets_holding_period = holding_period_days > min_holding_days
-    # Not excluded under Section 1(h)(11)(B)(iii)
-    not_excluded = not is_from_tax_exempt_org and not is_employer_securities_deductible
-    return from_qualified_corp and meets_holding_period and not_excluded
-  default: False
 
+# Parameters for holding period requirement
+
+parameter min_holding_days:
+  description: "Minimum holding period in days to qualify for preferential rate on dividends"
+  unit: days
+  reference: "26 USC 1(h)(11)(B)(iii); 26 USC 246(c)"
+  values:
+    2003-01-01: 60
+
+parameter holding_period_window:
+  description: "Window period around ex-dividend date for measuring holding period"
+  unit: days
+  reference: "26 USC 1(h)(11)(B)(iii); 26 USC 246(c)"
+  values:
+    2003-01-01: 121
+
+# Variable: qualified_dividend_income
+# This is an alias for the input qualified_dividends defined in h.rac
+# For microsimulation, we use direct input rather than dividend-by-dividend tracking
 
 variable qualified_dividend_income:
-  imports: [26/61/a/7/dividend_income#total_dividends]
+  imports:
+    - 26/1/h#qualified_dividends
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
   label: "Qualified Dividend Income"
-  description: "Total qualified dividend income eligible for preferential capital gains rates per 26 USC Section 1(h)(11)"
+  description: "Total qualified dividend income eligible for preferential capital gains rates per 26 USC 1(h)(11)"
+  formula: |
+    # In microsimulation, qualified dividends are provided as direct input
+    # Full implementation would aggregate is_qualified_dividend for each dividend payment
+    return qualified_dividends
   default: 0
+  tests:
+    - name: "Pass-through of qualified dividends input"
+      inputs:
+        qualified_dividends: 5000
+      expect: 5000
+    - name: "Zero qualified dividends"
+      inputs:
+        qualified_dividends: 0
+      expect: 0
