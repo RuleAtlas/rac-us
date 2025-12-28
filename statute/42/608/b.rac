@@ -5,3 +5,40 @@ variable benefit_calculation:
   syntax: python
   formula: |
     return tanf_gross_earned_income + tanf_gross_unearned_income
+  tests:
+    - name: "No income"
+      period: 2024-01
+      inputs:
+        tanf_gross_earned_income: 0
+        tanf_gross_unearned_income: 0
+      expect: 0
+    - name: "Earned income only"
+      period: 2024-01
+      inputs:
+        tanf_gross_earned_income: 1_500
+        tanf_gross_unearned_income: 0
+      expect: 1_500
+    - name: "Unearned income only"
+      period: 2024-01
+      inputs:
+        tanf_gross_earned_income: 0
+        tanf_gross_unearned_income: 800
+      expect: 800
+    - name: "Mixed income - low"
+      period: 2024-01
+      inputs:
+        tanf_gross_earned_income: 500
+        tanf_gross_unearned_income: 200
+      expect: 700
+    - name: "Mixed income - moderate"
+      period: 2024-01
+      inputs:
+        tanf_gross_earned_income: 1_200
+        tanf_gross_unearned_income: 400
+      expect: 1_600
+    - name: "Mixed income - high"
+      period: 2024-01
+      inputs:
+        tanf_gross_earned_income: 2_000
+        tanf_gross_unearned_income: 1_000
+      expect: 3_000

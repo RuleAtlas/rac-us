@@ -46,3 +46,45 @@ variable snap_medical_expense_deduction:
     excess = medical_expenses - medical_expense_threshold
     return max(0, excess)
   default: 0
+  tests:
+    - name: non_elderly_disabled_household_no_deduction
+      period: 2024-01
+      inputs:
+        has_elderly_disabled: false
+        medical_expenses: 200
+      expect: 0
+
+    - name: elderly_disabled_expenses_below_threshold
+      period: 2024-01
+      inputs:
+        has_elderly_disabled: true
+        medical_expenses: 25
+      expect: 0
+
+    - name: elderly_disabled_expenses_at_threshold
+      period: 2024-01
+      inputs:
+        has_elderly_disabled: true
+        medical_expenses: 35
+      expect: 0
+
+    - name: elderly_disabled_expenses_above_threshold
+      period: 2024-01
+      inputs:
+        has_elderly_disabled: true
+        medical_expenses: 100
+      expect: 65
+
+    - name: elderly_disabled_high_medical_expenses
+      period: 2024-01
+      inputs:
+        has_elderly_disabled: true
+        medical_expenses: 1_000
+      expect: 965
+
+    - name: elderly_disabled_zero_expenses
+      period: 2024-01
+      inputs:
+        has_elderly_disabled: true
+        medical_expenses: 0
+      expect: 0

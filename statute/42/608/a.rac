@@ -18,3 +18,69 @@ variable eligibility:
     net_income_eligible = tanf_countable_income <= tanf_need_standard
     resource_eligible = tanf_countable_resources <= tanf_resource_limit
     return gross_income_eligible and net_income_eligible and resource_eligible
+  tests:
+    - name: "Eligible family meeting all three tests"
+      period: 2024-01
+      inputs:
+        tanf_gross_income: 1_500
+        tanf_gross_income_limit: 2_000
+        tanf_countable_income: 800
+        tanf_need_standard: 1_000
+        tanf_countable_resources: 1_500
+        tanf_resource_limit: 2_000
+      expect: true
+
+    - name: "Ineligible due to gross income exceeding limit"
+      period: 2024-01
+      inputs:
+        tanf_gross_income: 2_500
+        tanf_gross_income_limit: 2_000
+        tanf_countable_income: 800
+        tanf_need_standard: 1_000
+        tanf_countable_resources: 1_500
+        tanf_resource_limit: 2_000
+      expect: false
+
+    - name: "Ineligible due to net income exceeding need standard"
+      period: 2024-01
+      inputs:
+        tanf_gross_income: 1_500
+        tanf_gross_income_limit: 2_000
+        tanf_countable_income: 1_200
+        tanf_need_standard: 1_000
+        tanf_countable_resources: 1_500
+        tanf_resource_limit: 2_000
+      expect: false
+
+    - name: "Ineligible due to resources exceeding limit"
+      period: 2024-01
+      inputs:
+        tanf_gross_income: 1_500
+        tanf_gross_income_limit: 2_000
+        tanf_countable_income: 800
+        tanf_need_standard: 1_000
+        tanf_countable_resources: 2_500
+        tanf_resource_limit: 2_000
+      expect: false
+
+    - name: "Eligible at exact threshold values"
+      period: 2024-01
+      inputs:
+        tanf_gross_income: 2_000
+        tanf_gross_income_limit: 2_000
+        tanf_countable_income: 1_000
+        tanf_need_standard: 1_000
+        tanf_countable_resources: 2_000
+        tanf_resource_limit: 2_000
+      expect: true
+
+    - name: "Ineligible with multiple tests failing"
+      period: 2024-01
+      inputs:
+        tanf_gross_income: 3_000
+        tanf_gross_income_limit: 2_000
+        tanf_countable_income: 1_500
+        tanf_need_standard: 1_000
+        tanf_countable_resources: 3_000
+        tanf_resource_limit: 2_000
+      expect: false

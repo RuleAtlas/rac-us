@@ -24,3 +24,39 @@ variable snap_child_support_deduction:
     # No cap on this deduction
     return child_support_paid
   default: 0
+  tests:
+    - name: no_child_support_payments
+      period: 2024-01
+      inputs:
+        child_support_paid: 0
+      expect: 0
+
+    - name: minimal_child_support_payment
+      period: 2024-01
+      inputs:
+        child_support_paid: 100
+      expect: 100
+
+    - name: typical_child_support_payment
+      period: 2024-01
+      inputs:
+        child_support_paid: 500
+      expect: 500
+
+    - name: high_child_support_payment
+      period: 2024-01
+      inputs:
+        child_support_paid: 1_200
+      expect: 1_200
+
+    - name: very_high_child_support_demonstrates_no_cap
+      period: 2024-01
+      inputs:
+        child_support_paid: 2_500
+      expect: 2_500
+
+    - name: multiple_children_high_support_no_federal_limit
+      period: 2024-01
+      inputs:
+        child_support_paid: 4_000
+      expect: 4_000

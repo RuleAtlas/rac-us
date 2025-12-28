@@ -28,3 +28,33 @@ variable snap_dependent_care_deduction:
     # No federal cap on this deduction
     return dependent_care_expenses
   default: 0
+  tests:
+    - name: no_dependent_care_expenses
+      period: 2024-01
+      inputs:
+        dependent_care_expenses: 0
+      expect: 0
+
+    - name: typical_child_care_expenses
+      period: 2024-01
+      inputs:
+        dependent_care_expenses: 800
+      expect: 800
+
+    - name: moderate_dependent_care
+      period: 2024-01
+      inputs:
+        dependent_care_expenses: 1_200
+      expect: 1_200
+
+    - name: high_dependent_care_no_cap
+      period: 2024-01
+      inputs:
+        dependent_care_expenses: 2_500
+      expect: 2_500
+
+    - name: very_high_dependent_care_demonstrates_no_federal_cap
+      period: 2024-01
+      inputs:
+        dependent_care_expenses: 5_000
+      expect: 5_000
