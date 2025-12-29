@@ -29,8 +29,8 @@ parameter fbr_couple:
   unit: USD
   period: Month
   values:
-    2024-01-01: 1415
-    2023-01-01: 1371
+    2024-01-01: 1_415
+    2023-01-01: 1_371
   label: "SSI FBR (Couple)"
 
 variable federal_benefit_rate:

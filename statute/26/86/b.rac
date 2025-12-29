@@ -8,7 +8,7 @@ For purposes of this section, the term "combined income" means the sum of-
 parameter ss_fraction:
   description: "Fraction of Social Security benefits added to combined income"
   reference: "26 USC 86(b)"
-  unit: "/1"
+  unit: /1
   values:
     1984-01-01: 0.5
 
@@ -19,7 +19,7 @@ variable combined_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Combined Income for Social Security Taxability"
   description: "Modified AGI plus one-half of Social Security benefits per 26 USC Section 86(b)"
   syntax: python
@@ -72,7 +72,7 @@ variable modified_agi:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Modified Adjusted Gross Income for Social Security Taxability"
   description: "AGI plus tax-exempt interest for determining taxable portion of Social Security benefits per 26 USC Section 86(b)(1)"
   syntax: python

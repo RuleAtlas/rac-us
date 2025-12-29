@@ -25,7 +25,7 @@ variable amt:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Alternative Minimum Tax"
   description: "AMT liability under Section 55(a): excess of tentative minimum tax over regular tax"
   syntax: python

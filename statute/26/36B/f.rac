@@ -50,32 +50,32 @@ parameter repay_cap_200_300_joint:
   reference: "26 USC 36B(f)(2)(B)(i), table row for income 200% to 300%"
   unit: USD
   values:
-    2024-01-01: 1500
-    2023-01-01: 1500
-    2022-01-01: 1500
+    2024-01-01: 1_500
+    2023-01-01: 1_500
+    2022-01-01: 1_500
 
 parameter repay_cap_300_400_single:
   description: "Maximum excess APTC repayment for single filers 300-400% FPL per 26 USC 36B(f)(2)(B)(i)"
   reference: "26 USC 36B(f)(2)(B)(i), table row for income 300% to 400%"
   unit: USD
   values:
-    2024-01-01: 1200
-    2023-01-01: 1200
-    2022-01-01: 1200
+    2024-01-01: 1_200
+    2023-01-01: 1_200
+    2022-01-01: 1_200
 
 parameter repay_cap_300_400_joint:
   description: "Maximum excess APTC repayment for joint filers 300-400% FPL per 26 USC 36B(f)(2)(B)(i)"
   reference: "26 USC 36B(f)(2)(B)(i), table row for income 300% to 400%"
   unit: USD
   values:
-    2024-01-01: 2400
-    2023-01-01: 2400
-    2022-01-01: 2400
+    2024-01-01: 2_400
+    2023-01-01: 2_400
+    2022-01-01: 2_400
 
 parameter bracket_200_pct:
   description: "200% of federal poverty line threshold per 26 USC 36B(f)(2)(B)(i)"
   reference: "26 USC 36B(f)(2)(B)(i), income bracket constant"
-  unit: "/1"
+  unit: /1
   values:
     2024-01-01: 2.0
     2023-01-01: 2.0
@@ -84,7 +84,7 @@ parameter bracket_200_pct:
 parameter bracket_300_pct:
   description: "300% of federal poverty line threshold per 26 USC 36B(f)(2)(B)(i)"
   reference: "26 USC 36B(f)(2)(B)(i), income bracket constant"
-  unit: "/1"
+  unit: /1
   values:
     2024-01-01: 3.0
     2023-01-01: 3.0
@@ -93,7 +93,7 @@ parameter bracket_300_pct:
 parameter bracket_400_pct:
   description: "400% of federal poverty line threshold per 26 USC 36B(f)(2)(B)(i)"
   reference: "26 USC 36B(f)(2)(B)(i), income bracket constant"
-  unit: "/1"
+  unit: /1
   values:
     2024-01-01: 4.0
     2023-01-01: 4.0
@@ -111,7 +111,7 @@ variable reconciliation:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "PTC Reconciliation Container"
   description: "Reconciliation of advance credit and actual credit per 26 USC 36B(f)"
   imports:
@@ -122,7 +122,7 @@ variable advance_ptc:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Advance Premium Tax Credit"
   description: "Advance payments of PTC made during year per 26 USC 36B(f)(1)"
   default: 0
@@ -144,7 +144,7 @@ variable net_ptc_adjustment:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net PTC Adjustment"
   description: "Difference between actual PTC and advance payments per 26 USC 36B(f)"
   syntax: python
@@ -180,7 +180,7 @@ variable excess_aptc_repayment_cap:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Excess APTC Repayment Cap"
   description: "Maximum repayment of excess advance per 26 USC 36B(f)(2)(B)"
   syntax: python
@@ -254,7 +254,7 @@ variable excess_advance_ptc_repayment:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Excess Advance PTC Repayment"
   description: "Additional tax due for excess advance payments per 26 USC 36B(f)(2)"
   syntax: python
@@ -307,7 +307,7 @@ variable additional_ptc_refund:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Additional PTC Refund"
   description: "Additional refund if actual PTC exceeds advance payments"
   syntax: python

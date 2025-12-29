@@ -75,7 +75,7 @@ input months_of_coverage:
 parameter hsa_limit_self_only:
   description: "Maximum annual HSA contribution for self-only HDHP coverage"
   reference: "26 USC 223(b)(2)(A)"
-  unit: "USD"
+  unit: USD
   values:
     2024-01-01: 4_150
 
@@ -83,7 +83,7 @@ parameter hsa_limit_self_only:
 parameter hsa_limit_family:
   description: "Maximum annual HSA contribution for family HDHP coverage"
   reference: "26 USC 223(b)(2)(B)"
-  unit: "USD"
+  unit: USD
   values:
     2024-01-01: 8_300
 
@@ -91,7 +91,7 @@ parameter hsa_limit_family:
 parameter hsa_catchup_contribution:
   description: "Additional annual HSA contribution allowed for individuals age 55+"
   reference: "26 USC 223(b)(3)(B)"
-  unit: "USD"
+  unit: USD
   values:
     2024-01-01: 1_000
 
@@ -99,7 +99,7 @@ parameter hsa_catchup_contribution:
 parameter catchup_age_threshold:
   description: "Minimum age to qualify for HSA catch-up contributions"
   reference: "26 USC 223(b)(3)(A)"
-  unit: "years"
+  unit: years
   values:
     1977-01-01: 55
 
@@ -107,7 +107,7 @@ parameter catchup_age_threshold:
 parameter months_per_year:
   description: "Number of months in a calendar year for proration"
   reference: "26 USC 223(b)(2)"
-  unit: "/1"
+  unit: /1
   values:
     1977-01-01: 12
 
@@ -116,7 +116,7 @@ variable hsa_annual_contribution_limit:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HSA Annual Contribution Limit"
   description: "Maximum HSA contribution for the year based on coverage type, before catch-up"
   syntax: python
@@ -182,7 +182,7 @@ variable hsa_total_contribution_limit:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HSA Total Contribution Limit"
   description: "Maximum HSA contribution including catch-up contributions, pro-rated by months"
   syntax: python

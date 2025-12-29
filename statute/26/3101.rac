@@ -1,4 +1,3 @@
-# 26 USC 3101 - Rate of tax on employees (FICA)
 # https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title26-section3101
 
 text: |
@@ -39,7 +38,7 @@ text: |
 parameter oasdi_employee_rate:
   description: "Employee OASDI (Social Security) tax rate"
   reference: "26 USC 3101(a)"
-  unit: "/1"
+  unit: /1
   values:
     1990-01-01: 0.062
 
@@ -47,7 +46,7 @@ parameter oasdi_employee_rate:
 parameter social_security_wage_base:
   description: "Maximum wages subject to OASDI tax (contribution and benefit base)"
   reference: "42 USC 430"
-  unit: "USD"
+  unit: USD
   values:
     2025-01-01: 176_100
     2024-01-01: 168_600
@@ -64,7 +63,7 @@ parameter social_security_wage_base:
 parameter medicare_employee_rate:
   description: "Employee Hospital Insurance (Medicare) tax rate"
   reference: "26 USC 3101(b)(1)"
-  unit: "/1"
+  unit: /1
   values:
     1986-01-01: 0.0145
 
@@ -72,7 +71,7 @@ parameter medicare_employee_rate:
 parameter additional_medicare_tax_rate:
   description: "Additional Medicare Tax rate on high earners"
   reference: "26 USC 3101(b)(2)"
-  unit: "/1"
+  unit: /1
   values:
     2013-01-01: 0.009
 
@@ -80,7 +79,7 @@ parameter additional_medicare_tax_rate:
 parameter additional_medicare_threshold_joint:
   description: "Wage threshold for Additional Medicare Tax on joint returns"
   reference: "26 USC 3101(b)(2)(A)"
-  unit: "USD"
+  unit: USD
   values:
     2013-01-01: 250_000
 
@@ -88,7 +87,7 @@ parameter additional_medicare_threshold_joint:
 parameter additional_medicare_threshold_separate:
   description: "Wage threshold for Additional Medicare Tax for married filing separately"
   reference: "26 USC 3101(b)(2)(B)"
-  unit: "USD"
+  unit: USD
   values:
     2013-01-01: 125_000
 
@@ -96,7 +95,7 @@ parameter additional_medicare_threshold_separate:
 parameter additional_medicare_threshold_other:
   description: "Wage threshold for Additional Medicare Tax for single filers"
   reference: "26 USC 3101(b)(2)(C)"
-  unit: "USD"
+  unit: USD
   values:
     2013-01-01: 200_000
 
@@ -108,7 +107,7 @@ input wages:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Wages"
   description: "Wages subject to FICA taxes per 26 USC 3121(a)"
   default: 0
@@ -129,7 +128,7 @@ variable oasdi_tax:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "OASDI Tax (Employee Share)"
   description: "Employee Social Security tax per 26 USC 3101(a)"
   syntax: python
@@ -177,7 +176,7 @@ variable medicare_tax:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Medicare Tax (Employee Share)"
   description: "Employee Medicare tax per 26 USC 3101(b)(1)"
   syntax: python
@@ -210,7 +209,7 @@ variable additional_medicare_tax:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Additional Medicare Tax"
   description: "0.9% additional tax on wages exceeding threshold per 26 USC 3101(b)(2)"
   syntax: python
@@ -270,7 +269,7 @@ variable total_fica_employee_tax:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total FICA Tax (Employee Share)"
   description: "Total employee FICA taxes: OASDI + Medicare + Additional Medicare"
   syntax: python

@@ -38,7 +38,7 @@ variable deduction_choice:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Deduction Choice (Standard or Itemized)"
   description: "The deduction amount taxpayer elects to use per 26 USC 63(e)"
   imports:
@@ -112,7 +112,7 @@ variable taxable_income_deductions:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Deductions from Taxable Income"
   description: "The deduction amount used (standard or itemized) per 26 USC 63"
   syntax: python

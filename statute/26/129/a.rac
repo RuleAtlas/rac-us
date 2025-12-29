@@ -35,7 +35,7 @@ variable dcap_taxable_amount:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "DCAP Taxable Amount"
   description: "Dependent care assistance benefits that exceed the exclusion and are taxable"
   syntax: python
@@ -206,7 +206,7 @@ variable dcap_benefits_received:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "DCAP Benefits Received"
   description: "Employer-provided dependent care assistance received during the year"
   default: 0
@@ -220,7 +220,7 @@ variable dcap_exclusion_amount:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "DCAP Exclusion Amount"
   description: "Amount of DCAP benefits that can be excluded from gross income"
   syntax: python

@@ -64,7 +64,7 @@ parameter resource_limit_couple:
   reference: "42 USC 1382(a)"
   unit: USD
   values:
-    2024-01-01: 3000
+    2024-01-01: 3_000
   label: "SSI Resource Limit (Couple)"
 
 variable age_requirement:

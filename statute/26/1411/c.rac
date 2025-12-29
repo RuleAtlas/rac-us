@@ -22,7 +22,7 @@ variable net_investment_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Investment Income"
   description: "Net investment income for NIIT purposes per Section 1_411(c)"
   syntax: python

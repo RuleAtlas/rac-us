@@ -14,7 +14,7 @@ adjusted for inflation per 32(j) to $6,920 for 2024)
 parameter joint_return_adjustment_amount:
   description: "Additional phaseout threshold for married filing jointly taxpayers"
   reference: "26 USC 32(b)(2)(B)"
-  unit: "USD"
+  unit: USD
   indexed_by: "inflation"
   values:
     2024-01-01: 6_920
@@ -30,7 +30,7 @@ variable joint_return_adjustment:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "EITC Joint Return Adjustment"
   description: "Additional phaseout threshold amount for joint filers per 26 USC 32(b)(2)(B)"
   syntax: python

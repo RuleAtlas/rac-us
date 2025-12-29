@@ -13,7 +13,7 @@ input net_capital_gain:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Capital Gain"
   description: "Net capital gain as defined in section 1(h)"
   default: 0
@@ -22,7 +22,7 @@ input qualified_coop_dividends:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Qualified Cooperative Dividends"
   description: "Aggregate amount of qualified cooperative dividends"
   default: 0
@@ -30,7 +30,7 @@ input qualified_coop_dividends:
 parameter qbi_deduction_rate:
   description: "Section 199A deduction rate for pass-through income per 26 USC 199A(a)(2)"
   reference: "26 USC 199A(a)(2)"
-  unit: "/1"
+  unit: /1
   values:
     2018-01-01: 0.20
 
@@ -54,7 +54,7 @@ variable qbi_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Qualified Business Income Deduction"
   description: "Section 199A deduction for pass-through income per 26 USC § 199A(a)"
   syntax: python

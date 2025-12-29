@@ -20,7 +20,7 @@ input foreign_source_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Foreign Source Income"
   description: "Income from foreign sources"
   default: 0
@@ -29,7 +29,7 @@ input worldwide_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Worldwide Income"
   description: "Total worldwide income"
   default: 0
@@ -43,7 +43,7 @@ variable special_rules:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Regular Tax"
   description: "Regular income tax for Section 55(c) cross-reference"
   syntax: python

@@ -90,7 +90,7 @@ parameter burial_funds_limit_individual:
   reference: "42 USC 1382b(a)"
   unit: USD
   values:
-    1974-01-01: 1500
+    1974-01-01: 1_500
   label: "SSI Burial Funds Limit (Individual)"
 
 parameter burial_funds_limit_couple:
@@ -98,7 +98,7 @@ parameter burial_funds_limit_couple:
   reference: "42 USC 1382b(a)"
   unit: USD
   values:
-    1974-01-01: 3000
+    1974-01-01: 3_000
   label: "SSI Burial Funds Limit (Couple)"
 
 parameter life_insurance_limit:
@@ -106,7 +106,7 @@ parameter life_insurance_limit:
   reference: "42 USC 1382b(a)"
   unit: USD
   values:
-    1974-01-01: 1500
+    1974-01-01: 1_500
   label: "SSI Life Insurance Face Value Limit"
 
 variable resource_exclusions:

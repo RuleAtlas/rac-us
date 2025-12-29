@@ -32,7 +32,7 @@ variable additional_standard_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Additional Standard Deduction"
   description: "Additional standard deduction amounts for aged and blind taxpayers per 26 USC 63(f)"
   syntax: python

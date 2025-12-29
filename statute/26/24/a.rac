@@ -20,7 +20,7 @@ variable ctc_gross_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "CTC Gross Credit"
   description: "Total CTC before phaseout per 26 USC 24(a)"
   formula: return credit_amount * num_ctc_qualifying_children
@@ -41,7 +41,7 @@ variable ctc_phaseout_threshold:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "CTC Phaseout Threshold"
   description: "Income threshold where CTC phaseout begins per 26 USC 24(b)(2) and 24(h)(3)"
   syntax: python
@@ -69,7 +69,7 @@ variable ctc_phaseout_reduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "CTC Phaseout Reduction"
   description: "Credit reduction based on income above threshold per 26 USC 24(b)(1)"
   syntax: python
@@ -97,7 +97,7 @@ variable child_tax_credit_before_limit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "CTC Before Tax Liability Limit"
   description: "Child Tax Credit after phaseout but before tax liability limit per 26 USC 24(a)-(b)"
   syntax: python
@@ -134,7 +134,7 @@ variable child_tax_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Child Tax Credit (Non-refundable)"
   description: "Non-refundable portion of CTC limited to tax liability per 26 USC 24(a) and 26(a)"
   syntax: python
@@ -165,7 +165,7 @@ variable ctc_total:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total Child Tax Credit"
   description: "Combined non-refundable CTC and refundable ACTC"
   formula: return child_tax_credit + additional_child_tax_credit

@@ -25,7 +25,7 @@ input gross_income:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Gross Income"
   description: "Total gross monthly income before deductions"
   default: 0
@@ -35,8 +35,8 @@ imports:
 
 parameter fpl_base:
   values:
-    2024-01-01: 1255
-  unit: "USD"
+    2024-01-01: 1_255
+  unit: USD
   period: Month
   label: "Federal Poverty Level Base"
   description: "Monthly FPL for 1-person household"
@@ -45,7 +45,7 @@ parameter fpl_base:
 parameter fpl_additional_per_person:
   values:
     2024-01-01: 440
-  unit: "USD"
+  unit: USD
   period: Month
   label: "FPL Additional Per Person"
   description: "Monthly FPL increment for each additional person"
@@ -54,7 +54,7 @@ parameter fpl_additional_per_person:
 parameter gross_income_limit_pct:
   values:
     1977-01-01: 1.30
-  unit: "/1"
+  unit: /1
   period: Month
   label: "SNAP Gross Income Limit"
   description: "Gross income must be at or below this percentage of FPL"
@@ -63,7 +63,7 @@ parameter gross_income_limit_pct:
 parameter net_income_limit_pct:
   values:
     1977-01-01: 1.00
-  unit: "/1"
+  unit: /1
   period: Month
   label: "SNAP Net Income Limit"
   description: "Net income must be at or below this percentage of FPL"
@@ -73,7 +73,7 @@ variable snap_fpl_monthly:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Monthly FPL"
   description: "Monthly Federal Poverty Level for household, scaled by size"
   syntax: python

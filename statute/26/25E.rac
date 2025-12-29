@@ -15,7 +15,7 @@ variable used_vehicle_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Used Clean Vehicle Credit"
   description: "Credit for previously-owned clean vehicles per 26 USC 25E"
   syntax: python

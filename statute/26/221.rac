@@ -31,7 +31,7 @@ an individual with respect to whom a deduction under section
 parameter max_deduction:
   description: "Maximum annual student loan interest deduction"
   reference: "26 USC 221(b)(1)"
-  unit: "USD"
+  unit: USD
   values:
     2024-01-01: 2_500
     2023-01-01: 2_500
@@ -41,7 +41,7 @@ parameter max_deduction:
 parameter phaseout_single_start:
   description: "Modified AGI threshold where student loan deduction phases out (single filers)"
   reference: "26 USC 221(b)(2)(B)"
-  unit: "USD"
+  unit: USD
   values:
     2024-01-01: 80_000
     2023-01-01: 75_000
@@ -50,7 +50,7 @@ parameter phaseout_single_start:
 parameter phaseout_single_end:
   description: "Modified AGI threshold where student loan deduction fully phases out (single filers)"
   reference: "26 USC 221(b)(2)(B)"
-  unit: "USD"
+  unit: USD
   values:
     2024-01-01: 95_000
     2023-01-01: 90_000
@@ -60,7 +60,7 @@ parameter phaseout_single_end:
 parameter phaseout_joint_start:
   description: "Modified AGI threshold where student loan deduction phases out (MFJ)"
   reference: "26 USC 221(b)(2)(B)"
-  unit: "USD"
+  unit: USD
   values:
     2024-01-01: 165_000
     2023-01-01: 155_000
@@ -69,7 +69,7 @@ parameter phaseout_joint_start:
 parameter phaseout_joint_end:
   description: "Modified AGI threshold where student loan deduction fully phases out (MFJ)"
   reference: "26 USC 221(b)(2)(B)"
-  unit: "USD"
+  unit: USD
   values:
     2024-01-01: 195_000
     2023-01-01: 185_000
@@ -190,7 +190,7 @@ variable student_loan_interest:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Student Loan Interest Deduction"
   description: "Above-the-line deduction for interest paid on qualified education loans per 26 USC 221"
   syntax: python

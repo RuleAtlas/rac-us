@@ -20,7 +20,7 @@ variable nol_carryforward_pre_2018:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Pre-2018 NOL Carryforward"
   description: "Net operating losses originating before 2018, not subject to 80% limitation"
   default: 0
@@ -44,7 +44,7 @@ variable nol_carryforward_post_2017:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Post-2017 NOL Carryforward"
   description: "Net operating losses originating after 2017, subject to 80% limitation"
   default: 0
@@ -68,7 +68,7 @@ variable farming_loss_carryback:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Farming Loss Carryback"
   description: "Farming loss available for 2-year carryback under Section 172(b)(1)(B)"
   default: 0
@@ -115,7 +115,7 @@ variable current_year_farming_loss:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Current Year Farming Loss"
   description: "Net operating loss from farming business in current year"
   default: 0
@@ -139,7 +139,7 @@ variable prior_nol_deduction_claimed:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Prior NOL Deduction Claimed"
   description: "NOL deduction amount claimed in current year (for modification calculation)"
   default: 0

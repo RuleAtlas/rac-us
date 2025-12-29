@@ -6,7 +6,7 @@ input child_support_paid:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Child Support Paid"
   description: "Monthly child support payments legally obligated and actually made"
   default: 0
@@ -15,7 +15,7 @@ variable snap_child_support_deduction:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Child Support Deduction"
   description: "Deduction for legally obligated child support payments actually made"
   syntax: python

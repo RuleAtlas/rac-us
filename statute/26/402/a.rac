@@ -14,7 +14,7 @@ variable distributions:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Taxable Distribution"
   description: "Taxable distribution after excluding rollover amounts"
   syntax: python

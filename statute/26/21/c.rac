@@ -26,7 +26,7 @@ variable expense_limit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "CDCC Maximum Expense Limit"
   description: "Dollar limit on creditable expenses based on number of qualifying individuals per 26 USC 21(c)"
   syntax: python

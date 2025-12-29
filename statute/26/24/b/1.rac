@@ -20,7 +20,7 @@ parameter phaseout_increment:
   reference: "26 USC 24(b)(1)"
   unit: USD
   values:
-    1997-01-01: 1000  # Per $1,000 (or fraction thereof)
+    1997-01-01: 1_000  # Per $1,000 (or fraction thereof)
 
 variable ctc_phaseout_amount:
   imports:
@@ -29,7 +29,7 @@ variable ctc_phaseout_amount:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "CTC Phaseout Amount"
   description: "Credit reduction based on excess income per 26 USC 24(b)(1): $50 per $1,000 (or fraction thereof) above threshold"
   syntax: python

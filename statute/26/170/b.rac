@@ -21,7 +21,7 @@ variable percentage_limitations:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Charitable Contribution Carryforward"
   description: "Excess contributions to carry forward per 26 USC 170(d)(1)"
   syntax: python

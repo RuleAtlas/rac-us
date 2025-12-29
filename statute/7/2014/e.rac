@@ -10,7 +10,7 @@ input earned_income:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Earned Income"
   description: "Monthly gross earned income from employment"
   default: 0
@@ -19,7 +19,7 @@ input gross_income:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Gross Income"
   description: "Total gross monthly income before deductions"
   default: 0
@@ -28,7 +28,7 @@ input shelter_costs:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Shelter Costs"
   description: "Monthly housing costs including rent/mortgage, utilities, property taxes"
   default: 0
@@ -60,7 +60,7 @@ parameter standard_deduction_schedule:
 parameter excess_shelter_rate:
   description: "USDA defines excess shelter as costs exceeding this fraction of adjusted income."
   reference: "7 USC 2014(e)"
-  unit: "/1"
+  unit: /1
   period: Month
   values:
     1977-01-01: 0.5
@@ -68,7 +68,7 @@ parameter excess_shelter_rate:
 parameter earned_income_deduction_rate:
   description: "SNAP earned income deduction rate applied to gross earnings"
   reference: "7 USC 2014(e)"
-  unit: "/1"
+  unit: /1
   period: Month
   label: "SNAP Earned Income Deduction Rate"
   values:
@@ -90,7 +90,7 @@ variable snap_total_deductions:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Total Deductions"
   description: "Sum of all SNAP income deductions"
   formula: return snap_pre_shelter_deductions + snap_shelter_deduction
@@ -150,7 +150,7 @@ variable snap_standard_deduction:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Standard Deduction"
   description: "Monthly standard deduction based on household size"
   syntax: python
@@ -210,7 +210,7 @@ variable snap_earned_income_deduction:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Earned Income Deduction"
   description: "20% of gross earned income deducted before other calculations"
   syntax: python
@@ -248,7 +248,7 @@ variable snap_pre_shelter_deductions:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Pre-Shelter Deductions"
   description: "Sum of all deductions before excess shelter calculation"
   syntax: python
@@ -298,7 +298,7 @@ variable snap_adjusted_income:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Adjusted Income"
   description: "Gross income minus pre-shelter deductions, used for shelter calculation"
   formula: return max(0, gross_income - snap_pre_shelter_deductions)
@@ -349,7 +349,7 @@ variable snap_shelter_deduction:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Shelter Deduction"
   description: "Deduction for shelter costs exceeding 50% of adjusted income"
   syntax: python
@@ -455,7 +455,7 @@ variable snap_net_income:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Net Income"
   description: "Monthly income after all SNAP deductions, used for benefit calculation"
   syntax: python

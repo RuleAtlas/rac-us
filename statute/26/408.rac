@@ -8,122 +8,122 @@ beneficiaries...
 parameter traditional_ira_contribution_limit:
   description: "Annual contribution limit for traditional IRA accounts"
   reference: "26 USC 408"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 7000
-    2023-01-01: 6500
-    2022-01-01: 6000
+    2024-01-01: 7_000
+    2023-01-01: 6_500
+    2022-01-01: 6_000
 
 parameter traditional_ira_contribution_limit_age50plus:
   description: "Annual contribution limit for traditional IRA accounts for individuals age 50+"
   reference: "26 USC 408"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 8000
-    2023-01-01: 7500
-    2022-01-01: 7000
+    2024-01-01: 8_000
+    2023-01-01: 7_500
+    2022-01-01: 7_000
 
 parameter simple_ira_contribution_limit:
   description: "Annual contribution limit for SIMPLE IRA accounts (employee deferral)"
   reference: "26 USC 408"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 16000
-    2023-01-01: 15500
-    2022-01-01: 14000
+    2024-01-01: 16_000
+    2023-01-01: 15_500
+    2022-01-01: 14_000
 
 parameter simple_ira_contribution_limit_age50plus:
   description: "Annual contribution limit for SIMPLE IRA accounts for individuals age 50+ (catch-up)"
   reference: "26 USC 408"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 19500
-    2023-01-01: 19000
-    2022-01-01: 17500
+    2024-01-01: 19_500
+    2023-01-01: 19_000
+    2022-01-01: 17_500
 
 parameter sep_ira_contribution_rate:
   description: "Maximum annual SEP IRA contribution as percentage of net self-employment income"
   reference: "26 USC 408"
-  unit: "/1"
+  unit: /1
   values:
     1977-01-01: 0.20
 
 parameter roth_ira_contribution_phase_out_mfj_low:
   description: "Lower MAGI threshold for Roth IRA deduction phaseout (Married Filing Jointly)"
   reference: "26 USC 408"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 230000
-    2023-01-01: 218000
-    2022-01-01: 204000
+    2024-01-01: 230_000
+    2023-01-01: 218_000
+    2022-01-01: 204_000
 
 parameter roth_ira_contribution_phase_out_mfj_high:
   description: "Upper MAGI threshold for Roth IRA deduction phaseout (Married Filing Jointly)"
   reference: "26 USC 408"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 240000
-    2023-01-01: 228000
-    2022-01-01: 214000
+    2024-01-01: 240_000
+    2023-01-01: 228_000
+    2022-01-01: 214_000
 
 parameter roth_ira_contribution_phase_out_single_low:
   description: "Lower MAGI threshold for Roth IRA deduction phaseout (Single filer)"
   reference: "26 USC 408"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 146000
-    2023-01-01: 138000
-    2022-01-01: 129000
+    2024-01-01: 146_000
+    2023-01-01: 138_000
+    2022-01-01: 129_000
 
 parameter roth_ira_contribution_phase_out_single_high:
   description: "Upper MAGI threshold for Roth IRA deduction phaseout (Single filer)"
   reference: "26 USC 408"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 161000
-    2023-01-01: 153000
-    2022-01-01: 144000
+    2024-01-01: 161_000
+    2023-01-01: 153_000
+    2022-01-01: 144_000
 
 parameter traditional_ira_deduction_phase_out_mfj_low:
   description: "Lower AGI threshold for traditional IRA deduction phaseout (Married Filing Jointly, covered by workplace plan)"
   reference: "26 USC 408"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 77000
-    2023-01-01: 73000
-    2022-01-01: 68000
+    2024-01-01: 77_000
+    2023-01-01: 73_000
+    2022-01-01: 68_000
 
 parameter traditional_ira_deduction_phase_out_mfj_high:
   description: "Upper AGI threshold for traditional IRA deduction phaseout (Married Filing Jointly, covered by workplace plan)"
   reference: "26 USC 408"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 87000
-    2023-01-01: 83000
-    2022-01-01: 78000
+    2024-01-01: 87_000
+    2023-01-01: 83_000
+    2022-01-01: 78_000
 
 parameter traditional_ira_deduction_phase_out_single_low:
   description: "Lower AGI threshold for traditional IRA deduction phaseout (Single filer, covered by workplace plan)"
   reference: "26 USC 408"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 46000
-    2023-01-01: 43800
-    2022-01-01: 40500
+    2024-01-01: 46_000
+    2023-01-01: 43_800
+    2022-01-01: 40_500
 
 parameter traditional_ira_deduction_phase_out_single_high:
   description: "Upper AGI threshold for traditional IRA deduction phaseout (Single filer, covered by workplace plan)"
   reference: "26 USC 408"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 56000
-    2023-01-01: 53800
-    2022-01-01: 50500
+    2024-01-01: 56_000
+    2023-01-01: 53_800
+    2022-01-01: 50_500
 
 parameter early_withdrawal_penalty_rate:
   description: "Additional tax rate on early IRA distributions (before age 59.5)"
   reference: "26 USC 408"
-  unit: "/1"
+  unit: /1
   values:
     1977-01-01: 0.10
 
@@ -141,7 +141,7 @@ variable traditional_ira_balance:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Traditional IRA Balance"
   description: "Total balance in all traditional IRA accounts"
   default: 0
@@ -166,7 +166,7 @@ variable roth_ira_balance:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Roth IRA Balance"
   description: "Total balance in all Roth IRA accounts"
   default: 0
@@ -257,7 +257,7 @@ variable ira_prior_year_balance:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "IRA Prior Year Balance"
   description: "Total IRA account balance as of December 31 of prior year"
   default: 0
@@ -282,7 +282,7 @@ variable ira_required_minimum_distribution:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "IRA Required Minimum Distribution"
   description: "Minimum amount that must be withdrawn from IRA"
   syntax: python
@@ -383,7 +383,7 @@ variable total_ira_balance:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total IRA Balance"
   description: "Combined balance of all traditional and Roth IRAs"
   formula: return traditional_ira_balance + roth_ira_balance

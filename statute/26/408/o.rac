@@ -16,7 +16,7 @@ account at the end of the tax year.
 parameter contribution_limit_excess_tax_rate:
   description: "Excise tax rate on excess IRA contributions"
   reference: "26 USC 408(o)"
-  unit: "/1"
+  unit: /1
   values:
     1977-01-01: 0.06
 
@@ -24,7 +24,7 @@ input traditional_ira_contributions:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Traditional IRA Contributions"
   description: "Amount contributed to traditional IRA accounts during the year"
   default: 0
@@ -33,7 +33,7 @@ input roth_ira_contributions:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Roth IRA Contributions"
   description: "Amount contributed to Roth IRA accounts during the year"
   default: 0
@@ -46,7 +46,7 @@ variable contribution_limits:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Excess Contribution Penalty"
   description: "6% excise tax on excess IRA contributions left in account"
   syntax: python

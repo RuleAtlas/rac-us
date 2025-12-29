@@ -11,7 +11,7 @@ variable total_nonrefundable_credits:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total Nonrefundable Credits"
   description: "Sum of nonrefundable personal credits per 26 USC Section 26, limited by tax liability"
   syntax: python

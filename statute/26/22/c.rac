@@ -21,7 +21,7 @@ variable initial_amount:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Section 22 Initial Amount"
   description: "Initial section 22 amount before reductions per 26 USC 22(c)(1)"
   syntax: python

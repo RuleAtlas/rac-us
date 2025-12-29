@@ -1,4 +1,3 @@
-# 26 USC 30D - New Clean Vehicle Credit
 #
 # The credit is comprised of two components of $3,750 each:
 #   - Critical minerals component: 30D(b)(2)
@@ -33,27 +32,27 @@ parameters:
   credit:
     critical_minerals_amount:
       values:
-        2023: 3750
-        2024: 3750
+        2023: 3_750
+        2024: 3_750
       description: "Credit amount for meeting critical minerals requirements"
       reference: "26 USC 30D(b)(2)"
-      unit: "USD"
+      unit: USD
 
     battery_components_amount:
       values:
-        2023: 3750
-        2024: 3750
+        2023: 3_750
+        2024: 3_750
       description: "Credit amount for meeting battery components requirements"
       reference: "26 USC 30D(b)(3)"
-      unit: "USD"
+      unit: USD
 
     maximum_credit:
       values:
-        2023: 7500
-        2024: 7500
+        2023: 7_500
+        2024: 7_500
       description: "Maximum total credit ($3,750 + $3,750)"
       reference: "26 USC 30D(b)"
-      unit: "USD"
+      unit: USD
 
   eligibility:
     min_battery_capacity_kwh:
@@ -62,53 +61,53 @@ parameters:
         2024: 7
       description: "Minimum battery capacity in kWh"
       reference: "26 USC 30D(d)(1)(F)"
-      unit: "kWh"
+      unit: kWh
 
     msrp_limit_van_suv_pickup:
       values:
-        2023: 80000
-        2024: 80000
+        2023: 80_000
+        2024: 80_000
       description: "MSRP limit for vans, SUVs, and pickup trucks"
       reference: "26 USC 30D(f)(11)(B)(i)"
-      unit: "USD"
+      unit: USD
 
     msrp_limit_other:
       values:
-        2023: 55000
-        2024: 55000
+        2023: 55_000
+        2024: 55_000
       description: "MSRP limit for all other vehicles"
       reference: "26 USC 30D(f)(11)(B)(ii)"
-      unit: "USD"
+      unit: USD
 
     income_limit:
       JOINT:
         values:
-          2023: 300000
-          2024: 300000
+          2023: 300_000
+          2024: 300_000
         description: "AGI limit for joint filers"
         reference: "26 USC 30D(f)(10)(B)(i)"
       SURVIVING_SPOUSE:
         values:
-          2023: 300000
-          2024: 300000
+          2023: 300_000
+          2024: 300_000
         description: "AGI limit for surviving spouse"
         reference: "26 USC 30D(f)(10)(B)(i)"
       HEAD_OF_HOUSEHOLD:
         values:
-          2023: 225000
-          2024: 225000
+          2023: 225_000
+          2024: 225_000
         description: "AGI limit for head of household"
         reference: "26 USC 30D(f)(10)(B)(ii)"
       SINGLE:
         values:
-          2023: 150000
-          2024: 150000
+          2023: 150_000
+          2024: 150_000
         description: "AGI limit for single filers"
         reference: "26 USC 30D(f)(10)(B)(iii)"
       SEPARATE:
         values:
-          2023: 150000
-          2024: 150000
+          2023: 150_000
+          2024: 150_000
         description: "AGI limit for married filing separately"
         reference: "26 USC 30D(f)(10)(B)(iii)"
 
@@ -125,7 +124,7 @@ input new_clean_vehicle_msrp:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "New Clean Vehicle MSRP"
   description: "Manufacturer's suggested retail price of the new clean vehicle"
   default: 0
@@ -134,7 +133,7 @@ input new_clean_vehicle_battery_capacity_kwh:
   entity: TaxUnit
   period: Year
   dtype: Decimal
-  unit: "kWh"
+  unit: kWh
   label: "New Clean Vehicle Battery Capacity"
   description: "Battery capacity in kilowatt-hours of new clean vehicle"
   default: 0
@@ -187,7 +186,7 @@ variable new_vehicle_msrp_limit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Applicable MSRP Limit"
   description: "MSRP limit based on vehicle classification"
   reference: "26 USC 30D(f)(11)(B)"
@@ -214,7 +213,7 @@ variable new_vehicle_agi_limit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Applicable AGI Limit"
   description: "Modified AGI limit based on filing status"
   reference: "26 USC 30D(f)(10)(B)"
@@ -263,7 +262,7 @@ variable new_vehicle_critical_minerals_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Critical Minerals Credit Component"
   description: "Credit amount for meeting critical minerals requirements"
   reference: "26 USC 30D(b)(2)"
@@ -279,7 +278,7 @@ variable new_vehicle_battery_components_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Battery Components Credit Component"
   description: "Credit amount for meeting battery components requirements"
   reference: "26 USC 30D(b)(3)"
@@ -298,7 +297,7 @@ variable new_vehicle_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "New Clean Vehicle Credit"
   description: "Credit for new clean vehicles per 26 USC 30D"
   reference: "26 USC 30D(a), (b)"

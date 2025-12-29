@@ -25,7 +25,7 @@ variable self_employment_medicare_tax:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Self-Employment Medicare Tax"
   description: "Hospital Insurance tax per 26 USC 1401(b)(1)"
   syntax: python

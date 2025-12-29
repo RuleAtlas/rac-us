@@ -22,7 +22,7 @@ variable investment_interest:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Investment Interest Carryforward"
   description: "Disallowed investment interest carried to succeeding year per 26 USC 163(d)(2)"
   formula: return max(0, investment_income - investment_expenses)

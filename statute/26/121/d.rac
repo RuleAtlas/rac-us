@@ -1,5 +1,3 @@
-# 26 USC § 121(d) - Special Rules
-
 text: """
 (6) Recognition of gain attributable to depreciation - Subsection (a) shall
 not apply to so much of the gain from the sale of any property as does not
@@ -12,7 +10,7 @@ input realized_gain_on_residence:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Realized Gain on Residence"
   description: "Amount of gain realized on sale or exchange of principal residence"
   default: 0
@@ -21,7 +19,7 @@ input depreciation_after_1997:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Depreciation After May 6, 1997"
   description: "Amount of depreciation deductions taken after May 6, 1997 (Section 1250 property)"
   default: 0
@@ -30,7 +28,7 @@ variable excludable_gain:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   description: "Gain eligible for exclusion per 121(d)(6) (realized gain minus depreciation recapture)"
   syntax: python
   formula: |

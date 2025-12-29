@@ -11,7 +11,7 @@ input self_employment_tax_paid:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Self-Employment Tax Paid"
   description: "Total self-employment tax paid during the tax year"
   default: 0
@@ -20,7 +20,7 @@ input self_employed_health_insurance_premiums:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Self-Employed Health Insurance Premiums"
   description: "Health insurance premiums paid for self-employed individual and spouse/dependents"
   default: 0
@@ -31,7 +31,7 @@ variable self_employment_tax_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Self-Employment Tax Deduction"
   description: "Deductible portion (50%) of self-employment tax per 26 USC 164(f)"
   syntax: python
@@ -45,7 +45,7 @@ variable self_employed_health_insurance_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Self-Employed Health Insurance Deduction"
   description: "Health insurance premiums for self-employed individuals per 26 USC 162(l)"
   syntax: python

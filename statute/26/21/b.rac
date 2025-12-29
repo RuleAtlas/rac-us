@@ -8,14 +8,14 @@ adjusted gross income for the taxable year exceeds $15,000.
 parameter maximum_rate:
   description: "Maximum applicable percentage for CDCC"
   reference: "26 USC 21(b)"
-  unit: "/1"
+  unit: /1
   values:
     1976-01-01: 0.35
 
 parameter minimum_rate:
   description: "Minimum applicable percentage for CDCC (floor rate)"
   reference: "26 USC 21(b)"
-  unit: "/1"
+  unit: /1
   values:
     1976-01-01: 0.20
 
@@ -36,7 +36,7 @@ parameter phase_down_increment:
 parameter phase_down_rate:
   description: "Rate reduction per AGI increment"
   reference: "26 USC 21(b)"
-  unit: "/1"
+  unit: /1
   values:
     1976-01-01: 0.01
 

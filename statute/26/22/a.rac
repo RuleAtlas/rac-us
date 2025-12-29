@@ -12,7 +12,7 @@ variable elderly_disabled_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Credit for the Elderly or Disabled"
   description: "Final credit for the elderly or disabled per 26 USC 22 (nonrefundable)"
   syntax: python
@@ -84,7 +84,7 @@ variable inputs:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Taxable Pension and Annuity Income"
   description: "Pension and annuity income included in gross income (excludes Social Security)"
   default: 0

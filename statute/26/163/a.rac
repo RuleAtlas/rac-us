@@ -8,7 +8,7 @@ variable interest_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Interest Deduction"
   description: "Total deductible interest for itemized deductions per 26 USC 163"
   syntax: python

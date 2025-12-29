@@ -9,7 +9,7 @@ variable charitable_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Charitable Contribution Deduction"
   description: "Total deductible charitable contributions for itemized deductions per 26 USC 170(a)"
   syntax: python

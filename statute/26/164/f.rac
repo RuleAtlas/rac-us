@@ -15,7 +15,7 @@ variable se_tax_deduction:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Self-Employment Tax Deduction"
   description: "Deduction for one-half of self-employment taxes per 164(f)"
   syntax: python

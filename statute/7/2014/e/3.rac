@@ -9,7 +9,7 @@ input dependent_care_expenses:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Dependent Care Expenses"
   description: "Monthly out-of-pocket expenses for care of dependents needed for work/training"
   default: 0
@@ -18,7 +18,7 @@ variable snap_dependent_care_deduction:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Dependent Care Deduction"
   description: "Deduction for dependent care expenses necessary for work or training"
   syntax: python

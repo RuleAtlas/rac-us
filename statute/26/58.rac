@@ -17,7 +17,7 @@ variable denial_of_losses:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total Section 58 Loss Adjustments"
   description: "Sum of all loss disallowances under Section 58"
   syntax: python

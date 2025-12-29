@@ -34,51 +34,51 @@ in which such individual's taxable year begins.
 parameter max_deduction:
   description: "Maximum annual student loan interest deduction"
   reference: "26 USC 221(a)"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 2500
-    2023-01-01: 2500
-    2000-01-01: 2500
+    2024-01-01: 2_500
+    2023-01-01: 2_500
+    2000-01-01: 2_500
 
 # 26 USC 221(b)(2)(B) - Income phaseout start for single/HOH/QW filers
 parameter phaseout_single_start:
   description: "Modified AGI threshold where student loan deduction phases out (single filers)"
   reference: "26 USC 221(a)"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 50000
-    2023-01-01: 50000
-    2000-01-01: 50000
+    2024-01-01: 50_000
+    2023-01-01: 50_000
+    2000-01-01: 50_000
 
 # 26 USC 221(b)(2)(B) - Income phaseout range for single/HOH/QW filers
 parameter phaseout_single_end:
   description: "Modified AGI threshold where student loan deduction fully phases out (single filers)"
   reference: "26 USC 221(a)"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 65000
-    2023-01-01: 65000
-    2000-01-01: 65000
+    2024-01-01: 65_000
+    2023-01-01: 65_000
+    2000-01-01: 65_000
 
 # 26 USC 221(b)(2)(B) - Income phaseout start for married filing jointly
 parameter phaseout_joint_start:
   description: "Modified AGI threshold where student loan deduction phases out (MFJ)"
   reference: "26 USC 221(a)"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 100000
-    2023-01-01: 100000
-    2000-01-01: 100000
+    2024-01-01: 100_000
+    2023-01-01: 100_000
+    2000-01-01: 100_000
 
 # 26 USC 221(b)(2)(B) - Income phaseout range for married filing jointly
 parameter phaseout_joint_end:
   description: "Modified AGI threshold where student loan deduction fully phases out (MFJ)"
   reference: "26 USC 221(a)"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 130000
-    2023-01-01: 130000
-    2000-01-01: 130000
+    2024-01-01: 130_000
+    2023-01-01: 130_000
+    2000-01-01: 130_000
 variable student_loan_deduction:
   imports:
     - 26/1#filing_status
@@ -87,7 +87,7 @@ variable student_loan_deduction:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Student Loan Interest Paid"
   description: "Interest paid by the taxpayer on qualified education loans during the tax year"
 
@@ -109,7 +109,7 @@ variable student_loan_interest_deduction_eligible:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Phase-out Start Threshold"
   description: "MAGI threshold where student loan interest deduction phase-out begins"
   syntax: python
@@ -125,7 +125,7 @@ variable student_loan_interest_phaseout_start:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Phase-out End Threshold"
   description: "MAGI threshold where student loan interest deduction is fully phased out"
   syntax: python
@@ -151,7 +151,7 @@ variable student_loan_interest_phaseout_ratio:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Student Loan Interest Deduction (Before Phase-out)"
   description: "Deduction amount before applying income-based phase-out"
   syntax: python
@@ -237,7 +237,7 @@ variable student_loan_interest_deduction_before_phaseout:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Student Loan Interest Deduction"
   description: "Above-the-line deduction for interest paid on qualified education loans per 26 USC 221"
   syntax: python
@@ -277,7 +277,7 @@ variable student_loan_interest_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   syntax: python
   formula: |
     # Check eligibility per 221(d)

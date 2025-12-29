@@ -14,7 +14,7 @@ input earned_income:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Earned Income"
   description: "Wages and self-employment income"
   default: 0
@@ -23,7 +23,7 @@ input adjusted_gross_income:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Adjusted Gross Income"
   description: "AGI for phaseout calculation"
   default: 0
@@ -59,7 +59,7 @@ variable ira_deduction:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Traditional IRA Deduction"
   description: "Maximum traditional IRA deduction after phaseout"
   syntax: python

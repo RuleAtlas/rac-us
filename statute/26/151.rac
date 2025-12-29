@@ -7,17 +7,17 @@ in computing taxable income.
 parameter exemption_amount:
   description: "Personal exemption amount per exemption"
   reference: "26 USC 151"
-  unit: "USD"
+  unit: USD
   values:
     2018-01-01: 0  # Suspended by TCJA
-    2017-01-01: 4050
-    2016-01-01: 4050
+    2017-01-01: 4_050
+    2016-01-01: 4_050
 
 variable personal_exemption:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Personal Exemption"
   description: "Deduction for personal exemptions per 26 USC 151 (suspended 2018-2025)"
   syntax: python

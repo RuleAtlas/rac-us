@@ -41,7 +41,7 @@ input earned_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Earned Income"
   description: "Taxpayer's earned income for dependent standard deduction calculation"
   default: 0
@@ -86,7 +86,7 @@ variable standard_deduction_standalone:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Standard Deduction"
   description: "Total standard deduction including basic and additional amounts per 26 USC 63"
   syntax: python

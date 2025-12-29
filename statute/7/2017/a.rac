@@ -29,7 +29,7 @@ parameter max_allotment_schedule:
 parameter max_schedule_size:
   description: "Maximum household size with specific allotment in schedule"
   reference: "7 USC 2017(a)"
-  unit: "/1"
+  unit: /1
   period: Month
   values:
     1977-01-01: 8
@@ -47,7 +47,7 @@ parameter additional_per_person:
 parameter minimum_benefit_max_size:
   description: "Maximum household size eligible for minimum benefit"
   reference: "7 USC 2017(a)"
-  unit: "/1"
+  unit: /1
   period: Month
   values:
     1977-01-01: 2
@@ -66,7 +66,7 @@ parameter minimum_amount:
 parameter contribution_rate:
   description: "Household contribution as share of net income"
   reference: "7 USC 2017(a)"
-  unit: "/1"
+  unit: /1
   period: Month
   values:
     1977-01-01: 0.30
@@ -75,7 +75,7 @@ variable snap_max_allotment:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Maximum Allotment"
   description: "Maximum monthly SNAP benefit based on Thrifty Food Plan for household size"
   syntax: python
@@ -162,7 +162,7 @@ variable snap_expected_contribution:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Expected Contribution"
   description: "Expected household contribution toward food costs (30% of net income)"
   formula: return round(snap_net_income * contribution_rate)
@@ -215,7 +215,7 @@ variable snap_calculated_benefit:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Calculated Benefit"
   description: "SNAP benefit calculated as maximum allotment minus expected contribution"
   formula: return snap_max_allotment - snap_expected_contribution
@@ -256,7 +256,7 @@ variable snap_minimum_benefit:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Minimum Benefit"
   description: "Minimum monthly SNAP benefit for 1-2 person households"
   syntax: python
@@ -308,7 +308,7 @@ variable snap_allotment:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Allotment"
   description: "Final monthly SNAP benefit amount"
   syntax: python

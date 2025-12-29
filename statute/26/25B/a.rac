@@ -12,7 +12,7 @@ variable savers_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Saver's Credit"
   description: "Credit for qualified retirement savings contributions per 26 USC 25B (nonrefundable)"
   syntax: python

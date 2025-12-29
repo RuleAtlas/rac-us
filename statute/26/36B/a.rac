@@ -20,7 +20,7 @@ input actual_health_premium:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Actual Health Plan Premium"
   description: "Annual premium for enrolled qualified health plan"
   default: 0
@@ -29,7 +29,7 @@ input actual_health_premium_monthly:
   entity: TaxUnit
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Monthly Health Plan Premium"
   description: "Monthly premium for enrolled qualified health plan"
   default: 0
@@ -41,7 +41,7 @@ variable monthly_expected_contribution:
   entity: TaxUnit
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Monthly Expected Contribution"
   description: "Taxpayer's expected monthly contribution toward premium per 26 USC 36B(b)(3)(A)(ii)"
   syntax: python
@@ -58,7 +58,7 @@ variable monthly_benchmark_excess:
   entity: TaxUnit
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Monthly Benchmark Excess"
   description: "Excess of SLCSP benchmark over expected contribution per 26 USC 36B(b)(3)(A)"
   syntax: python
@@ -73,7 +73,7 @@ variable monthly_premium_assistance:
   entity: TaxUnit
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Monthly Premium Assistance"
   description: "Monthly premium assistance amount per 26 USC 36B(b)(2)"
   syntax: python
@@ -91,7 +91,7 @@ variable premium_assistance_credit_amount:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Premium Assistance Credit Amount"
   description: "Annual premium assistance credit per 26 USC 36B(b)(1)"
   syntax: python
@@ -110,7 +110,7 @@ variable premium_tax_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Premium Tax Credit"
   description: "Premium tax credit per 26 USC 36B(a) - credit amount equals premium assistance credit amount"
   syntax: python

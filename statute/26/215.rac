@@ -20,7 +20,7 @@ rules apply.
 parameter alimony_deduction_rate:
   description: "Rate at which alimony paid is deductible (1.0 for pre-2019 agreements)"
   reference: "26 USC 215(a)"
-  unit: "/1"
+  unit: /1
   values:
     2024-01-01: 1.0
     2019-01-01: 1.0
@@ -30,7 +30,7 @@ input alimony_paid:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Alimony Paid"
   description: "Total alimony or separate maintenance payments made during the tax year"
   default: 0
@@ -48,7 +48,7 @@ variable alimony_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Alimony Deduction"
   description: "Above-the-line deduction for alimony payments per 26 USC 62(a)(10) and 215"
   syntax: python

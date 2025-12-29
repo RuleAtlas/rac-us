@@ -9,7 +9,7 @@ variable itemized_deductions:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Itemized Deductions"
   description: "Deductions allowable under IRC Chapter 1 other than AGI deductions or personal exemptions per 26 USC 63(d)"
   imports:
@@ -22,7 +22,7 @@ variable itemized_taxable_income_deductions:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total Itemized Deductions"
   description: "Sum of allowable itemized deductions per 26 USC 63(d)"
   syntax: python
@@ -97,7 +97,7 @@ variable total_itemized_deductions:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total Itemized Deductions"
   description: "Alias for itemized_taxable_income_deductions"
   syntax: python

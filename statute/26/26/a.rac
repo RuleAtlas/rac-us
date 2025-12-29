@@ -11,7 +11,7 @@ variable tax_liability_before_credits:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Tax Liability Before Credits"
   description: "Maximum amount of nonrefundable credits per Section 26(a)"
   syntax: python

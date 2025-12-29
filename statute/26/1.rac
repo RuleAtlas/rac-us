@@ -120,7 +120,7 @@ variable income_tax_before_credits:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Income Tax Before Credits"
   description: "Federal income tax on ordinary income before credits per 26 USC Section 1"
   syntax: python
@@ -327,7 +327,7 @@ variable income_tax_before_credits_vectorized:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Income Tax Before Credits (Vectorized)"
   description: "Vectorized implementation for microsimulation"
   syntax: python
@@ -348,7 +348,7 @@ variable total_federal_income_tax:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total Federal Income Tax"
   description: "Final federal income tax liability (negative = refund) per 26 USC Section 1"
   syntax: python

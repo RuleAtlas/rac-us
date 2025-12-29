@@ -16,7 +16,7 @@ section 2(b)), or
 parameter basic_joint:
   description: "Basic standard deduction for married filing jointly or surviving spouse"
   reference: "26 USC 63(c)(2)"
-  unit: "USD"
+  unit: USD
   indexed_by: statute/26/63/c/4
   values:
     1988-01-01: 5_000
@@ -29,7 +29,7 @@ parameter basic_joint:
 parameter basic_head_of_household:
   description: "Basic standard deduction for head of household filing status"
   reference: "26 USC 63(c)(2)"
-  unit: "USD"
+  unit: USD
   indexed_by: statute/26/63/c/4
   values:
     1988-01-01: 4_400
@@ -42,7 +42,7 @@ parameter basic_head_of_household:
 parameter basic_single:
   description: "Basic standard deduction for single or married filing separately"
   reference: "26 USC 63(c)(2)"
-  unit: "USD"
+  unit: USD
   indexed_by: statute/26/63/c/4
   values:
     1988-01-01: 3_000
@@ -57,7 +57,7 @@ variable basic_standard_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Basic Standard Deduction"
   description: "Basic standard deduction amount based on filing status per 26 USC 63(c)(2)"
   syntax: python

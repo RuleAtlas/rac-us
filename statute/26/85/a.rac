@@ -20,7 +20,7 @@ the loss of employment. This includes:
 parameter unemployment_inclusion_rate:
   description: "Fraction of unemployment compensation included in gross income"
   reference: "26 USC 85(a)"
-  unit: "/1"
+  unit: /1
   values:
     2024-01-01: 1.0
     2023-01-01: 1.0
@@ -32,7 +32,7 @@ variable unemployment_compensation:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Unemployment Compensation"
   description: "Unemployment compensation received per 26 USC Section 85(a)"
   default: 0
@@ -52,7 +52,7 @@ variable person_unemployment_included:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Unemployment Compensation Included in Income"
   description: "Amount of unemployment compensation included in gross income per 26 USC 85(a)"
   syntax: python

@@ -1,5 +1,3 @@
-# 26 USC § 213(d)(1) - Definition of Medical Care
-
 text: """
 (1) The term 'medical care' means amounts paid—
 (A) for the diagnosis, cure, mitigation, treatment, or prevention
@@ -22,7 +20,7 @@ variable qualified_medical_expenses:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Qualifying Medical Expenses"
   description: "Medical expenses eligible for deduction, net of insurance reimbursement"
   syntax: python

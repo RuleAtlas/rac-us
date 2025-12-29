@@ -7,7 +7,7 @@ input student_loan_interest_paid:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Student Loan Interest Paid"
   description: "Total interest paid on qualified education loans during tax year"
   default: 0
@@ -16,7 +16,7 @@ input student_loan_interest_paid:
 parameter max_deduction:
   description: "Maximum annual student loan interest deduction"
   reference: "26 USC 62(a)(17)"
-  unit: "USD"
+  unit: USD
   values:
     2024-01-01: 2_500
     2023-01-01: 2_500
@@ -27,7 +27,7 @@ variable student_loan_interest_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Student Loan Interest Deduction"
   description: "Above-the-line deduction for student loan interest per 26 USC 221"
   syntax: python

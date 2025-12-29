@@ -7,7 +7,7 @@ variable net_rent_royalty_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Rent and Royalty Income"
   description: "Passive rental and royalty income not from trade or business, counted for EITC investment income test per 26 USC §32(i)(2)(C)"
   tests:

@@ -31,7 +31,7 @@ spouse.
 parameter alimony_income_inclusion_rate:
   description: "Rate at which alimony received is includible in gross income"
   reference: "26 USC 71(a); Tax Cuts and Jobs Act of 2017"
-  unit: "/1"
+  unit: /1
   values:
     2019-01-01: 1.0
     2000-01-01: 1.0
@@ -48,7 +48,7 @@ input alimony_received:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Alimony Received"
   description: "Total alimony or separate maintenance payments received during the tax year"
   default: 0
@@ -57,7 +57,7 @@ variable alimony_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Tax Unit Taxable Alimony Income"
   description: "Total alimony includible in gross income for the tax unit"
   reference: "26 USC 71(a)"

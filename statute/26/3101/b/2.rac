@@ -15,7 +15,7 @@ input irs_employment_income:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Employment Income"
   description: "Wages, salaries, and tips subject to employment taxes"
   default: 0
@@ -24,7 +24,7 @@ input taxable_self_employment_income:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Taxable Self-Employment Income"
   description: "Self-employment income subject to Additional Medicare Tax"
   default: 0
@@ -35,7 +35,7 @@ variable additional_medicare_tax:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Additional Medicare Tax"
   description: "0.9% additional Medicare tax on wages above threshold per 26 USC 3_101(b)(2)"
   syntax: python

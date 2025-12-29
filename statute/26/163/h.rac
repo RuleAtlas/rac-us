@@ -16,18 +16,18 @@ separate return).
 parameter acquisition_debt_limit:
   description: "Maximum acquisition indebtedness for mortgage interest deduction"
   reference: "26 USC 163(h)"
-  unit: "USD"
+  unit: USD
   values:
-    1987-01-01: 1000000
-    2017-12-15: 750000  # TCJA reduced limit for debt incurred after this date
+    1987-01-01: 1_000_000
+    2017-12-15: 750_000  # TCJA reduced limit for debt incurred after this date
 
 parameter acquisition_debt_limit_mfs:
   description: "Maximum acquisition indebtedness for married filing separately"
   reference: "26 USC 163(h)"
-  unit: "USD"
+  unit: USD
   values:
-    1987-01-01: 500000
-    2017-12-15: 375000  # TCJA reduced limit for debt incurred after this date
+    1987-01-01: 500_000
+    2017-12-15: 375_000  # TCJA reduced limit for debt incurred after this date
 
 input married_separate:
   entity: TaxUnit
@@ -41,7 +41,7 @@ input acquisition_debt:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Acquisition Debt"
   description: "Total acquisition indebtedness on qualified residence"
   default: 0
@@ -50,7 +50,7 @@ input mortgage_interest_paid:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Mortgage Interest Paid"
   description: "Total mortgage interest paid during the year"
   default: 0
@@ -60,7 +60,7 @@ variable qualified_residence_interest:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Qualified Residence Interest Deduction"
   description: "Deductible interest on qualified residence per 26 USC 163(h)"
   syntax: python

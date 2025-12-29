@@ -96,7 +96,7 @@ variable standard_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Standard Deduction"
   description: "Total standard deduction including basic and additional amounts per 26 USC 63"
   syntax: python

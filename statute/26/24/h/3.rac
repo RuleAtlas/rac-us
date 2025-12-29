@@ -12,9 +12,9 @@ parameter phaseout_threshold_joint:
   reference: "26 USC 24(h)(3)"
   unit: USD
   values:
-    2026-01-01: 110000  # TCJA sunset - revert to pre-TCJA
-    2018-01-01: 400000  # TCJA
-    1997-01-01: 110000  # TRA97 original
+    2026-01-01: 110_000  # TCJA sunset - revert to pre-TCJA
+    2018-01-01: 400_000  # TCJA
+    1997-01-01: 110_000  # TRA97 original
   tests:
     - name: "tcja_joint_2024"
       description: "Joint filer threshold during TCJA period"
@@ -38,9 +38,9 @@ parameter phaseout_threshold_other:
   reference: "26 USC 24(h)(3)"
   unit: USD
   values:
-    2026-01-01: 75000   # TCJA sunset - revert to pre-TCJA
-    2018-01-01: 200000  # TCJA
-    1997-01-01: 75000   # TRA97 original
+    2026-01-01: 75_000   # TCJA sunset - revert to pre-TCJA
+    2018-01-01: 200_000  # TCJA
+    1997-01-01: 75_000   # TRA97 original
   tests:
     - name: "tcja_other_2024"
       description: "Non-joint filer threshold during TCJA period"

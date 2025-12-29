@@ -17,7 +17,7 @@ parameter aoc_first_tier_limit:
   description: "Maximum expenses at 100% rate for American Opportunity Credit"
   reference: "26 USC 25A(i)(1)(A), indexed under 26 USC 25A(h)"
   indexed_by: statute/26/25A/h
-  unit: "USD"
+  unit: USD
   values:
     2009-01-01: 2_000
 
@@ -25,7 +25,7 @@ parameter aoc_first_tier_limit:
 parameter aoc_first_tier_rate:
   description: "Credit rate for first tier of qualified expenses per 26 USC 25A(i)(1)(A)"
   reference: "26 USC 25A(i)(1)(A)"
-  unit: "/1"
+  unit: /1
   values:
     2009-01-01: 1.0
 
@@ -34,7 +34,7 @@ parameter aoc_second_tier_limit:
   description: "Maximum total expenses eligible for American Opportunity Credit"
   reference: "26 USC 25A(i)(1)(B), indexed under 26 USC 25A(h)"
   indexed_by: statute/26/25A/h
-  unit: "USD"
+  unit: USD
   values:
     2009-01-01: 4_000
 
@@ -42,7 +42,7 @@ parameter aoc_second_tier_limit:
 parameter aoc_second_tier_rate:
   description: "Credit rate for second tier of qualified expenses per 26 USC 25A(i)(1)(B)"
   reference: "26 USC 25A(i)(1)(B)"
-  unit: "/1"
+  unit: /1
   values:
     2009-01-01: 0.25
 
@@ -50,7 +50,7 @@ input aoc_qualified_expenses:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "AOC Qualified Expenses"
   description: "Qualified tuition and related expenses for American Opportunity Credit"
   default: 0
@@ -59,7 +59,7 @@ variable education_credits_validation:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Education Credit"
   description: "Total education credit claimed per 26 USC § 25A"
   syntax: python

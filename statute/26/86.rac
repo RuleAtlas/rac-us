@@ -29,31 +29,31 @@ received by the taxpayer as a pension or annuity under the Social Security Act.
 parameter base_amount_single:
   description: "Base amount for single and head of household filers"
   reference: "26 USC 86(c)(1)(A)"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 25000
-    2023-01-01: 25000
-    2022-01-01: 25000
-    2021-01-01: 25000
-    2020-01-01: 25000
+    2024-01-01: 25_000
+    2023-01-01: 25_000
+    2022-01-01: 25_000
+    2021-01-01: 25_000
+    2020-01-01: 25_000
 
 # 26 USC 86(c)(1)(B) - Base amount for joint filers
 parameter base_amount_joint:
   description: "Base amount for married filing jointly and qualifying widow(er)"
   reference: "26 USC 86(c)(1)(B)"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 32000
-    2023-01-01: 32000
-    2022-01-01: 32000
-    2021-01-01: 32000
-    2020-01-01: 32000
+    2024-01-01: 32_000
+    2023-01-01: 32_000
+    2022-01-01: 32_000
+    2021-01-01: 32_000
+    2020-01-01: 32_000
 
 # 26 USC 86(c)(1)(C) - Base amount for MFS (zero threshold)
 parameter base_amount_mfs:
   description: "Base amount for married filing separately"
   reference: "26 USC 86(c)(1)(C)"
-  unit: "USD"
+  unit: USD
   values:
     2024-01-01: 0
     2023-01-01: 0
@@ -65,7 +65,7 @@ parameter base_amount_mfs:
 parameter tier1_rate:
   description: "Fraction of benefits subject to tier 1 taxation"
   reference: "26 USC 86(a)(1)"
-  unit: "/1"
+  unit: /1
   values:
     2024-01-01: 0.5
     2023-01-01: 0.5
@@ -75,7 +75,7 @@ variable tax_unit_social_security:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total Social Security Benefits Received"
   description: "Sum of Social Security and tier 1 railroad retirement benefits received by tax unit members per 26 USC Section 86(d)"
   default: 0
@@ -87,7 +87,7 @@ variable combined_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Combined Income"
   description: "Modified AGI plus one-half of self-employment taxes and tax-exempt interest per 26 USC 86(c)(2)"
   syntax: python
@@ -114,7 +114,7 @@ variable taxable_social_security_amount:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Taxable Social Security Benefits"
   description: "Portion of Social Security benefits included in taxable income per 26 USC 86(b)"
   syntax: python
@@ -218,7 +218,7 @@ variable taxable_social_security:
   entity: TaxUnit
   period: Year
   dtype: Rate
-  unit: "/1"
+  unit: /1
   label: "Taxable Fraction of Social Security"
   description: "Portion of Social Security benefits included in taxable income (as a percentage)"
   syntax: python

@@ -29,30 +29,30 @@ specified service trade or business shall be taken into account...
 parameter threshold_single:
   description: "QBI deduction threshold amount for single filers"
   reference: "26 USC 199A(d)"
-  unit: "USD"
+  unit: USD
   values:
-    2018-01-01: 157500
+    2018-01-01: 157_500
 
 parameter threshold_joint:
   description: "QBI deduction threshold amount for joint filers"
   reference: "26 USC 199A(d)"
-  unit: "USD"
+  unit: USD
   values:
-    2018-01-01: 315000
+    2018-01-01: 315_000
 
 parameter phaseout_range_single:
   description: "QBI deduction phaseout range for single filers"
   reference: "26 USC 199A(d)"
-  unit: "USD"
+  unit: USD
   values:
-    2018-01-01: 50000
+    2018-01-01: 50_000
 
 parameter phaseout_range_joint:
   description: "QBI deduction phaseout range for joint filers"
   reference: "26 USC 199A(d)"
-  unit: "USD"
+  unit: USD
   values:
-    2018-01-01: 100000
+    2018-01-01: 100_000
 
 variable sstb:
   imports:
@@ -61,7 +61,7 @@ variable sstb:
   entity: TaxUnit
   period: Year
   dtype: Rate
-  unit: "percent"
+  unit: percent
   label: "QBI Applicable Percentage"
   description: "Phase-in percentage for SSTB income per 26 USC § 199A(d)(3)"
   syntax: python

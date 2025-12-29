@@ -10,7 +10,7 @@ input base_period_wages:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Base Period Wages"
   description: "Total wages earned during the base period (first 4 of last 5 completed calendar quarters)"
   default: 0
@@ -19,7 +19,7 @@ variable eligibility:
   entity: Person
   period: Year
   dtype: Integer
-  unit: "USD"
+  unit: USD
   label: "Extended benefits weeks"
   description: "Additional weeks available under extended benefits"
   syntax: python

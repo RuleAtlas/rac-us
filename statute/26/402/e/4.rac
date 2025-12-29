@@ -15,7 +15,7 @@ variable early_withdrawal:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Early Withdrawal Penalty"
   description: "10% additional tax on early distributions from retirement plans per 72(t)"
   syntax: python

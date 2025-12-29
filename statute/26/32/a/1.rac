@@ -16,7 +16,7 @@ variable earned_income_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Earned Income Tax Credit"
   description: "Refundable credit for low-to-moderate income working individuals and families per 26 USC 32(a)(1)"
   syntax: python

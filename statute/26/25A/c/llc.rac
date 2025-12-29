@@ -10,12 +10,12 @@ parameter llc_expense_limit:
   reference: "26 USC 25A(c)(llc)"
   unit: USD
   values:
-    2009-01-01: 10000
+    2009-01-01: 10_000
 
 parameter llc_credit_rate:
   description: "Credit rate for lifetime learning credit"
   reference: "26 USC 25A(c)(llc)"
-  unit: "/1"
+  unit: /1
   values:
     2009-01-01: 0.20
 
@@ -30,7 +30,7 @@ input llc_qualified_expenses:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "LLC Qualified Expenses"
   description: "Qualified tuition and related education expenses per 26 USC 25A(f)"
   default: 0
@@ -42,7 +42,7 @@ variable llc:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Lifetime Learning Credit"
   description: "Lifetime Learning Credit after phaseout per 26 USC § 25A(c)"
   syntax: python

@@ -21,14 +21,14 @@ parameter earned_income_threshold:
   reference: "26 USC 24(d)(1)(B)"
   unit: USD
   values:
-    2018-01-01: 2500  # TCJA
-    2009-01-01: 3000  # ARRA
+    2018-01-01: 2_500  # TCJA
+    2009-01-01: 3_000  # ARRA
     1997-01-01: 0     # Pre-ARRA formula was different
 
 parameter refundable_rate:
   description: "Rate applied to earned income above threshold for ACTC"
   reference: "26 USC 24(d)(1)(B)"
-  unit: "/1"
+  unit: /1
   values:
     1997-01-01: 0.15  # 15% of earned income above threshold
 
@@ -47,7 +47,7 @@ variable actc_earned_income_formula:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "ACTC Earned Income Formula"
   description: "15% of earned income above threshold"
   syntax: python
@@ -67,7 +67,7 @@ variable actc_ss_tax_formula:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "ACTC SS Tax Formula"
   description: "SS taxes minus EITC for families with 3+ qualifying children"
   syntax: python
@@ -85,7 +85,7 @@ variable additional_child_tax_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Additional Child Tax Credit"
   description: "Refundable portion of CTC per 26 USC 24(d)"
   syntax: python

@@ -34,7 +34,7 @@ input long_term_capital_gains:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Long-Term Capital Gains"
   description: "Net long-term capital gains from sale of assets held more than one year"
   default: 0
@@ -43,7 +43,7 @@ input short_term_capital_gains:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Short-Term Capital Gains"
   description: "Net short-term capital gains from sale of assets held one year or less"
   default: 0
@@ -52,7 +52,7 @@ input qualified_dividends:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Qualified Dividends"
   description: "Qualified dividend income eligible for preferential rates per Section 1(h)(11)"
   default: 0
@@ -83,7 +83,7 @@ variable net_capital_gain:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Capital Gain"
   description: "Net long-term capital gains after netting with short-term losses per 26 USC 1_222"
   syntax: python
@@ -97,7 +97,7 @@ variable adjusted_net_capital_gain:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Adjusted Net Capital Gain"
   description: "Net capital gain plus qualified dividends per Section 1(h)(11)(A)"
   syntax: python
@@ -112,7 +112,7 @@ variable ordinary_income_for_cap_gains:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Ordinary Income for Bracket Positioning"
   description: "Taxable income minus adjusted net capital gain, used to determine bracket starting position"
   syntax: python
@@ -128,7 +128,7 @@ variable capital_gains_tax:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Capital Gains Tax"
   description: "Federal income tax on net capital gain and qualified dividends at preferential rates per 26 USC 1(h)"
   syntax: python
@@ -211,7 +211,7 @@ variable qualified_dividend_tax:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Qualified Dividend Tax"
   description: "Federal income tax on qualified dividend income at preferential rates per Section 1(h)(11)"
   syntax: python
@@ -226,7 +226,7 @@ variable net_capital_gain_tax:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Capital Gain Tax"
   description: "Federal income tax on net capital gain (excluding qualified dividends) at preferential rates"
   syntax: python

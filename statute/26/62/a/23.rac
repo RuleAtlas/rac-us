@@ -7,7 +7,7 @@ input qualified_tip_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Qualified Tip Income"
   description: "Tips received in qualified occupations (food service, hospitality, etc.)"
   default: 0
@@ -33,7 +33,7 @@ variable tip_income_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Tip Income Deduction"
   description: "Above-the-line deduction for qualified tip income per 26 USC 62(a)(23) via Section 74A"
   syntax: python

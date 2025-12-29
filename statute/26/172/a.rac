@@ -12,7 +12,7 @@ variable nol_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Operating Loss Deduction"
   description: "Total NOL deduction from carryforwards and carrybacks per 26 USC 172(a)"
   syntax: python
@@ -143,7 +143,7 @@ variable taxable_income_before_nol:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Taxable Income Before NOL Deduction"
   description: "Taxable income computed without NOL deduction"
   syntax: python
@@ -189,7 +189,7 @@ variable amt_nol_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "AMT NOL Deduction"
   description: "NOL deduction for AMT purposes per Section 56(d)"
   syntax: python

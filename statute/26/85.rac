@@ -20,7 +20,7 @@ variable unemployment_in_agi:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Taxable Unemployment Compensation"
   description: "Unemployment compensation included in gross income per 26 USC Section 85"
   syntax: python

@@ -29,7 +29,7 @@ variable w2_wage_limitation:
   entity: TaxUnit
   period: Year
   dtype: Rate
-  unit: "USD"
+  unit: USD
   label: "QBI W-2 Limitation Reduction Ratio"
   description: "Ratio for phasing in W-2 wage limitation per 26 USC § 199A(b)(3)(B)"
   syntax: python

@@ -56,7 +56,7 @@ variable earned_income_limit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "CDCC Earned Income Limit"
   description: "Earned income limitation on creditable expenses per 26 USC 21(d)"
   syntax: python

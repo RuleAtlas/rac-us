@@ -21,7 +21,7 @@ as a disaster area, paragraph (b) shall not apply.
 parameter casualty_loss_floor:
   description: "Per-event floor on individual casualty losses"
   reference: "26 USC 165(b)(1)"
-  unit: "USD"
+  unit: USD
   values:
     2018-01-01: 100
     1998-01-01: 500
@@ -31,7 +31,7 @@ parameter casualty_loss_floor:
 parameter agi_floor_rate:
   description: "AGI threshold rate for aggregate casualty losses"
   reference: "26 USC 165(b)(2)"
-  unit: "/1"
+  unit: /1
   values:
     1984-01-01: 0.10
 
@@ -39,7 +39,7 @@ input casualty_loss_amount:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Casualty Loss Amount"
   description: "Loss from a single casualty or theft event before applying floor"
   default: 0
@@ -48,7 +48,7 @@ input adjusted_gross_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Adjusted Gross Income"
   description: "AGI per 26 USC 62"
   default: 0
@@ -65,7 +65,7 @@ variable casualty_loss_per_event:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Casualty Loss Per Event"
   description: "Loss from a single casualty or theft event after applying $100 floor per 26 USC §165(b)(1)"
   syntax: python
@@ -97,7 +97,7 @@ variable total_casualty_loss_before_agi_limit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total Casualty Loss Before AGI Limitation"
   description: "Sum of all casualty losses from multiple events after $100 floor but before 10% AGI limitation per 26 USC §165(b)(2)"
   syntax: python
@@ -124,7 +124,7 @@ variable casualty_loss_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Casualty Loss Deduction"
   description: "Deductible casualty and theft loss limited by 10% AGI floor per 26 USC §165(b)(2), except for federally declared disasters per §165(h)"
   syntax: python

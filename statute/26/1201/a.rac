@@ -8,7 +8,7 @@ variable alternative_tax:
   entity: Corporation
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Corporate Income Tax (with Section 1_201 consideration)"
   description: "Final corporate tax applying Section 1_201 if beneficial"
   syntax: python

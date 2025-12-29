@@ -16,7 +16,7 @@ years preceding the taxable year of such loss.
 parameter nol_limitation_rate:
   description: "80% limitation rate on NOL deduction for post-TCJA losses"
   reference: "26 USC 172(b)"
-  unit: "/1"
+  unit: /1
   values:
     2018-01-01: 0.80
 
@@ -31,7 +31,7 @@ variable carryback_carryover:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   imports:
     - 26/63/a#taxable_income
     - 26/1#filing_status
@@ -289,7 +289,7 @@ variable total_nol_carryforward:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total NOL Carryforward Available"
   description: "Total NOL carryforward from all prior years available for deduction"
   syntax: python
@@ -370,7 +370,7 @@ variable nol_taxable_income_for_limitation:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Taxable Income for NOL Limitation"
   description: "Taxable income computed without NOL deduction for 80% limitation"
   syntax: python
@@ -430,7 +430,7 @@ variable nol_limitation_amount:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "NOL Limitation Amount"
   description: "Maximum NOL deduction based on 80% taxable income limitation"
   syntax: python
@@ -501,7 +501,7 @@ variable nol_deduction_pre_tcja:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Pre-TCJA NOL Deduction"
   description: "NOL deduction from pre-TCJA losses (not subject to 80% limit)"
   syntax: python
@@ -572,7 +572,7 @@ variable nol_deduction_post_tcja:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Post-TCJA NOL Deduction"
   description: "NOL deduction from post-TCJA losses (subject to 80% limit)"
   syntax: python
@@ -668,7 +668,7 @@ variable nol_carryforward_remaining_pre_tcja:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Remaining Pre-TCJA NOL Carryforward"
   description: "Pre-TCJA NOL remaining after current year deduction"
   formula: return max(0, nol_carryforward_pre_tcja - nol_deduction_pre_tcja)
@@ -734,7 +734,7 @@ variable nol_carryforward_remaining_post_tcja:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Remaining Post-TCJA NOL Carryforward"
   description: "Post-TCJA NOL remaining after current year deduction"
   formula: return max(0, nol_carryforward_post_tcja - nol_deduction_post_tcja)

@@ -25,7 +25,7 @@ input educator_expenses:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Educator Expenses"
   description: "Qualified out-of-pocket expenses for classroom supplies and professional development"
   default: 0
@@ -34,7 +34,7 @@ variable educator_expense_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total Educator Expense Deduction"
   description: "Combined educator expense deduction for tax unit (both spouses if applicable)"
   syntax: python
@@ -48,7 +48,7 @@ variable educator_expense_deduction:
 parameter max_deduction:
   description: "Maximum educator expense deduction per taxpayer per year"
   reference: "26 USC 62(a)(2)(D)"
-  unit: "USD"
+  unit: USD
   values:
     2002-01-01: 250
     2018-01-01: 300

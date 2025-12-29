@@ -13,7 +13,7 @@ variable amti:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Alternative Minimum Taxable Income"
   description: "AMTI computed per Section 55(b)(2) as taxable income plus adjustments and preferences, less AMT NOL"
   syntax: python

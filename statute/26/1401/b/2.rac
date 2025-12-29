@@ -29,26 +29,26 @@ parameter additional_medicare_rate:
 # Threshold for joint returns
 parameter additional_medicare_threshold_joint:
   values:
-    2013-01-01: 250000
+    2013-01-01: 250_000
   reference: "26 USC 1401(b)(2)(A) - Joint return threshold"
 
 # Threshold for married filing separately
 parameter additional_medicare_threshold_separate:
   values:
-    2013-01-01: 125000
+    2013-01-01: 125_000
   reference: "26 USC 1401(b)(2)(B) - MFS threshold (1/2 of joint)"
 
 # Threshold for single, HOH, surviving spouse
 parameter additional_medicare_threshold_single:
   values:
-    2013-01-01: 200000
+    2013-01-01: 200_000
   reference: "26 USC 1401(b)(2)(C) - Single/HOH threshold"
 
 variable additional_medicare_tax:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Additional Medicare Tax"
   description: "0.9% additional Medicare tax on self-employment income and wages above threshold per 26 USC 1401(b)(2)"
   imports:
@@ -58,7 +58,7 @@ variable combined_medicare_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Combined Medicare Income"
   description: "Combined wages and SE income for Additional Medicare Tax threshold"
   syntax: python
@@ -95,7 +95,7 @@ variable additional_medicare_tax_threshold:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Additional Medicare Tax Threshold"
   description: "Income threshold for Additional Medicare Tax based on filing status"
   syntax: python
@@ -147,7 +147,7 @@ variable se_income_subject_to_additional_medicare_tax:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SE Income Subject to Additional Medicare Tax"
   description: "Self-employment income subject to 0.9% additional tax per 1_401(b)(2)"
   syntax: python
@@ -216,7 +216,7 @@ variable self_employment_additional_medicare_tax:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Additional Medicare Tax (Self-Employment)"
   description: "0.9% additional Medicare tax on SE income above threshold per 26 USC 1401(b)(2)"
   formula: return additional_medicare_rate * se_income_subject_to_additional_medicare_tax

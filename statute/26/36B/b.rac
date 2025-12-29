@@ -12,7 +12,7 @@ variable applicable_percentage:
   entity: TaxUnit
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Monthly Expected Premium Contribution"
   description: "Monthly portion of expected premium contribution"
   syntax: python

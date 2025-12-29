@@ -10,7 +10,7 @@ input self_employment_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Self-Employment Income"
   description: "Net self-employment income (Schedule C)"
   default: 0
@@ -19,7 +19,7 @@ input self_employed_pension_contributions:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Self-Employed Pension Contributions"
   description: "Contributions to SEP, SIMPLE, Solo 401(k), or other qualified self-employed plans"
   default: 0
@@ -33,10 +33,10 @@ parameter sep_contribution_rate:
 parameter solo_401k_employee_limit:
   description: "Employee deferral limit for Solo 401(k) plans"
   reference: "26 USC 62(a)(6)"
-  unit: "USD"
+  unit: USD
   values:
-    2018-01-01: 18500
-    2024-01-01: 23500
+    2018-01-01: 18_500
+    2024-01-01: 23_500
 
 parameter solo_401k_employer_limit:
   description: "Employer contribution limit for Solo 401(k) plans (25% of net SE income)"
@@ -48,7 +48,7 @@ variable self_employed_pension_limit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Self-Employed Pension Contribution Limit"
   description: "Maximum deductible pension contribution based on self-employment income"
   syntax: python
@@ -62,7 +62,7 @@ variable self_employed_pension_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Self-Employed Pension Deduction"
   description: "Contributions to SEP, SIMPLE, or qualified plans by self-employed per 26 USC 62(a)(6)"
   syntax: python

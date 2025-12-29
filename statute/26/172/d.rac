@@ -41,7 +41,7 @@ variable nol_modification_prior_nol:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "NOL Modification - Prior NOL"
   description: "Add back prior year NOL deductions per 172(d)(1)"
   syntax: python
@@ -92,7 +92,7 @@ variable nol_modification_capital_losses:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "NOL Modification - Capital Losses"
   description: "Capital losses limited to capital gains per 172(d)(2)"
   syntax: python
@@ -181,7 +181,7 @@ variable nol_modification_exemptions:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "NOL Modification - Exemptions"
   description: "Add back personal exemptions per 172(d)(3)"
   syntax: python
@@ -232,7 +232,7 @@ variable nol_modification_nonbusiness:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "NOL Modification - Nonbusiness Deductions"
   description: "Limit nonbusiness deductions to nonbusiness income per 172(d)(4)"
   syntax: python
@@ -279,7 +279,7 @@ variable nol_modification_dividends:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "NOL Modification - Dividends"
   description: "Adjustment for dividend-received deductions per 172(d)(5)"
   syntax: python
@@ -300,7 +300,7 @@ variable nol_modification_reit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "NOL Modification - REIT"
   description: "Adjustment for REIT income per 172(d)(6)"
   syntax: python
@@ -322,7 +322,7 @@ variable nol_modification_qbi:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "NOL Modification - QBI"
   description: "Add back section 199A QBI deduction per 172(d)(8)"
   syntax: python
@@ -352,7 +352,7 @@ variable nol_modification_fdii:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "NOL Modification - FDII"
   description: "Add back section 250 FDII deduction per 172(d)(9)"
   syntax: python
@@ -377,7 +377,7 @@ variable nol_modifications:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total NOL Modifications"
   description: "Total modifications to taxable income for NOL calculation per 172(d)"
   syntax: python

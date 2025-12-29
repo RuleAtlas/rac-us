@@ -25,7 +25,7 @@ variable child_tax_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Child Tax Credit (Nonrefundable)"
   description: "Nonrefundable portion of Child Tax Credit per 26 USC Section 24"
   formula: return ctc
@@ -58,7 +58,7 @@ variable additional_child_tax_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Additional Child Tax Credit (Refundable)"
   description: "Refundable portion of Child Tax Credit per 26 USC Section 24(d)"
   formula: return actc
@@ -91,7 +91,7 @@ variable total_child_tax_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total Child Tax Credit"
   description: "Combined nonrefundable CTC and refundable ACTC per 26 USC Section 24"
   formula: return ctc_total

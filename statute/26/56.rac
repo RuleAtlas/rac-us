@@ -15,7 +15,7 @@ input state_local_taxes:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "State and Local Taxes"
   description: "State and local taxes deducted as itemized deduction"
   default: 0
@@ -30,7 +30,7 @@ variable adjustments:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total AMT Adjustments"
   description: "Sum of all AMT adjustments under Sections 56 and 58"
   syntax: python

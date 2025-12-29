@@ -40,7 +40,7 @@ variable capital_gains:
   entity: Asset
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Realized Gain or Loss"
   description: "Amount realized minus adjusted basis under IRC 1_001(a)"
   syntax: python
@@ -327,7 +327,7 @@ variable netting:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Capital Gain or Loss"
   description: "Taxable capital gain or loss after netting gains and losses per IRC 1_211-1_212"
   syntax: python
@@ -533,7 +533,7 @@ variable preferential_rates:
   entity: TaxUnit
   period: Year
   dtype: Rate
-  unit: "/1"
+  unit: /1
   label: "Preferential Capital Gains Tax Rate"
   description: "Weighted average tax rate on capital gains under IRC 1(h)"
   syntax: python

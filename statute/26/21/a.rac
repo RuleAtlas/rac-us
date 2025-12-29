@@ -1,4 +1,3 @@
-# 26 USC 21 - Expenses for household and dependent care services
 # https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title26-section21
 
 text: """
@@ -42,7 +41,7 @@ which may be taken into account under subsection (a) shall not exceed--
 parameter cdcc_expense_limit_one:
   description: "Maximum expenses for one qualifying individual"
   reference: "26 USC 21(c)(1)"
-  unit: "USD"
+  unit: USD
   values:
     1976-01-01: 3_000
 
@@ -50,7 +49,7 @@ parameter cdcc_expense_limit_one:
 parameter cdcc_expense_limit_two_plus:
   description: "Maximum expenses for two or more qualifying individuals"
   reference: "26 USC 21(c)(2)"
-  unit: "USD"
+  unit: USD
   values:
     1976-01-01: 6_000
 
@@ -62,7 +61,7 @@ parameter cdcc_expense_limit_two_plus:
 parameter cdcc_maximum_rate:
   description: "Maximum applicable percentage for CDCC"
   reference: "26 USC 21(a)(2)"
-  unit: "/1"
+  unit: /1
   values:
     1976-01-01: 0.35
 
@@ -70,7 +69,7 @@ parameter cdcc_maximum_rate:
 parameter cdcc_minimum_rate:
   description: "Minimum applicable percentage floor for CDCC"
   reference: "26 USC 21(a)(2)"
-  unit: "/1"
+  unit: /1
   values:
     1976-01-01: 0.20
 
@@ -78,7 +77,7 @@ parameter cdcc_minimum_rate:
 parameter cdcc_phase_down_threshold:
   description: "AGI threshold above which applicable percentage reduces"
   reference: "26 USC 21(a)(2)"
-  unit: "USD"
+  unit: USD
   values:
     1976-01-01: 15_000
 
@@ -86,7 +85,7 @@ parameter cdcc_phase_down_threshold:
 parameter cdcc_phase_down_increment:
   description: "AGI increment for each 1% reduction in applicable percentage"
   reference: "26 USC 21(a)(2)"
-  unit: "USD"
+  unit: USD
   values:
     1976-01-01: 2_000
 
@@ -94,7 +93,7 @@ parameter cdcc_phase_down_increment:
 parameter cdcc_phase_down_rate:
   description: "Percentage reduction per increment above threshold"
   reference: "26 USC 21(a)(2)"
-  unit: "/1"
+  unit: /1
   values:
     1976-01-01: 0.01
 
@@ -114,7 +113,7 @@ input cdcc_expenses_paid:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "CDCC Expenses Paid"
   description: "Employment-related child/dependent care expenses paid during the year"
   default: 0
@@ -123,7 +122,7 @@ input earned_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Earned Income"
   description: "Earned income for CDCC limitation"
   default: 0
@@ -132,7 +131,7 @@ input adjusted_gross_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Adjusted Gross Income"
   description: "AGI for applicable percentage calculation"
   default: 0
@@ -145,7 +144,7 @@ variable child_dependent_care_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Child and Dependent Care Credit"
   description: "Credit for employment-related expenses for care of qualifying individuals per 26 USC 21"
   syntax: python

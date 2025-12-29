@@ -35,7 +35,7 @@ variable adjusted_gross_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Adjusted Gross Income"
   description: "Gross income minus above-the-line deductions per 26 USC §62(a)"
   syntax: python

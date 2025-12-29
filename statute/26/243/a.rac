@@ -15,7 +15,7 @@ input dividends_received:
   entity: Corporation
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Dividends Received"
   description: "Total dividends received from domestic corporations"
   default: 0
@@ -24,7 +24,7 @@ input ownership_percentage:
   entity: Corporation
   period: Year
   dtype: Rate
-  unit: "/1"
+  unit: /1
   label: "Ownership Percentage"
   description: "Percentage of voting stock owned in the dividend-paying corporation"
   default: 0
@@ -32,28 +32,28 @@ input ownership_percentage:
 parameter ownership_threshold_affiliated:
   description: "Ownership threshold for affiliated corporation status (80%)"
   reference: "26 USC 243(a)"
-  unit: "/1"
+  unit: /1
   values:
     1987-01-01: 0.80
 
 parameter ownership_threshold_20_percent:
   description: "Ownership threshold for 20-percent owned corporation status"
   reference: "26 USC 243(a)"
-  unit: "/1"
+  unit: /1
   values:
     1987-01-01: 0.20
 
 parameter deduction_rate_affiliated:
   description: "Deduction rate for dividends from affiliated corporations (80%+ ownership)"
   reference: "26 USC 243(a)"
-  unit: "/1"
+  unit: /1
   values:
     1987-01-01: 1.00
 
 parameter deduction_rate_20_percent:
   description: "Deduction rate for dividends from 20-percent owned corporations"
   reference: "26 USC 243(a)"
-  unit: "/1"
+  unit: /1
   values:
     2018-01-01: 0.65
     1987-01-01: 0.80
@@ -61,7 +61,7 @@ parameter deduction_rate_20_percent:
 parameter deduction_rate_portfolio:
   description: "Deduction rate for portfolio dividends (less than 20% ownership)"
   reference: "26 USC 243(a)"
-  unit: "/1"
+  unit: /1
   values:
     2018-01-01: 0.50
     1987-01-01: 0.70
@@ -70,7 +70,7 @@ variable dividends_received_deduction:
   entity: Corporation
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Dividends Received Deduction"
   description: "Deduction for dividends received from domestic corporations under IRC 243"
   syntax: python

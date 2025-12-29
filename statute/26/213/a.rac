@@ -9,17 +9,17 @@ such expenses exceed 7.5 percent of adjusted gross income.
 variable medical_expense_deduction:
   imports:
     - 26/62/a#adjusted_gross_income
-    - 26/213/d#qualifying_medical_expenses
+    - 26/213/d/1#qualified_medical_expenses
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Medical Expense Deduction"
   description: "Itemized deduction for medical expenses exceeding 7.5% of AGI per 26 USC 213(a)"
   syntax: python
   formula: |
     agi = adjusted_gross_income
-    expenses = qualifying_medical_expenses
+    expenses = qualified_medical_expenses
     # Calculate floor: 7.5% of AGI (permanent after CAA 2021)
     # Negative AGI treated as $0 floor
     floor = max(0, agi) * p.rate
@@ -31,40 +31,40 @@ variable medical_expense_deduction:
       period: 2024
       inputs:
         adjusted_gross_income: 100_000
-        qualifying_medical_expenses: 15_000
+        qualified_medical_expenses: 15_000
       expect: 7_500  # 15,000 - (100,000 * 0.075) = 15,000 - 7,500
 
     - name: "Medical expenses equal AGI floor - no deduction"
       period: 2024
       inputs:
         adjusted_gross_income: 80_000
-        qualifying_medical_expenses: 6_000
+        qualified_medical_expenses: 6_000
       expect: 0  # 6,000 - (80,000 * 0.075) = 6,000 - 6,000 = 0
 
     - name: "Medical expenses below AGI floor - no deduction"
       period: 2024
       inputs:
         adjusted_gross_income: 50_000
-        qualifying_medical_expenses: 2_000
+        qualified_medical_expenses: 2_000
       expect: 0  # 2,000 < (50,000 * 0.075) = 3,750, so max(0, -1,750) = 0
 
     - name: "Zero medical expenses"
       period: 2024
       inputs:
         adjusted_gross_income: 75_000
-        qualifying_medical_expenses: 0
+        qualified_medical_expenses: 0
       expect: 0  # No expenses to deduct
 
     - name: "Negative AGI treated as zero floor"
       period: 2024
       inputs:
         adjusted_gross_income: -10_000
-        qualifying_medical_expenses: 5_000
+        qualified_medical_expenses: 5_000
       expect: 5_000  # max(0, -10,000) * 0.075 = 0, so full 5,000 is deductible
 
     - name: "High medical expenses relative to modest income"
       period: 2024
       inputs:
         adjusted_gross_income: 40_000
-        qualifying_medical_expenses: 25_000
+        qualified_medical_expenses: 25_000
       expect: 22_000  # 25,000 - (40,000 * 0.075) = 25,000 - 3,000

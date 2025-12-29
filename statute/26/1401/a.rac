@@ -20,16 +20,16 @@ parameter se_oasdi_rate:
 # Per 26 USC 3121(a)(1), as adjusted annually
 parameter social_security_wage_base:
   values:
-    2023-01-01: 160200
-    2024-01-01: 168600
-    2025-01-01: 176100
+    2023-01-01: 160_200
+    2024-01-01: 168_600
+    2025-01-01: 176_100
   reference: "SSA annual determination - contribution and benefit base"
 
 input net_self_employment_earnings:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Self-Employment Earnings"
   description: "Net earnings from self-employment per 26 USC 1402"
   default: 0
@@ -38,7 +38,7 @@ input irs_employment_income:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Employment Income"
   description: "Wages subject to FICA taxes"
   default: 0
@@ -47,7 +47,7 @@ variable se_income_subject_to_oasdi:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SE Income Subject to OASDI"
   description: "Self-employment income subject to OASDI tax (limited by wage base minus wages)"
   syntax: python
@@ -90,7 +90,7 @@ variable self_employment_social_security_tax:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Self-Employment OASDI Tax"
   description: "Old-age, survivors, and disability insurance tax per 26 USC 1401(a)"
   syntax: python

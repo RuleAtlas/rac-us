@@ -1,4 +1,3 @@
-# Title 7 - SNAP (Supplemental Nutrition Assistance Program)
 #
 # This is the top-level SNAP benefit variable that returns the final allotment
 # after eligibility checks and benefit calculations.
@@ -33,7 +32,7 @@ input gross_income:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Gross Income"
   description: "Total gross monthly income before deductions"
   default: 0
@@ -42,7 +41,7 @@ input earned_income:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Earned Income"
   description: "Monthly gross earned income from employment"
   default: 0
@@ -51,7 +50,7 @@ input shelter_costs:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Shelter Costs"
   description: "Monthly housing costs including rent/mortgage, utilities, property taxes"
   default: 0
@@ -68,7 +67,7 @@ input bank_accounts:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Bank Account Balances"
   description: "Total balance in checking and savings accounts"
   default: 0
@@ -93,7 +92,7 @@ variable snap:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Benefits"
   description: "Monthly SNAP (food stamps) benefit amount"
   formula: return snap_allotment

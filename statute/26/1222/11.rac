@@ -7,7 +7,7 @@ variable capital_gain_net_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Capital Gain Net Income"
   description: "Net capital gains (gains minus losses) per 26 USC §1_222(11), counted for EITC investment income test"
   tests:

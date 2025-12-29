@@ -2,7 +2,7 @@ input broadband_monthly_charge:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Broadband Monthly Charge"
   description: "Monthly charge for broadband service"
   default: 0
@@ -17,7 +17,7 @@ parameter months_per_year:
 parameter standard_benefit:
   description: "Standard monthly ACP benefit"
   reference: "47 USC 1752(a)(7)"
-  unit: "USD"
+  unit: USD
   values:
     2024-04-01: 0
     2021-11-15: 30
@@ -26,7 +26,7 @@ parameter standard_benefit:
 parameter tribal_benefit:
   description: "Tribal land monthly ACP benefit"
   reference: "47 USC 1752(a)(7)"
-  unit: "USD"
+  unit: USD
   values:
     2024-04-01: 0
     2021-11-15: 75
@@ -38,7 +38,7 @@ variable acp_annual_benefit:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "ACP Annual Benefit"
   description: "Annualized ACP benefit for household"
   syntax: python
@@ -84,7 +84,7 @@ variable acp_benefit:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "ACP Monthly Benefit"
   description: "Monthly discount equal to amount charged, up to maximum per 47 USC 1_752(a)(7)"
   syntax: python
@@ -137,7 +137,7 @@ variable acp_max_benefit:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "ACP Maximum Monthly Benefit"
   description: "Maximum monthly benefit: $75 on Tribal land, $30 otherwise per 47 USC 1_752(a)(7)"
   syntax: python

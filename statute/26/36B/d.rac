@@ -55,7 +55,7 @@ variable ptc_magi:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Modified AGI for PTC"
   description: "MAGI for PTC purposes per 26 USC 36B(d)(2)(B)"
   syntax: python
@@ -76,7 +76,7 @@ variable household_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Household Income for PTC"
   description: "Modified AGI of taxpayer plus dependents per 26 USC 36B(d)(2)(A)"
   syntax: python
@@ -89,7 +89,7 @@ variable ptc_federal_poverty_level:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Federal Poverty Level for PTC"
   description: "FPL for household size per 26 USC 36B(d)(3) and HHS Guidelines"
   syntax: python
@@ -105,7 +105,7 @@ variable household_income_pct_fpl:
   entity: TaxUnit
   period: Year
   dtype: Rate
-  unit: "/1"
+  unit: /1
   label: "Household Income as Percentage of FPL"
   description: "Household income relative to federal poverty level"
   syntax: python
@@ -120,7 +120,7 @@ variable slcsp_premium:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Second Lowest Cost Silver Plan Premium"
   description: "SLCSP benchmark premium per 26 USC 36B(b)(3)(B)"
   default: 0
@@ -129,7 +129,7 @@ variable slcsp_premium_monthly:
   entity: TaxUnit
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Monthly SLCSP Premium"
   description: "Monthly portion of benchmark premium"
   formula: return slcsp_premium / months_per_year

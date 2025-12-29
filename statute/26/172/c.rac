@@ -17,7 +17,7 @@ variable net_operating_loss:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Operating Loss"
   description: "Excess of deductions over gross income per 26 USC 172(c)"
   syntax: python

@@ -10,7 +10,7 @@ variable depreciation:
   entity: Asset
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "MACRS Depreciation"
   description: "Total depreciation deduction under Section 168"
   syntax: python

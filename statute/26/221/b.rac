@@ -36,7 +36,7 @@ defined in section 25A(f)(2))'.
 parameter minimum_qualified_education_expenses:
   description: "Minimum qualified higher education expenses threshold (per 26 USC 221(d)(6))"
   reference: "26 USC 221(b)"
-  unit: "USD"
+  unit: USD
   values:
     2024-01-01: 0
     2023-01-01: 0
@@ -63,7 +63,7 @@ variable has_qualified_education_loan:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Qualified Higher Education Expenses"
   description: "Expenses qualifying under Section 221(d)(6), referencing Section 529(e)(3)"
   tests:

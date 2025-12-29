@@ -14,7 +14,7 @@ variable total_refundable_credits:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total Refundable Credits"
   description: "Sum of refundable credits that can generate refunds per 26 USC Section 6_401"
   syntax: python

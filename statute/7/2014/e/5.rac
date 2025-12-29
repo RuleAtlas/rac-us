@@ -16,7 +16,7 @@ input medical_expenses:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Medical Expenses"
   description: "Monthly out-of-pocket medical expenses for elderly/disabled members"
   default: 0
@@ -24,7 +24,7 @@ input medical_expenses:
 parameter medical_expense_threshold:
   values:
     1977-01-01: 35
-  unit: "USD"
+  unit: USD
   period: Month
   label: "SNAP Medical Expense Deduction Threshold"
   description: "Monthly threshold above which medical expenses are deductible"
@@ -34,7 +34,7 @@ variable snap_medical_expense_deduction:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SNAP Medical Expense Deduction"
   description: "Deduction for medical expenses over $35/month for elderly/disabled members"
   syntax: python

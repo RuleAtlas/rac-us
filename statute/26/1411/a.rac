@@ -25,7 +25,7 @@ to the amounts described in paragraph (1).
 parameter niit_rate:
   description: "Net Investment Income Tax rate"
   reference: "26 USC 1411(a)"
-  unit: "/1"
+  unit: /1
   values:
     2013-01-01: 0.038
 
@@ -58,7 +58,7 @@ variable niit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Investment Income Tax"
   description: "3.8% surtax on investment income for high-income taxpayers per Section 1_411(a)"
   syntax: python
@@ -405,7 +405,7 @@ variable niit_standalone:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Investment Income Tax (Standalone)"
   description: "3.8% surtax on investment income for high-income taxpayers per Section 1_411(a) - validation version"
   syntax: python

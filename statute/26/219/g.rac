@@ -18,7 +18,7 @@ input adjusted_gross_income:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Adjusted Gross Income (MAGI for IRA)"
   description: "Income for phaseout calculation purposes"
   default: 0
@@ -52,36 +52,36 @@ parameter ira_phaseout_single_start:
   reference: "26 USC 219(g)"
   unit: USD
   values:
-    2024-01-01: 146000
-    2023-01-01: 138000
-    2022-01-01: 138000
+    2024-01-01: 146_000
+    2023-01-01: 138_000
+    2022-01-01: 138_000
 
 parameter ira_phaseout_single_end:
   description: "IRA deduction completely phased out at this MAGI for single filers"
   reference: "26 USC 219(g)"
   unit: USD
   values:
-    2024-01-01: 161000
-    2023-01-01: 153000
-    2022-01-01: 153000
+    2024-01-01: 161_000
+    2023-01-01: 153_000
+    2022-01-01: 153_000
 
 parameter ira_phaseout_joint_start:
   description: "IRA deduction phaseout starts at this MAGI for married filing jointly with active participant"
   reference: "26 USC 219(g)"
   unit: USD
   values:
-    2024-01-01: 123000
-    2023-01-01: 116000
-    2022-01-01: 116000
+    2024-01-01: 123_000
+    2023-01-01: 116_000
+    2022-01-01: 116_000
 
 parameter ira_phaseout_joint_end:
   description: "IRA deduction completely phased out at this MAGI for married filing jointly"
   reference: "26 USC 219(g)"
   unit: USD
   values:
-    2024-01-01: 143000
-    2023-01-01: 136000
-    2022-01-01: 136000
+    2024-01-01: 143_000
+    2023-01-01: 136_000
+    2022-01-01: 136_000
 
 parameter ira_phaseout_mfs_start:
   description: "IRA deduction phaseout starts at this MAGI for married filing separately"
@@ -95,40 +95,40 @@ parameter ira_phaseout_mfs_end:
   reference: "26 USC 219(g)"
   unit: USD
   values:
-    2024-01-01: 10000
-    2023-01-01: 10000
+    2024-01-01: 10_000
+    2023-01-01: 10_000
 
 parameter ira_phaseout_spouse_covered_start:
   description: "IRA deduction phaseout starts at this MAGI when spouse is covered but taxpayer is not"
   reference: "26 USC 219(g)"
   unit: USD
   values:
-    2024-01-01: 236000
-    2023-01-01: 230000
-    2022-01-01: 230000
+    2024-01-01: 236_000
+    2023-01-01: 230_000
+    2022-01-01: 230_000
 
 parameter ira_phaseout_spouse_covered_end:
   description: "IRA deduction completely phased out at this MAGI when spouse is covered but taxpayer is not"
   reference: "26 USC 219(g)"
   unit: USD
   values:
-    2024-01-01: 246000
-    2023-01-01: 240000
-    2022-01-01: 240000
+    2024-01-01: 246_000
+    2023-01-01: 240_000
+    2022-01-01: 240_000
 
 parameter phaseout_range_single:
   description: "Width of phaseout range for single filers"
   reference: "26 USC 219(g)"
   unit: USD
   values:
-    1974-01-01: 15000
+    1974-01-01: 15_000
 
 parameter phaseout_range_joint:
   description: "Width of phaseout range for married filing jointly"
   reference: "26 USC 219(g)"
   unit: USD
   values:
-    1974-01-01: 20000
+    1974-01-01: 20_000
 
 variable ira_phaseout_ratio:
   imports:
@@ -137,7 +137,7 @@ variable ira_phaseout_ratio:
   entity: Person
   period: Year
   dtype: Rate
-  unit: "/1"
+  unit: /1
   label: "IRA Phaseout Reduction Ratio"
   description: "Ratio of MAGI excess to phaseout range"
   syntax: python
@@ -282,7 +282,7 @@ variable ira_deduction_after_phaseout:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "IRA Deduction After Phase-out"
   description: "IRA deduction after applying income-based phase-out"
   syntax: python

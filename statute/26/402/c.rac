@@ -26,7 +26,7 @@ variable rmd:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Required Minimum Distribution"
   description: "Minimum amount required to be distributed from qualified retirement plan per 26 USC 402(c)"
   imports: [26/person/age#age]
@@ -42,7 +42,7 @@ variable prior_year_401k_balance:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "401(k) Prior Year Balance"
   description: "Account balance as of December 31 of prior year for RMD calculation"
   default: 0
@@ -294,7 +294,7 @@ variable required_minimum_distribution:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Required Minimum Distribution"
   description: "Minimum amount that must be withdrawn from retirement account"
   syntax: python
@@ -359,7 +359,7 @@ variable rmd_shortfall_penalty:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "RMD Shortfall Penalty"
   description: "Excise tax on failure to take required minimum distribution"
   syntax: python

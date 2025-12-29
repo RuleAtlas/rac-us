@@ -19,7 +19,7 @@ variable distributions:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "IRA Early Withdrawal Penalty"
   description: "10% additional tax on early IRA distributions per 72(t)"
   syntax: python

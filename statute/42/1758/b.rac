@@ -110,8 +110,8 @@ enum school_meal_tier:
 # Federal Poverty Line Parameters (annual)
 parameter school_meal_fpl_base:
   values:
-    2025-01-01: 15060
-    2024-01-01: 14580
+    2025-01-01: 15_060
+    2024-01-01: 14_580
   unit: USD
   period: Year
   label: "Annual FPL Base"
@@ -120,8 +120,8 @@ parameter school_meal_fpl_base:
 
 parameter school_meal_fpl_increment:
   values:
-    2025-01-01: 5380
-    2024-01-01: 5380
+    2025-01-01: 5_380
+    2024-01-01: 5_380
   unit: USD
   period: Year
   label: "FPL Additional Per Person"
@@ -147,8 +147,8 @@ parameter reduced_price_limit_pct_fpl:
 # School Meal Subsidy Parameters (annual per student)
 parameter school_meal_subsidy_free:
   values:
-    2025-01-01: 1680
-    2024-01-01: 1625
+    2025-01-01: 1_680
+    2024-01-01: 1_625
   unit: USD
   period: Year
   label: "Free School Meal Annual Value"
@@ -157,8 +157,8 @@ parameter school_meal_subsidy_free:
 
 parameter school_meal_subsidy_reduced:
   values:
-    2025-01-01: 1050
-    2024-01-01: 1025
+    2025-01-01: 1_050
+    2024-01-01: 1_025
   unit: USD
   period: Year
   label: "Reduced-Price School Meal Annual Value"

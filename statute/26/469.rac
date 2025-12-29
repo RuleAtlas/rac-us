@@ -1,5 +1,3 @@
-# 26 USC Section 469 - Passive Activity Losses and Credits
-
 text: """
 (a) Disallowance.--
 (1) In general.--If for any taxable year the taxpayer is described in
@@ -40,42 +38,42 @@ exceed
 parameter allowance_amount:
   description: "Base rental real estate allowance amount"
   reference: "26 USC 469(i)(2)"
-  unit: "USD"
+  unit: USD
   values:
     1986-01-01: 25_000
 
 parameter allowance_amount_mfs:
   description: "Rental real estate allowance for MFS living apart"
   reference: "26 USC 469(i)(5)(B)"
-  unit: "USD"
+  unit: USD
   values:
     1986-01-01: 12_500
 
 parameter phaseout_start:
   description: "AGI threshold where phaseout begins"
   reference: "26 USC 469(i)(3)(A)"
-  unit: "USD"
+  unit: USD
   values:
     1986-01-01: 100_000
 
 parameter phaseout_start_mfs:
   description: "AGI threshold for MFS living apart"
   reference: "26 USC 469(i)(5)(B)"
-  unit: "USD"
+  unit: USD
   values:
     1986-01-01: 50_000
 
 parameter phaseout_rate:
   description: "Rate at which allowance phases out (50%)"
   reference: "26 USC 469(i)(3)(A)"
-  unit: "/1"
+  unit: /1
   values:
     1986-01-01: 0.5
 
 parameter hours_threshold:
   description: "Hours required to qualify as real estate professional"
   reference: "26 USC 469(c)(7)(B)(ii)"
-  unit: "hours"
+  unit: hours
   values:
     1993-01-01: 750
 
@@ -86,7 +84,7 @@ variable base_rental_real_estate_allowance:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Base Rental Real Estate Allowance"
   description: "Base $25,000 allowance amount before phaseout per 26 USC 469(i)(2)"
   syntax: python
@@ -129,7 +127,7 @@ variable disallowed_rental_real_estate_loss:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Disallowed Rental Real Estate Loss"
   description: "Rental real estate loss that is suspended per 26 USC 469(a)"
   syntax: python
@@ -160,7 +158,7 @@ variable net_rental_real_estate_loss:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Rental Real Estate Loss"
   description: "Losses from rental real estate activities exceeding income per 26 USC 469(i)"
   formula: return max(0, rental_real_estate_loss - rental_real_estate_income)
@@ -189,7 +187,7 @@ variable passive_loss_limitation:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Passive Activity Income"
   description: "Net income from passive activities per 26 USC 469(d)"
   syntax: python
@@ -220,7 +218,7 @@ variable real_estate_professional:
   entity: TaxUnit
   period: Year
   dtype: Boolean
-  unit: ""
+  unit: 
   label: "Real Estate Professional"
   description: "Whether taxpayer qualifies as real estate professional per 26 USC 469(c)(7)"
   syntax: python
@@ -255,7 +253,7 @@ variable rental_real_estate_allowance_after_phaseout:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Rental Real Estate Allowance After Phaseout"
   description: "Allowance remaining after AGI-based phaseout per 26 USC 469(i)"
   formula: return max(0, base_rental_real_estate_allowance - rental_real_estate_allowance_phaseout)
@@ -284,7 +282,7 @@ variable rental_real_estate_allowance_phaseout:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Rental Real Estate Allowance Phaseout"
   description: "Reduction in allowance due to AGI phaseout per 26 USC 469(i)(3)"
   syntax: python
@@ -319,7 +317,7 @@ variable rental_real_estate_exception:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Rental Real Estate Loss Allowance"
   description: "Amount of rental real estate loss allowed against non-passive income per 26 USC 469(i)"
   syntax: python
@@ -363,7 +361,7 @@ variable rental_real_estate_phaseout_threshold:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Rental Real Estate Phaseout Threshold"
   description: "Modified AGI threshold where phaseout begins per 26 USC 469(i)(3)"
   syntax: python

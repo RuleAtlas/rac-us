@@ -29,7 +29,7 @@ variable qualified_business_income:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Net Qualified Business Income"
   description: "QBI after loss carryforward adjustment"
   formula: return max(0, qualified_business_income - qualified_business_income_loss_carryforward)

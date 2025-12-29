@@ -14,7 +14,7 @@ variable earned_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Earned Income"
   description: "Wages, salaries, tips, and net self-employment income per 26 USC §32(c)(2)(A)"
   syntax: python

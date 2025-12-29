@@ -26,7 +26,7 @@ input iso_exercise_price:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "ISO Exercise Price"
   description: "Total amount paid to exercise incentive stock options during the year"
   default: 0
@@ -35,7 +35,7 @@ input iso_fmv_at_exercise:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "ISO Fair Market Value at Exercise"
   description: "Fair market value of ISO stock at the time of exercise"
   default: 0
@@ -45,7 +45,7 @@ variable iso_exercise_bargain_element:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "ISO Bargain Element for AMT"
   description: "Difference between FMV at exercise and exercise price, included in AMTI when shares are held through year end per 26 USC 422(b) and 56(b)(3)"
   syntax: python

@@ -8,7 +8,7 @@ variable expensing_election:
   entity: Business
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Section 179 Carryforward"
   description: "Disallowed Section 179 amount to carry forward to next year"
   syntax: python

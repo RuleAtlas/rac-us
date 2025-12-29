@@ -14,7 +14,7 @@ input earned_income:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Earned Income"
   description: "Wages and self-employment income"
   default: 0
@@ -31,7 +31,7 @@ input age:
 parameter ira_base_limit:
   description: "Standard IRA contribution limit per taxpayer"
   reference: "26 USC 219(b)(1)(A)"
-  unit: "USD"
+  unit: USD
   values:
     2024-01-01: 7_000
     2023-01-01: 6_500
@@ -41,7 +41,7 @@ parameter ira_base_limit:
 parameter ira_catch_up_amount:
   description: "Additional catch-up contribution for taxpayers age 50 or older"
   reference: "26 USC 219(b)(5)(B)"
-  unit: "USD"
+  unit: USD
   values:
     2024-01-01: 1_000
     2023-01-01: 1_000
@@ -51,7 +51,7 @@ parameter ira_catch_up_amount:
 parameter catch_up_age:
   description: "Age at which taxpayer becomes eligible for catch-up contributions"
   reference: "26 USC 219(b)(5)"
-  unit: "years"
+  unit: years
   values:
     1974-01-01: 50
 
@@ -60,7 +60,7 @@ variable ira_contribution_limit:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Maximum Deductible IRA Contribution"
   description: "IRA contribution limit before phaseout, lesser of earned income or statutory limit"
   syntax: python
@@ -140,7 +140,7 @@ variable ira_max_deductible_contribution:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Maximum Deductible IRA Contribution (alias)"
   description: "Alias for ira_contribution_limit for backward compatibility"
   formula: return ira_contribution_limit
@@ -150,7 +150,7 @@ variable traditional_ira_contributions:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Traditional IRA Contributions"
   description: "Actual traditional IRA contributions made"
   syntax: python

@@ -23,7 +23,7 @@ input hsa_contributions:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HSA Contributions"
   description: "Amount contributed to HSA during tax year"
   default: 0
@@ -39,18 +39,18 @@ input age:
 parameter self_only_limit:
   description: "HSA contribution limit for self-only coverage"
   reference: "26 USC 62(a)(12)"
-  unit: "USD"
+  unit: USD
   values:
-    2018-01-01: 3450
-    2024-01-01: 4150
+    2018-01-01: 3_450
+    2024-01-01: 4_150
 
 parameter family_limit:
   description: "HSA contribution limit for family coverage"
   reference: "26 USC 62(a)(12)"
-  unit: "USD"
+  unit: USD
   values:
-    2018-01-01: 6900
-    2024-01-01: 8300
+    2018-01-01: 6_900
+    2024-01-01: 8_300
 
 parameter catch_up_age:
   description: "Age at which catch-up contributions allowed (55+)"
@@ -61,15 +61,15 @@ parameter catch_up_age:
 parameter catch_up_amount:
   description: "HSA catch-up contribution for age 55+"
   reference: "26 USC 62(a)(12)"
-  unit: "USD"
+  unit: USD
   values:
-    2003-01-01: 1000
+    2003-01-01: 1_000
 
 variable hsa_contribution_limit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HSA Contribution Limit"
   description: "Maximum allowable HSA contribution including catch-up"
   syntax: python
@@ -91,7 +91,7 @@ variable hsa_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total HSA Deduction"
   description: "Combined HSA deduction for tax unit"
   syntax: python

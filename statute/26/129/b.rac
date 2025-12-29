@@ -54,7 +54,7 @@ variable earned_income_limit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "DCAP Earned Income Limit"
   description: "Earned income limitation on dependent care assistance exclusion per 26 USC 129(b)"
   syntax: python

@@ -10,7 +10,7 @@ input irs_employment_income:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Employment Income"
   description: "Wages, salaries, and tips subject to employment taxes"
   default: 0
@@ -18,7 +18,7 @@ input irs_employment_income:
 parameter employee_rate:
   description: "Employee Medicare tax rate"
   reference: "26 USC 3101(b)"
-  unit: "/1"
+  unit: /1
   values:
     1986-01-01: 0.0145
 
@@ -26,7 +26,7 @@ variable medicare_tax:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Medicare Tax Withheld"
   description: "Total Medicare tax withheld from wages (employee share) per 26 USC 3_101(b)"
   syntax: python

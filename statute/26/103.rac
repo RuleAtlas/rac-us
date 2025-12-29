@@ -8,7 +8,7 @@ variable tax_exempt_interest:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Tax-Exempt Interest Income"
   description: "Interest from state and local bonds excluded from gross income under 26 USC §103, but counted for EITC investment income test"
   tests:

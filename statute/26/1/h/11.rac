@@ -47,7 +47,7 @@ variable qualified_dividend_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Qualified Dividend Income"
   description: "Total qualified dividend income eligible for preferential capital gains rates per 26 USC 1(h)(11)"
   syntax: python

@@ -13,7 +13,7 @@ parameter salt_cap:
   unit: USD
   values:
     2026-01-01: .inf
-    2018-01-01: 10000
+    2018-01-01: 10_000
     1900-01-01: .inf
 
 parameter salt_cap_married_separate:
@@ -22,7 +22,7 @@ parameter salt_cap_married_separate:
   unit: USD
   values:
     2026-01-01: .inf
-    2018-01-01: 5000
+    2018-01-01: 5_000
     1900-01-01: .inf
 
 variable salt_deduction_cap:
@@ -31,7 +31,7 @@ variable salt_deduction_cap:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SALT Deduction Cap"
   description: "Maximum allowable SALT deduction per 26 USC 164(b)(6)(A)"
   syntax: python
@@ -76,7 +76,7 @@ input state_local_taxes:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "State and Local Taxes Paid"
   description: "Total state and local taxes paid (income + property + sales)"
   default: 0
@@ -87,7 +87,7 @@ variable salt_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SALT Deduction"
   description: "State and local tax deduction, capped per 26 USC 164(b)(6)(A)"
   syntax: python

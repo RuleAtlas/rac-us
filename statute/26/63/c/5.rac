@@ -16,7 +16,7 @@ greater of--
 parameter dependent_minimum:
   description: "Minimum standard deduction floor for dependents"
   reference: "26 USC 63(c)(5)"
-  unit: "USD"
+  unit: USD
   indexed_by: statute/26/63/c/4
   values:
     1988-01-01: 500
@@ -29,7 +29,7 @@ parameter dependent_minimum:
 parameter dependent_earned_addon:
   description: "Amount added to dependent's earned income for standard deduction calculation"
   reference: "26 USC 63(c)(5)"
-  unit: "USD"
+  unit: USD
   indexed_by: statute/26/63/c/4
   values:
     1988-01-01: 250
@@ -42,7 +42,7 @@ input earned_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Earned Income"
   description: "Taxpayer's earned income for dependent standard deduction calculation"
   default: 0
@@ -53,7 +53,7 @@ variable dependent_standard_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Dependent Standard Deduction"
   description: "Limited standard deduction for individuals claimed as dependents per 26 USC 63(c)(5)"
   syntax: python

@@ -11,70 +11,70 @@ parameter aotc_phaseout_start_mfj:
   reference: "26 USC 25A(a)"
   unit: USD
   values:
-    2024-01-01: 160000
-    2023-01-01: 160000
+    2024-01-01: 160_000
+    2023-01-01: 160_000
 
 parameter aotc_phaseout_end_mfj:
   description: "Income threshold for complete AOTC phaseout (Married Filing Jointly)"
   reference: "26 USC 25A(a)"
   unit: USD
   values:
-    2024-01-01: 180000
-    2023-01-01: 180000
+    2024-01-01: 180_000
+    2023-01-01: 180_000
 
 parameter aotc_phaseout_start_single:
   description: "Income threshold for AOTC phaseout (Single)"
   reference: "26 USC 25A(a)"
   unit: USD
   values:
-    2024-01-01: 80000
-    2023-01-01: 80000
+    2024-01-01: 80_000
+    2023-01-01: 80_000
 
 parameter aotc_phaseout_end_single:
   description: "Income threshold for complete AOTC phaseout (Single)"
   reference: "26 USC 25A(a)"
   unit: USD
   values:
-    2024-01-01: 90000
-    2023-01-01: 90000
+    2024-01-01: 90_000
+    2023-01-01: 90_000
 
 parameter llc_phaseout_start_mfj:
   description: "Income threshold for LLC phaseout (Married Filing Jointly)"
   reference: "26 USC 25A(a)"
   unit: USD
   values:
-    2024-01-01: 160000
-    2023-01-01: 160000
+    2024-01-01: 160_000
+    2023-01-01: 160_000
 
 parameter llc_phaseout_end_mfj:
   description: "Income threshold for complete LLC phaseout (Married Filing Jointly)"
   reference: "26 USC 25A(a)"
   unit: USD
   values:
-    2024-01-01: 180000
-    2023-01-01: 180000
+    2024-01-01: 180_000
+    2023-01-01: 180_000
 
 parameter llc_phaseout_start_single:
   description: "Income threshold for LLC phaseout (Single)"
   reference: "26 USC 25A(a)"
   unit: USD
   values:
-    2024-01-01: 80000
-    2023-01-01: 80000
+    2024-01-01: 80_000
+    2023-01-01: 80_000
 
 parameter llc_phaseout_end_single:
   description: "Income threshold for complete LLC phaseout (Single)"
   reference: "26 USC 25A(a)"
   unit: USD
   values:
-    2024-01-01: 90000
-    2023-01-01: 90000
+    2024-01-01: 90_000
+    2023-01-01: 90_000
 
 input american_opportunity_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "American Opportunity Tax Credit"
   description: "Calculated AOTC before phaseout and refundable portion"
   default: 0
@@ -83,7 +83,7 @@ input lifetime_learning_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Lifetime Learning Credit"
   description: "Calculated LLC before phaseout"
   default: 0
@@ -95,7 +95,7 @@ variable education_credits:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Education Credit"
   description: "Total education credit claimed (nonrefundable + refundable) per 26 USC § 25A"
   syntax: python

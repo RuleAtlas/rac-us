@@ -18,7 +18,7 @@ variable taxable_income:
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Taxable Income"
   description: "Adjusted gross income minus deductions per 26 USC 63"
   syntax: python

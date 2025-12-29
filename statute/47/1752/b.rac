@@ -78,7 +78,7 @@ variable acp_total_value:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total ACP Value"
   description: "Total annual value of ACP benefits (broadband + device)"
   syntax: python

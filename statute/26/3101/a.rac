@@ -9,25 +9,25 @@ individual a tax equal to 6.2 percent of the wages (as defined in section
 parameter employee_rate:
   description: "Employee Social Security tax rate"
   reference: "26 USC 3101(a)"
-  unit: "/1"
+  unit: /1
   values:
     1990-01-01: 0.062
 
 parameter wage_base:
   description: "Social Security wage base (maximum taxable earnings)"
   reference: "26 USC 3101(a)"
-  unit: "USD"
+  unit: USD
   values:
-    2024-01-01: 168600
-    2023-01-01: 160200
-    2022-01-01: 147000
+    2024-01-01: 168_600
+    2023-01-01: 160_200
+    2022-01-01: 147_000
 
 variable employee_social_security_tax:
   imports: [26/3121/a/irs_employment_income#irs_employment_income]
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Employee Social Security Tax"
   description: "Employee share of Social Security (OASDI) tax at 6.2% of wages up to wage base per 26 USC 3_101(a)"
   syntax: python
@@ -124,7 +124,7 @@ variable employee_fica_tax:
   entity: Person
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Employee FICA Tax"
   description: "Combined employee Social Security and Medicare taxes per 26 USC 3_101"
   syntax: python

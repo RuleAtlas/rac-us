@@ -15,10 +15,10 @@ The term "exemption amount" means—
 parameter exemption_joint:
   description: "AMT exemption for married filing jointly"
   reference: "26 USC 55(d)(1)"
-  unit: "USD"
+  unit: USD
   indexed_by: statute/26/55/d/4
   values:
-    2018-01-01: 109400
+    2018-01-01: 109_400
   tests:
     - name: "MFJ exemption is defined"
       inputs: {}
@@ -27,10 +27,10 @@ parameter exemption_joint:
 parameter exemption_single:
   description: "AMT exemption for single filers"
   reference: "26 USC 55(d)(1)"
-  unit: "USD"
+  unit: USD
   indexed_by: statute/26/55/d/4
   values:
-    2018-01-01: 70300
+    2018-01-01: 70_300
   tests:
     - name: "Single exemption is defined"
       inputs: {}
@@ -39,10 +39,10 @@ parameter exemption_single:
 parameter exemption_married_separate:
   description: "AMT exemption for married filing separately"
   reference: "26 USC 55(d)(1)"
-  unit: "USD"
+  unit: USD
   indexed_by: statute/26/55/d/4
   values:
-    2018-01-01: 54700
+    2018-01-01: 54_700
   tests:
     - name: "MFS exemption is half of joint"
       inputs: {}

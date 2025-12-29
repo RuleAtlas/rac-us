@@ -12,10 +12,10 @@ For 2024: $232,600 for joint filers, $116,300 for single and MFS.
 parameter amt_bracket_joint:
   description: "AMT 28% bracket threshold for married filing jointly"
   reference: "26 USC 55(b)(3)"
-  unit: "USD"
+  unit: USD
   indexed_by: statute/26/55/d/4
   values:
-    2018-01-01: 191100
+    2018-01-01: 191_100
   tests:
     - name: "MFJ bracket threshold is $191,100"
       inputs: {}
@@ -24,10 +24,10 @@ parameter amt_bracket_joint:
 parameter amt_bracket_single:
   description: "AMT 28% bracket threshold for single filers"
   reference: "26 USC 55(b)(3)"
-  unit: "USD"
+  unit: USD
   indexed_by: statute/26/55/d/4
   values:
-    2018-01-01: 95550
+    2018-01-01: 95_550
   tests:
     - name: "Single bracket threshold is $95,550"
       inputs: {}
@@ -39,10 +39,10 @@ parameter amt_bracket_single:
 parameter amt_bracket_married_separate:
   description: "AMT 28% bracket threshold for married filing separately"
   reference: "26 USC 55(b)(3)"
-  unit: "USD"
+  unit: USD
   indexed_by: statute/26/55/d/4
   values:
-    2018-01-01: 95550
+    2018-01-01: 95_550
   tests:
     - name: "MFS bracket threshold is $95,550"
       inputs: {}

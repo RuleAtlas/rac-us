@@ -8,7 +8,7 @@ input taxable_income:
   entity: Corporation
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Corporate Taxable Income"
   description: "Corporation's taxable income"
   default: 0
@@ -32,7 +32,7 @@ input tax_year:
 parameter flat_rate:
   description: "Post-TCJA flat corporate income tax rate"
   reference: "26 USC 11(b)"
-  unit: "/1"
+  unit: /1
   values:
     2018-01-01: 0.21
 
@@ -55,7 +55,7 @@ variable tax_amount:
   entity: Corporation
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Corporate Income Tax"
   description: "Federal corporate income tax under 26 USC 11"
   syntax: python

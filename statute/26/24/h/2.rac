@@ -12,9 +12,9 @@ parameter credit_amount:
   reference: "26 USC 24(h)(2)"
   unit: USD
   values:
-    2026-01-01: 1000  # TCJA sunset
+    2026-01-01: 1_000  # TCJA sunset
     2018-01-01: 2000  # TCJA
-    1997-01-01: 1000  # TRA97 original amount
+    1997-01-01: 1_000  # TRA97 original amount
   tests:
     - name: "tcja_period_2024"
       description: "Credit amount during TCJA period (2018-2025)"
