@@ -259,7 +259,6 @@ variable acp_eligible:
   imports:
     - 47/1752/a/6#acp_income_eligible
     - 47/1752/a/6#acp_categorically_eligible
-    - 47/1752/parameters/benefit_amount/standard#acp_standard_benefit
   entity: Household
   period: Month
   dtype: Boolean
