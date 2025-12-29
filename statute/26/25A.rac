@@ -1,3 +1,58 @@
+text: """
+(i) American opportunity tax credit.--In the case of any taxable year
+beginning after 2008--
+(1) In general.--In the case of an eligible student for whom an
+election is made under this subsection, the Hope Scholarship Credit
+shall be an amount equal to the sum of--
+(A) 100 percent of so much of the qualified tuition and related
+expenses paid by the taxpayer during the taxable year (for education
+furnished to the eligible student during any academic period beginning
+in such taxable year) as does not exceed $2,000, plus
+(B) 25 percent of such expenses so paid as exceeds $2,000 but does
+not exceed $4,000.
+"""
+
+# 26 USC 25A(i)(1)(A) - First tier limit for AOC
+parameter aoc_first_tier_limit:
+  description: "Maximum expenses at 100% rate for American Opportunity Credit"
+  reference: "26 USC 25A(i)(1)(A)"
+  unit: "USD"
+  values:
+    2009-01-01: 2_000
+
+# 26 USC 25A(i)(1)(A) - First tier rate for AOC
+parameter aoc_first_tier_rate:
+  description: "Credit rate for first tier of qualified expenses"
+  reference: "26 USC 25A(i)(1)(A)"
+  unit: "/1"
+  values:
+    2009-01-01: 1.0
+
+# 26 USC 25A(i)(1)(B) - Second tier limit for AOC
+parameter aoc_second_tier_limit:
+  description: "Maximum total expenses eligible for American Opportunity Credit"
+  reference: "26 USC 25A(i)(1)(B)"
+  unit: "USD"
+  values:
+    2009-01-01: 4_000
+
+# 26 USC 25A(i)(1)(B) - Second tier rate for AOC
+parameter aoc_second_tier_rate:
+  description: "Credit rate for second tier of qualified expenses (25%)"
+  reference: "26 USC 25A(i)(1)(B)"
+  unit: "/1"
+  values:
+    2009-01-01: 0.25
+
+input aoc_qualified_expenses:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "AOC Qualified Expenses"
+  description: "Qualified tuition and related expenses for American Opportunity Credit"
+  default: 0
+
 variable education_credits_validation:
   entity: TaxUnit
   period: Year
@@ -19,37 +74,21 @@ variable education_credits_validation:
       period: 2024
       inputs:
         aoc_qualified_expenses: 0
-        aoc_first_tier_limit: 2_000
-        aoc_first_tier_rate: 1.0
-        aoc_second_tier_limit: 4_000
-        aoc_second_tier_rate: 0.25
       expect: 0
     - name: "Expenses below first tier limit - full 100% credit"
       period: 2024
       inputs:
         aoc_qualified_expenses: 1_500
-        aoc_first_tier_limit: 2_000
-        aoc_first_tier_rate: 1.0
-        aoc_second_tier_limit: 4_000
-        aoc_second_tier_rate: 0.25
       expect: 1_500
     - name: "Expenses at first tier limit exactly"
       period: 2024
       inputs:
         aoc_qualified_expenses: 2_000
-        aoc_first_tier_limit: 2_000
-        aoc_first_tier_rate: 1.0
-        aoc_second_tier_limit: 4_000
-        aoc_second_tier_rate: 0.25
       expect: 2_000
     - name: "Expenses in second tier - partial 25% credit"
       period: 2024
       inputs:
         aoc_qualified_expenses: 3_000
-        aoc_first_tier_limit: 2_000
-        aoc_first_tier_rate: 1.0
-        aoc_second_tier_limit: 4_000
-        aoc_second_tier_rate: 0.25
       # First tier: $2,000 * 100% = $2,000
       # Second tier: ($3,000 - $2,000) * 25% = $250
       # Total: $2,250
@@ -58,10 +97,6 @@ variable education_credits_validation:
       period: 2024
       inputs:
         aoc_qualified_expenses: 4_000
-        aoc_first_tier_limit: 2_000
-        aoc_first_tier_rate: 1.0
-        aoc_second_tier_limit: 4_000
-        aoc_second_tier_rate: 0.25
       # First tier: $2,000 * 100% = $2,000
       # Second tier: $2,000 * 25% = $500
       # Total: $2,500 (maximum AOTC)
@@ -70,10 +105,6 @@ variable education_credits_validation:
       period: 2024
       inputs:
         aoc_qualified_expenses: 10_000
-        aoc_first_tier_limit: 2_000
-        aoc_first_tier_rate: 1.0
-        aoc_second_tier_limit: 4_000
-        aoc_second_tier_rate: 0.25
       # Expenses capped at $4,000 for credit calculation
       # First tier: $2,000 * 100% = $2,000
       # Second tier: $2,000 * 25% = $500

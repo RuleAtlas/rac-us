@@ -1,3 +1,84 @@
+# 26 USC Section 469 - Passive Activity Losses and Credits
+
+text: """
+(a) Disallowance.--
+(1) In general.--If for any taxable year the taxpayer is described in
+paragraph (2), neither--
+(A) the passive activity loss, nor
+(B) the passive activity credit,
+for the taxable year shall be allowed.
+(2) Persons described.--The following are described in this paragraph:
+(A) any individual, estate, or trust,
+(B) any closely held C corporation, and
+(C) any personal service corporation.
+(b) Disallowed Loss or Credit Carried to Next Year.--
+Except as otherwise provided in this section, any loss or credit from
+an activity which is disallowed under subsection (a) shall be treated
+as a deduction or credit allocable to such activity in the next
+taxable year.
+(c) Passive Activity Defined.--
+(1) In general.--The term 'passive activity' means any activity--
+(A) which involves the conduct of any trade or business, and
+(B) in which the taxpayer does not materially participate.
+(2) Passive activity includes any rental activity.--
+Except as provided in paragraph (7), the term 'passive activity' includes
+any rental activity.
+(d) Passive Activity Loss and Credit Defined.--
+(1) Passive activity loss.--The term 'passive activity loss' means the
+amount (if any) by which--
+(A) the aggregate losses from all passive activities for the taxable year,
+exceed
+(B) the aggregate income from all passive activities for such year.
+(i)(2) Amount allowable.--$25,000 per 469(i)(2)
+(i)(3)(A) Phaseout.--reduce by 50% of excess over $100,000 AGI
+(i)(5)(B) MFS living apart.--$12,500 allowance, $50,000 phaseout threshold
+(c)(7)(B)(ii) Real estate professional.--More than 750 hours
+"""
+
+# Parameter Declarations
+
+parameter allowance_amount:
+  description: "Base rental real estate allowance amount"
+  reference: "26 USC 469(i)(2)"
+  unit: "USD"
+  values:
+    1986-01-01: 25_000
+
+parameter allowance_amount_mfs:
+  description: "Rental real estate allowance for MFS living apart"
+  reference: "26 USC 469(i)(5)(B)"
+  unit: "USD"
+  values:
+    1986-01-01: 12_500
+
+parameter phaseout_start:
+  description: "AGI threshold where phaseout begins"
+  reference: "26 USC 469(i)(3)(A)"
+  unit: "USD"
+  values:
+    1986-01-01: 100_000
+
+parameter phaseout_start_mfs:
+  description: "AGI threshold for MFS living apart"
+  reference: "26 USC 469(i)(5)(B)"
+  unit: "USD"
+  values:
+    1986-01-01: 50_000
+
+parameter phaseout_rate:
+  description: "Rate at which allowance phases out (50%)"
+  reference: "26 USC 469(i)(3)(A)"
+  unit: "/1"
+  values:
+    1986-01-01: 0.5
+
+parameter hours_threshold:
+  description: "Hours required to qualify as real estate professional"
+  reference: "26 USC 469(c)(7)(B)(ii)"
+  unit: "hours"
+  values:
+    1993-01-01: 750
+
 # Applicable Allowance Amount - Depends on Filing Status
 # 26 USC Section 469(i)(2)
 variable base_rental_real_estate_allowance:
@@ -24,19 +105,19 @@ variable base_rental_real_estate_allowance:
   default: 0
   tests:
     - name: "Single filer gets $25k base allowance"
-      inputs: {filing_status: "single", allowance_amount: 25_000}
+      inputs: {filing_status: "single"}
       expect: 25000
     - name: "Married joint filers get $25k base allowance"
-      inputs: {filing_status: "married_joint", allowance_amount: 25_000}
+      inputs: {filing_status: "married_joint"}
       expect: 25000
     - name: "MFS living apart gets $12.5k base allowance"
-      inputs: {filing_status: "married_separate", lived_apart_from_spouse_all_year: true, allowance_amount_mfs: 12_500}
+      inputs: {filing_status: "married_separate", lived_apart_from_spouse_all_year: true}
       expect: 12500
     - name: "MFS living together gets $0 base allowance"
-      inputs: {filing_status: "married_separate", lived_apart_from_spouse_all_year: false, allowance_amount: 25_000}
+      inputs: {filing_status: "married_separate", lived_apart_from_spouse_all_year: false}
       expect: 0
     - name: "Head of household gets $25k base allowance"
-      inputs: {filing_status: "head_of_household", allowance_amount: 25_000}
+      inputs: {filing_status: "head_of_household"}
       expect: 25000
 
 # Disallowed Rental Real Estate Loss
@@ -101,55 +182,22 @@ variable net_rental_real_estate_loss:
       inputs: {rental_real_estate_loss: 100_000, rental_real_estate_income: 5_000}
       expect: 95000
 
-# 26 USC Section 469 - Passive Activity Losses and Credits
-#
-
-text: """
-(a) Disallowance.--
-(1) In general.--If for any taxable year the taxpayer is described in
-paragraph (2), neither--
-(A) the passive activity loss, nor
-(B) the passive activity credit,
-for the taxable year shall be allowed.
-(2) Persons described.--The following are described in this paragraph:
-(A) any individual, estate, or trust,
-(B) any closely held C corporation, and
-(C) any personal service corporation.
-(b) Disallowed Loss or Credit Carried to Next Year.--
-Except as otherwise provided in this section, any loss or credit from
-an activity which is disallowed under subsection (a) shall be treated
-as a deduction or credit allocable to such activity in the next
-taxable year.
-(c) Passive Activity Defined.--
-(1) In general.--The term 'passive activity' means any activity--
-(A) which involves the conduct of any trade or business, and
-(B) in which the taxpayer does not materially participate.
-(2) Passive activity includes any rental activity.--
-Except as provided in paragraph (7), the term 'passive activity' includes
-any rental activity.
-(d) Passive Activity Loss and Credit Defined.--
-(1) Passive activity loss.--The term 'passive activity loss' means the
-amount (if any) by which--
-(A) the aggregate losses from all passive activities for the taxable year,
-exceed
-(B) the aggregate income from all passive activities for such year.
-"""
 variable passive_loss_limitation:
   imports:
     - 26/469#rental_real_estate_loss_allowance as rental_real_estate_allowance
     - 26/1#filing_status
   entity: TaxUnit
   period: Year
-  dtype: Boolean
-  unit: ""
-  label: "Has Passive Activities"
-  description: "Whether taxpayer has any passive activities per 26 USC 469(c)"
+  dtype: Money
+  unit: "USD"
+  label: "Net Passive Activity Income"
+  description: "Net income from passive activities per 26 USC 469(d)"
   syntax: python
   formula: |
     # Per 469(d)(1): Passive activity loss = losses - income (if positive)
     # Net income is the reverse: income - losses (if positive)
     return max(0, passive_activity_income - passive_activity_losses)
-  default: false
+  default: 0
   tests:
     - name: "Income exceeds losses - net income"
       inputs: {passive_activity_income: 50_000, passive_activity_losses: 20_000}
@@ -185,19 +233,19 @@ variable real_estate_professional:
   default: false
   tests:
     - name: "Qualifies - materially participates and over 750 hours"
-      inputs: {materially_participates_in_real_property_business: true, hours_in_real_property_trades_businesses: 800, hours_threshold: 750}
+      inputs: {materially_participates_in_real_property_business: true, hours_in_real_property_trades_businesses: 800}
       expect: true
     - name: "Does not qualify - lacks material participation"
-      inputs: {materially_participates_in_real_property_business: false, hours_in_real_property_trades_businesses: 800, hours_threshold: 750}
+      inputs: {materially_participates_in_real_property_business: false, hours_in_real_property_trades_businesses: 800}
       expect: false
     - name: "Does not qualify - insufficient hours despite material participation"
-      inputs: {materially_participates_in_real_property_business: true, hours_in_real_property_trades_businesses: 700, hours_threshold: 750}
+      inputs: {materially_participates_in_real_property_business: true, hours_in_real_property_trades_businesses: 700}
       expect: false
     - name: "Does not qualify - no participation and insufficient hours"
-      inputs: {materially_participates_in_real_property_business: false, hours_in_real_property_trades_businesses: 500, hours_threshold: 750}
+      inputs: {materially_participates_in_real_property_business: false, hours_in_real_property_trades_businesses: 500}
       expect: false
     - name: "Qualifies - exactly 751 hours (over threshold)"
-      inputs: {materially_participates_in_real_property_business: true, hours_in_real_property_trades_businesses: 751, hours_threshold: 750}
+      inputs: {materially_participates_in_real_property_business: true, hours_in_real_property_trades_businesses: 751}
       expect: true
 
 variable rental_real_estate_allowance_after_phaseout:
@@ -247,19 +295,19 @@ variable rental_real_estate_allowance_phaseout:
   default: 0
   tests:
     - name: "AGI below threshold - no phaseout"
-      inputs: {adjusted_gross_income: 80_000, rental_real_estate_phaseout_threshold: 100_000, phaseout_rate: 0.5}
+      inputs: {adjusted_gross_income: 80_000, rental_real_estate_phaseout_threshold: 100_000}
       expect: 0
     - name: "AGI at threshold - no phaseout"
-      inputs: {adjusted_gross_income: 100_000, rental_real_estate_phaseout_threshold: 100_000, phaseout_rate: 0.5}
+      inputs: {adjusted_gross_income: 100_000, rental_real_estate_phaseout_threshold: 100_000}
       expect: 0
     - name: "AGI $20k above threshold - $10k phaseout"
-      inputs: {adjusted_gross_income: 120_000, rental_real_estate_phaseout_threshold: 100_000, phaseout_rate: 0.5}
+      inputs: {adjusted_gross_income: 120_000, rental_real_estate_phaseout_threshold: 100_000}
       expect: 10000
     - name: "AGI $50k above threshold - $25k phaseout"
-      inputs: {adjusted_gross_income: 150_000, rental_real_estate_phaseout_threshold: 100_000, phaseout_rate: 0.5}
+      inputs: {adjusted_gross_income: 150_000, rental_real_estate_phaseout_threshold: 100_000}
       expect: 25000
     - name: "MFS with $50k threshold - $5k phaseout"
-      inputs: {adjusted_gross_income: 60_000, rental_real_estate_phaseout_threshold: 50_000, phaseout_rate: 0.5}
+      inputs: {adjusted_gross_income: 60_000, rental_real_estate_phaseout_threshold: 50_000}
       expect: 5000
 
 
@@ -329,17 +377,17 @@ variable rental_real_estate_phaseout_threshold:
   default: 100_000
   tests:
     - name: "Single filer - $100k threshold"
-      inputs: {filing_status: "single", phaseout_start: 100_000}
+      inputs: {filing_status: "single"}
       expect: 100000
     - name: "Married joint - $100k threshold"
-      inputs: {filing_status: "married_joint", phaseout_start: 100_000}
+      inputs: {filing_status: "married_joint"}
       expect: 100000
     - name: "MFS living apart - $50k threshold"
-      inputs: {filing_status: "married_separate", lived_apart_from_spouse_all_year: true, phaseout_start_mfs: 50_000}
+      inputs: {filing_status: "married_separate", lived_apart_from_spouse_all_year: true}
       expect: 50000
     - name: "MFS living together - $100k threshold"
-      inputs: {filing_status: "married_separate", lived_apart_from_spouse_all_year: false, phaseout_start: 100_000}
+      inputs: {filing_status: "married_separate", lived_apart_from_spouse_all_year: false}
       expect: 100000
     - name: "Head of household - $100k threshold"
-      inputs: {filing_status: "head_of_household", phaseout_start: 100_000}
+      inputs: {filing_status: "head_of_household"}
       expect: 100000
