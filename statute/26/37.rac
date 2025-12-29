@@ -1,0 +1,25 @@
+#
+# Reference: https://www.law.cornell.edu/uscode/text/26/37
+
+text: """
+Section 37 provides the credit for the elderly or the disabled. This is a
+nonrefundable credit available to individuals who are 65 or older, or who
+are under 65 and retired on permanent and total disability.
+
+(a) General rule - In the case of a qualified individual, there shall be
+allowed as a credit against the tax imposed by this chapter for the taxable
+year an amount equal to 15 percent of such individual's section 22 amount
+for such taxable year.
+
+Note: Despite being in the refundable credits section, this credit is actually
+nonrefundable. It reduces tax liability to zero but does not generate refunds.
+"""
+
+input elderly_disabled_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Credit for Elderly or Disabled"
+  description: "Nonrefundable credit for elderly or disabled taxpayers per 26 USC 37"
+  default: 0

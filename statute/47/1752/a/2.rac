@@ -1,0 +1,88 @@
+#
+# Defines what constitutes a "household" for ACP eligibility purposes.
+
+text: """
+47 USC 1752(a)(2) - Household Definition
+
+(2) Eligible household.— The term "eligible household" means,
+regardless of whether the household or any member of the household
+receives support under subpart E of part 54 of title 47, Code of
+Federal Regulations (or any successor regulation), a household in
+which at least 1 member—
+(A) meets the qualifications...
+"""
+
+# Household composition inputs for ACP
+
+input household_member_count:
+  entity: Household
+  period: Month
+  dtype: Integer
+  label: "Household Member Count"
+  description: "Number of individuals in the household"
+  default: 1
+
+input household_address_residential:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Residential Address"
+  description: "Whether household has a residential address (not commercial)"
+  default: true
+
+input household_single_subscription:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Single Subscription Household"
+  description: "Whether household receives only one ACP benefit (per address rule)"
+  default: true
+
+variable acp_valid_household:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "ACP Valid Household"
+  description: "Whether the group qualifies as a household for ACP purposes per 47 USC 1752(a)(2)"
+  syntax: python
+  formula: |
+    # Must be a residential address with at least one member
+    # Only one ACP benefit per household address
+    return household_member_count >= 1 and household_address_residential and household_single_subscription
+  default: true
+  tests:
+    - name: "Valid single-person household"
+      period: 2024-01
+      inputs:
+        household_member_count: 1
+        household_address_residential: true
+        household_single_subscription: true
+      expect: true
+    - name: "Valid multi-person household"
+      period: 2024-01
+      inputs:
+        household_member_count: 4
+        household_address_residential: true
+        household_single_subscription: true
+      expect: true
+    - name: "Invalid - non-residential address"
+      period: 2024-01
+      inputs:
+        household_member_count: 2
+        household_address_residential: false
+        household_single_subscription: true
+      expect: false
+    - name: "Invalid - duplicate subscription at address"
+      period: 2024-01
+      inputs:
+        household_member_count: 2
+        household_address_residential: true
+        household_single_subscription: false
+      expect: false
+    - name: "Invalid - zero members"
+      period: 2024-01
+      inputs:
+        household_member_count: 0
+        household_address_residential: true
+        household_single_subscription: true
+      expect: false

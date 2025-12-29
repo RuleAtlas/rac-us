@@ -1,0 +1,51 @@
+#
+# Reference: https://www.law.cornell.edu/uscode/text/26/38
+
+text: """
+Section 38 establishes the general business credit, which is the sum of
+numerous business-related credits. While primarily nonrefundable, certain
+components may be refundable in specific circumstances.
+
+(a) Allowance of credit - There shall be allowed as a credit against the
+tax imposed by this chapter for the taxable year an amount equal to the
+sum of the business credit carryforwards, the current year business credit,
+and the business credit carrybacks.
+
+(b) Current year business credit - For purposes of this subpart, the amount
+of the current year business credit is the sum of the following credits:
+  (1) Investment credit (Section 46)
+  (2) Work opportunity credit (Section 51)
+  (3) Alcohol fuels credit (Section 40)
+  (4) Research credit (Section 41)
+  (5) Low-income housing credit (Section 42)
+  (6) Disabled access credit (Section 44)
+  (7) Renewable electricity production credit (Section 45)
+  ... and many others
+"""
+
+input general_business_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "General Business Credit"
+  description: "Sum of current year business credits per 26 USC 38"
+  default: 0
+
+input general_business_credit_carryforward:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "General Business Credit Carryforward"
+  description: "Business credit carryforward from prior years"
+  default: 0
+
+input general_business_credit_carryback:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "General Business Credit Carryback"
+  description: "Business credit carryback from future years"
+  default: 0

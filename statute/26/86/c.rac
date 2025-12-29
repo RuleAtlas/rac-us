@@ -1,0 +1,149 @@
+text: """
+26 USC Section 86(c) - Base Amount and Adjusted Base Amount
+
+(c) Base amount and adjusted base amount.--For purposes of this section--
+
+(1) Base amount.--The term "base amount" means--
+(A) except as otherwise provided in this paragraph, $25,000,
+(B) $32,000 in the case of a joint return, and
+(C) zero in the case of a taxpayer who--
+(i) is married as of the close of the taxable year (within the meaning
+of section 7703) but does not file a joint return for such year, and
+(ii) does not live apart from his spouse at all times during the taxable year.
+
+(2) Adjusted base amount.--The term "adjusted base amount" means--
+(A) except as otherwise provided in this paragraph, $34,000,
+(B) $44,000 in the case of a joint return, and
+(C) zero in the case of a taxpayer described in paragraph (1)(C).
+"""
+
+# 26 USC 86(c)(1) - Base amount (tier 1 threshold)
+# These are the thresholds for the 50% inclusion tier
+
+parameter base_amount_single:
+  description: "Base amount for single filers (tier 1 threshold)"
+  reference: "26 USC 86(c)(1)(A)"
+  unit: USD
+  values:
+    1984-01-01: 25_000
+
+parameter base_amount_joint:
+  description: "Base amount for joint filers (tier 1 threshold)"
+  reference: "26 USC 86(c)(1)(B)"
+  unit: USD
+  values:
+    1984-01-01: 32_000
+
+parameter base_amount_mfs_living_together:
+  description: "Base amount for MFS living with spouse (zero)"
+  reference: "26 USC 86(c)(1)(C)"
+  unit: USD
+  values:
+    1984-01-01: 0
+
+# 26 USC 86(c)(2) - Adjusted base amount (tier 2 threshold)
+# These are the thresholds for the 85% inclusion tier
+
+parameter adjusted_base_amount_single:
+  description: "Adjusted base amount for single filers (tier 2 threshold)"
+  reference: "26 USC 86(c)(2)(A)"
+  unit: USD
+  values:
+    1994-01-01: 34_000
+
+parameter adjusted_base_amount_joint:
+  description: "Adjusted base amount for joint filers (tier 2 threshold)"
+  reference: "26 USC 86(c)(2)(B)"
+  unit: USD
+  values:
+    1994-01-01: 44_000
+
+parameter adjusted_base_amount_mfs_living_together:
+  description: "Adjusted base amount for MFS living with spouse (zero)"
+  reference: "26 USC 86(c)(2)(C)"
+  unit: USD
+  values:
+    1994-01-01: 0
+
+
+variable base_amount:
+  imports:
+    - 26/1#filing_status
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Base Amount for Social Security Taxation"
+  description: "Base amount threshold for tier 1 Social Security taxation per 26 USC 86(c)(1)"
+  reference: "26 USC 86(c)(1)"
+  syntax: python
+  formula: |
+    if filing_status == MARRIED_FILING_JOINTLY:
+        return base_amount_joint
+    elif filing_status == QUALIFYING_WIDOW:
+        return base_amount_joint
+    elif filing_status == MARRIED_FILING_SEPARATELY:
+        # MFS living with spouse gets zero threshold
+        # TODO: Add check for living apart (would get $25k threshold)
+        return base_amount_mfs_living_together
+    else:
+        return base_amount_single
+  tests:
+    - name: "Single filer base amount"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+      expect: 25_000
+    - name: "Joint filer base amount"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+      expect: 32_000
+    - name: "MFS living together base amount"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+      expect: 0
+    - name: "Head of household base amount"
+      period: 2024
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+      expect: 25_000
+
+
+variable adjusted_base_amount:
+  imports:
+    - 26/1#filing_status
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Adjusted Base Amount for Social Security Taxation"
+  description: "Adjusted base amount threshold for tier 2 Social Security taxation per 26 USC 86(c)(2)"
+  reference: "26 USC 86(c)(2)"
+  syntax: python
+  formula: |
+    if filing_status == MARRIED_FILING_JOINTLY:
+        return adjusted_base_amount_joint
+    elif filing_status == QUALIFYING_WIDOW:
+        return adjusted_base_amount_joint
+    elif filing_status == MARRIED_FILING_SEPARATELY:
+        return adjusted_base_amount_mfs_living_together
+    else:
+        return adjusted_base_amount_single
+  tests:
+    - name: "Single filer adjusted base amount"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+      expect: 34_000
+    - name: "Joint filer adjusted base amount"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+      expect: 44_000
+    - name: "MFS adjusted base amount"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+      expect: 0

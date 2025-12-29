@@ -1,0 +1,36 @@
+#
+# Reference: https://www.law.cornell.edu/uscode/text/26/36
+
+text: """
+Section 36 provided a refundable credit for first-time homebuyers. The credit
+was available for homes purchased between April 9, 2008 and September 30, 2010.
+The credit has expired and is no longer available for new purchases.
+
+(a) Allowance of credit - In the case of an individual who is a first-time
+homebuyer of a principal residence in the United States during a taxable year,
+there shall be allowed as a credit against the tax imposed by this subtitle
+for such taxable year an amount equal to 10 percent of the purchase price
+of the residence.
+
+Note: While expired for new claims, some taxpayers may still have recapture
+obligations if they sold their home within 36 months of purchase or converted
+it to non-principal residence use.
+"""
+
+input first_time_homebuyer_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "First-Time Homebuyer Credit"
+  description: "Expired refundable credit for first-time homebuyers per 26 USC 36 (2008-2010)"
+  default: 0
+
+input first_time_homebuyer_credit_recapture:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "First-Time Homebuyer Credit Recapture"
+  description: "Amount to be recaptured if home sold within 36 months"
+  default: 0

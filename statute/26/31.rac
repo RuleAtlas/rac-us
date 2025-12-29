@@ -1,0 +1,21 @@
+#
+# Reference: https://www.law.cornell.edu/uscode/text/26/31
+
+text: """
+Section 31 allows as a credit against tax the amount of tax withheld
+at source under chapter 24 (income tax withholding on wages). This is
+a refundable credit - any excess over tax liability is refunded.
+
+(a) Wage withholding - The amount withheld as tax under chapter 24
+shall be allowed to the recipient of the income as a credit against
+the tax imposed by this subtitle.
+"""
+
+input wage_withholding_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Federal Income Tax Withheld"
+  description: "Amount of federal income tax withheld from wages per 26 USC 31(a)"
+  default: 0

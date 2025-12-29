@@ -1,0 +1,30 @@
+text: """
+26 USC Section 85(c) - Unemployment Compensation Defined
+
+(c) Unemployment compensation defined.--For purposes of this section, the term
+"unemployment compensation" means any amount received by an individual under--
+(1) an unemployment compensation law of the United States or of any State, or
+(2) any other law (whether foreign or domestic) which provides unemployment
+benefits in connection with the loss of employment.
+
+This includes:
+- Federal unemployment insurance (UI)
+- State unemployment insurance (SUTA)
+- Railroad unemployment compensation (RRUC)
+- Trade adjustment assistance (TAA) benefits
+- Pandemic unemployment programs (PUA, PEUC, FPUC)
+- Extended unemployment benefits
+- Foreign unemployment benefits
+"""
+
+# 26 USC 85(c) - Definition of unemployment compensation
+# This section defines the scope of what constitutes "unemployment compensation"
+# for purposes of including it in gross income under section 85(a)
+
+input is_unemployment_compensation:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Receives Unemployment Compensation"
+  description: "Whether income received qualifies as unemployment compensation per 26 USC 85(c)"
+  default: false

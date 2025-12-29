@@ -1,0 +1,26 @@
+#
+# Reference: https://www.law.cornell.edu/uscode/text/26/35
+
+text: """
+Section 35 provides a refundable credit (Health Coverage Tax Credit or HCTC)
+for a percentage of health insurance premiums paid by eligible individuals
+who receive trade adjustment assistance (TAA) or are PBGC pension recipients.
+
+(a) In general - In the case of an individual, there shall be allowed as a
+credit against the tax imposed by subtitle A an amount equal to the
+applicable percentage of the amount paid by the taxpayer for coverage of
+the taxpayer and qualifying family members under qualified health insurance
+for eligible coverage months.
+
+Note: This credit has been largely superseded by the Premium Tax Credit
+(Section 36B) under the Affordable Care Act for most taxpayers.
+"""
+
+input health_coverage_tax_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Health Coverage Tax Credit"
+  description: "Refundable credit for health insurance costs of TAA recipients per 26 USC 35"
+  default: 0

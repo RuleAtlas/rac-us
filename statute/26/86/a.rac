@@ -1,0 +1,95 @@
+text: """
+26 USC Section 86(a) - Social Security Benefits in Gross Income
+
+(a) In general.--
+(1) Inclusion.--
+(A) In general.--Except as otherwise provided in this section, gross income
+for the taxable year of any taxpayer described in subparagraph (B) (without
+regard to subparagraph (B)(iii)) includes social security benefits in an
+amount equal to the lesser of--
+(i) one-half of the social security benefits received during the taxable
+year, or
+(ii) one-half of the excess described in subparagraph (C).
+
+(B) Taxpayers to whom this subsection applies.--A taxpayer is described in
+this subparagraph if--
+(i) the sum of (I) the modified adjusted gross income of the taxpayer for
+the taxable year, plus (II) one-half of the social security benefits
+received during the taxable year, exceeds the base amount.
+
+(C) Excess.--The excess described in this subparagraph is the excess of--
+(i) the sum described in subparagraph (B)(i), over
+(ii) the base amount.
+"""
+
+# 26 USC 86(a)(1) - Tier 1 Social Security inclusion
+# Up to 50% of benefits may be taxable if combined income exceeds base amount
+
+parameter tier1_inclusion_rate:
+  description: "Maximum percentage of Social Security benefits includible under tier 1"
+  reference: "26 USC 86(a)(1)(A)(i)"
+  unit: /1
+  values:
+    1984-01-01: 0.50
+
+parameter tier2_inclusion_rate:
+  description: "Maximum percentage of Social Security benefits includible under tier 2"
+  reference: "26 USC 86(a)(2)"
+  unit: /1
+  values:
+    1994-01-01: 0.85
+
+variable tier1_taxable_ss:
+  imports:
+    - 26/86#tax_unit_social_security
+    - 26/86/b#combined_income
+    - 26/86#base_amount_single
+    - 26/86#base_amount_joint
+    - 26/1#filing_status
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tier 1 Taxable Social Security"
+  description: "Amount of Social Security benefits taxable under tier 1 (50% threshold) per 26 USC 86(a)(1)"
+  reference: "26 USC 86(a)(1)"
+  syntax: python
+  formula: |
+    # Determine base amount by filing status
+    if filing_status in [MARRIED_FILING_JOINTLY, QUALIFYING_WIDOW]:
+        base = base_amount_joint
+    else:
+        base = base_amount_single
+
+    # Excess over base amount per 86(a)(1)(C)
+    excess = max(0, combined_income - base)
+
+    # Tier 1 amount is lesser of:
+    # (i) 50% of SS benefits, or
+    # (ii) 50% of excess over base amount
+    half_benefits = tier1_inclusion_rate * tax_unit_social_security
+    half_excess = tier1_inclusion_rate * excess
+
+    return min(half_benefits, half_excess)
+  tests:
+    - name: "Below base amount - no tax"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        combined_income: 20_000
+        tax_unit_social_security: 12_000
+      expect: 0
+    - name: "Above base - limited by excess"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        combined_income: 30_000
+        tax_unit_social_security: 20_000
+      expect: 2500  # min(10000, 2500)
+    - name: "Above base - limited by benefits"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        combined_income: 50_000
+        tax_unit_social_security: 10_000
+      expect: 5000  # min(5000, 12500)

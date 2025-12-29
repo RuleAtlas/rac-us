@@ -1,0 +1,40 @@
+#
+# Reference: https://www.law.cornell.edu/uscode/text/26/53
+
+text: """
+Section 53 provides a credit for prior year minimum tax liability (AMT credit).
+When a taxpayer pays Alternative Minimum Tax (AMT) due to timing differences
+(rather than permanent preferences), they may be entitled to a credit in
+future years when their regular tax exceeds their tentative minimum tax.
+
+(a) Allowance of credit - There shall be allowed as a credit against the
+tax imposed by this chapter for any taxable year an amount equal to the
+minimum tax credit for such taxable year.
+
+(b) Minimum tax credit - For purposes of subsection (a), the minimum tax
+credit for any taxable year is the excess (if any) of the adjusted net
+minimum tax imposed for all prior taxable years beginning after 1986
+over the amount allowable as a credit under subsection (a) for such
+prior taxable years.
+
+Note: The AMT credit is generally nonrefundable but may be refundable in
+certain circumstances for individuals with long-term unused credits.
+"""
+
+input amt_credit_carryforward:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "AMT Credit Carryforward"
+  description: "Credit for prior year minimum tax liability per 26 USC 53"
+  default: 0
+
+input refundable_amt_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Refundable AMT Credit"
+  description: "Refundable portion of AMT credit for long-term unused credits"
+  default: 0

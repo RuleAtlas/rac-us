@@ -1,0 +1,24 @@
+#
+# Reference: https://www.law.cornell.edu/uscode/text/26/34
+
+text: """
+Section 34 provides a refundable credit for certain uses of gasoline,
+diesel fuel, and other special fuels. The credit allows taxpayers to
+recover federal excise taxes paid on fuels used for nontaxable purposes
+such as farming, off-highway business use, or export.
+
+(a) General rule - There shall be allowed as a credit against the tax
+imposed by this subtitle for the taxable year an amount equal to the
+sum of the amounts payable to the taxpayer under sections 6420, 6421,
+and 6427 (determined without regard to section 6421(i)) with respect
+to gasoline and special fuels used during such year.
+"""
+
+input fuel_tax_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Fuel Tax Credit"
+  description: "Credit for federal excise taxes on fuels used for nontaxable purposes per 26 USC 34"
+  default: 0

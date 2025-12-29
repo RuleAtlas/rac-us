@@ -1,0 +1,38 @@
+text: """
+26 USC Section 85(b) - Exceptions
+
+(b) Exceptions.--
+(1) Amounts excluded.--Gross income does not include any amount of unemployment
+compensation which, pursuant to section 104(a)(1), is not includible in gross income.
+
+Note: Section 104(a)(1) excludes amounts received under workmen's compensation acts
+as compensation for personal injuries or sickness. This exception is narrow and
+applies only when unemployment compensation is received in lieu of workers'
+compensation benefits.
+"""
+
+# 26 USC 85(b)(1) - Excluded unemployment compensation
+# This exception applies when unemployment compensation is received under
+# circumstances described in section 104(a)(1) (workers' compensation exclusion)
+
+variable unemployment_exclusion:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Excluded Unemployment Compensation"
+  description: "Unemployment compensation excluded from gross income per 26 USC 85(b)(1) and 104(a)(1)"
+  reference: "26 USC 85(b)(1)"
+  syntax: python
+  formula: |
+    # Most unemployment compensation is fully taxable
+    # This exclusion applies only to amounts that qualify under section 104(a)(1)
+    # which covers workers' compensation for personal injury/sickness
+    # In practice, this is a very narrow exception
+    return 0
+  default: 0
+  tests:
+    - name: "No exclusion for typical unemployment"
+      period: 2024-01
+      inputs: {}
+      expect: 0

@@ -1,0 +1,76 @@
+#
+# This subsection addresses temporary emergency standards of eligibility
+# and resource provisions during disasters or emergencies.
+#
+# TODO: Full implementation needed
+
+text: """
+7 USC 2014(h) - Temporary Emergency Standards of Eligibility
+
+(h) Temporary emergency standards of eligibility.— The Secretary shall,
+upon request of a State agency, develop temporary emergency standards
+of eligibility for households that are victims of a disaster...
+"""
+
+# Emergency/disaster-related SNAP resource provisions
+# These inputs capture additional resources that may be excluded
+# during emergency situations
+
+input disaster_affected:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Disaster Affected Household"
+  description: "Whether household is affected by a declared disaster"
+  default: false
+
+input disaster_assistance_received:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: USD
+  label: "Disaster Assistance Received"
+  description: "Amount of disaster assistance funds received"
+  default: 0
+
+input disaster_declaration_date:
+  entity: Household
+  period: Month
+  dtype: Integer
+  label: "Disaster Declaration Date"
+  description: "Date of disaster declaration (YYYYMMDD format)"
+  default: 0
+
+variable snap_disaster_resource_exclusion:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: USD
+  label: "SNAP Disaster Resource Exclusion"
+  description: "Resources excluded from SNAP calculations during disaster per 7 USC 2014(h)"
+  syntax: python
+  formula: |
+    # Disaster assistance is typically excluded from countable resources
+    if disaster_affected:
+        return disaster_assistance_received
+    return 0
+  default: 0
+  tests:
+    - name: "Disaster-affected household excludes assistance"
+      period: 2024-01
+      inputs:
+        disaster_affected: true
+        disaster_assistance_received: 5000
+      expect: 5000
+    - name: "Non-disaster household no exclusion"
+      period: 2024-01
+      inputs:
+        disaster_affected: false
+        disaster_assistance_received: 0
+      expect: 0
+    - name: "Disaster-affected no assistance"
+      period: 2024-01
+      inputs:
+        disaster_affected: true
+        disaster_assistance_received: 0
+      expect: 0
