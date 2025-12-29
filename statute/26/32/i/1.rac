@@ -19,6 +19,19 @@ variable disqualified_income_limit:
   syntax: python
   formula: |
     return disqualified_income_limit_amount
+  tests:
+    - name: "2024 limit reflects inflation adjustment"
+      period: 2024
+      inputs: {}
+      expect: 11_600
+    - name: "2023 limit is $11,000"
+      period: 2023
+      inputs: {}
+      expect: 11_000
+    - name: "2021 limit before ARPA increase"
+      period: 2021
+      inputs: {}
+      expect: 10_000
 
 # 26 USC §32(i)(1) - Denial of Credit for Excessive Investment Income
 #

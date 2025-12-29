@@ -103,6 +103,25 @@ variable student_loan_interest_deduction_eligible:
     # Check that primary taxpayer is not claimed as dependent
     taxpayer_not_dependent = not any(members.is_claimed_as_dependent)
     return not_mfs and taxpayer_not_dependent
+  tests:
+    - name: "Single filer not claimed as dependent is eligible"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        members_is_claimed_as_dependent: false
+      expect: true
+    - name: "Married filing separately is ineligible per 221(d)(2)"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        members_is_claimed_as_dependent: false
+      expect: false
+    - name: "Taxpayer claimed as dependent is ineligible per 221(d)(3)"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        members_is_claimed_as_dependent: true
+      expect: false
 
 variable student_loan_interest_phaseout_start:
   entity: TaxUnit

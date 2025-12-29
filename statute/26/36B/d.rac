@@ -44,6 +44,24 @@ variable ptc_household_size:
     # - Taxpayer (and spouse if filing jointly)
     # - All dependents for whom deduction under section 151 is allowed
     return tax_unit_size
+  tests:
+    - name: "Single filer household size"
+      period: 2024
+      inputs:
+        tax_unit_size: 1
+      expect: 1
+
+    - name: "Married couple with two dependents"
+      period: 2024
+      inputs:
+        tax_unit_size: 4
+      expect: 4
+
+    - name: "Single parent with one dependent"
+      period: 2024
+      inputs:
+        tax_unit_size: 2
+      expect: 2
 
 variable ptc_magi:
   entity: TaxUnit

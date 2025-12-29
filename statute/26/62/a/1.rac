@@ -44,6 +44,22 @@ variable self_employment_tax_deduction:
   formula: |
     # Only 50% of SE tax is deductible
     return self_employment_tax_paid * se_tax_deduction_rate
+  tests:
+    - name: "Standard SE tax deduction (50%)"
+      period: 2024
+      inputs:
+        self_employment_tax_paid: 3_856
+      expect: 1928
+    - name: "No SE tax paid"
+      period: 2024
+      inputs:
+        self_employment_tax_paid: 0
+      expect: 0
+    - name: "Large SE tax deduction"
+      period: 2024
+      inputs:
+        self_employment_tax_paid: 8_500
+      expect: 4_250
 
 # Self-employed health insurance deduction
 # Reference: 26 USC 162(l)

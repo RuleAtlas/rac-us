@@ -320,6 +320,34 @@ variable income_tax_before_credits_vectorized:
   formula: |
     return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
   default: 0
+  tests:
+    - name: "Single filer, $50k spanning multiple brackets (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 50_000
+        filing_status: SINGLE
+      # $11,600 at 10%: $1,160.00
+      # $35,550 at 12%: $4,266.00
+      # $2,850 at 22%: $627.00
+      # Total: $6,053.00
+      expect: 6_053.00
+    - name: "Married filing jointly, $100k spanning brackets (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 100_000
+        filing_status: JOINT
+      # $23,200 at 10%: $2,320.00
+      # $71,100 at 12%: $8,532.00
+      # $5,700 at 22%: $1,254.00
+      # Total: $12,106.00
+      expect: 12_106.00
+    - name: "Zero taxable income returns zero tax"
+      period: 2024
+      inputs:
+        taxable_income: 0
+        filing_status: SINGLE
+      # marginal_agg should return 0 for zero income
+      expect: 0
 
 variable total_federal_income_tax:
   imports:

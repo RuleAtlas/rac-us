@@ -175,3 +175,22 @@ variable traditional_ira_contributions:
     # returns the maximum allowed contribution
     return ira_contribution_limit
   default: 0
+  tests:
+    - name: "Standard contribution for under 50"
+      period: 2024
+      inputs:
+        earned_income: 75_000
+        age: 35
+      expect: 7_000
+    - name: "Catch-up contribution for age 50+"
+      period: 2024
+      inputs:
+        earned_income: 100_000
+        age: 52
+      expect: 8_000
+    - name: "Contribution capped by earned income"
+      period: 2024
+      inputs:
+        earned_income: 4_500
+        age: 40
+      expect: 4_500

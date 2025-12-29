@@ -186,6 +186,24 @@ variable new_vehicle_meets_battery_capacity:
   description: "Whether vehicle meets the minimum 7 kWh battery capacity requirement"
   formula: |
     return new_clean_vehicle_battery_capacity_kwh >= min_battery_capacity_kwh
+  tests:
+    - name: "Battery capacity below 7 kWh minimum - ineligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_battery_capacity_kwh: 5
+      expect: false
+
+    - name: "Battery capacity exactly at 7 kWh minimum - eligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_battery_capacity_kwh: 7
+      expect: true
+
+    - name: "Battery capacity above 7 kWh minimum - eligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_battery_capacity_kwh: 75
+      expect: true
 
 # MSRP limit based on vehicle type - 30D(f)(11)
 variable new_vehicle_msrp_limit:

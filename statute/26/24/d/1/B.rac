@@ -54,6 +54,28 @@ variable actc_earned_income_formula:
     # Cap at refundable max per child times number of qualifying children
     max_refundable = refundable_max * num_ctc_qualifying_children
     return min(earned_formula, max_refundable)
+  tests:
+    - name: "Earned income above threshold, 2 children"
+      period: 2024
+      inputs:
+        earned_income: 30_000
+        num_ctc_qualifying_children: 2
+        refundable_max: 1_700
+      expect: 3_400  # min(0.15*(30000-2500), 1700*2) = min(4125, 3400) = 3400
+    - name: "Earned income below threshold"
+      period: 2024
+      inputs:
+        earned_income: 2_000
+        num_ctc_qualifying_children: 1
+        refundable_max: 1_700
+      expect: 0  # max(0, 2000-2500) = 0, so 0.15*0 = 0
+    - name: "High income, formula exceeds cap"
+      period: 2024
+      inputs:
+        earned_income: 100_000
+        num_ctc_qualifying_children: 3
+        refundable_max: 1_700
+      expect: 5_100  # min(0.15*(100000-2500), 1700*3) = min(14625, 5100) = 5100
 
 variable actc_ss_tax_formula:
   imports:

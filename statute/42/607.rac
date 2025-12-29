@@ -285,6 +285,33 @@ variable tanf_required_work_hours_weekly:
             return hours_two_parent
     return 0
   default: 0
+  tests:
+    - name: "Single parent with young child requires 20 hours weekly"
+      period: 2024-01
+      inputs:
+        is_tanf_single_parent: true
+        has_child_under_1: true
+        tanf_work_requirement_exempt: false
+        is_tanf_two_parent_family: false
+        receives_federal_childcare_assistance: false
+      expect: 20
+    - name: "Single parent without young child requires 30 hours weekly"
+      period: 2024-01
+      inputs:
+        is_tanf_single_parent: true
+        has_child_under_1: false
+        tanf_work_requirement_exempt: false
+        is_tanf_two_parent_family: false
+        receives_federal_childcare_assistance: false
+      expect: 30
+    - name: "Two-parent family with childcare requires 55 hours weekly"
+      period: 2024-01
+      inputs:
+        is_tanf_single_parent: false
+        is_tanf_two_parent_family: true
+        tanf_work_requirement_exempt: false
+        receives_federal_childcare_assistance: true
+      expect: 55
 
 variable tanf_required_work_hours_monthly:
   entity: Person

@@ -57,6 +57,22 @@ variable acp_device_copay_valid:
     # Copay must be > $10 and < $50 per (b)(5)(A)
     return connected_device_copay > acp_device_min_copay and connected_device_copay < acp_device_max_copay
   default: false
+  tests:
+    - name: "Valid copay in middle of range ($25)"
+      period: 2024-01
+      inputs:
+        connected_device_copay: 25
+      expect: true
+    - name: "Copay exactly at minimum ($10 is not valid - must be MORE than $10)"
+      period: 2024-01
+      inputs:
+        connected_device_copay: 10
+      expect: false
+    - name: "Copay exactly at maximum ($50 is not valid - must be LESS than $50)"
+      period: 2024-01
+      inputs:
+        connected_device_copay: 50
+      expect: false
 
 
 variable acp_device_received:

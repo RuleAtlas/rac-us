@@ -82,6 +82,28 @@ variable hsa_contribution_limit:
     if age >= catch_up_age:
       return base_limit + catch_up_amount
     return base_limit
+  tests:
+    - name: "No HDHP returns zero limit"
+      period: 2024
+      inputs:
+        has_hdhp: false
+        hsa_coverage_type: self_only
+        age: 40
+      expect: 0
+    - name: "Self-only coverage under 55"
+      period: 2024
+      inputs:
+        has_hdhp: true
+        hsa_coverage_type: self_only
+        age: 40
+      expect: 4_150
+    - name: "Family coverage with catch-up at 55+"
+      period: 2024
+      inputs:
+        has_hdhp: true
+        hsa_coverage_type: family
+        age: 60
+      expect: 9_300
 
 variable hsa_deduction:
   entity: TaxUnit

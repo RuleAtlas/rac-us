@@ -111,6 +111,22 @@ variable ira_contribution_limit:
     if age >= catch_up_age:
       return base_limit + catch_up_amount
     return base_limit
+  tests:
+    - name: "Under 50, base limit only"
+      period: 2018
+      inputs:
+        age: 35
+      expect: 5_500
+    - name: "Age 50+, catch-up eligible"
+      period: 2018
+      inputs:
+        age: 50
+      expect: 6_500
+    - name: "Age 65, well above catch-up threshold"
+      period: 2018
+      inputs:
+        age: 65
+      expect: 6_500
 
 variable ira_deduction_before_phaseout:
   entity: Person
@@ -123,6 +139,25 @@ variable ira_deduction_before_phaseout:
   formula: |
     # Cannot deduct more than contributed or the annual limit
     return min(traditional_ira_contributions, ira_contribution_limit)
+  tests:
+    - name: "Contribution below limit"
+      period: 2018
+      inputs:
+        age: 35
+        traditional_ira_contributions: 2_000
+      expect: 2_000
+    - name: "Contribution exceeds limit (under 50)"
+      period: 2018
+      inputs:
+        age: 35
+        traditional_ira_contributions: 10_000
+      expect: 5_500
+    - name: "Zero contributions"
+      period: 2018
+      inputs:
+        age: 35
+        traditional_ira_contributions: 0
+      expect: 0
 
 variable ira_phaseout_ratio:
   entity: Person
@@ -145,6 +180,25 @@ variable ira_phaseout_ratio:
       return 1  # Fully phased out
     # Proportional phase-out
     return (magi - start) / (end - start)
+  tests:
+    - name: "No employer plan - no phaseout"
+      period: 2018
+      inputs:
+        has_retirement_plan_at_work: false
+        adjusted_gross_income: 200_000
+      expect: 0
+    - name: "Employer plan, income at phaseout start"
+      period: 2018
+      inputs:
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 63_000
+      expect: 0
+    - name: "Employer plan, income at 50% phaseout"
+      period: 2018
+      inputs:
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 68_000
+      expect: 0.5
 
 variable ira_deduction:
   entity: Person
@@ -159,6 +213,31 @@ variable ira_deduction:
     phaseout = ira_phaseout_ratio
     # Apply phase-out
     return base_deduction * (1 - phaseout)
+  tests:
+    - name: "Full deduction with no phaseout"
+      period: 2018
+      inputs:
+        age: 35
+        traditional_ira_contributions: 5_500
+        has_retirement_plan_at_work: false
+        adjusted_gross_income: 100_000
+      expect: 5_500
+    - name: "50% phaseout applied"
+      period: 2018
+      inputs:
+        age: 35
+        traditional_ira_contributions: 5_500
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 68_000
+      expect: 2_750
+    - name: "Fully phased out"
+      period: 2018
+      inputs:
+        age: 35
+        traditional_ira_contributions: 5_500
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 80_000
+      expect: 0
 
 variable total_ira_deduction:
   entity: TaxUnit

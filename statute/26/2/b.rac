@@ -47,6 +47,27 @@ variable is_head_of_household:
 
     return maintains_household
   default: False
+  tests:
+    - name: "Unmarried with dependent qualifies as HOH"
+      period: 2024
+      inputs:
+        is_married: False
+        num_dependents: 1
+      expect: True
+
+    - name: "Married person does not qualify as HOH"
+      period: 2024
+      inputs:
+        is_married: True
+        num_dependents: 2
+      expect: False
+
+    - name: "Unmarried without dependents does not qualify as HOH"
+      period: 2024
+      inputs:
+        is_married: False
+        num_dependents: 0
+      expect: False
 
 variable filing_status:
   imports: [26/2/b#is_head_of_household]

@@ -57,6 +57,29 @@ variable monthly_expected_contribution:
     annual_contribution = household_income * applicable_percentage
     return annual_contribution / months_per_year
   default: 0
+  tests:
+    # Unit test: directly test formula with immediate inputs
+    # Formula: (household_income * applicable_percentage) / 12
+    - name: "Zero contribution at 150% FPL (0% applicable percentage)"
+      period: 2024-01
+      inputs:
+        household_income: 22_590  # 150% FPL for single
+        applicable_percentage: 0  # 0% contribution under IRA at 150% FPL
+      expect: 0  # (22590 * 0) / 12 = 0
+
+    - name: "Monthly contribution at 200% FPL (2% applicable percentage)"
+      period: 2024-01
+      inputs:
+        household_income: 30_120  # 200% FPL for single
+        applicable_percentage: 0.02  # 2% contribution at 200% FPL
+      expect: 50.2  # (30120 * 0.02) / 12 = 602.4 / 12 = 50.2
+
+    - name: "Monthly contribution at 400% FPL (8.5% applicable percentage)"
+      period: 2024-01
+      inputs:
+        household_income: 60_240  # 400% FPL for single
+        applicable_percentage: 0.085  # 8.5% cap under IRA
+      expect: 426.7  # (60240 * 0.085) / 12 = 5120.4 / 12 = 426.7
 
 variable monthly_benchmark_excess:
   imports:

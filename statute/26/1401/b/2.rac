@@ -54,6 +54,22 @@ variable additional_medicare_tax:
     # Aggregate wage and SE income across household
     return self_employment_additional_medicare_tax
   default: 0
+  tests:
+    - name: "Tax on SE income above threshold"
+      period: 2024
+      inputs:
+        self_employment_additional_medicare_tax: 450
+      expect: 450
+    - name: "No tax when below threshold"
+      period: 2024
+      inputs:
+        self_employment_additional_medicare_tax: 0
+      expect: 0
+    - name: "High earner additional Medicare tax"
+      period: 2024
+      inputs:
+        self_employment_additional_medicare_tax: 900
+      expect: 900
 
 variable combined_medicare_income:
   entity: TaxUnit

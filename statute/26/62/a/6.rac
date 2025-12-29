@@ -54,6 +54,22 @@ variable self_employed_pension_limit:
     # Capped at annual limits for specific plan types
     max_contribution = self_employment_income * sep_contribution_rate
     return min(max_contribution, solo_401k_employee_limit + int(solo_401k_employer_limit * self_employment_income))
+  tests:
+    - name: "Pension limit at moderate income (25% rule)"
+      period: 2024
+      inputs:
+        self_employment_income: 100_000
+      expect: 25_000
+    - name: "Pension limit at low income"
+      period: 2024
+      inputs:
+        self_employment_income: 40_000
+      expect: 10_000
+    - name: "No self-employment income"
+      period: 2024
+      inputs:
+        self_employment_income: 0
+      expect: 0
 
 variable self_employed_pension_deduction:
   entity: TaxUnit
@@ -87,6 +103,39 @@ tests:
     outputs:
       self_employed_pension_limit: 0
       self_employed_pension_deduction: 0
+
+  - name: "Pension limit at moderate income (25% rule binds)"
+    # max_contribution = 100_000 * 0.25 = 25_000
+    # solo_401k_total = 23_500 + (100_000 * 0.25) = 48_500
+    # min(25_000, 48_500) = 25_000
+    period: 2024-01
+    inputs:
+      tax_unit:
+        self_employment_income: 100_000
+    outputs:
+      self_employed_pension_limit: 25_000
+
+  - name: "Pension limit at low income (Solo 401k limit binds)"
+    # max_contribution = 40_000 * 0.25 = 10_000
+    # solo_401k_total = 23_500 + (40_000 * 0.25) = 33_500
+    # min(10_000, 33_500) = 10_000
+    period: 2024-01
+    inputs:
+      tax_unit:
+        self_employment_income: 40_000
+    outputs:
+      self_employed_pension_limit: 10_000
+
+  - name: "Pension limit at high income"
+    # max_contribution = 300_000 * 0.25 = 75_000
+    # solo_401k_total = 23_500 + (300_000 * 0.25) = 98_500
+    # min(75_000, 98_500) = 75_000
+    period: 2024-01
+    inputs:
+      tax_unit:
+        self_employment_income: 300_000
+    outputs:
+      self_employed_pension_limit: 75_000
 
   - name: "Contribution below limit"
     period: 2024-01
