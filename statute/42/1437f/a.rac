@@ -1,3 +1,7 @@
+# TODO: This file contains HCV eligibility content that may belong in other subsections.
+# Section 1437f(a) is an authorization provision. Eligibility rules are in (c), (f), (o).
+# See beads issue for restructuring.
+
 text: """
 The Secretary may enter into annual contributions contracts with
 public housing agencies pursuant to which such agencies may enter
@@ -31,6 +35,27 @@ variable hcv_very_low_income_limit:
         extra_members = household_size - max_table_size
         return base + (additional * extra_members)
   default: 0
+  tests:
+    - name: "Single person 50% AMI"
+      period: 2024
+      inputs:
+        household_size: 1
+      expect: 35_650
+    - name: "Two person 50% AMI"
+      period: 2024
+      inputs:
+        household_size: 2
+      expect: 40_750
+    - name: "Four person 50% AMI"
+      period: 2024
+      inputs:
+        household_size: 4
+      expect: 50_850
+    - name: "Family of 8 50% AMI"
+      period: 2024
+      inputs:
+        household_size: 8
+      expect: 65_200
 
 variable hcv_extremely_low_income_limit:
   entity: Household
@@ -50,6 +75,27 @@ variable hcv_extremely_low_income_limit:
         extra_members = household_size - max_table_size
         return base + (additional * extra_members)
   default: 0
+  tests:
+    - name: "Single person 30% AMI"
+      period: 2024
+      inputs:
+        household_size: 1
+      expect: 21_390
+    - name: "Two person 30% AMI"
+      period: 2024
+      inputs:
+        household_size: 2
+      expect: 24_450
+    - name: "Four person 30% AMI"
+      period: 2024
+      inputs:
+        household_size: 4
+      expect: 30_510
+    - name: "Family of 8 30% AMI"
+      period: 2024
+      inputs:
+        household_size: 8
+      expect: 39_120
 
 variable hcv_low_income_limit:
   entity: Household
@@ -77,7 +123,43 @@ variable hcv_income_eligible:
   label: "HCV Income Eligible"
   description: "Whether household meets 50% AMI income eligibility for HCV"
   formula: return hcv_annual_income <= hcv_very_low_income_limit
-  default: False
+  default: false
+  tests:
+    - name: "Single person eligible"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 30_000
+        hcv_very_low_income_limit: 35_650
+      expect: true
+    - name: "Single person at limit"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 35_650
+        hcv_very_low_income_limit: 35_650
+      expect: true
+    - name: "Single person over limit"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 40_000
+        hcv_very_low_income_limit: 35_650
+      expect: false
+    - name: "Family of 4 eligible"
+      period: 2024
+      inputs:
+        household_size: 4
+        hcv_annual_income: 45_000
+        hcv_very_low_income_limit: 50_850
+      expect: true
+    - name: "Family of 4 ineligible"
+      period: 2024
+      inputs:
+        household_size: 4
+        hcv_annual_income: 60_000
+        hcv_very_low_income_limit: 50_850
+      expect: false
 
 variable hcv_extremely_low_income:
   entity: Household
@@ -86,7 +168,36 @@ variable hcv_extremely_low_income:
   label: "HCV Extremely Low Income"
   description: "Whether household is at or below 30% AMI for targeting purposes"
   formula: return hcv_annual_income <= hcv_extremely_low_income_limit
-  default: False
+  default: false
+  tests:
+    - name: "Single person extremely low income"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 20_000
+        hcv_extremely_low_income_limit: 21_390
+      expect: true
+    - name: "Single person at extremely low limit"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 21_390
+        hcv_extremely_low_income_limit: 21_390
+      expect: true
+    - name: "Single person over extremely low limit"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 30_000
+        hcv_extremely_low_income_limit: 21_390
+      expect: false
+    - name: "Family of 4 extremely low income"
+      period: 2024
+      inputs:
+        household_size: 4
+        hcv_annual_income: 25_000
+        hcv_extremely_low_income_limit: 30_510
+      expect: true
 
 variable hcv_family_eligible:
   entity: Household
@@ -106,7 +217,7 @@ variable hcv_family_eligible:
     if household_size >= 1:
         return True
     return False
-  default: False
+  default: false
 
 variable hcv_citizenship_eligible:
   entity: Household
@@ -125,7 +236,7 @@ variable hcv_citizenship_eligible:
     if has_eligible_citizen_or_immigrant:
         return True
     return False
-  default: False
+  default: false
 
 variable hcv_eligible:
   entity: Household
@@ -142,7 +253,7 @@ variable hcv_eligible:
     if hcv_income_eligible and hcv_family_eligible and hcv_citizenship_eligible:
         return True
     return False
-  default: False
+  default: false
   tests:
     - name: "Single person, very low income, eligible"
       period: 2024
@@ -189,168 +300,3 @@ variable hcv_eligible:
         hcv_family_eligible: false
         hcv_citizenship_eligible: false
       expect: false
-
-variable hcv_very_low_income_limit:
-  entity: Household
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "HCV Very Low Income Limit"
-  description: "50% of Area Median Income limit for HCV eligibility"
-  syntax: python
-  formula: |
-    # Income limit varies by household size
-    # For sizes > max_table_size, add per-person amount
-    limits = parameter(gov.hud.hcv.income_limits.very_low_income)
-    additional = parameter(gov.hud.hcv.income_limits.very_low_income.additional_per_person)
-    if household_size <= max_table_size:
-        return limits[household_size]
-    else:
-        base = limits[max_table_size]
-        extra_members = household_size - max_table_size
-        return base + (additional * extra_members)
-  default: 0
-  tests:
-    - name: "Single person 50% AMI"
-      period: 2024
-      inputs:
-        household_size: 1
-      expect: 35650
-    - name: "Two person 50% AMI"
-      period: 2024
-      inputs:
-        household_size: 2
-      expect: 40750
-    - name: "Four person 50% AMI"
-      period: 2024
-      inputs:
-        household_size: 4
-      expect: 50850
-    - name: "Family of 8 50% AMI"
-      period: 2024
-      inputs:
-        household_size: 8
-      expect: 65200
-
-variable hcv_extremely_low_income_limit:
-  entity: Household
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "HCV Extremely Low Income Limit"
-  description: "30% of Area Median Income limit for targeting requirement"
-  syntax: python
-  formula: |
-    limits = parameter(gov.hud.hcv.income_limits.extremely_low_income)
-    additional = parameter(gov.hud.hcv.income_limits.extremely_low_income.additional_per_person)
-    if household_size <= max_table_size:
-        return limits[household_size]
-    else:
-        base = limits[max_table_size]
-        extra_members = household_size - max_table_size
-        return base + (additional * extra_members)
-  default: 0
-  tests:
-    - name: "Single person 30% AMI"
-      period: 2024
-      inputs:
-        household_size: 1
-      expect: 21390
-    - name: "Two person 30% AMI"
-      period: 2024
-      inputs:
-        household_size: 2
-      expect: 24450
-    - name: "Four person 30% AMI"
-      period: 2024
-      inputs:
-        household_size: 4
-      expect: 30510
-    - name: "Family of 8 30% AMI"
-      period: 2024
-      inputs:
-        household_size: 8
-      expect: 39120
-
-variable hcv_income_eligible:
-  entity: Household
-  period: Year
-  dtype: Boolean
-  label: "HCV Income Eligible"
-  description: "Whether household meets 50% AMI income eligibility for HCV"
-  formula: return hcv_annual_income <= hcv_very_low_income_limit
-  default: False
-  tests:
-    - name: "Single person eligible"
-      period: 2024
-      inputs:
-        household_size: 1
-        hcv_annual_income: 30_000
-        hcv_very_low_income_limit: 35_650
-      expect: true
-    - name: "Single person at limit"
-      period: 2024
-      inputs:
-        household_size: 1
-        hcv_annual_income: 35_650
-        hcv_very_low_income_limit: 35_650
-      expect: true
-    - name: "Single person over limit"
-      period: 2024
-      inputs:
-        household_size: 1
-        hcv_annual_income: 40_000
-        hcv_very_low_income_limit: 35_650
-      expect: false
-    - name: "Family of 4 eligible"
-      period: 2024
-      inputs:
-        household_size: 4
-        hcv_annual_income: 45_000
-        hcv_very_low_income_limit: 50_850
-      expect: true
-    - name: "Family of 4 ineligible"
-      period: 2024
-      inputs:
-        household_size: 4
-        hcv_annual_income: 60_000
-        hcv_very_low_income_limit: 50_850
-      expect: false
-
-variable hcv_extremely_low_income:
-  entity: Household
-  period: Year
-  dtype: Boolean
-  label: "HCV Extremely Low Income"
-  description: "Whether household is at or below 30% AMI for targeting purposes"
-  formula: return hcv_annual_income <= hcv_extremely_low_income_limit
-  default: False
-  tests:
-    - name: "Single person extremely low income"
-      period: 2024
-      inputs:
-        household_size: 1
-        hcv_annual_income: 20_000
-        hcv_extremely_low_income_limit: 21_390
-      expect: true
-    - name: "Single person at extremely low limit"
-      period: 2024
-      inputs:
-        household_size: 1
-        hcv_annual_income: 21_390
-        hcv_extremely_low_income_limit: 21_390
-      expect: true
-    - name: "Single person over extremely low limit"
-      period: 2024
-      inputs:
-        household_size: 1
-        hcv_annual_income: 30_000
-        hcv_extremely_low_income_limit: 21_390
-      expect: false
-    - name: "Family of 4 extremely low income"
-      period: 2024
-      inputs:
-        household_size: 4
-        hcv_annual_income: 25_000
-        hcv_extremely_low_income_limit: 30_510
-      expect: true

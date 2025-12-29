@@ -1,5 +1,3 @@
-# Reference: IRC Section 24(d)(1)(B) as amended by P.L. 115-97 (TCJA)
-
 text: """
 (d) Portion of credit refundable.—
 (1) In general.—
@@ -48,7 +46,7 @@ variable actc_earned_income_formula:
   dtype: Money
   unit: "USD"
   label: "ACTC Earned Income Formula"
-  description: "15% of earned income above threshold per 26 USC 24(d)(1)(B)(i)"
+  description: "15% of earned income above threshold"
   syntax: python
   formula: |
     excess = max(0, earned_income - earned_income_threshold)
@@ -68,7 +66,7 @@ variable actc_ss_tax_formula:
   dtype: Money
   unit: "USD"
   label: "ACTC SS Tax Formula"
-  description: "SS taxes minus EITC for families with 3+ children per 26 USC 24(d)(1)(B)(ii)"
+  description: "SS taxes minus EITC for families with 3+ qualifying children"
   syntax: python
   formula: |
     # Only applies with 3+ qualifying children
