@@ -120,6 +120,13 @@ variable capital_gains:
 # 26 USC Section 1223 - Holding Period Rules
 #
 
+parameter long_term_holding_days:
+  description: "Days held for long-term capital gain treatment (more than one year)"
+  reference: "26 USC 1222"
+  unit: days
+  values:
+    1900-01-01: 366
+
 input acquisition_date:
   entity: Asset
   period: Year
@@ -182,7 +189,7 @@ variable holding_period:
       days_held = disposition_date - acquisition_date
     if is_inherited_property:
       return True
-    return days_held > 366
+    return days_held > long_term_holding_days
   default: False
   tests:
     - name: "Stock held less than 1 year (short-term)"

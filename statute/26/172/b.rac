@@ -49,7 +49,7 @@ variable carryback_carryover:
     # Apply 80% limitation to post-2017 losses only
     if nol_carryforward_post_2017 > 0:
         # Post-TCJA NOLs limited to 80% of taxable income
-        limited_amount = taxable_income * 0.80
+        limited_amount = taxable_income * nol_limitation_rate
         post_2017_allowed = min(nol_carryforward_post_2017, max(0, limited_amount - nol_carryforward_pre_2018))
     else:
         post_2017_allowed = 0

@@ -3,6 +3,21 @@ An individual shall not be treated as an eligible individual for a taxable
 year if such individual is a qualifying child of another taxpayer for such
 taxable year.
 """
+
+parameter qualifying_child_age_under_threshold:
+  description: "Age threshold for qualifying child (under this age)"
+  reference: "26 USC 152(c)(3)(A)(i)"
+  unit: years
+  values:
+    1984-01-01: 19
+
+parameter qualifying_child_student_age_threshold:
+  description: "Age threshold for qualifying child who is full-time student"
+  reference: "26 USC 152(c)(3)(A)(ii)"
+  unit: years
+  values:
+    1984-01-01: 24
+
 variable is_qualifying_child_of_other:
   entity: TaxUnit
   period: Year
@@ -15,8 +30,8 @@ variable is_qualifying_child_of_other:
     # 2. Under 24, full-time student, and lived with parent
     # 3. Permanently disabled (no age limit)
     (
-      (age < 19 and lived_with_parent) or
-      (age < 24 and is_full_time_student and lived_with_parent) or
+      (age < qualifying_child_age_under_threshold and lived_with_parent) or
+      (age < qualifying_child_student_age_threshold and is_full_time_student and lived_with_parent) or
       (is_permanently_disabled and lived_with_parent)
     )
   tests:

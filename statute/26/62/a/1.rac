@@ -1,5 +1,12 @@
 # Deductions attributable to a trade or business carried on by the taxpayer.
 
+parameter se_tax_deduction_rate:
+  description: "Deductible portion of self-employment tax"
+  reference: "26 USC 164(f)"
+  unit: /1
+  values:
+    1990-01-01: 0.5
+
 text: """
 (1) Trade and business deductions.—The deductions allowed by part VI
 (sec. 161 and following) which consist of expenses paid or incurred by
@@ -37,7 +44,7 @@ variable self_employment_tax_deduction:
   syntax: python
   formula: |
     # Only 50% of SE tax is deductible
-    return self_employment_tax_paid * 0.5
+    return self_employment_tax_paid * se_tax_deduction_rate
 
 # Self-employed health insurance deduction
 # Reference: 26 USC 162(l)

@@ -16,6 +16,13 @@ of the taxpayer for the taxable year.
 #
 # Expected contribution = (household_income * applicable_percentage) / 12
 
+parameter months_per_year:
+  description: "Months in a year for annual/monthly conversion"
+  reference: "26 USC 36B(b)(3)(A)(ii)"
+  unit: months
+  values:
+    1900-01-01: 12
+
 input actual_health_premium:
   entity: TaxUnit
   period: Year
@@ -49,7 +56,7 @@ variable monthly_expected_contribution:
     # Per 36B(b)(3)(A)(ii): 1/12 of (household_income * applicable_percentage)
     # applicable_percentage is the rate from the sliding scale in 36B(b)(3)(A)
     annual_contribution = household_income * applicable_percentage
-    return annual_contribution / 12
+    return annual_contribution / months_per_year
   default: 0
 
 variable monthly_benchmark_excess:

@@ -20,6 +20,27 @@ parameter contribution_limit_excess_tax_rate:
   values:
     1977-01-01: 0.06
 
+parameter ira_catchup_age_threshold:
+  description: "Age threshold for IRA catch-up contributions"
+  reference: "26 USC 219(b)(5)(B)"
+  unit: years
+  values:
+    2002-01-01: 50
+
+parameter ira_contribution_limit_under_catchup_age:
+  description: "IRA contribution limit for individuals under catch-up age"
+  reference: "26 USC 219(b)(5)(A)"
+  unit: USD
+  values:
+    2024-01-01: 7_000
+
+parameter ira_contribution_limit_catchup_age:
+  description: "IRA contribution limit for individuals at or above catch-up age"
+  reference: "26 USC 219(b)(5)(B)"
+  unit: USD
+  values:
+    2024-01-01: 8_000
+
 input traditional_ira_contributions:
   entity: Person
   period: Year
@@ -53,10 +74,10 @@ variable contribution_limits:
   formula: |
     total_contributions = traditional_ira_contributions + roth_ira_contributions
     # Determine applicable limit based on age and account type
-    if age >= 50:
-        limit = 8_000  # 2024 limit for age 50+
+    if age >= ira_catchup_age_threshold:
+        limit = ira_contribution_limit_catchup_age
     else:
-        limit = 7_000  # 2024 limit for under 50
+        limit = ira_contribution_limit_under_catchup_age
 
     if total_contributions > limit:
         excess = total_contributions - limit
