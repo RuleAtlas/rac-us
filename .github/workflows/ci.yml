@@ -1,4 +1,4 @@
-name: Validate Encodings
+name: CI
 
 on:
   push:
