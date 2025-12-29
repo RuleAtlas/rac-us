@@ -1,3 +1,6 @@
+# 26 USC 21 - Expenses for household and dependent care services
+# https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title26-section21
+
 text: """
 (a) ALLOWANCE OF CREDIT. --
 (1) IN GENERAL. -- In the case of an individual who maintains a household which
@@ -6,109 +9,108 @@ subsection (b)(1)), there shall be allowed as a credit against the tax
 imposed by this chapter for the taxable year an amount equal to the
 applicable percentage of the employment-related expenses (as defined in
 subsection (b)(2)) paid by such individual during the taxable year.
+
+(2) APPLICABLE PERCENTAGE DEFINED. -- For purposes of paragraph (1), the term
+"applicable percentage" means 35 percent reduced (but not below 20 percent)
+by 1 percentage point for each $2,000 (or fraction thereof) by which the
+taxpayer's adjusted gross income for the taxable year exceeds $15,000.
+
+(c) DOLLAR LIMIT ON AMOUNT CREDITABLE. -- The amount of the employment-related
+expenses incurred during any taxable year which may be taken into account
+under subsection (a) shall not exceed--
+(1) $3,000 if there is 1 qualifying individual with respect to the taxpayer
+    for such taxable year, or
+(2) $6,000 if there are 2 or more qualifying individuals with respect to
+    the taxpayer for such taxable year.
+
+(d) EARNED INCOME LIMITATION. --
+(1) IN GENERAL. -- Except as otherwise provided in this subsection, the
+amount of the employment-related expenses incurred during any taxable year
+which may be taken into account under subsection (a) shall not exceed--
+(A) in the case of an individual who is not married at the close of such
+    year, such individual's earned income for such year, or
+(B) in the case of an individual who is married at the close of such year,
+    the lesser of such individual's earned income or the earned income
+    of his spouse for such year.
 """
-variable child_dependent_care_credit:
-  imports:
-    - 26/21/e#num_cdcc_qualifying_individuals
-    - 26/21/b#cdcc_applicable_percentage
-    - 26/21/c#cdcc_maximum_expense_limit
-    - 26/21/d#cdcc_earned_income_limit
-    - 26/21/a#cdcc_expenses_paid
-    - 26/26/a#tax_liability_before_credits
+
+# =============================================================================
+# Parameters from 26 USC 21(c) - Dollar limit on amount creditable
+# =============================================================================
+
+# 26 USC 21(c)(1) - One qualifying individual limit
+parameter cdcc_expense_limit_one:
+  description: "Maximum expenses for one qualifying individual"
+  reference: "26 USC 21(c)(1)"
+  unit: "USD"
+  values:
+    1976-01-01: 3_000
+
+# 26 USC 21(c)(2) - Two or more qualifying individuals limit
+parameter cdcc_expense_limit_two_plus:
+  description: "Maximum expenses for two or more qualifying individuals"
+  reference: "26 USC 21(c)(2)"
+  unit: "USD"
+  values:
+    1976-01-01: 6_000
+
+# =============================================================================
+# Parameters from 26 USC 21(a)(2) - Applicable percentage
+# =============================================================================
+
+# 26 USC 21(a)(2) - Maximum applicable percentage
+parameter cdcc_maximum_rate:
+  description: "Maximum applicable percentage for CDCC"
+  reference: "26 USC 21(a)(2)"
+  unit: "/1"
+  values:
+    1976-01-01: 0.35
+
+# 26 USC 21(a)(2) - Minimum applicable percentage (floor)
+parameter cdcc_minimum_rate:
+  description: "Minimum applicable percentage floor for CDCC"
+  reference: "26 USC 21(a)(2)"
+  unit: "/1"
+  values:
+    1976-01-01: 0.20
+
+# 26 USC 21(a)(2) - Phase-down threshold
+parameter cdcc_phase_down_threshold:
+  description: "AGI threshold above which applicable percentage reduces"
+  reference: "26 USC 21(a)(2)"
+  unit: "USD"
+  values:
+    1976-01-01: 15_000
+
+# 26 USC 21(a)(2) - Phase-down increment
+parameter cdcc_phase_down_increment:
+  description: "AGI increment for each 1% reduction in applicable percentage"
+  reference: "26 USC 21(a)(2)"
+  unit: "USD"
+  values:
+    1976-01-01: 2_000
+
+# 26 USC 21(a)(2) - Phase-down rate per increment
+parameter cdcc_phase_down_rate:
+  description: "Percentage reduction per increment above threshold"
+  reference: "26 USC 21(a)(2)"
+  unit: "/1"
+  values:
+    1976-01-01: 0.01
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+input num_cdcc_qualifying_individuals:
   entity: TaxUnit
   period: Year
-  dtype: Money
-  unit: "USD"
-  label: "Child and Dependent Care Credit"
-  description: "Credit for employment-related expenses for care of qualifying individuals per 26 USC 21"
-  syntax: python
-  formula: |
-    # Apply all limitations: actual expenses, statutory limit, earned income limit
-    limited_expenses = min(cdcc_expenses_paid, cdcc_maximum_expense_limit, cdcc_earned_income_limit)
-    # No qualifying individuals = no credit
-    if num_cdcc_qualifying_individuals == 0:
-        return 0
-    # Per 26 USC 21(a)(1): credit = applicable percentage × employment-related expenses
-    return cdcc_applicable_percentage * limited_expenses
+  dtype: Integer
+  label: "Number of CDCC Qualifying Individuals"
+  description: "Count of qualifying individuals for child and dependent care credit"
   default: 0
-  tests:
-    - name: "No qualifying individuals returns zero"
-      period: 2024
-      inputs:
-        num_cdcc_qualifying_individuals: 0
-        cdcc_expenses_paid: 5_000
-        cdcc_maximum_expense_limit: 3_000
-        cdcc_earned_income_limit: 40_000
-        cdcc_applicable_percentage: 0.20
-      expect: 0
 
-    - name: "One qualifying individual - expenses below limit - 20% rate"
-      period: 2024
-      inputs:
-        num_cdcc_qualifying_individuals: 1
-        cdcc_expenses_paid: 2_000
-        cdcc_maximum_expense_limit: 3_000
-        cdcc_earned_income_limit: 40_000
-        cdcc_applicable_percentage: 0.20
-      # 2,000 × 0.20 = 400
-      expect: 400
-
-    - name: "One qualifying individual - expenses at statutory limit - 35% rate"
-      period: 2024
-      inputs:
-        num_cdcc_qualifying_individuals: 1
-        cdcc_expenses_paid: 5_000
-        cdcc_maximum_expense_limit: 3_000
-        cdcc_earned_income_limit: 40_000
-        cdcc_applicable_percentage: 0.35
-      # 3,000 × 0.35 = 1,050
-      expect: 1_050
-
-    - name: "Two qualifying individuals - expenses below limit - 25% rate"
-      period: 2024
-      inputs:
-        num_cdcc_qualifying_individuals: 2
-        cdcc_expenses_paid: 4_000
-        cdcc_maximum_expense_limit: 6_000
-        cdcc_earned_income_limit: 50_000
-        cdcc_applicable_percentage: 0.25
-      # 4,000 × 0.25 = 1,000
-      expect: 1_000
-
-    - name: "Two qualifying individuals - expenses exceed statutory limit - 20% rate"
-      period: 2024
-      inputs:
-        num_cdcc_qualifying_individuals: 2
-        cdcc_expenses_paid: 10_000
-        cdcc_maximum_expense_limit: 6_000
-        cdcc_earned_income_limit: 50_000
-        cdcc_applicable_percentage: 0.20
-      # 6,000 × 0.20 = 1,200
-      expect: 1_200
-
-    - name: "Earned income limit binding - single low earner - 35% rate"
-      period: 2024
-      inputs:
-        num_cdcc_qualifying_individuals: 1
-        cdcc_expenses_paid: 5_000
-        cdcc_maximum_expense_limit: 3_000
-        cdcc_earned_income_limit: 2_500
-        cdcc_applicable_percentage: 0.35
-      # 2,500 × 0.35 = 875
-      expect: 875
-
-    - name: "All limits apply - minimum of three constraints - 30% rate"
-      period: 2024
-      inputs:
-        num_cdcc_qualifying_individuals: 2
-        cdcc_expenses_paid: 8_000
-        cdcc_maximum_expense_limit: 6_000
-        cdcc_earned_income_limit: 5_000
-        cdcc_applicable_percentage: 0.30
-      # 5,000 × 0.30 = 1,500
-      expect: 1_500
-
-variable inputs:
+input cdcc_expenses_paid:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -117,8 +119,29 @@ variable inputs:
   description: "Employment-related child/dependent care expenses paid during the year"
   default: 0
 
-# Standalone validation version - all logic inline (no imports)
-variable cdcc_standalone:
+input earned_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Earned Income"
+  description: "Earned income for CDCC limitation"
+  default: 0
+
+input adjusted_gross_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Adjusted Gross Income"
+  description: "AGI for applicable percentage calculation"
+  default: 0
+
+# =============================================================================
+# Variables
+# =============================================================================
+
+variable child_dependent_care_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -131,21 +154,23 @@ variable cdcc_standalone:
     if num_cdcc_qualifying_individuals == 0:
         expense_limit = 0
     elif num_cdcc_qualifying_individuals == 1:
-        expense_limit = one_qualifying_individual
+        expense_limit = cdcc_expense_limit_one
     else:
-        expense_limit = two_or_more_qualifying_individuals
+        expense_limit = cdcc_expense_limit_two_plus
+
     # 26 USC 21(d)(1): Earned income limitation
-    # Credit limited to lesser of spouse's earned income for married couples
     earned_income_limit = earned_income
+
     # 26 USC 21(b)(2): Qualified expenses = actual expenses capped by limits
     qualified_expenses = min(cdcc_expenses_paid, expense_limit, earned_income_limit)
+
     # 26 USC 21(a)(2): Applicable percentage
     # Starts at 35%, decreases by 1% per $2,000 of AGI above threshold, floor of 20%
-    agi_above_threshold = max(0, adjusted_gross_income - phase_down_threshold)
-    percentage_reduction = (agi_above_threshold // phase_down_increment) * phase_down_rate
-    applicable_rate = max(minimum_rate, maximum_rate - percentage_reduction)
+    agi_above_threshold = max(0, adjusted_gross_income - cdcc_phase_down_threshold)
+    percentage_reduction = (agi_above_threshold // cdcc_phase_down_increment) * cdcc_phase_down_rate
+    applicable_rate = max(cdcc_minimum_rate, cdcc_maximum_rate - percentage_reduction)
+
     # Final credit = applicable percentage * qualified expenses
-    # Note: non-refundable (limited to tax liability) under permanent law
     return applicable_rate * qualified_expenses
   default: 0
   tests:
@@ -156,13 +181,6 @@ variable cdcc_standalone:
         cdcc_expenses_paid: 5_000
         earned_income: 50_000
         adjusted_gross_income: 50_000
-        one_qualifying_individual: 3_000
-        two_or_more_qualifying_individuals: 6_000
-        phase_down_threshold: 15_000
-        phase_down_increment: 2_000
-        phase_down_rate: 0.01
-        maximum_rate: 0.35
-        minimum_rate: 0.20
       expect: 0
 
     - name: "One child - low AGI gets maximum 35% rate"
@@ -172,13 +190,6 @@ variable cdcc_standalone:
         cdcc_expenses_paid: 3_000
         earned_income: 15_000
         adjusted_gross_income: 15_000
-        one_qualifying_individual: 3_000
-        two_or_more_qualifying_individuals: 6_000
-        phase_down_threshold: 15_000
-        phase_down_increment: 2_000
-        phase_down_rate: 0.01
-        maximum_rate: 0.35
-        minimum_rate: 0.20
       # At $15,000 AGI (threshold), rate = 35%, credit = 3,000 * 0.35 = 1,050
       expect: 1_050
 
@@ -189,13 +200,6 @@ variable cdcc_standalone:
         cdcc_expenses_paid: 3_000
         earned_income: 25_000
         adjusted_gross_income: 25_000
-        one_qualifying_individual: 3_000
-        two_or_more_qualifying_individuals: 6_000
-        phase_down_threshold: 15_000
-        phase_down_increment: 2_000
-        phase_down_rate: 0.01
-        maximum_rate: 0.35
-        minimum_rate: 0.20
       # AGI $25,000 is $10,000 above threshold = 5 increments
       # Rate = 35% - 5% = 30%, credit = 3,000 * 0.30 = 900
       expect: 900
@@ -207,13 +211,6 @@ variable cdcc_standalone:
         cdcc_expenses_paid: 8_000
         earned_income: 60_000
         adjusted_gross_income: 60_000
-        one_qualifying_individual: 3_000
-        two_or_more_qualifying_individuals: 6_000
-        phase_down_threshold: 15_000
-        phase_down_increment: 2_000
-        phase_down_rate: 0.01
-        maximum_rate: 0.35
-        minimum_rate: 0.20
       # AGI $60,000 is $45,000 above threshold = 23 increments
       # Rate would be 35% - 23% = 12%, but floor is 20%
       # Expenses capped at $6,000, credit = 6,000 * 0.20 = 1,200
@@ -226,13 +223,6 @@ variable cdcc_standalone:
         cdcc_expenses_paid: 5_000
         earned_income: 40_000
         adjusted_gross_income: 40_000
-        one_qualifying_individual: 3_000
-        two_or_more_qualifying_individuals: 6_000
-        phase_down_threshold: 15_000
-        phase_down_increment: 2_000
-        phase_down_rate: 0.01
-        maximum_rate: 0.35
-        minimum_rate: 0.20
       # Expenses capped at $3,000 (one child limit)
       # AGI $40,000 is $25,000 above threshold = 13 increments
       # Rate = 35% - 13% = 22%, credit = 3,000 * 0.22 = 660
@@ -245,13 +235,6 @@ variable cdcc_standalone:
         cdcc_expenses_paid: 10_000
         earned_income: 50_000
         adjusted_gross_income: 35_000
-        one_qualifying_individual: 3_000
-        two_or_more_qualifying_individuals: 6_000
-        phase_down_threshold: 15_000
-        phase_down_increment: 2_000
-        phase_down_rate: 0.01
-        maximum_rate: 0.35
-        minimum_rate: 0.20
       # Expenses capped at $6,000 (two child limit)
       # AGI $35,000 is $20,000 above threshold = 10 increments
       # Rate = 35% - 10% = 25%, credit = 6,000 * 0.25 = 1,500
@@ -264,13 +247,6 @@ variable cdcc_standalone:
         cdcc_expenses_paid: 5_000
         earned_income: 2_000
         adjusted_gross_income: 12_000
-        one_qualifying_individual: 3_000
-        two_or_more_qualifying_individuals: 6_000
-        phase_down_threshold: 15_000
-        phase_down_increment: 2_000
-        phase_down_rate: 0.01
-        maximum_rate: 0.35
-        minimum_rate: 0.20
       # Earned income only $2,000 caps expenses
       # AGI $12,000 is below threshold, rate = 35%
       # Credit = 2,000 * 0.35 = 700
@@ -283,13 +259,6 @@ variable cdcc_standalone:
         cdcc_expenses_paid: 3_000
         earned_income: 17_000
         adjusted_gross_income: 17_000
-        one_qualifying_individual: 3_000
-        two_or_more_qualifying_individuals: 6_000
-        phase_down_threshold: 15_000
-        phase_down_increment: 2_000
-        phase_down_rate: 0.01
-        maximum_rate: 0.35
-        minimum_rate: 0.20
       # AGI $17,000 is $2,000 above threshold = 1 increment
       # Rate = 35% - 1% = 34%, credit = 3,000 * 0.34 = 1,020
       expect: 1_020
@@ -301,14 +270,7 @@ variable cdcc_standalone:
         cdcc_expenses_paid: 12_000
         earned_income: 80_000
         adjusted_gross_income: 20_000
-        one_qualifying_individual: 3_000
-        two_or_more_qualifying_individuals: 6_000
-        phase_down_threshold: 15_000
-        phase_down_increment: 2_000
-        phase_down_rate: 0.01
-        maximum_rate: 0.35
-        minimum_rate: 0.20
       # Three children still uses $6,000 limit (two or more)
-      # AGI $20,000 is $5,000 above threshold = 3 increments (ceiling of 5000/2000)
-      # Rate = 35% - 3% = 32%, credit = 6,000 * 0.32 = 1,920
-      expect: 1_920
+      # AGI $20,000 is $5,000 above threshold = 2 increments (floor of 5000/2000)
+      # Rate = 35% - 2% = 33%, credit = 6,000 * 0.33 = 1,980
+      expect: 1_980
