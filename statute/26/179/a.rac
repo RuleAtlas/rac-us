@@ -21,3 +21,52 @@ variable expensing_election:
     # Available after phaseout (cannot go below zero)
     return max(0, max_available - phaseout_reduction)
   default: 0
+  tests:
+    - name: "Investment below phaseout threshold - full deduction available"
+      period: 2024
+      inputs:
+        maximum_deduction: 1_220_000
+        total_cost_of_section_179_property: 2_000_000
+        phaseout_threshold: 3_050_000
+        phaseout_rate: 1.0
+      expect: 1_220_000
+    - name: "Investment at phaseout threshold - full deduction available"
+      period: 2024
+      inputs:
+        maximum_deduction: 1_220_000
+        total_cost_of_section_179_property: 3_050_000
+        phaseout_threshold: 3_050_000
+        phaseout_rate: 1.0
+      expect: 1_220_000
+    - name: "Investment exceeds threshold by $500k - deduction reduced to $720k"
+      period: 2024
+      inputs:
+        maximum_deduction: 1_220_000
+        total_cost_of_section_179_property: 3_550_000
+        phaseout_threshold: 3_050_000
+        phaseout_rate: 1.0
+      expect: 720_000
+    - name: "Investment exceeds threshold by full deduction amount - zero remaining"
+      period: 2024
+      inputs:
+        maximum_deduction: 1_220_000
+        total_cost_of_section_179_property: 4_270_000
+        phaseout_threshold: 3_050_000
+        phaseout_rate: 1.0
+      expect: 0
+    - name: "Investment far exceeds threshold - floor at zero"
+      period: 2024
+      inputs:
+        maximum_deduction: 1_220_000
+        total_cost_of_section_179_property: 5_000_000
+        phaseout_threshold: 3_050_000
+        phaseout_rate: 1.0
+      expect: 0
+    - name: "Small business with minimal investment - full deduction"
+      period: 2024
+      inputs:
+        maximum_deduction: 1_220_000
+        total_cost_of_section_179_property: 100_000
+        phaseout_threshold: 3_050_000
+        phaseout_rate: 1.0
+      expect: 1_220_000

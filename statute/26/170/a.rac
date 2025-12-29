@@ -17,3 +17,45 @@ variable charitable_deduction:
     # Total deduction = current year + carryforward used
     return charitable_deduction_before_carryforward + charitable_carryforward_used
   default: 0
+  tests:
+    - name: "Current year contributions only - typical donor"
+      period: 2024
+      inputs:
+        charitable_deduction_before_carryforward: 5_000
+        charitable_carryforward_used: 0
+      expect: 5_000
+
+    - name: "Carryforward only - no current year contributions"
+      period: 2024
+      inputs:
+        charitable_deduction_before_carryforward: 0
+        charitable_carryforward_used: 8_000
+      expect: 8_000
+
+    - name: "Combined current year and carryforward"
+      period: 2024
+      inputs:
+        charitable_deduction_before_carryforward: 12_000
+        charitable_carryforward_used: 3_500
+      expect: 15_500
+
+    - name: "Large charitable donor with carryforward"
+      period: 2024
+      inputs:
+        charitable_deduction_before_carryforward: 75_000
+        charitable_carryforward_used: 25_000
+      expect: 100_000
+
+    - name: "Zero charitable deduction"
+      period: 2024
+      inputs:
+        charitable_deduction_before_carryforward: 0
+        charitable_carryforward_used: 0
+      expect: 0
+
+    - name: "Small donor with minimal carryforward"
+      period: 2024
+      inputs:
+        charitable_deduction_before_carryforward: 500
+        charitable_carryforward_used: 150
+      expect: 650

@@ -31,3 +31,39 @@ variable new_vehicle_credit:
     min_capacity = p.eligibility.min_battery_capacity_kwh
     return capacity >= min_capacity
   default: 0
+  tests:
+    - name: "Battery capacity below minimum - ineligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_battery_capacity_kwh: 5
+      expect: false
+
+    - name: "Battery capacity exactly at minimum threshold"
+      period: 2024
+      inputs:
+        new_clean_vehicle_battery_capacity_kwh: 7
+      expect: true
+
+    - name: "Battery capacity above minimum - eligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_battery_capacity_kwh: 75
+      expect: true
+
+    - name: "Zero battery capacity - ineligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_battery_capacity_kwh: 0
+      expect: false
+
+    - name: "Small plug-in hybrid battery capacity - ineligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_battery_capacity_kwh: 4
+      expect: false
+
+    - name: "Large EV battery capacity - eligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_battery_capacity_kwh: 100
+      expect: true
