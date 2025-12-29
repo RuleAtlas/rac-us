@@ -12,49 +12,49 @@ source:
 # Basic standard deduction amounts per § 63(c)(2)
 basic_joint:
   implements: statute/26/63/c/4  # Authority for inflation adjustment
-  overrides: statute/26/63/c/2/basic_amounts#basic_joint
+  overrides: statute/26/63/c/2#basic_joint
   value: 29200
 
 basic_head_of_household:
   implements: statute/26/63/c/4
-  overrides: statute/26/63/c/2/basic_amounts#basic_head_of_household
+  overrides: statute/26/63/c/2#basic_head_of_household
   value: 21900
 
 basic_single:
   implements: statute/26/63/c/4
-  overrides: statute/26/63/c/2/basic_amounts#basic_single
+  overrides: statute/26/63/c/2#basic_single
   value: 14600
 
 # Additional amounts for aged per § 63(f)(1)
 additional_aged_unmarried:
   implements: statute/26/63/c/4
-  overrides: statute/26/63/f/1/aged_amount#additional_aged_unmarried
+  overrides: statute/26/63/f/1#additional_aged_unmarried
   value: 1950
 
 additional_aged_married:
   implements: statute/26/63/c/4
-  overrides: statute/26/63/f/1/aged_amount#additional_aged_married
+  overrides: statute/26/63/f/1#additional_aged_married
   value: 1550
 
 # Additional amounts for blind per § 63(f)(2)
 # (same amounts as aged)
 additional_blind_unmarried:
   implements: statute/26/63/c/4
-  overrides: statute/26/63/f/2/blind_amount#additional_blind_unmarried
+  overrides: statute/26/63/f/2#additional_blind_unmarried
   value: 1950
 
 additional_blind_married:
   implements: statute/26/63/c/4
-  overrides: statute/26/63/f/2/blind_amount#additional_blind_married
+  overrides: statute/26/63/f/2#additional_blind_married
   value: 1550
 
 # Dependent limitation amounts per § 63(c)(5)
 dependent_minimum:
   implements: statute/26/63/c/4
-  overrides: statute/26/63/c/5/parameters#dependent_minimum
+  overrides: statute/26/63/c/5#dependent_minimum
   value: 1300
 
 dependent_earned_addon:
   implements: statute/26/63/c/4
-  overrides: statute/26/63/c/5/parameters#dependent_earned_addon
+  overrides: statute/26/63/c/5#dependent_earned_addon
   value: 450

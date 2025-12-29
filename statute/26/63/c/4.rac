@@ -1,0 +1,53 @@
+# Reference: IRC Section 63(c)(4)
+
+text: """
+(4) Adjustments for inflation.-- In the case of any taxable year
+beginning in a calendar year after 1988, each dollar amount contained
+in paragraph (2)(B), (2)(C), or (5) or subsection (f) shall be
+increased by an amount equal to--
+(A) such dollar amount, multiplied by
+(B) the cost-of-living adjustment determined under section 1(f)(3)
+for the calendar year in which the taxable year begins, by
+substituting for 'calendar year 2016' in subparagraph (A)(ii) thereof--
+(i) 'calendar year 1987' in the case of the dollar amounts contained
+in paragraph (2)(B), (2)(C), or (5)(A) or subsection (f), and
+(ii) 'calendar year 1997' in the case of the dollar amount contained
+in paragraph (5)(B).
+If any increase under this paragraph is not a multiple of $50, such
+increase shall be rounded to the next lowest multiple of $50.
+"""
+
+indexing_rule standard_deduction_inflation:
+  description: "Cost-of-living adjustment for standard deduction amounts"
+  reference: "26 USC 63(c)(4)"
+
+  applies_to:
+    # 63(c)(2)(B): Head of household
+    - statute/26/63/c/2#basic_head_of_household
+    # 63(c)(2)(C): Single/MFS
+    - statute/26/63/c/2#basic_single
+    # 63(c)(5): Dependent limitations
+    - statute/26/63/c/5#dependent_minimum
+    - statute/26/63/c/5#dependent_earned_addon
+    # 63(f): Aged and blind additional amounts
+    - statute/26/63/f/1#additional_aged_married
+    - statute/26/63/f/1#additional_aged_unmarried
+    - statute/26/63/f/2#additional_blind_married
+    - statute/26/63/f/2#additional_blind_unmarried
+
+  method:
+    type: cost_of_living_adjustment
+    reference_section: "26 USC 1(f)(3)"
+
+  base_years:
+    # 63(c)(4)(B)(i): 1987 for most amounts
+    default: 1987
+    # 63(c)(4)(B)(ii): 1997 for dependent_earned_addon
+    statute/26/63/c/5#dependent_earned_addon: 1997
+
+  rounding:
+    rule: round_down_to_nearest
+    amount: 50
+
+  # Note: 63(c)(2)(A) joint return amount is 200% of (C),
+  # so it's derived, not directly indexed
