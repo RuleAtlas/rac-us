@@ -10,14 +10,12 @@ residence for periods aggregating 2 years or more.
 parameter ownership_required:
   description: "Years of ownership required in 5-year lookback period"
   unit: years
-  reference: "26 USC 121(a)"
   values:
     1997-05-07: 2
 
 parameter use_required:
   description: "Years of use as principal residence required in 5-year lookback period"
   unit: years
-  reference: "26 USC 121(a)"
   values:
     1997-05-07: 2
 

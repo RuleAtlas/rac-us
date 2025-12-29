@@ -17,21 +17,18 @@ or exchange by the taxpayer to which subsection (a) applied.
 parameter single_limit:
   description: "Maximum exclusion for single taxpayer or married filing separately"
   unit: USD
-  reference: "26 USC 121(b)(1)"
   values:
     1997-05-07: 250_000
 
 parameter joint_limit:
   description: "Maximum exclusion for married filing jointly"
   unit: USD
-  reference: "26 USC 121(b)(2)"
   values:
     1997-05-07: 500_000
 
 parameter waiting_period:
   description: "Years since prior exclusion claimed (once-every-2-years limitation)"
   unit: years
-  reference: "26 USC 121(b)(3)"
   values:
     1997-05-07: 2
 
