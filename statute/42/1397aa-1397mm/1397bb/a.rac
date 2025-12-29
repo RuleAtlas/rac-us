@@ -23,7 +23,7 @@ variable benefits:
   entity: Household
   period: Year
   dtype: Boolean
-  unit: "USD"
+  unit: USD
   label: "Household Has CHIP Eligible"
   description: "Household contains at least one CHIP-eligible person"
   syntax: python

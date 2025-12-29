@@ -146,24 +146,45 @@ parameter credit_rate_3:
 
 parameter earned_income_cap_0:
   description: "EITC earned income cap for taxpayers with no qualifying children"
-  reference: "26 USC 32"
+  reference: "26 USC 32(b)(2)(A); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
+  indexed_by: statute/26/32/j
   unit: "USD"
   values:
-    2024-01-01: 8260
+    2018: 4220
+    2019: 4285
+    2020: 4360
+    2021: 4425
+    2022: 4560
+    2023: 4880
+    2024: 8260
 
 parameter earned_income_cap_1:
   description: "EITC earned income cap for taxpayers with one qualifying child"
-  reference: "26 USC 32"
+  reference: "26 USC 32(b)(2)(A); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
+  indexed_by: statute/26/32/j
   unit: "USD"
   values:
-    2024-01-01: 12390
+    2018: 6330
+    2019: 6430
+    2020: 6550
+    2021: 6660
+    2022: 6935
+    2023: 7430
+    2024: 12390
 
 parameter earned_income_cap_2:
   description: "EITC earned income cap for taxpayers with two or more qualifying children"
-  reference: "26 USC 32"
+  reference: "26 USC 32(b)(2)(A); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
+  indexed_by: statute/26/32/j
   unit: "USD"
   values:
-    2024-01-01: 17400
+    2018: 8890
+    2019: 9030
+    2020: 9200
+    2021: 9330
+    2022: 9750
+    2023: 10460
+    2024: 17400
 
 parameter phaseout_rate_0:
   description: "EITC phaseout rate for taxpayers with no qualifying children"
@@ -188,24 +209,45 @@ parameter phaseout_rate_2:
 
 parameter phaseout_start_0:
   description: "EITC phaseout start for taxpayers with no qualifying children"
-  reference: "26 USC 32"
+  reference: "26 USC 32(b)(2)(A); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
+  indexed_by: statute/26/32/j
   unit: "USD"
   values:
-    2024-01-01: 10330
+    2018: 5280
+    2019: 5360
+    2020: 5450
+    2021: 5540
+    2022: 5750
+    2023: 6160
+    2024: 10330
 
 parameter phaseout_start_1:
   description: "EITC phaseout start for taxpayers with qualifying children"
-  reference: "26 USC 32"
+  reference: "26 USC 32(b)(2)(A); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
+  indexed_by: statute/26/32/j
   unit: "USD"
   values:
-    2024-01-01: 22720
+    2018: 11610
+    2019: 11786
+    2020: 12010
+    2021: 12210
+    2022: 12750
+    2023: 13660
+    2024: 22720
 
 parameter joint_adjustment:
   description: "Additional phaseout threshold amount for joint filers"
-  reference: "26 USC 32"
+  reference: "26 USC 32(b)(2)(B); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
+  indexed_by: statute/26/32/j
   unit: "USD"
   values:
-    2024-01-01: 6920
+    2018: 5000
+    2019: 5080
+    2020: 5160
+    2021: 5240
+    2022: 5450
+    2023: 5840
+    2024: 6920
 
 variable eitc_standalone:
   imports:

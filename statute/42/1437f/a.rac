@@ -20,7 +20,7 @@ variable hcv_very_low_income_limit:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Very Low Income Limit"
   description: "50% of Area Median Income limit for HCV eligibility"
   syntax: python
@@ -62,7 +62,7 @@ variable hcv_extremely_low_income_limit:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Extremely Low Income Limit"
   description: "30% of Area Median Income limit for targeting requirement"
   syntax: python
@@ -102,7 +102,7 @@ variable hcv_low_income_limit:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Low Income Limit"
   description: "80% of Area Median Income limit for continued occupancy"
   syntax: python
@@ -131,35 +131,30 @@ variable hcv_income_eligible:
       inputs:
         household_size: 1
         hcv_annual_income: 30_000
-        hcv_very_low_income_limit: 35_650
       expect: true
     - name: "Single person at limit"
       period: 2024
       inputs:
         household_size: 1
         hcv_annual_income: 35_650
-        hcv_very_low_income_limit: 35_650
       expect: true
     - name: "Single person over limit"
       period: 2024
       inputs:
         household_size: 1
         hcv_annual_income: 40_000
-        hcv_very_low_income_limit: 35_650
       expect: false
     - name: "Family of 4 eligible"
       period: 2024
       inputs:
         household_size: 4
         hcv_annual_income: 45_000
-        hcv_very_low_income_limit: 50_850
       expect: true
     - name: "Family of 4 ineligible"
       period: 2024
       inputs:
         household_size: 4
         hcv_annual_income: 60_000
-        hcv_very_low_income_limit: 50_850
       expect: false
 
 variable hcv_extremely_low_income:
@@ -176,28 +171,24 @@ variable hcv_extremely_low_income:
       inputs:
         household_size: 1
         hcv_annual_income: 20_000
-        hcv_extremely_low_income_limit: 21_390
       expect: true
     - name: "Single person at extremely low limit"
       period: 2024
       inputs:
         household_size: 1
         hcv_annual_income: 21_390
-        hcv_extremely_low_income_limit: 21_390
       expect: true
     - name: "Single person over extremely low limit"
       period: 2024
       inputs:
         household_size: 1
         hcv_annual_income: 30_000
-        hcv_extremely_low_income_limit: 21_390
       expect: false
     - name: "Family of 4 extremely low income"
       period: 2024
       inputs:
         household_size: 4
         hcv_annual_income: 25_000
-        hcv_extremely_low_income_limit: 30_510
       expect: true
 
 variable hcv_family_eligible:
@@ -261,43 +252,33 @@ variable hcv_eligible:
       inputs:
         household_size: 1
         hcv_annual_income: 30_000
-        hcv_income_eligible: true
-        hcv_family_eligible: true
-        hcv_citizenship_eligible: true
+        has_eligible_citizen_or_immigrant: true
       expect: true
     - name: "Family of 4, very low income, eligible"
       period: 2024
       inputs:
         household_size: 4
         hcv_annual_income: 45_000
-        hcv_income_eligible: true
-        hcv_family_eligible: true
-        hcv_citizenship_eligible: true
+        has_eligible_citizen_or_immigrant: true
       expect: true
     - name: "Income ineligible"
       period: 2024
       inputs:
         household_size: 2
         hcv_annual_income: 80_000
-        hcv_income_eligible: false
-        hcv_family_eligible: true
-        hcv_citizenship_eligible: true
+        has_eligible_citizen_or_immigrant: true
       expect: false
     - name: "Citizenship ineligible"
       period: 2024
       inputs:
         household_size: 1
         hcv_annual_income: 25_000
-        hcv_income_eligible: true
-        hcv_family_eligible: true
-        hcv_citizenship_eligible: false
+        has_eligible_citizen_or_immigrant: false
       expect: false
     - name: "All requirements not met"
       period: 2024
       inputs:
         household_size: 1
         hcv_annual_income: 100_000
-        hcv_income_eligible: false
-        hcv_family_eligible: false
-        hcv_citizenship_eligible: false
+        has_eligible_citizen_or_immigrant: false
       expect: false

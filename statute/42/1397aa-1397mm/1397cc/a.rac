@@ -30,7 +30,7 @@ cost sharing... the cumulative amount of which exceeds
 parameter cost_sharing_exempt_threshold:
   description: "Income level (as % FPL) below which children are exempt from most cost-sharing"
   reference: "42 USC 1397aa-1397mm(1397cc)(a)"
-  unit: "/1"
+  unit: /1
   values:
     2024-01-01: 150
     1997-01-01: 150
@@ -47,7 +47,7 @@ input medicaid_income_level:
   entity: Household
   period: Year
   dtype: Integer
-  unit: "percent"
+  unit: %
   label: "Income as Percent of FPL"
   description: "Household income as a percentage of the federal poverty line"
   default: 0
@@ -56,7 +56,7 @@ variable cost_sharing:
   entity: Household
   period: Year
   dtype: Boolean
-  unit: "USD"
+  unit: USD
   label: "CHIP Affordable"
   description: "CHIP cost-sharing is within 5% of household income"
   syntax: python

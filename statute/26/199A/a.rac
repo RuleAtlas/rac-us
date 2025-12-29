@@ -28,8 +28,8 @@ input qualified_coop_dividends:
   default: 0
 
 parameter qbi_deduction_rate:
-  description: "Section 199A deduction rate"
-  reference: "26 USC 199A(a)"
+  description: "Section 199A deduction rate for pass-through income per 26 USC 199A(a)(2)"
+  reference: "26 USC 199A(a)(2)"
   unit: "/1"
   values:
     2018-01-01: 0.20
@@ -73,8 +73,8 @@ variable qbi_deduction:
         taxable_income: 100_000
         net_capital_gain: 0
         qualified_coop_dividends: 0
-        qbi_deduction_rate: 0.20
-      expect: 20_000  # 0.20 * 100_000 = 20_000
+      # 0.20 (parameter) * 100_000 = 20_000
+      expect: 20_000
 
     - name: "QBI deduction reduced by net capital gain"
       period: 2024
@@ -82,8 +82,8 @@ variable qbi_deduction:
         taxable_income: 100_000
         net_capital_gain: 25_000
         qualified_coop_dividends: 0
-        qbi_deduction_rate: 0.20
-      expect: 15_000  # 0.20 * (100_000 - 25_000) = 0.20 * 75_000 = 15_000
+      # 0.20 * (100_000 - 25_000) = 0.20 * 75_000 = 15_000
+      expect: 15_000
 
     - name: "QBI deduction reduced by qualified cooperative dividends"
       period: 2024
@@ -91,8 +91,8 @@ variable qbi_deduction:
         taxable_income: 80_000
         net_capital_gain: 0
         qualified_coop_dividends: 10_000
-        qbi_deduction_rate: 0.20
-      expect: 14_000  # 0.20 * (80_000 - 10_000) = 0.20 * 70_000 = 14_000
+      # 0.20 * (80_000 - 10_000) = 0.20 * 70_000 = 14_000
+      expect: 14_000
 
     - name: "QBI deduction reduced by both capital gains and coop dividends"
       period: 2024
@@ -100,8 +100,8 @@ variable qbi_deduction:
         taxable_income: 150_000
         net_capital_gain: 30_000
         qualified_coop_dividends: 20_000
-        qbi_deduction_rate: 0.20
-      expect: 20_000  # 0.20 * (150_000 - 30_000 - 20_000) = 0.20 * 100_000 = 20_000
+      # 0.20 * (150_000 - 30_000 - 20_000) = 0.20 * 100_000 = 20_000
+      expect: 20_000
 
     # ============================================================================
     # EDGE CASE TESTS
@@ -112,8 +112,8 @@ variable qbi_deduction:
         taxable_income: 50_000
         net_capital_gain: 60_000
         qualified_coop_dividends: 0
-        qbi_deduction_rate: 0.20
-      expect: 0  # max(0, 0.20 * (50_000 - 60_000)) = max(0, -2_000) = 0
+      # max(0, 0.20 * (50_000 - 60_000)) = max(0, -2_000) = 0
+      expect: 0
 
     - name: "Zero taxable income - no QBI deduction"
       period: 2024
@@ -121,5 +121,5 @@ variable qbi_deduction:
         taxable_income: 0
         net_capital_gain: 0
         qualified_coop_dividends: 0
-        qbi_deduction_rate: 0.20
-      expect: 0  # 0.20 * 0 = 0
+      # 0.20 * 0 = 0
+      expect: 0

@@ -88,7 +88,7 @@ input household_gross_income:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Household Gross Income"
   description: "Total gross annual household income"
   default: 0
@@ -112,7 +112,7 @@ parameter school_meal_fpl_base:
   values:
     2025-01-01: 15060
     2024-01-01: 14580
-  unit: "USD"
+  unit: USD
   period: Year
   label: "Annual FPL Base"
   description: "Annual Federal Poverty Level for 1-person household"
@@ -122,7 +122,7 @@ parameter school_meal_fpl_increment:
   values:
     2025-01-01: 5380
     2024-01-01: 5380
-  unit: "USD"
+  unit: USD
   period: Year
   label: "FPL Additional Per Person"
   description: "Annual FPL increment per additional household member"
@@ -131,7 +131,7 @@ parameter school_meal_fpl_increment:
 parameter free_meal_limit_pct_fpl:
   values:
     1977-01-01: 1.30
-  unit: "/1"
+  unit: /1
   label: "Free Meal Income Limit"
   description: "Free meals for households at or below this percentage of FPL"
   reference: "42 USC 1758(b)"
@@ -139,7 +139,7 @@ parameter free_meal_limit_pct_fpl:
 parameter reduced_price_limit_pct_fpl:
   values:
     1977-01-01: 1.85
-  unit: "/1"
+  unit: /1
   label: "Reduced-Price Meal Income Limit"
   description: "Reduced-price meals for households up to this percentage of FPL"
   reference: "42 USC 1758(b)"
@@ -149,7 +149,7 @@ parameter school_meal_subsidy_free:
   values:
     2025-01-01: 1680
     2024-01-01: 1625
-  unit: "USD"
+  unit: USD
   period: Year
   label: "Free School Meal Annual Value"
   description: "Annual value of free school meals (lunch + breakfast)"
@@ -159,7 +159,7 @@ parameter school_meal_subsidy_reduced:
   values:
     2025-01-01: 1050
     2024-01-01: 1025
-  unit: "USD"
+  unit: USD
   period: Year
   label: "Reduced-Price School Meal Annual Value"
   description: "Annual value of reduced-price school meals (lunch + breakfast)"
@@ -170,7 +170,7 @@ variable school_meal_fpl:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Federal Poverty Level"
   description: "Annual FPL for household based on size"
   syntax: python
@@ -566,7 +566,7 @@ variable school_meal_subsidy_annual:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Annual School Meal Subsidy Value"
   description: "Annual value of school meal subsidy based on free/reduced tier"
   syntax: python

@@ -18,7 +18,7 @@ input total_resources:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total Resources"
   description: "Total value of all resources"
   default: 0
@@ -27,7 +27,7 @@ input primary_residence_value:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Primary Residence Value"
   description: "Value of primary residence (excluded from SSI)"
   default: 0
@@ -36,7 +36,7 @@ input household_goods_value:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Household Goods Value"
   description: "Value of household goods and personal effects"
   default: 0
@@ -45,7 +45,7 @@ input automobile_value:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Automobile Value"
   description: "Value of one automobile"
   default: 0
@@ -54,7 +54,7 @@ input designated_burial_funds:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Designated Burial Funds"
   description: "Funds set aside for burial expenses"
   default: 0
@@ -71,7 +71,7 @@ input life_insurance_face_value:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Life Insurance Face Value"
   description: "Total face value of life insurance policies"
   default: 0
@@ -80,7 +80,7 @@ input life_insurance_cash_value:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Life Insurance Cash Value"
   description: "Cash surrender value of life insurance policies"
   default: 0
@@ -88,7 +88,7 @@ input life_insurance_cash_value:
 parameter burial_funds_limit_individual:
   description: "Maximum burial funds exclusion for individual"
   reference: "42 USC 1382b(a)"
-  unit: "USD"
+  unit: USD
   values:
     1974-01-01: 1500
   label: "SSI Burial Funds Limit (Individual)"
@@ -96,7 +96,7 @@ parameter burial_funds_limit_individual:
 parameter burial_funds_limit_couple:
   description: "Maximum burial funds exclusion for couple"
   reference: "42 USC 1382b(a)"
-  unit: "USD"
+  unit: USD
   values:
     1974-01-01: 3000
   label: "SSI Burial Funds Limit (Couple)"
@@ -104,7 +104,7 @@ parameter burial_funds_limit_couple:
 parameter life_insurance_limit:
   description: "Maximum face value of life insurance to qualify for exclusion"
   reference: "42 USC 1382b(a)"
-  unit: "USD"
+  unit: USD
   values:
     1974-01-01: 1500
   label: "SSI Life Insurance Face Value Limit"
@@ -113,7 +113,7 @@ variable resource_exclusions:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SSI countable resources"
   description: "Total resources minus exclusions per 42 USC 1_382b(a)"
   syntax: python

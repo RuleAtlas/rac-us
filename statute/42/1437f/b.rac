@@ -4,7 +4,7 @@ variable hcv_childcare_deduction:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Child Care Deduction"
   description: "Deduction for child care expenses enabling work or education"
   syntax: python
@@ -23,7 +23,7 @@ variable hcv_medical_deduction:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Medical Expense Deduction"
   description: "Deduction for medical expenses over 3% of income (elderly/disabled only)"
   syntax: python
@@ -43,7 +43,7 @@ variable hcv_disability_assistance_deduction:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Disability Assistance Deduction"
   description: "Deduction for disability assistance expenses enabling work"
   syntax: python
@@ -62,9 +62,10 @@ variable hcv_monthly_adjusted_income:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Monthly Adjusted Income"
   description: "Monthly adjusted income for TTP calculation"
+  syntax: python
   formula: return hcv_annual_adjusted_income / months_per_year
   default: 0
   tests:
@@ -93,7 +94,7 @@ variable hcv_annual_income:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Annual Income"
   description: "Total annual gross income from all counted sources per 24 CFR 5.609(b)"
   syntax: python
@@ -176,7 +177,7 @@ variable hcv_dependent_deduction:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Dependent Deduction"
   description: "Deduction of $480 per dependent family member"
   syntax: python
@@ -214,7 +215,7 @@ variable hcv_elderly_disabled_deduction:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Elderly/Disabled Deduction"
   description: "Deduction of $400 for elderly (62+) or disabled head/spouse"
   syntax: python
@@ -248,7 +249,7 @@ variable hcv_total_deductions:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Total Deductions"
   description: "Sum of all allowable deductions from annual income"
   syntax: python
@@ -300,7 +301,7 @@ variable hcv_annual_adjusted_income:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Annual Adjusted Income"
   description: "Annual income minus all allowable deductions"
   syntax: python

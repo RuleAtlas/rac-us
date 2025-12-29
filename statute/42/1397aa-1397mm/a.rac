@@ -22,7 +22,7 @@ input per_capita_chip_benefit:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Per-Capita CHIP Benefit"
   description: "Annual per-capita CHIP benefit value (varies by state, typically $2,000-$5,000)"
   default: 0
@@ -31,7 +31,7 @@ variable chip:
   entity: Household
   period: Year
   dtype: Integer
-  unit: "USD"
+  unit: USD
   label: "CHIP Coverage Gap Count"
   description: "Number of CHIP-eligible persons facing cost-sharing burden"
   syntax: python

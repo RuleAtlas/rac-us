@@ -23,7 +23,7 @@ input tanf_benefit_amount:
   entity: TanfUnit
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "TANF Benefit Amount"
   description: "TANF benefit amount (for calculating sanctions)"
   default: 0
@@ -32,7 +32,7 @@ input tanf_benefit_amount_before_sanctions:
   entity: TanfUnit
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "TANF Benefit Before Sanctions"
   description: "TANF benefit amount before any sanctions applied"
   default: 0
@@ -166,7 +166,7 @@ variable tanf_work_sanction_amount:
   entity: TanfUnit
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "TANF Work Sanction Reduction"
   description: "Monthly benefit reduction due to work requirement non-compliance"
   syntax: python
@@ -229,7 +229,7 @@ variable tanf_child_support_sanction_amount:
   entity: TanfUnit
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "TANF Child Support Sanction"
   description: "Benefit reduction for child support non-cooperation"
   syntax: python
@@ -294,7 +294,7 @@ variable tanf_total_sanction_amount:
   entity: TanfUnit
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "TANF Total Sanctions"
   description: "Combined benefit reduction from all applicable sanctions"
   syntax: python
@@ -313,7 +313,7 @@ variable tanf_benefit_after_sanctions:
   entity: TanfUnit
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "TANF Benefit After Sanctions"
   description: "TANF benefit amount after applying all sanctions"
   syntax: python
@@ -505,7 +505,6 @@ variable tanf_child_support_good_cause_exemption:
       inputs:
         tanf_child_support_cooperation_met: false
         tanf_benefit_amount: 400
-        child_support_noncompliance_rate: 0.25
       expect: 100
       variable: tanf_child_support_sanction_amount
 
@@ -514,7 +513,6 @@ variable tanf_child_support_good_cause_exemption:
       inputs:
         tanf_child_support_cooperation_met: false
         tanf_benefit_amount: 1_000
-        child_support_noncompliance_rate: 0.25
       expect: 250
       variable: tanf_child_support_sanction_amount
 

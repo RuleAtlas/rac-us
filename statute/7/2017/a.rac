@@ -20,6 +20,7 @@ parameter max_allotment_schedule:
   description: "SNAP maximum allotment by household size, for use with cut()"
   reference: "7 USC 2017(a)"
   unit: USD
+  period: Month
   values:
     2024-10-01: [292, 536, 768, 975, 1158, 1390, 1536, 1756]
     2023-10-01: [291, 535, 766, 973, 1155, 1386, 1532, 1751]
@@ -28,7 +29,8 @@ parameter max_allotment_schedule:
 parameter max_schedule_size:
   description: "Maximum household size with specific allotment in schedule"
   reference: "7 USC 2017(a)"
-  unit: persons
+  unit: "/1"
+  period: Month
   values:
     1977-01-01: 8
 
@@ -36,6 +38,7 @@ parameter additional_per_person:
   description: "USDA adds this amount for each person beyond 8 in the SNAP household."
   reference: "7 USC 2017(a)"
   unit: USD
+  period: Month
   values:
     2024-10-01: 220
     2023-10-01: 219
@@ -44,7 +47,8 @@ parameter additional_per_person:
 parameter minimum_benefit_max_size:
   description: "Maximum household size eligible for minimum benefit"
   reference: "7 USC 2017(a)"
-  unit: persons
+  unit: "/1"
+  period: Month
   values:
     1977-01-01: 2
 
@@ -52,6 +56,7 @@ parameter minimum_amount:
   description: "USDA guarantees this minimum monthly benefit for 1-2 person SNAP households."
   reference: "7 USC 2017(a)"
   unit: USD
+  period: Month
   values:
     2024-10-01: 23
     2023-10-01: 23
@@ -62,6 +67,7 @@ parameter contribution_rate:
   description: "Household contribution as share of net income"
   reference: "7 USC 2017(a)"
   unit: "/1"
+  period: Month
   values:
     1977-01-01: 0.30
 
@@ -316,93 +322,123 @@ variable snap_allotment:
     return max(0, min(benefit, snap_max_allotment))
   default: 0
   tests:
-    - name: "Ineligible household"
+    - name: "Ineligible household due to income/resources"
       period: 2024-10
       inputs:
         household_size: 1
-        snap_eligible: false
-        snap_calculated_benefit: 200
-        snap_minimum_benefit: 23
-        snap_max_allotment: 292
+        gross_income: 5_000
+        earned_income: 5_000
+        shelter_costs: 0
+        has_elderly_disabled: false
+        bank_accounts: 0
+        receives_ssi: false
+        receives_tanf: false
       expect: 0
-    - name: "Single person, no income (minimum benefit applies)"
+    - name: "Single person, zero net income"
       period: 2024-10
       inputs:
         household_size: 1
-        snap_eligible: true
-        snap_calculated_benefit: 269
-        snap_minimum_benefit: 23
-        snap_max_allotment: 292
-      expect: 269
-    - name: "Single person, high contribution (minimum benefit applies)"
+        gross_income: 0
+        earned_income: 0
+        shelter_costs: 0
+        has_elderly_disabled: false
+        bank_accounts: 0
+        receives_ssi: false
+        receives_tanf: false
+      expect: 292
+    - name: "Single person, high income (still eligible, minimum benefit)"
       period: 2024-10
       inputs:
         household_size: 1
-        snap_eligible: true
-        snap_calculated_benefit: 10
-        snap_minimum_benefit: 23
-        snap_max_allotment: 292
+        gross_income: 1_200
+        earned_income: 1_200
+        shelter_costs: 500
+        has_elderly_disabled: false
+        bank_accounts: 0
+        receives_ssi: false
+        receives_tanf: false
       expect: 23
-    - name: "Two person household minimum applies"
+    - name: "Two person household, low income (minimum benefit)"
       period: 2024-10
       inputs:
         household_size: 2
-        snap_eligible: true
-        snap_calculated_benefit: 15
-        snap_minimum_benefit: 23
-        snap_max_allotment: 536
+        gross_income: 1_000
+        earned_income: 1_000
+        shelter_costs: 600
+        has_elderly_disabled: false
+        bank_accounts: 0
+        receives_ssi: false
+        receives_tanf: false
       expect: 23
-    - name: "Family of 4, standard case"
+    - name: "Family of 4, moderate income"
       period: 2024-10
       inputs:
         household_size: 4
-        snap_eligible: true
-        snap_calculated_benefit: 700
-        snap_minimum_benefit: 0
-        snap_max_allotment: 975
-      expect: 700
-    - name: "Family of 4, calculated benefit exceeds max"
+        gross_income: 1_500
+        earned_income: 1_500
+        shelter_costs: 700
+        has_elderly_disabled: false
+        bank_accounts: 0
+        receives_ssi: false
+        receives_tanf: false
+      expect: 545
+    - name: "Family of 4, higher income"
       period: 2024-10
       inputs:
         household_size: 4
-        snap_eligible: true
-        snap_calculated_benefit: 1_200
-        snap_minimum_benefit: 0
-        snap_max_allotment: 975
-      expect: 975
-    - name: "Eligible with negative calculated benefit (minimum floor)"
+        gross_income: 2_200
+        earned_income: 2_000
+        shelter_costs: 1_000
+        has_elderly_disabled: false
+        bank_accounts: 0
+        receives_ssi: false
+        receives_tanf: false
+      expect: 342
+    - name: "Categorical eligibility via TANF with high income"
       period: 2024-10
       inputs:
         household_size: 2
-        snap_eligible: true
-        snap_calculated_benefit: -50
-        snap_minimum_benefit: 23
-        snap_max_allotment: 536
+        gross_income: 2_000
+        earned_income: 2_000
+        shelter_costs: 800
+        has_elderly_disabled: false
+        bank_accounts: 4_000
+        receives_ssi: false
+        receives_tanf: true
       expect: 23
     - name: "Three person household standard case"
       period: 2024-10
       inputs:
         household_size: 3
-        snap_eligible: true
-        snap_calculated_benefit: 600
-        snap_minimum_benefit: 0
-        snap_max_allotment: 768
-      expect: 600
+        gross_income: 1_200
+        earned_income: 1_000
+        shelter_costs: 600
+        has_elderly_disabled: false
+        bank_accounts: 0
+        receives_ssi: false
+        receives_tanf: false
+      expect: 668
     - name: "Large household (8 persons)"
       period: 2024-10
       inputs:
         household_size: 8
-        snap_eligible: true
-        snap_calculated_benefit: 1_500
-        snap_minimum_benefit: 0
-        snap_max_allotment: 1_756
-      expect: 1500
+        gross_income: 3_000
+        earned_income: 3_000
+        shelter_costs: 1_400
+        has_elderly_disabled: false
+        bank_accounts: 0
+        receives_ssi: false
+        receives_tanf: false
+      expect: 1_256
     - name: "Very large household (15 persons)"
       period: 2024-10
       inputs:
         household_size: 15
-        snap_eligible: true
-        snap_calculated_benefit: 3_000
-        snap_minimum_benefit: 0
-        snap_max_allotment: 3_316
-      expect: 3000
+        gross_income: 5_000
+        earned_income: 5_000
+        shelter_costs: 2_000
+        has_elderly_disabled: false
+        bank_accounts: 0
+        receives_ssi: false
+        receives_tanf: false
+      expect: 1_795

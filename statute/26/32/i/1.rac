@@ -1,7 +1,26 @@
+# 26 USC §32(i)(1) - Investment Income Limit
+parameter disqualified_income_limit_amount:
+  description: "Maximum investment income limit for EITC eligibility"
+  reference: "26 USC 32(i)(1)"
+  unit: "USD"
+  indexed_by: "inflation"
+  values:
+    2024-01-01: 11_600
+    2023-01-01: 11_000
+    2022-01-01: 10_000
+    2021-01-01: 10_000
+    2020-01-01: 10_000
+
 variable disqualified_income_limit:
   entity: TaxUnit
   period: Year
   dtype: Money
+  unit: "USD"
+  label: "Investment Income Limit"
+  description: "Maximum investment income allowed before EITC disqualification per 26 USC 32(i)(1)"
+  syntax: python
+  formula: |
+    return disqualified_income_limit_amount
 
 # 26 USC §32(i)(1) - Denial of Credit for Excessive Investment Income
 #

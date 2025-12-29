@@ -12,7 +12,7 @@ variable hcv_adjusted_income_contribution:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Adjusted Income Contribution"
   description: "Share of monthly adjusted income per 24 CFR 5.628(a)(1)"
   syntax: python
@@ -25,7 +25,7 @@ variable hcv_gross_income_contribution:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Gross Income Contribution"
   description: "Share of monthly gross income per 24 CFR 5.628(a)(2)"
   syntax: python
@@ -39,7 +39,7 @@ variable hcv_welfare_rent:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Welfare Rent"
   description: "Welfare assistance portion designated for housing"
   syntax: python
@@ -53,7 +53,7 @@ variable hcv_minimum_rent:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Minimum Rent"
   description: "PHA-determined minimum rent ($0-$50)"
   syntax: python
@@ -67,7 +67,7 @@ variable hcv_total_tenant_payment:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Total Tenant Payment"
   description: "Monthly tenant contribution - greatest of 30% adjusted, 10% gross, welfare rent, or minimum rent"
   syntax: python
@@ -92,7 +92,7 @@ variable hcv_tenant_rent_to_owner:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Tenant Rent to Owner"
   description: "Amount tenant pays directly to landlord"
   syntax: python
@@ -112,7 +112,7 @@ variable hcv_utility_reimbursement:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "HCV Utility Reimbursement"
   description: "Reimbursement when utility allowance exceeds TTP"
   syntax: python

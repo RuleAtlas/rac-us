@@ -23,7 +23,7 @@ parameter credit_percentage_by_children:
   unit: "/1"
   values:
     2024-01-01:
-      0: 0.765
+      0: 0.0765
       1: 0.34
       2: 0.40
       3: 0.45
@@ -36,10 +36,10 @@ parameter phaseout_percentage_by_children:
   unit: "/1"
   values:
     2024-01-01:
-      0: 0.765
-      1: 0.1_598
-      2: 0.2_106
-      3: 0.2_106
+      0: 0.0765
+      1: 0.1598
+      2: 0.2106
+      3: 0.2106
 
 # 26 USC 32(b)(1) - Credit Percentage
 variable credit_percentage:
