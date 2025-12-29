@@ -29,3 +29,76 @@ variable savers_credit:
     able_contributions_person
     )
   default: 0
+  tests:
+    - name: "Single contribution type - Traditional IRA only"
+      period: 2024
+      inputs:
+        traditional_ira_contributions: 2_000
+        traditional_401k_contributions: 0
+        traditional_403b_contributions: 0
+        roth_ira_contributions: 0
+        roth_401k_contributions: 0
+        roth_403b_contributions: 0
+        self_employed_pension_contributions: 0
+        able_contributions_person: 0
+      expect: 2_000
+    - name: "Multiple contribution types - IRA and 401k"
+      period: 2024
+      inputs:
+        traditional_ira_contributions: 1_500
+        traditional_401k_contributions: 3_000
+        traditional_403b_contributions: 0
+        roth_ira_contributions: 0
+        roth_401k_contributions: 0
+        roth_403b_contributions: 0
+        self_employed_pension_contributions: 0
+        able_contributions_person: 0
+      expect: 4_500
+    - name: "Mixed traditional and Roth contributions"
+      period: 2024
+      inputs:
+        traditional_ira_contributions: 1_000
+        traditional_401k_contributions: 0
+        traditional_403b_contributions: 0
+        roth_ira_contributions: 1_000
+        roth_401k_contributions: 2_500
+        roth_403b_contributions: 0
+        self_employed_pension_contributions: 0
+        able_contributions_person: 0
+      expect: 4_500
+    - name: "All contribution types with non-zero values"
+      period: 2024
+      inputs:
+        traditional_ira_contributions: 500
+        traditional_401k_contributions: 1_000
+        traditional_403b_contributions: 750
+        roth_ira_contributions: 500
+        roth_401k_contributions: 1_000
+        roth_403b_contributions: 750
+        self_employed_pension_contributions: 2_000
+        able_contributions_person: 500
+      expect: 7_000
+    - name: "Self-employed pension and ABLE contributions"
+      period: 2024
+      inputs:
+        traditional_ira_contributions: 0
+        traditional_401k_contributions: 0
+        traditional_403b_contributions: 0
+        roth_ira_contributions: 0
+        roth_401k_contributions: 0
+        roth_403b_contributions: 0
+        self_employed_pension_contributions: 5_000
+        able_contributions_person: 1_000
+      expect: 6_000
+    - name: "Zero contributions - no credit"
+      period: 2024
+      inputs:
+        traditional_ira_contributions: 0
+        traditional_401k_contributions: 0
+        traditional_403b_contributions: 0
+        roth_ira_contributions: 0
+        roth_401k_contributions: 0
+        roth_403b_contributions: 0
+        self_employed_pension_contributions: 0
+        able_contributions_person: 0
+      expect: 0

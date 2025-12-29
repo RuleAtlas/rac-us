@@ -15,3 +15,28 @@ parameter credit_amount:
     2026-01-01: 1000  # TCJA sunset
     2018-01-01: 2000  # TCJA
     1997-01-01: 1000  # TRA97 original amount
+  tests:
+    - name: "tcja_period_2024"
+      description: "Credit amount during TCJA period (2018-2025)"
+      period: 2024
+      expect: 2_000
+    - name: "tcja_period_2018"
+      description: "Credit amount in first year of TCJA"
+      period: 2018
+      expect: 2_000
+    - name: "tcja_period_2025"
+      description: "Credit amount in last year of TCJA"
+      period: 2025
+      expect: 2_000
+    - name: "post_tcja_sunset_2026"
+      description: "Credit amount after TCJA sunset reverts to $1,000"
+      period: 2026
+      expect: 1_000
+    - name: "pre_tcja_2017"
+      description: "Credit amount before TCJA was $1,000"
+      period: 2017
+      expect: 1_000
+    - name: "original_tra97_2000"
+      description: "Credit amount under original TRA97"
+      period: 2000
+      expect: 1_000

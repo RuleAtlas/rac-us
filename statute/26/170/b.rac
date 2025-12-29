@@ -37,3 +37,45 @@ variable percentage_limitations:
     overall = agi * p.overall_limit
     return overall
   default: 0
+  tests:
+    - name: "Moderate income - overall limit at 60% of AGI"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 100_000
+      expect: 60_000
+      # overall = 100_000 * 0.60 = 60_000
+
+    - name: "High income taxpayer - large contribution limit"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 500_000
+      expect: 300_000
+      # overall = 500_000 * 0.60 = 300_000
+
+    - name: "Low income - small contribution limit"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 30_000
+      expect: 18_000
+      # overall = 30_000 * 0.60 = 18_000
+
+    - name: "Zero income - zero contribution limit"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 0
+      expect: 0
+      # overall = 0 * 0.60 = 0
+
+    - name: "Very high income donor"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 1_000_000
+      expect: 600_000
+      # overall = 1_000_000 * 0.60 = 600_000
+
+    - name: "Median income household"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 75_000
+      expect: 45_000
+      # overall = 75_000 * 0.60 = 45_000
