@@ -1,0 +1,351 @@
+text: |
+  7 USC 2012(j) - Elderly or Disabled Member
+
+  (j) "Elderly or disabled member" means a member of a household who—
+  (1) is sixty years of age or older;
+  (2)(A) receives supplemental security income benefits under title XVI of the
+  Social Security Act (42 U.S.C. 1381 et seq.), or
+  (B) receives Federally or State administered supplemental benefits of the
+  type described in section 1616(a) of the Social Security Act, if the Secretary
+  determines that such benefits are conditioned on meeting disability or
+  blindness criteria at least as stringent as those under title XVI, or
+  (C) receives disability or blindness payments under title I, II, X, XIV, or
+  XVI of the Social Security Act, or
+  (D) receives disability retirement benefits from a governmental agency
+  because of a disability considered permanent under section 221(i) of the
+  Social Security Act, or
+  (E) is a veteran—
+  (i) who has a service-connected or non-service-connected disability which
+  is rated as total by the Department of Veterans Affairs, or
+  (ii) who is considered in need of regular aid and attendance or permanently
+  housebound under such title, or
+  (F) is a surviving spouse or child of a veteran and—
+  (i) is entitled to compensation for a service-connected death or pension
+  benefits for a non-service-connected death under title 38, United States Code, and
+  (ii) has a disability considered permanent under section 221(i) of the
+  Social Security Act, or
+  (G) receives an annuity under section 2(a)(1)(iv) or 2(a)(1)(v) of the
+  Railroad Retirement Act of 1974, if the Secretary determines that the
+  eligibility for such annuity is based on disability or blindness criteria
+  comparable to or more stringent than those under title XVI of the Social
+  Security Act.
+
+# ============================================================================
+# Person-level inputs for determining elderly/disabled status
+# ============================================================================
+
+input age:
+  entity: Person
+  period: Month
+  dtype: Integer
+  label: "Age"
+  description: "Age of person in years"
+  default: 0
+
+input receives_ssi:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Receives SSI"
+  description: "Whether person receives Supplemental Security Income per 2012(j)(2)(A)"
+  default: false
+
+input receives_ssdi:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Receives SSDI"
+  description: "Whether person receives Social Security Disability Insurance per 2012(j)(2)(C)"
+  default: false
+
+input receives_state_disability:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Receives State Disability Benefits"
+  description: "Receives state supplemental disability benefits per 2012(j)(2)(B)"
+  default: false
+
+input receives_government_disability_retirement:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Receives Government Disability Retirement"
+  description: "Receives disability retirement from government agency per 2012(j)(2)(D)"
+  default: false
+
+input is_veteran_totally_disabled:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Veteran Totally Disabled"
+  description: "Veteran with total disability rating from VA per 2012(j)(2)(E)(i)"
+  default: false
+
+input is_veteran_needing_aid_attendance:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Veteran Needing Aid and Attendance"
+  description: "Veteran needing regular aid and attendance per 2012(j)(2)(E)(ii)"
+  default: false
+
+input is_veteran_surviving_spouse_child_disabled:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Disabled Veteran Survivor"
+  description: "Surviving spouse/child of veteran with permanent disability per 2012(j)(2)(F)"
+  default: false
+
+input receives_railroad_disability_annuity:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Receives Railroad Disability Annuity"
+  description: "Receives disability annuity under Railroad Retirement Act per 2012(j)(2)(G)"
+  default: false
+
+# ============================================================================
+# Parameters
+# ============================================================================
+
+parameter snap_elderly_age_threshold:
+  description: "Age threshold for SNAP elderly status"
+  unit: year
+  period: Month
+  label: "SNAP Elderly Age Threshold"
+  reference: "7 USC 2012(j)(1)"
+  values:
+    1977-01-01: 60
+
+# ============================================================================
+# Person-level variables
+# ============================================================================
+
+variable is_snap_elderly:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "SNAP Elderly Status"
+  description: "Whether person qualifies as elderly for SNAP per 7 USC 2012(j)(1)"
+  reference: "7 USC 2012(j)(1)"
+  syntax: python
+  formula: |
+    # Per 7 USC 2012(j)(1): elderly means 60 years of age or older
+    return age >= snap_elderly_age_threshold
+  default: false
+  tests:
+    - name: "Person exactly 60 qualifies as elderly"
+      period: 2024-01
+      inputs:
+        age: 60
+      expect: true
+    - name: "Person 59 does not qualify as elderly"
+      period: 2024-01
+      inputs:
+        age: 59
+      expect: false
+    - name: "Person 65 qualifies as elderly"
+      period: 2024-01
+      inputs:
+        age: 65
+      expect: true
+    - name: "Child does not qualify as elderly"
+      period: 2024-01
+      inputs:
+        age: 10
+      expect: false
+    - name: "Person at 0 does not qualify"
+      period: 2024-01
+      inputs:
+        age: 0
+      expect: false
+
+variable is_snap_disabled:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "SNAP Disabled Status"
+  description: "Whether person qualifies as disabled for SNAP per 7 USC 2012(j)(2)"
+  reference: "7 USC 2012(j)(2)"
+  syntax: python
+  formula: |
+    # Per 7 USC 2012(j)(2): disabled if receiving any qualifying disability benefit
+    # (A) SSI recipient
+    if receives_ssi:
+        return True
+    # (B) State-administered supplemental disability benefits
+    if receives_state_disability:
+        return True
+    # (C) SSDI or other SSA disability/blindness payments
+    if receives_ssdi:
+        return True
+    # (D) Government disability retirement
+    if receives_government_disability_retirement:
+        return True
+    # (E)(i) Veteran with total disability rating
+    if is_veteran_totally_disabled:
+        return True
+    # (E)(ii) Veteran needing aid and attendance
+    if is_veteran_needing_aid_attendance:
+        return True
+    # (F) Surviving spouse/child of veteran with disability
+    if is_veteran_surviving_spouse_child_disabled:
+        return True
+    # (G) Railroad disability annuity
+    if receives_railroad_disability_annuity:
+        return True
+    return False
+  default: false
+  tests:
+    - name: "SSI recipient qualifies as disabled"
+      period: 2024-01
+      inputs:
+        age: 45
+        receives_ssi: true
+      expect: true
+    - name: "SSDI recipient qualifies as disabled"
+      period: 2024-01
+      inputs:
+        age: 50
+        receives_ssdi: true
+      expect: true
+    - name: "Veteran with total disability qualifies"
+      period: 2024-01
+      inputs:
+        age: 35
+        is_veteran_totally_disabled: true
+      expect: true
+    - name: "Veteran needing aid and attendance qualifies"
+      period: 2024-01
+      inputs:
+        age: 70
+        is_veteran_needing_aid_attendance: true
+      expect: true
+    - name: "State disability recipient qualifies"
+      period: 2024-01
+      inputs:
+        age: 40
+        receives_state_disability: true
+      expect: true
+    - name: "Government disability retiree qualifies"
+      period: 2024-01
+      inputs:
+        age: 55
+        receives_government_disability_retirement: true
+      expect: true
+    - name: "Veteran surviving spouse/child with disability qualifies"
+      period: 2024-01
+      inputs:
+        age: 30
+        is_veteran_surviving_spouse_child_disabled: true
+      expect: true
+    - name: "Railroad disability annuity recipient qualifies"
+      period: 2024-01
+      inputs:
+        age: 58
+        receives_railroad_disability_annuity: true
+      expect: true
+    - name: "Person with no qualifying disability benefits"
+      period: 2024-01
+      inputs:
+        age: 45
+        receives_ssi: false
+        receives_ssdi: false
+        receives_state_disability: false
+        receives_government_disability_retirement: false
+        is_veteran_totally_disabled: false
+        is_veteran_needing_aid_attendance: false
+        is_veteran_surviving_spouse_child_disabled: false
+        receives_railroad_disability_annuity: false
+      expect: false
+    - name: "Multiple qualifying conditions (SSI and SSDI)"
+      period: 2024-01
+      inputs:
+        age: 50
+        receives_ssi: true
+        receives_ssdi: true
+      expect: true
+
+variable is_snap_elderly_or_disabled:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "SNAP Elderly or Disabled Status"
+  description: "Whether person qualifies as elderly or disabled for SNAP per 7 USC 2012(j)"
+  reference: "7 USC 2012(j)"
+  syntax: python
+  formula: |
+    # Person qualifies if either elderly (60+) OR receives qualifying disability benefits
+    return is_snap_elderly or is_snap_disabled
+  default: false
+  tests:
+    - name: "Elderly person (60+) qualifies"
+      period: 2024-01
+      inputs:
+        age: 65
+      expect: true
+    - name: "Disabled person under 60 qualifies"
+      period: 2024-01
+      inputs:
+        age: 45
+        receives_ssi: true
+      expect: true
+    - name: "Elderly AND disabled person qualifies"
+      period: 2024-01
+      inputs:
+        age: 70
+        receives_ssdi: true
+      expect: true
+    - name: "Non-elderly, non-disabled person does not qualify"
+      period: 2024-01
+      inputs:
+        age: 45
+        receives_ssi: false
+        receives_ssdi: false
+      expect: false
+
+# ============================================================================
+# Household-level aggregation
+# ============================================================================
+
+variable snap_household_has_elderly_or_disabled:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Household Has Elderly or Disabled Member"
+  description: "Whether household contains at least one elderly or disabled member per 7 USC 2012(j)"
+  reference: "7 USC 2012(j)"
+  syntax: python
+  formula: |
+    # Aggregate across all persons in household
+    # Returns True if any household member is elderly or disabled
+    return household.any(is_snap_elderly_or_disabled)
+  default: false
+  tests:
+    - name: "Household with one elderly member (65)"
+      period: 2024-01
+      inputs:
+        is_snap_elderly_or_disabled: [true, false]
+      expect: true
+    - name: "Household with one disabled member"
+      period: 2024-01
+      inputs:
+        is_snap_elderly_or_disabled: [false, true, false]
+      expect: true
+    - name: "Household with no elderly or disabled members"
+      period: 2024-01
+      inputs:
+        is_snap_elderly_or_disabled: [false, false]
+      expect: false
+    - name: "Single elderly person household"
+      period: 2024-01
+      inputs:
+        is_snap_elderly_or_disabled: [true]
+      expect: true
+    - name: "Single working-age person household"
+      period: 2024-01
+      inputs:
+        is_snap_elderly_or_disabled: [false]
+      expect: false

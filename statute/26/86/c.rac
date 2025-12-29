@@ -33,10 +33,16 @@ parameter base_amount_joint:
     1984-01-01: 32_000
 
 parameter base_amount_mfs_living_together:
-  description: "Base amount for MFS living with spouse (zero)"
+  description: "Base amount for MFS living with spouse (zero per 86(c)(1)(C))"
   unit: USD
   values:
     1984-01-01: 0
+
+parameter base_amount_mfs_living_apart:
+  description: "Base amount for MFS living apart from spouse all year (same as single per 86(c)(1)(C)(ii))"
+  unit: USD
+  values:
+    1984-01-01: 25_000
 
 # 26 USC 86(c)(2) - Adjusted base amount (tier 2 threshold)
 # These are the thresholds for the 85% inclusion tier
@@ -54,10 +60,75 @@ parameter adjusted_base_amount_joint:
     1994-01-01: 44_000
 
 parameter adjusted_base_amount_mfs_living_together:
-  description: "Adjusted base amount for MFS living with spouse (zero)"
+  description: "Adjusted base amount for MFS living with spouse (zero per 86(c)(2)(C))"
   unit: USD
   values:
     1994-01-01: 0
+
+parameter adjusted_base_amount_mfs_living_apart:
+  description: "Adjusted base amount for MFS living apart from spouse all year (same as single per 86(c)(2)(C))"
+  unit: USD
+  values:
+    1994-01-01: 34_000
+
+# Input for lived apart status (used for MFS "living apart" exception)
+input lived_apart_from_spouse_all_year:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Lived Apart From Spouse All Year"
+  description: "Whether married separate filers lived apart from spouse for entire tax year per 26 USC 86(c)(1)(C)(ii)"
+  default: false
+
+# 26 USC 86(c)(1)(C) - MFS Living Apart Check
+# Determines whether MFS taxpayer qualifies for higher base amount due to living apart exception
+variable mfs_qualifies_for_higher_base_amount:
+  imports:
+    - 26/1#filing_status
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "MFS Qualifies for Higher Base Amount"
+  description: "Whether a married filing separately taxpayer qualifies for single filer base amounts by living apart from spouse all year per 26 USC 86(c)(1)(C)(ii)"
+  reference: "26 USC 86(c)(1)(C)(ii)"
+  syntax: python
+  formula: |
+    # Only MFS filers can qualify for this exception
+    if filing_status != MARRIED_FILING_SEPARATELY:
+        return false
+    # MFS filer who lived apart from spouse all year qualifies for higher base amount
+    return lived_apart_from_spouse_all_year
+  tests:
+    - name: "Single filer - not applicable"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        lived_apart_from_spouse_all_year: true
+      expect: false
+    - name: "MFS living together - does not qualify"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        lived_apart_from_spouse_all_year: false
+      expect: false
+    - name: "MFS living apart all year - qualifies"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        lived_apart_from_spouse_all_year: true
+      expect: true
+    - name: "Joint filer - not applicable"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        lived_apart_from_spouse_all_year: true
+      expect: false
+    - name: "Head of household - not applicable"
+      period: 2024
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        lived_apart_from_spouse_all_year: false
+      expect: false
 
 
 variable base_amount:
@@ -69,6 +140,7 @@ variable base_amount:
   unit: USD
   label: "Base Amount for Social Security Taxation"
   description: "Base amount threshold for tier 1 Social Security taxation per 26 USC 86(c)(1)"
+  reference: "26 USC 86(c)(1)"
   syntax: python
   formula: |
     if filing_status == MARRIED_FILING_JOINTLY:
@@ -76,9 +148,12 @@ variable base_amount:
     elif filing_status == QUALIFYING_WIDOW:
         return base_amount_joint
     elif filing_status == MARRIED_FILING_SEPARATELY:
-        # MFS living with spouse gets zero threshold
-        # TODO: Add check for living apart (would get $25k threshold)
-        return base_amount_mfs_living_together
+        # 26 USC 86(c)(1)(C): MFS gets zero UNLESS they lived apart all year
+        # If lived apart all year, they get the single filer threshold ($25k)
+        if lived_apart_from_spouse_all_year:
+            return base_amount_mfs_living_apart
+        else:
+            return base_amount_mfs_living_together
     else:
         return base_amount_single
   tests:
@@ -92,16 +167,28 @@ variable base_amount:
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
       expect: 32_000
-    - name: "MFS living together base amount"
+    - name: "MFS living together base amount - zero"
       period: 2024
       inputs:
         filing_status: MARRIED_FILING_SEPARATELY
+        lived_apart_from_spouse_all_year: false
       expect: 0
+    - name: "MFS living apart all year base amount - gets single threshold"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        lived_apart_from_spouse_all_year: true
+      expect: 25_000
     - name: "Head of household base amount"
       period: 2024
       inputs:
         filing_status: HEAD_OF_HOUSEHOLD
       expect: 25_000
+    - name: "Qualifying widow base amount"
+      period: 2024
+      inputs:
+        filing_status: QUALIFYING_WIDOW
+      expect: 32_000
 
 
 variable adjusted_base_amount:
@@ -113,6 +200,7 @@ variable adjusted_base_amount:
   unit: USD
   label: "Adjusted Base Amount for Social Security Taxation"
   description: "Adjusted base amount threshold for tier 2 Social Security taxation per 26 USC 86(c)(2)"
+  reference: "26 USC 86(c)(2)"
   syntax: python
   formula: |
     if filing_status == MARRIED_FILING_JOINTLY:
@@ -120,7 +208,11 @@ variable adjusted_base_amount:
     elif filing_status == QUALIFYING_WIDOW:
         return adjusted_base_amount_joint
     elif filing_status == MARRIED_FILING_SEPARATELY:
-        return adjusted_base_amount_mfs_living_together
+        # 26 USC 86(c)(2)(C): References 86(c)(1)(C) - same living apart exception applies
+        if lived_apart_from_spouse_all_year:
+            return adjusted_base_amount_mfs_living_apart
+        else:
+            return adjusted_base_amount_mfs_living_together
     else:
         return adjusted_base_amount_single
   tests:
@@ -134,8 +226,25 @@ variable adjusted_base_amount:
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
       expect: 44_000
-    - name: "MFS adjusted base amount"
+    - name: "MFS living together adjusted base amount - zero"
       period: 2024
       inputs:
         filing_status: MARRIED_FILING_SEPARATELY
+        lived_apart_from_spouse_all_year: false
       expect: 0
+    - name: "MFS living apart all year adjusted base amount - gets single threshold"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        lived_apart_from_spouse_all_year: true
+      expect: 34_000
+    - name: "Head of household adjusted base amount"
+      period: 2024
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+      expect: 34_000
+    - name: "Qualifying widow adjusted base amount"
+      period: 2024
+      inputs:
+        filing_status: QUALIFYING_WIDOW
+      expect: 44_000

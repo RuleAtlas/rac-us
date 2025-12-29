@@ -74,6 +74,16 @@ input loss_limited_net_capital_gains:
   description: "Net capital gains after applying the $3,000 capital loss limitation"
   default: 0
 
+# Per Section 1411(c)(1)(B), deductions properly allocable to gross income or net gain
+input allocable_investment_deductions:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Allocable Investment Deductions"
+  description: "Deductions properly allocable to investment income per Section 1411(c)(1)(B), including investment interest expense and certain advisory fees"
+  default: 0
+
 variable net_investment_income:
   imports:
     - 26/32/i/2/C#rental_income
@@ -82,7 +92,8 @@ variable net_investment_income:
   dtype: Money
   unit: USD
   label: "Net Investment Income"
-  description: "Net investment income for NIIT purposes per Section 1_411(c)"
+  description: "Net investment income for NIIT purposes per Section 1411(c)"
+  reference: "26 USC 1411(c)(1)"
   syntax: python
   formula: |
     # Section 1411(c)(1)(A)(i): Investment income from interest, dividends, annuities, royalties, rents
@@ -94,18 +105,22 @@ variable net_investment_income:
         sum(members, royalty_income) +
         sum(members, annuity_income)
     )
+
     # Section 1411(c)(1)(A)(iii): Net capital gains (loss-limited)
     # loss_limited_net_capital_gains is already at TaxUnit level
     capital_gains_component = loss_limited_net_capital_gains
+
     # Section 1411(c)(2): Passive business income
     passive_component = sum(members, passive_business_income)
-    # Total NII before deductions
+
+    # Total gross NII before deductions
     gross_nii = investment_income + capital_gains_component + passive_component
+
     # Section 1411(c)(1)(B): Deductions properly allocable to NII
-    # This is a simplified calculation - full implementation would include
-    # investment interest expense, margin interest, and other allocable deductions
-    # TODO: Add allocable_investment_deductions when available
-    return max(0, gross_nii)
+    # Per Treas. Reg. 1.1411-4: investment interest, SALT on investment income, misc expenses
+    net_nii = gross_nii - allocable_investment_deductions
+
+    return max(0, net_nii)
   default: 0
   tests:
     # ========================================
@@ -121,6 +136,7 @@ variable net_investment_income:
         annuity_income: 0
         loss_limited_net_capital_gains: 0
         passive_business_income: 0
+        allocable_investment_deductions: 0
       # NII = $5,000 + $3,000 = $8,000
       expect: 8_000
 
@@ -134,6 +150,7 @@ variable net_investment_income:
         annuity_income: 6_000
         loss_limited_net_capital_gains: 0
         passive_business_income: 0
+        allocable_investment_deductions: 0
       # NII = $10k + $8k + $12k + $5k + $6k = $41,000
       expect: 41_000
 
@@ -147,6 +164,7 @@ variable net_investment_income:
         annuity_income: 0
         loss_limited_net_capital_gains: 0
         passive_business_income: 0
+        allocable_investment_deductions: 0
       expect: 0
 
     # ========================================
@@ -162,6 +180,7 @@ variable net_investment_income:
         annuity_income: 0
         loss_limited_net_capital_gains: 25_000
         passive_business_income: 0
+        allocable_investment_deductions: 0
       # Investment income: $2k + $4k = $6k
       # Capital gains: $25k
       # NII = $6k + $25k = $31,000
@@ -177,6 +196,7 @@ variable net_investment_income:
         annuity_income: 0
         loss_limited_net_capital_gains: 50_000
         passive_business_income: 0
+        allocable_investment_deductions: 0
       # NII = $50,000 (capital gains only)
       expect: 50_000
 
@@ -193,8 +213,78 @@ variable net_investment_income:
         annuity_income: 0
         loss_limited_net_capital_gains: 10_000
         passive_business_income: 15_000
+        allocable_investment_deductions: 0
       # Investment income: $3k + $2k + $8k = $13k
       # Capital gains: $10k
       # Passive: $15k
       # NII = $13k + $10k + $15k = $38,000
       expect: 38_000
+
+    # ========================================
+    # Deductions properly allocable to NII
+    # ========================================
+    - name: "Investment income with allocable deductions"
+      period: 2024
+      inputs:
+        taxable_interest_income: 20_000
+        dividend_income: 15_000
+        rental_income: 0
+        royalty_income: 0
+        annuity_income: 0
+        loss_limited_net_capital_gains: 0
+        passive_business_income: 0
+        allocable_investment_deductions: 5_000
+      # Gross NII: $20k + $15k = $35k
+      # Less deductions: $5k
+      # Net NII = $30,000
+      expect: 30_000
+
+    - name: "Margin interest reduces NII"
+      period: 2024
+      inputs:
+        taxable_interest_income: 50_000
+        dividend_income: 30_000
+        rental_income: 10_000
+        royalty_income: 0
+        annuity_income: 0
+        loss_limited_net_capital_gains: 100_000
+        passive_business_income: 0
+        allocable_investment_deductions: 25_000
+      # Gross NII: $50k + $30k + $10k + $100k = $190k
+      # Less deductions: $25k
+      # Net NII = $165,000
+      expect: 165_000
+
+    - name: "Deductions cannot exceed gross NII (floor at zero)"
+      period: 2024
+      inputs:
+        taxable_interest_income: 5_000
+        dividend_income: 3_000
+        rental_income: 0
+        royalty_income: 0
+        annuity_income: 0
+        loss_limited_net_capital_gains: 0
+        passive_business_income: 0
+        allocable_investment_deductions: 20_000  # Exceeds gross NII
+      # Gross NII: $8k, Deductions: $20k
+      # Net NII = max(0, 8k - 20k) = $0
+      expect: 0
+
+    - name: "Full portfolio with deductions"
+      period: 2024
+      inputs:
+        taxable_interest_income: 25_000
+        dividend_income: 40_000
+        rental_income: 20_000
+        royalty_income: 5_000
+        annuity_income: 10_000
+        loss_limited_net_capital_gains: 75_000
+        passive_business_income: 25_000
+        allocable_investment_deductions: 15_000
+      # Investment income: $25k + $40k + $20k + $5k + $10k = $100k
+      # Capital gains: $75k
+      # Passive: $25k
+      # Gross NII: $200k
+      # Less deductions: $15k
+      # Net NII = $185,000
+      expect: 185_000

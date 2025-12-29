@@ -1,379 +1,634 @@
+# ============================================================================
+# ROLLOVER COMPLIANCE RULES - 26 USC 402(c)
+# ============================================================================
+#
+# Per 26 USC 402(c), eligible rollover distributions can be excluded from
+# gross income if transferred to an eligible retirement plan within the
+# required timeframe. However, certain distributions are NOT eligible for
+# rollover treatment.
+#
+# Key rules implemented:
+# - 60-day rollover deadline (402(c)(3))
+# - One-rollover-per-year rule for IRAs (408(d)(3)(B))
+# - RMDs cannot be rolled over (402(c)(4)(B))
+# - Hardship distributions cannot be rolled over (402(c)(4)(C))
+# - Substantially equal periodic payments cannot be rolled over (402(c)(4)(A))
+# ============================================================================
+
 text: """
-(9) Required distributions.--
-(A) In general.--A trust shall not constitute a qualified trust under
-this subsection unless the plan provides that the entire interest
-of each employee--
-(i) will be distributed to such employee not later than the required
-beginning date, or
-(ii) will be distributed, beginning not later than the required
-beginning date...
+(c) Rules applicable to rollovers from exempt trusts.--
+(1) Exclusion from income.--If--
+(A) any portion of the balance to the credit of an employee in a qualified
+trust is paid to the employee in an eligible rollover distribution,
+(B) the employee transfers any portion of the property received in such
+distribution to an eligible retirement plan, and
+(C) in the case of a distribution of property other than money, the amount
+so transferred consists of the property distributed,
+then such distribution (to the extent so transferred) shall not be includible
+in gross income for the taxable year in which paid.
+
+(3) Transfer must be made within 60 days of receipt.--
+(A) In general.--Except as provided in subparagraph (B), paragraph (1) shall
+not apply to any transfer of a distribution made after the 60th day following
+the day on which the distributee received the property distributed.
+
+(4) Eligible rollover distribution.--For purposes of this subsection, the term
+"eligible rollover distribution" means any distribution to an employee of all
+or any portion of the balance to the credit of the employee in a qualified
+trust; except that such term shall not include--
+(A) any distribution which is one of a series of substantially equal periodic
+payments (not less frequently than annually) made--
+(i) for the life (or life expectancy) of the employee or the joint lives
+(or joint life expectancies) of the employee and the employee's designated
+beneficiary, or
+(ii) for a specified period of 10 years or more,
+(B) any distribution to the extent such distribution is required under section
+401(a)(9), and
+(C) any distribution which is made upon hardship of the employee.
 """
 
-parameter uniform_lifetime_table:
-  description: "Life expectancy divisors for RMD calculation (Table III)"
-  unit: years
-  values:
-    # Schedule: [27.4, 26.5, 25.5, 24.6, 23.7, 22.9, 22.0, 21.1, 20.2, 19.4, 18.5, 17.7, 16.8, 16.0, 15.2, 14.4, 13.7, 12.9, 12.2, 11.5, 10.8, 10.1, 9.5, 8.9, 8.4, 7.8, 7.3, 6.8, 6.4, 6.0, 5.6, 5.2, 4.9, 4.6, 4.3, 4.1, 3.9, 3.7, 3.5, 3.4, 3.3, 3.1, 3.0, 2.9, 2.8, 2.7, 2.5, 2.3, 2.0]
+# ============================================================================
+# PARAMETERS
+# ============================================================================
 
-parameter rmd_birth_year_thresholds:
-  description: "Birth year thresholds for RMD age determination per SECURE 2.0"
+parameter rollover_deadline_days:
+  description: "Maximum days after receipt to complete a rollover per 26 USC 402(c)(3)"
+  unit: days
+  reference: "26 USC 402(c)(3)(A)"
   values:
-    # Schedule: [72, 73, 75]
+    1974-01-01: 60
 
-input rmd:
+parameter ira_rollover_waiting_months:
+  description: "Minimum months between non-direct IRA rollovers per 26 USC 408(d)(3)(B)"
+  unit: months
+  reference: "26 USC 408(d)(3)(B)"
+  values:
+    2015-01-01: 12
+    1974-01-01: 12
+
+parameter rmd_shortfall_penalty_rate:
+  description: "Excise tax rate on RMD shortfall per 26 USC 4974"
+  unit: rate
+  reference: "26 USC 4974(a)"
+  values:
+    2023-01-01: 0.25
+    1974-01-01: 0.50
+
+parameter plan_loan_offset_extended_deadline_days:
+  description: "Extended deadline for plan loan offset rollovers (approximation of tax return due date)"
+  unit: days
+  reference: "26 USC 402(c)(3)(C)"
+  values:
+    2018-01-01: 180
+
+# ============================================================================
+# ROLLOVER INPUT VARIABLES
+# ============================================================================
+
+input rollover_distribution_amount:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
-  label: "Required Minimum Distribution"
-  description: "Minimum amount required to be distributed from qualified retirement plan per 26 USC 402(c)"
+  label: "Rollover Distribution Amount"
+  description: "Amount of distribution intended for rollover"
+  default: 0
 
-input birth_year:
+input days_since_distribution_receipt:
   entity: Person
   period: Year
   dtype: Integer
-  label: "Birth Year"
-  description: "Year of birth for RMD age determination"
-
-input prior_year_401k_balance:
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "401(k) Prior Year Balance"
-  description: "Account balance as of December 31 of prior year for RMD calculation"
+  label: "Days Since Distribution Receipt"
+  description: "Number of days elapsed since receiving the distribution"
   default: 0
 
-input is_still_working_for_plan_sponsor:
+input is_direct_rollover:
   entity: Person
   period: Year
   dtype: Boolean
-  label: "Still Working for Plan Sponsor"
-  description: "Whether employee is still working for the 401(k) plan sponsor"
+  label: "Is Direct Rollover"
+  description: "Whether distribution is a direct trustee-to-trustee transfer per 26 USC 401(a)(31)"
   default: false
 
-input is_5_percent_owner:
+input is_hardship_distribution:
   entity: Person
   period: Year
   dtype: Boolean
-  label: "Is 5% Owner"
-  description: "Whether employee owns 5% or more of the business"
+  label: "Is Hardship Distribution"
+  description: "Whether distribution is made upon hardship of the employee per 26 USC 402(c)(4)(C)"
   default: false
 
-variable rmd_applicable_age:
-  entity: Person
-  period: Year
-  dtype: Integer
-  label: "RMD Applicable Age"
-  description: "Age at which required minimum distributions must begin"
-  syntax: python
-  formula: |
-    # Use cut() to look up applicable age from birth year thresholds
-    return cut(birth_year, rmd_birth_year_thresholds)
-  default: 0
-  tests:
-    - name: "Birth year 1950 (age 72 under SECURE 1.0)"
-      period: 2024
-      inputs:
-        birth_year: 1950
-      expect: 72
-    - name: "Birth year 1951 (age 72)"
-      period: 2024
-      inputs:
-        birth_year: 1951
-      expect: 72
-    - name: "Birth year 1952 (age 73 under SECURE 2.0)"
-      period: 2024
-      inputs:
-        birth_year: 1952
-      expect: 73
-    - name: "Birth year 1960 (age 73)"
-      period: 2024
-      inputs:
-        birth_year: 1960
-      expect: 73
-    - name: "Birth year 1961 onwards (age 75 under SECURE 2.0)"
-      period: 2024
-      inputs:
-        birth_year: 1961
-      expect: 75
-    - name: "Birth year 1970 (age 75)"
-      period: 2024
-      inputs:
-        birth_year: 1970
-      expect: 75
-
-variable has_reached_rmd_age:
+input is_periodic_payment:
   entity: Person
   period: Year
   dtype: Boolean
-  label: "Reached RMD Age"
-  description: "Whether individual has reached required minimum distribution age"
-  formula: return age >= rmd_applicable_age
+  label: "Is Substantially Equal Periodic Payment"
+  description: "Whether distribution is part of substantially equal periodic payments over life expectancy or 10+ years per 26 USC 402(c)(4)(A)"
   default: false
-  tests:
-    - name: "Age 72, RMD age 72 (reached)"
-      period: 2024
-      inputs:
-        age: 72
-        rmd_applicable_age: 72
-      expect: true
-    - name: "Age 71, RMD age 72 (not reached)"
-      period: 2024
-      inputs:
-        age: 71
-        rmd_applicable_age: 72
-      expect: false
-    - name: "Age 73, RMD age 73 (reached)"
-      period: 2024
-      inputs:
-        age: 73
-        rmd_applicable_age: 73
-      expect: true
-    - name: "Age 75, RMD age 73 (exceeded)"
-      period: 2024
-      inputs:
-        age: 75
-        rmd_applicable_age: 73
-      expect: true
-    - name: "Age 74, RMD age 75 (not reached)"
-      period: 2024
-      inputs:
-        age: 74
-        rmd_applicable_age: 75
-      expect: false
-    - name: "Age 75, RMD age 75 (reached)"
-      period: 2024
-      inputs:
-        age: 75
-        rmd_applicable_age: 75
-      expect: true
 
-variable is_rmd_required:
+input is_corrective_distribution:
   entity: Person
   period: Year
   dtype: Boolean
-  label: "RMD Required"
-  description: "Whether a required minimum distribution must be taken this year"
-  syntax: python
-  formula: |
-    # Must have reached RMD age
-    if not has_reached_rmd_age:
-        return False
-    # Still-working exception for non-5% owners
-    if is_still_working_for_plan_sponsor and not is_5_percent_owner:
-        return False
-    # Must have account balance
-    if prior_year_401k_balance <= 0:
-        return False
-    return True
+  label: "Is Corrective Distribution"
+  description: "Whether distribution is a corrective distribution of excess contributions or deferrals"
   default: false
-  tests:
-    - name: "Basic case: reached RMD age, not working, has balance"
-      period: 2024
-      inputs:
-        has_reached_rmd_age: true
-        is_still_working_for_plan_sponsor: false
-        is_5_percent_owner: false
-        prior_year_401k_balance: 100_000
-      expect: true
-    - name: "Not reached RMD age yet"
-      period: 2024
-      inputs:
-        has_reached_rmd_age: false
-        is_still_working_for_plan_sponsor: false
-        is_5_percent_owner: false
-        prior_year_401k_balance: 100_000
-      expect: false
-    - name: "Still-working exception: working and not 5% owner"
-      period: 2024
-      inputs:
-        has_reached_rmd_age: true
-        is_still_working_for_plan_sponsor: true
-        is_5_percent_owner: false
-        prior_year_401k_balance: 100_000
-      expect: false
-    - name: "Still-working exception does not apply: 5% owner"
-      period: 2024
-      inputs:
-        has_reached_rmd_age: true
-        is_still_working_for_plan_sponsor: true
-        is_5_percent_owner: true
-        prior_year_401k_balance: 100_000
-      expect: true
-    - name: "No account balance"
-      period: 2024
-      inputs:
-        has_reached_rmd_age: true
-        is_still_working_for_plan_sponsor: false
-        is_5_percent_owner: false
-        prior_year_401k_balance: 0
-      expect: false
-    - name: "Negative account balance"
-      period: 2024
-      inputs:
-        has_reached_rmd_age: true
-        is_still_working_for_plan_sponsor: false
-        is_5_percent_owner: false
-        prior_year_401k_balance: -1_000
-      expect: false
-    - name: "Retired with 5% ownership (still-working exception does not apply)"
-      period: 2024
-      inputs:
-        has_reached_rmd_age: true
-        is_still_working_for_plan_sponsor: false
-        is_5_percent_owner: true
-        prior_year_401k_balance: 500_000
-      expect: true
-    - name: "Small account balance"
-      period: 2024
-      inputs:
-        has_reached_rmd_age: true
-        is_still_working_for_plan_sponsor: false
-        is_5_percent_owner: false
-        prior_year_401k_balance: 1
-      expect: true
 
-variable rmd_divisor:
+input has_ira_rollover_in_prior_12_months:
   entity: Person
   period: Year
-  dtype: Decimal
-  label: "RMD Divisor"
-  description: "Life expectancy divisor from IRS Uniform Lifetime Table"
-  syntax: python
-  formula: |
-    # Use cut() to look up divisor from Uniform Lifetime Table
-    return cut(age, uniform_lifetime_table)
-  default: 0
-  tests:
-    - name: "Age 72 (start of RMDs under prior law)"
-      period: 2024
-      inputs:
-        age: 72
-      expect: 27.4
-    - name: "Age 73"
-      period: 2024
-      inputs:
-        age: 73
-      expect: 26.5
-    - name: "Age 80 (mid-range)"
-      period: 2024
-      inputs:
-        age: 80
-      expect: 19.4
-    - name: "Age 85"
-      period: 2024
-      inputs:
-        age: 85
-      expect: 15.2
-    - name: "Age 90"
-      period: 2024
-      inputs:
-        age: 90
-      expect: 11.5
-    - name: "Age 95"
-      period: 2024
-      inputs:
-        age: 95
-      expect: 9.5
-    - name: "Age 100 (advanced age)"
-      period: 2024
-      inputs:
-        age: 100
-      expect: 5.6
-    - name: "Age 110 (very advanced age)"
-      period: 2024
-      inputs:
-        age: 110
-      expect: 2.0
+  dtype: Boolean
+  label: "Had IRA Rollover in Prior 12 Months"
+  description: "Whether individual completed a 60-day IRA-to-IRA or IRA-to-Roth rollover in the prior 12 months"
+  default: false
 
-variable required_minimum_distribution:
+input is_ira_to_ira_rollover:
   entity: Person
   period: Year
-  dtype: Money
-  unit: USD
-  label: "Required Minimum Distribution"
-  description: "Minimum amount that must be withdrawn from retirement account"
+  dtype: Boolean
+  label: "Is IRA-to-IRA Rollover"
+  description: "Whether this is a rollover from one IRA to another IRA (subject to once-per-year rule)"
+  default: false
+
+input is_plan_loan_offset:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Plan Loan Offset"
+  description: "Whether distribution is a qualified plan loan offset amount per 26 USC 402(c)(3)(C)"
+  default: false
+
+input has_secretary_waiver:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Has Secretary Waiver"
+  description: "Whether Secretary has waived 60-day requirement due to casualty, disaster, or other events per 26 USC 402(c)(3)(B)"
+  default: false
+
+# ============================================================================
+# ROLLOVER ELIGIBILITY VARIABLES
+# ============================================================================
+
+variable is_rmd_portion:
+  imports:
+    - 26/402/c#is_rmd_required
+    - 26/402/c#required_minimum_distribution
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is RMD Portion of Distribution"
+  description: "Whether distribution includes required minimum distribution amount that cannot be rolled over"
+  reference: "26 USC 402(c)(4)(B)"
   syntax: python
   formula: |
-    if not is_rmd_required:
-        return 0
-    # RMD = Prior year balance / Life expectancy divisor
-    return prior_year_401k_balance / rmd_divisor
-  default: 0
+    # If RMD is required and distribution includes RMD amount, that portion is not rollover-eligible
+    if is_rmd_required and rollover_distribution_amount > 0:
+        return required_minimum_distribution > 0
+    return False
   tests:
-    - name: "RMD not required (age not reached)"
+    - name: "RMD required, has RMD amount"
+      period: 2024
+      inputs:
+        is_rmd_required: true
+        required_minimum_distribution: 20_000
+        rollover_distribution_amount: 50_000
+      expect: true
+    - name: "RMD required but no RMD amount calculated"
+      period: 2024
+      inputs:
+        is_rmd_required: true
+        required_minimum_distribution: 0
+        rollover_distribution_amount: 50_000
+      expect: false
+    - name: "RMD not required"
       period: 2024
       inputs:
         is_rmd_required: false
-        prior_year_401k_balance: 100_000
-        rmd_divisor: 27.4
-      expect: 0
-    - name: "Age 72 with $500,000 balance"
+        required_minimum_distribution: 0
+        rollover_distribution_amount: 50_000
+      expect: false
+    - name: "No rollover distribution"
       period: 2024
       inputs:
         is_rmd_required: true
-        prior_year_401k_balance: 500_000
-        rmd_divisor: 27.4
-      expect: 18248.18
-    - name: "Age 73 with $300,000 balance"
-      period: 2024
-      inputs:
-        is_rmd_required: true
-        prior_year_401k_balance: 300_000
-        rmd_divisor: 26.5
-      expect: 11320.75
-    - name: "Age 80 with $250,000 balance"
-      period: 2024
-      inputs:
-        is_rmd_required: true
-        prior_year_401k_balance: 250_000
-        rmd_divisor: 19.4
-      expect: 12886.60
-    - name: "Age 85 with $1,000,000 balance"
-      period: 2024
-      inputs:
-        is_rmd_required: true
-        prior_year_401k_balance: 1_000_000
-        rmd_divisor: 15.2
-      expect: 65789.47
-    - name: "Age 90 with modest balance"
-      period: 2024
-      inputs:
-        is_rmd_required: true
-        prior_year_401k_balance: 100_000
-        rmd_divisor: 11.5
-      expect: 8695.65
-    - name: "Age 100 with large balance"
-      period: 2024
-      inputs:
-        is_rmd_required: true
-        prior_year_401k_balance: 2_000_000
-        rmd_divisor: 5.6
-      expect: 357142.86
+        required_minimum_distribution: 20_000
+        rollover_distribution_amount: 0
+      expect: false
 
-variable rmd_shortfall_penalty:
+variable rollover_eligible_amount:
+  imports:
+    - 26/402/c#is_rmd_required
+    - 26/402/c#required_minimum_distribution
   entity: Person
   period: Year
   dtype: Money
   unit: USD
-  label: "RMD Shortfall Penalty"
-  description: "Excise tax on failure to take required minimum distribution"
+  label: "Rollover Eligible Amount"
+  description: "Maximum amount eligible for rollover after excluding RMD portion per 26 USC 402(c)(2)"
+  reference: "26 USC 402(c)(2), 402(c)(4)(B)"
   syntax: python
   formula: |
-    # Input: Actual distribution taken
-    # For now, assume full compliance
-    return 0
+    # Start with full distribution amount
+    eligible = rollover_distribution_amount
+    # Subtract RMD portion - RMDs cannot be rolled over
+    if is_rmd_required:
+        rmd_amount = required_minimum_distribution
+        # Only the amount in excess of RMD is rollover-eligible
+        eligible = max(0, eligible - rmd_amount)
+    return eligible
   tests:
-    - name: "Full compliance: no penalty"
+    - name: "No RMD required - full amount eligible"
       period: 2024
-      inputs: {}
-      expect: 0
-    - name: "Placeholder: assumes full compliance"
+      inputs:
+        rollover_distribution_amount: 100_000
+        is_rmd_required: false
+        required_minimum_distribution: 0
+      expect: 100_000
+    - name: "RMD required - must exclude RMD portion"
       period: 2024
-      inputs: {}
-      expect: 0
-    - name: "RMD penalty will depend on shortfall percentage (future implementation)"
+      inputs:
+        rollover_distribution_amount: 100_000
+        is_rmd_required: true
+        required_minimum_distribution: 20_000
+      expect: 80_000
+    - name: "Distribution equals RMD - nothing eligible"
       period: 2024
-      inputs: {}
+      inputs:
+        rollover_distribution_amount: 25_000
+        is_rmd_required: true
+        required_minimum_distribution: 25_000
       expect: 0
+    - name: "Distribution less than RMD - nothing eligible"
+      period: 2024
+      inputs:
+        rollover_distribution_amount: 15_000
+        is_rmd_required: true
+        required_minimum_distribution: 25_000
+      expect: 0
+    - name: "Large distribution with small RMD"
+      period: 2024
+      inputs:
+        rollover_distribution_amount: 500_000
+        is_rmd_required: true
+        required_minimum_distribution: 18_000
+      expect: 482_000
+
+variable meets_60_day_requirement:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Meets 60-Day Requirement"
+  description: "Whether rollover is completed within 60-day deadline per 26 USC 402(c)(3)"
+  reference: "26 USC 402(c)(3)"
+  syntax: python
+  formula: |
+    # Direct rollovers bypass the 60-day requirement entirely
+    if is_direct_rollover:
+        return True
+    # Secretary may waive for hardship (casualty, disaster, etc.)
+    if has_secretary_waiver:
+        return True
+    # Plan loan offset amounts have extended deadline (tax return due date)
+    if is_plan_loan_offset:
+        # Extended deadline per 402(c)(3)(C): tax return due date including extensions
+        return days_since_distribution_receipt <= plan_loan_offset_extended_deadline_days
+    # Standard 60-day rule
+    return days_since_distribution_receipt <= rollover_deadline_days
+  tests:
+    - name: "Direct rollover - always meets requirement"
+      period: 2024
+      inputs:
+        is_direct_rollover: true
+        days_since_distribution_receipt: 100
+        rollover_deadline_days: 60
+      expect: true
+    - name: "Within 60 days"
+      period: 2024
+      inputs:
+        is_direct_rollover: false
+        days_since_distribution_receipt: 45
+        rollover_deadline_days: 60
+        has_secretary_waiver: false
+        is_plan_loan_offset: false
+      expect: true
+    - name: "Exactly 60 days"
+      period: 2024
+      inputs:
+        is_direct_rollover: false
+        days_since_distribution_receipt: 60
+        rollover_deadline_days: 60
+        has_secretary_waiver: false
+        is_plan_loan_offset: false
+      expect: true
+    - name: "Exceeds 60 days - fails"
+      period: 2024
+      inputs:
+        is_direct_rollover: false
+        days_since_distribution_receipt: 61
+        rollover_deadline_days: 60
+        has_secretary_waiver: false
+        is_plan_loan_offset: false
+      expect: false
+    - name: "Exceeds 60 days but has Secretary waiver"
+      period: 2024
+      inputs:
+        is_direct_rollover: false
+        days_since_distribution_receipt: 90
+        rollover_deadline_days: 60
+        has_secretary_waiver: true
+        is_plan_loan_offset: false
+      expect: true
+    - name: "Plan loan offset - extended deadline (within 180 days)"
+      period: 2024
+      inputs:
+        is_direct_rollover: false
+        days_since_distribution_receipt: 150
+        rollover_deadline_days: 60
+        plan_loan_offset_extended_deadline_days: 180
+        has_secretary_waiver: false
+        is_plan_loan_offset: true
+      expect: true
+    - name: "Plan loan offset - exceeds extended deadline"
+      period: 2024
+      inputs:
+        is_direct_rollover: false
+        days_since_distribution_receipt: 200
+        rollover_deadline_days: 60
+        plan_loan_offset_extended_deadline_days: 180
+        has_secretary_waiver: false
+        is_plan_loan_offset: true
+      expect: false
+
+variable meets_once_per_year_rule:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Meets Once-Per-Year Rule"
+  description: "Whether IRA rollover complies with one-rollover-per-12-months limitation per 26 USC 408(d)(3)(B)"
+  reference: "26 USC 408(d)(3)(B)"
+  syntax: python
+  formula: |
+    # Rule only applies to IRA-to-IRA 60-day rollovers
+    # Does NOT apply to:
+    # - Direct trustee-to-trustee transfers
+    # - Rollovers from employer plans to IRA
+    # - Roth conversions
+    if not is_ira_to_ira_rollover:
+        return True
+    # Direct transfers are unlimited
+    if is_direct_rollover:
+        return True
+    # Check if had a 60-day IRA rollover in prior 12 months
+    if has_ira_rollover_in_prior_12_months:
+        return False
+    return True
+  tests:
+    - name: "Not an IRA-to-IRA rollover - rule does not apply"
+      period: 2024
+      inputs:
+        is_ira_to_ira_rollover: false
+        is_direct_rollover: false
+        has_ira_rollover_in_prior_12_months: true
+      expect: true
+    - name: "Direct IRA transfer - unlimited"
+      period: 2024
+      inputs:
+        is_ira_to_ira_rollover: true
+        is_direct_rollover: true
+        has_ira_rollover_in_prior_12_months: true
+      expect: true
+    - name: "First 60-day IRA rollover - valid"
+      period: 2024
+      inputs:
+        is_ira_to_ira_rollover: true
+        is_direct_rollover: false
+        has_ira_rollover_in_prior_12_months: false
+      expect: true
+    - name: "Second 60-day IRA rollover within 12 months - invalid"
+      period: 2024
+      inputs:
+        is_ira_to_ira_rollover: true
+        is_direct_rollover: false
+        has_ira_rollover_in_prior_12_months: true
+      expect: false
+
+variable is_eligible_rollover_distribution:
+  imports:
+    - 26/402/c#is_rmd_required
+    - 26/402/c#required_minimum_distribution
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Eligible Rollover Distribution"
+  description: "Whether distribution qualifies as an eligible rollover distribution per 26 USC 402(c)(4)"
+  reference: "26 USC 402(c)(4)"
+  syntax: python
+  formula: |
+    # Must have a distribution amount
+    if rollover_distribution_amount <= 0:
+        return False
+    # Exclusion (A): Substantially equal periodic payments
+    if is_periodic_payment:
+        return False
+    # Exclusion (B): Required minimum distributions
+    # Note: The RMD portion is excluded, but excess can still be rolled over
+    # This variable checks if the ENTIRE distribution is RMD
+    if is_rmd_required and rollover_distribution_amount <= required_minimum_distribution:
+        return False
+    # Exclusion (C): Hardship distributions
+    if is_hardship_distribution:
+        return False
+    # Corrective distributions are also not eligible
+    if is_corrective_distribution:
+        return False
+    return True
+  tests:
+    - name: "Normal distribution - eligible"
+      period: 2024
+      inputs:
+        rollover_distribution_amount: 50_000
+        is_periodic_payment: false
+        is_rmd_required: false
+        required_minimum_distribution: 0
+        is_hardship_distribution: false
+        is_corrective_distribution: false
+      expect: true
+    - name: "Substantially equal periodic payment - not eligible"
+      period: 2024
+      inputs:
+        rollover_distribution_amount: 30_000
+        is_periodic_payment: true
+        is_rmd_required: false
+        required_minimum_distribution: 0
+        is_hardship_distribution: false
+        is_corrective_distribution: false
+      expect: false
+    - name: "Distribution equals RMD - not eligible"
+      period: 2024
+      inputs:
+        rollover_distribution_amount: 20_000
+        is_periodic_payment: false
+        is_rmd_required: true
+        required_minimum_distribution: 20_000
+        is_hardship_distribution: false
+        is_corrective_distribution: false
+      expect: false
+    - name: "Distribution exceeds RMD - eligible (excess can be rolled)"
+      period: 2024
+      inputs:
+        rollover_distribution_amount: 50_000
+        is_periodic_payment: false
+        is_rmd_required: true
+        required_minimum_distribution: 20_000
+        is_hardship_distribution: false
+        is_corrective_distribution: false
+      expect: true
+    - name: "Hardship distribution - not eligible"
+      period: 2024
+      inputs:
+        rollover_distribution_amount: 25_000
+        is_periodic_payment: false
+        is_rmd_required: false
+        required_minimum_distribution: 0
+        is_hardship_distribution: true
+        is_corrective_distribution: false
+      expect: false
+    - name: "Corrective distribution - not eligible"
+      period: 2024
+      inputs:
+        rollover_distribution_amount: 5_000
+        is_periodic_payment: false
+        is_rmd_required: false
+        required_minimum_distribution: 0
+        is_hardship_distribution: false
+        is_corrective_distribution: true
+      expect: false
+    - name: "No distribution amount"
+      period: 2024
+      inputs:
+        rollover_distribution_amount: 0
+        is_periodic_payment: false
+        is_rmd_required: false
+        required_minimum_distribution: 0
+        is_hardship_distribution: false
+        is_corrective_distribution: false
+      expect: false
+
+variable is_valid_rollover:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Valid Rollover"
+  description: "Whether rollover meets all statutory requirements for tax-free treatment per 26 USC 402(c)"
+  reference: "26 USC 402(c)(1)"
+  syntax: python
+  formula: |
+    # Must be an eligible rollover distribution
+    if not is_eligible_rollover_distribution:
+        return False
+    # Must meet 60-day requirement (or exception)
+    if not meets_60_day_requirement:
+        return False
+    # Must meet once-per-year rule for IRA rollovers
+    if not meets_once_per_year_rule:
+        return False
+    # Must have some eligible amount after excluding RMD
+    if rollover_eligible_amount <= 0:
+        return False
+    return True
+  tests:
+    - name: "Valid direct rollover"
+      period: 2024
+      inputs:
+        is_eligible_rollover_distribution: true
+        meets_60_day_requirement: true
+        meets_once_per_year_rule: true
+        rollover_eligible_amount: 50_000
+      expect: true
+    - name: "Not an eligible rollover distribution"
+      period: 2024
+      inputs:
+        is_eligible_rollover_distribution: false
+        meets_60_day_requirement: true
+        meets_once_per_year_rule: true
+        rollover_eligible_amount: 50_000
+      expect: false
+    - name: "Exceeds 60-day deadline"
+      period: 2024
+      inputs:
+        is_eligible_rollover_distribution: true
+        meets_60_day_requirement: false
+        meets_once_per_year_rule: true
+        rollover_eligible_amount: 50_000
+      expect: false
+    - name: "Violates once-per-year rule"
+      period: 2024
+      inputs:
+        is_eligible_rollover_distribution: true
+        meets_60_day_requirement: true
+        meets_once_per_year_rule: false
+        rollover_eligible_amount: 50_000
+      expect: false
+    - name: "No eligible amount (all RMD)"
+      period: 2024
+      inputs:
+        is_eligible_rollover_distribution: true
+        meets_60_day_requirement: true
+        meets_once_per_year_rule: true
+        rollover_eligible_amount: 0
+      expect: false
+    - name: "Valid 60-day rollover from 401k"
+      period: 2024
+      inputs:
+        is_eligible_rollover_distribution: true
+        meets_60_day_requirement: true
+        meets_once_per_year_rule: true
+        rollover_eligible_amount: 100_000
+      expect: true
+
+variable taxable_distribution_after_rollover:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Taxable Distribution After Rollover"
+  description: "Amount of distribution that remains taxable after valid rollover per 26 USC 402(c)(1)"
+  reference: "26 USC 402(c)(1)"
+  syntax: python
+  formula: |
+    # If rollover is not valid, entire distribution is taxable
+    if not is_valid_rollover:
+        return rollover_distribution_amount
+    # If valid rollover, only the non-rolled-over portion is taxable
+    # This includes the RMD portion which cannot be rolled over
+    return rollover_distribution_amount - rollover_eligible_amount
+  tests:
+    - name: "Invalid rollover - full amount taxable"
+      period: 2024
+      inputs:
+        is_valid_rollover: false
+        rollover_distribution_amount: 50_000
+        rollover_eligible_amount: 50_000
+      expect: 50_000
+    - name: "Valid rollover, no RMD - nothing taxable"
+      period: 2024
+      inputs:
+        is_valid_rollover: true
+        rollover_distribution_amount: 50_000
+        rollover_eligible_amount: 50_000
+      expect: 0
+    - name: "Valid rollover with RMD portion - RMD is taxable"
+      period: 2024
+      inputs:
+        is_valid_rollover: true
+        rollover_distribution_amount: 100_000
+        rollover_eligible_amount: 80_000
+      expect: 20_000
+    - name: "Partial rollover - remaining amount taxable"
+      period: 2024
+      inputs:
+        is_valid_rollover: true
+        rollover_distribution_amount: 75_000
+        rollover_eligible_amount: 60_000
+      expect: 15_000

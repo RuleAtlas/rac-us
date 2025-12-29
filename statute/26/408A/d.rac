@@ -1,3 +1,9 @@
+# COSILICO RAC STATUTE ENCODING
+# 26 USC 408A(d) - Roth IRA Distribution Rules
+# Implements qualified distribution requirements including 5-year rule,
+# age 59.5 threshold, death/disability exceptions, and first-time homebuyer
+# Updated: 2024-12-29
+
 text: """
 (d) Distribution rules.--For purposes of this title--
 (1) Exclusion.--Any qualified distribution from a Roth IRA shall not be
@@ -18,14 +24,64 @@ period beginning with the first taxable year for which the
 individual made a contribution to a Roth IRA...
 """
 
+# =============================================================================
+# PARAMETERS - 26 USC 408A(d)
+# =============================================================================
+
 # 26 USC 408A(d)(2)(A)(i) - Age threshold for qualified Roth distribution
 parameter early_withdrawal_penalty_age:
   description: "Age at which distributions qualify under 408A(d)(2)(A)(i) - 59 1/2"
   unit: years
+  reference:
+    - title: "26 U.S. Code 408A(d)(2)(A)(i)"
+      href: "https://www.law.cornell.edu/uscode/text/26/408A#d_2_A_i"
   values:
     1998-01-01: 59.5
 
-# Basic person attributes needed for Roth IRA distribution rules
+# 26 USC 408A(d)(2)(B) - 5-taxable-year holding period
+parameter roth_ira_holding_period_years:
+  description: "Number of taxable years required before qualified distribution per 408A(d)(2)(B)"
+  unit: years
+  reference:
+    - title: "26 U.S. Code 408A(d)(2)(B)"
+      href: "https://www.law.cornell.edu/uscode/text/26/408A#d_2_B"
+  values:
+    1998-01-01: 5
+
+# 26 USC 72(t)(2)(F) - First-time homebuyer lifetime limit
+parameter first_time_homebuyer_lifetime_limit:
+  description: "Maximum lifetime distribution for first-time homebuyer exception per 72(t)(2)(F)"
+  unit: USD
+  reference:
+    - title: "26 U.S. Code 72(t)(2)(F)"
+      href: "https://www.law.cornell.edu/uscode/text/26/72#t_2_F"
+  values:
+    1998-01-01: 10_000
+
+# 26 USC 72(t)(2)(F) - Years without home ownership to qualify as first-time homebuyer
+parameter first_time_homebuyer_lookback_years:
+  description: "Years without principal residence ownership to qualify as first-time homebuyer"
+  unit: years
+  reference:
+    - title: "26 U.S. Code 72(t)(2)(F)"
+      href: "https://www.law.cornell.edu/uscode/text/26/72#t_2_F"
+  values:
+    1998-01-01: 2
+
+# 26 USC 72(t)(2)(F) - Days to use distribution for home purchase
+parameter first_time_homebuyer_use_period_days:
+  description: "Days after distribution to use funds for qualified acquisition costs"
+  unit: days
+  reference:
+    - title: "26 U.S. Code 72(t)(2)(F)"
+      href: "https://www.law.cornell.edu/uscode/text/26/72#t_2_F"
+  values:
+    1998-01-01: 120
+
+# =============================================================================
+# INPUTS - Person-level data required for Roth IRA distribution rules
+# =============================================================================
+
 input age:
   entity: Person
   period: Year
@@ -34,96 +90,391 @@ input age:
   description: "Person's age at year-end"
   default: 0
 
-# Roth IRA 5-year holding period requirement per 408A(d)(2)(B)
+input first_roth_contribution_year:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "First Roth Contribution Year"
+  description: "Tax year in which individual first made a contribution to any Roth IRA. Value of 0 means no Roth contributions ever made."
+  default: 0
+
+input is_deceased:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Deceased"
+  description: "Whether the person is deceased as of this tax year"
+  default: false
+
+input is_roth_beneficiary:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Roth IRA Beneficiary"
+  description: "Whether person is receiving distribution as beneficiary of deceased Roth IRA owner"
+  default: false
+
+input is_roth_estate_beneficiary:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Roth IRA Estate Beneficiary"
+  description: "Whether person is receiving distribution as estate of deceased Roth IRA owner"
+  default: false
+
+input is_disabled_72m7:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Disabled per 72(m)(7)"
+  description: "Whether person is unable to engage in any substantial gainful activity by reason of any medically determinable physical or mental impairment which can be expected to result in death or to be of long-continued and indefinite duration, per 26 USC 72(m)(7)"
+  default: false
+
+input years_since_principal_residence_ownership:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Years Since Principal Residence Ownership"
+  description: "Number of years since person (and spouse if married) had ownership interest in a principal residence. Value >= 2 means first-time homebuyer. Value of -1 means currently owns."
+  default: -1
+
+input spouse_years_since_principal_residence_ownership:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Spouse Years Since Principal Residence Ownership"
+  description: "Number of years since spouse had ownership interest in a principal residence. Value >= 2 means qualifies. Value of -1 means currently owns. Value of 0 if unmarried."
+  default: 0
+
+input prior_first_home_distributions:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Prior First-Time Homebuyer Distributions"
+  description: "Aggregate amount of qualified first-time homebuyer distributions taken in all prior taxable years"
+  default: 0
+
+input current_year_home_distribution_request:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Current Year First-Home Distribution Request"
+  description: "Amount of Roth IRA distribution requested for first-time home purchase this year"
+  default: 0
+
+input home_distribution_used_within_120_days:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Home Distribution Used Within 120 Days"
+  description: "Whether the first-time homebuyer distribution was used for qualified acquisition costs within 120 days"
+  default: false
+
+# =============================================================================
+# VARIABLES - 26 USC 408A(d) Distribution Rules
+# =============================================================================
+
+# 26 USC 408A(d)(2)(B) - 5-year holding period rule
 variable is_roth_ira_5_year_satisfied:
+  imports:
+    - 26/408A/d#roth_ira_holding_period_years
   entity: Person
   period: Year
   dtype: Boolean
   label: "Roth IRA 5-Year Rule Satisfied"
-  description: "Whether the 5-year holding period for qualified Roth distributions has been met per 26 USC 408A(d)(2)(B)"
+  description: "Whether the 5-taxable-year holding period for qualified Roth distributions has been met per 26 USC 408A(d)(2)(B). The period begins with the first taxable year for which the individual made a contribution to a Roth IRA (including conversions)."
+  syntax: python
   formula: |
-    # Placeholder: Would require tracking first Roth contribution date
-    # and comparing to distribution date (5 years)
-    return True
+    # If no Roth contribution ever made, 5-year rule cannot be satisfied
+    if first_roth_contribution_year <= 0:
+        return False
+    # Current tax year must be at least 5 years after first contribution year
+    # Example: First contribution in 2020, earliest qualified year is 2025
+    years_elapsed = period.year - first_roth_contribution_year
+    return years_elapsed >= roth_ira_holding_period_years
   default: false
   tests:
-    - name: "5-year rule - placeholder returns true"
+    - name: "5-year rule - no Roth contributions ever made"
       period: 2024
-      inputs: {}
-      expect: true  # Placeholder implementation always returns True
-    - name: "5-year rule - first contribution 2019 (placeholder)"
+      inputs:
+        first_roth_contribution_year: 0
+      expect: false
+    - name: "5-year rule - first contribution 2019, distribution 2024 (5 years elapsed)"
       period: 2024
-      inputs: {}
-      expect: true  # Would be true when formula tracks 5+ years since first contribution
-    - name: "5-year rule - first contribution 2023 (placeholder)"
+      inputs:
+        first_roth_contribution_year: 2019
+      expect: true
+    - name: "5-year rule - first contribution 2020, distribution 2024 (4 years elapsed)"
       period: 2024
-      inputs: {}
-      expect: true  # Would be false when formula tracks < 5 years; placeholder returns true
+      inputs:
+        first_roth_contribution_year: 2020
+      expect: false
+    - name: "5-year rule - first contribution 2018, distribution 2024 (6 years elapsed)"
+      period: 2024
+      inputs:
+        first_roth_contribution_year: 2018
+      expect: true
+    - name: "5-year rule - first contribution 2024, distribution 2024 (0 years elapsed)"
+      period: 2024
+      inputs:
+        first_roth_contribution_year: 2024
+      expect: false
+    - name: "5-year rule - first contribution 2020, distribution 2025 (exactly 5 years)"
+      period: 2025
+      inputs:
+        first_roth_contribution_year: 2020
+      expect: true
 
-# Roth IRA distribution due to death per 408A(d)(2)(A)(ii)
+# 26 USC 408A(d)(2)(A)(ii) - Distribution due to death
 variable is_roth_death_distribution:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Roth Death Distribution"
-  description: "Whether distribution is made to beneficiary/estate due to death per 26 USC 408A(d)(2)(A)(ii)"
+  description: "Whether distribution is made to a beneficiary or to the estate of the individual on or after the death of the individual per 26 USC 408A(d)(2)(A)(ii)"
+  syntax: python
   formula: |
-    # Placeholder: Would require estate information
+    # Qualifies if person is receiving as beneficiary of deceased owner
+    if is_roth_beneficiary:
+        return True
+    # Qualifies if person is receiving as estate of deceased owner
+    if is_roth_estate_beneficiary:
+        return True
     return False
   default: false
   tests:
-    - name: "Death distribution - placeholder returns false"
+    - name: "Death distribution - not a beneficiary"
       period: 2024
-      inputs: {}
-      expect: false  # Placeholder implementation
-    - name: "Death distribution - beneficiary scenario (placeholder)"
+      inputs:
+        is_roth_beneficiary: false
+        is_roth_estate_beneficiary: false
+      expect: false
+    - name: "Death distribution - individual beneficiary"
       period: 2024
-      inputs: {}
-      expect: false  # Would be true when formula tracks beneficiary status
+      inputs:
+        is_roth_beneficiary: true
+        is_roth_estate_beneficiary: false
+      expect: true
+    - name: "Death distribution - estate beneficiary"
+      period: 2024
+      inputs:
+        is_roth_beneficiary: false
+        is_roth_estate_beneficiary: true
+      expect: true
+    - name: "Death distribution - both flags set (unusual but valid)"
+      period: 2024
+      inputs:
+        is_roth_beneficiary: true
+        is_roth_estate_beneficiary: true
+      expect: true
 
-# Roth IRA owner disability per 408A(d)(2)(A)(iii)
+# 26 USC 408A(d)(2)(A)(iii) referencing 72(m)(7) - Disability
 variable is_roth_owner_disabled:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Roth IRA Owner Disabled"
-  description: "Whether owner is disabled as defined in 22 USC 72(m)(7) per 26 USC 408A(d)(2)(A)(iii)"
+  description: "Whether owner is disabled as defined in 26 USC 72(m)(7): unable to engage in any substantial gainful activity by reason of any medically determinable physical or mental impairment which can be expected to result in death or to be of long-continued and indefinite duration"
+  syntax: python
   formula: |
-    # Placeholder: Would require disability determination
-    return False
+    # Disability determination per 72(m)(7) is provided as input
+    # The IRS requires proof of disability in form and manner prescribed
+    return is_disabled_72m7
   default: false
   tests:
-    - name: "Owner disabled - placeholder returns false"
+    - name: "Owner disabled - not disabled"
       period: 2024
-      inputs: {}
-      expect: false  # Placeholder implementation
-    - name: "Owner disabled - disability scenario (placeholder)"
+      inputs:
+        is_disabled_72m7: false
+      expect: false
+    - name: "Owner disabled - meets 72(m)(7) definition"
       period: 2024
-      inputs: {}
-      expect: false  # Would be true when formula tracks disability per 72(m)(7)
+      inputs:
+        is_disabled_72m7: true
+      expect: true
 
-# Roth IRA first-time homebuyer distribution per 408A(d)(2)(A)(iv)
+# 26 USC 72(t)(2)(F) - First-time homebuyer qualification
+variable is_first_time_homebuyer:
+  imports:
+    - 26/408A/d#first_time_homebuyer_lookback_years
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "First-Time Homebuyer"
+  description: "Whether individual (and spouse) had no ownership interest in a principal residence during the 2-year period ending on the acquisition date per 26 USC 72(t)(2)(F)"
+  syntax: python
+  formula: |
+    # Must not have owned principal residence in past 2 years
+    if years_since_principal_residence_ownership < first_time_homebuyer_lookback_years:
+        return False
+    # If married, spouse must also not have owned in past 2 years
+    # spouse_years value of 0 means unmarried (no spouse to check)
+    if spouse_years_since_principal_residence_ownership > 0:
+        if spouse_years_since_principal_residence_ownership < first_time_homebuyer_lookback_years:
+            return False
+    return True
+  default: false
+  tests:
+    - name: "First-time homebuyer - currently owns home"
+      period: 2024
+      inputs:
+        years_since_principal_residence_ownership: -1
+        spouse_years_since_principal_residence_ownership: 0
+      expect: false
+    - name: "First-time homebuyer - owned 1 year ago"
+      period: 2024
+      inputs:
+        years_since_principal_residence_ownership: 1
+        spouse_years_since_principal_residence_ownership: 0
+      expect: false
+    - name: "First-time homebuyer - owned 2 years ago (qualifies)"
+      period: 2024
+      inputs:
+        years_since_principal_residence_ownership: 2
+        spouse_years_since_principal_residence_ownership: 0
+      expect: true
+    - name: "First-time homebuyer - never owned (qualifies)"
+      period: 2024
+      inputs:
+        years_since_principal_residence_ownership: 99
+        spouse_years_since_principal_residence_ownership: 0
+      expect: true
+    - name: "First-time homebuyer - qualifies but spouse owned 1 year ago"
+      period: 2024
+      inputs:
+        years_since_principal_residence_ownership: 5
+        spouse_years_since_principal_residence_ownership: 1
+      expect: false
+    - name: "First-time homebuyer - both spouses qualify"
+      period: 2024
+      inputs:
+        years_since_principal_residence_ownership: 3
+        spouse_years_since_principal_residence_ownership: 3
+      expect: true
+
+# 26 USC 72(t)(2)(F) - Remaining first-time homebuyer distribution allowance
+variable remaining_first_home_allowance:
+  imports:
+    - 26/408A/d#first_time_homebuyer_lifetime_limit
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Remaining First-Home Distribution Allowance"
+  description: "Remaining lifetime allowance for qualified first-time homebuyer distributions (max $10,000 lifetime) per 26 USC 72(t)(2)(F)"
+  syntax: python
+  formula: |
+    remaining = first_time_homebuyer_lifetime_limit - prior_first_home_distributions
+    return max(0, remaining)
+  default: 10000
+  tests:
+    - name: "Remaining allowance - no prior distributions"
+      period: 2024
+      inputs:
+        prior_first_home_distributions: 0
+      expect: 10000
+    - name: "Remaining allowance - partial prior use"
+      period: 2024
+      inputs:
+        prior_first_home_distributions: 3000
+      expect: 7000
+    - name: "Remaining allowance - fully used"
+      period: 2024
+      inputs:
+        prior_first_home_distributions: 10000
+      expect: 0
+    - name: "Remaining allowance - exceeded (edge case)"
+      period: 2024
+      inputs:
+        prior_first_home_distributions: 12000
+      expect: 0
+
+# 26 USC 408A(d)(2)(A)(iv) + 72(t)(2)(F) - Qualified first-time homebuyer distribution amount
 variable roth_first_home_distribution:
+  imports:
+    - 26/408A/d#first_time_homebuyer_lifetime_limit
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: "Roth First Home Distribution"
-  description: "Amount of Roth IRA distributed as first-time homebuyer (max $10,000 lifetime) per 26 USC 408A(d)(2)(A)(iv)"
+  description: "Amount of Roth IRA that qualifies as first-time homebuyer distribution (max $10,000 lifetime) per 26 USC 408A(d)(2)(A)(iv) and 72(t)(2)(F). Must be used within 120 days for qualified acquisition costs."
+  syntax: python
   formula: |
-    # Placeholder: Would require tracking lifetime first-home distributions
-    return 0
+    # Must be a first-time homebuyer
+    if not is_first_time_homebuyer:
+        return 0
+    # Must have used (or plan to use) funds within 120 days for home purchase
+    if not home_distribution_used_within_120_days:
+        return 0
+    # Calculate remaining lifetime allowance
+    remaining = first_time_homebuyer_lifetime_limit - prior_first_home_distributions
+    if remaining <= 0:
+        return 0
+    # Distribution cannot exceed remaining lifetime limit
+    return min(current_year_home_distribution_request, remaining)
   default: 0
   tests:
-    - name: "First home distribution - placeholder returns zero"
+    - name: "First home distribution - not first-time homebuyer"
       period: 2024
-      inputs: {}
-      expect: 0  # Placeholder implementation
-    - name: "First home distribution - max $10,000 lifetime (placeholder)"
+      inputs:
+        is_first_time_homebuyer: false
+        home_distribution_used_within_120_days: true
+        prior_first_home_distributions: 0
+        current_year_home_distribution_request: 10000
+      expect: 0
+    - name: "First home distribution - funds not used within 120 days"
       period: 2024
-      inputs: {}
-      expect: 0  # Would return up to 10_000 when formula tracks distributions
+      inputs:
+        is_first_time_homebuyer: true
+        home_distribution_used_within_120_days: false
+        prior_first_home_distributions: 0
+        current_year_home_distribution_request: 10000
+      expect: 0
+    - name: "First home distribution - full $10,000 first use"
+      period: 2024
+      inputs:
+        is_first_time_homebuyer: true
+        home_distribution_used_within_120_days: true
+        prior_first_home_distributions: 0
+        current_year_home_distribution_request: 10000
+      expect: 10000
+    - name: "First home distribution - request exceeds limit"
+      period: 2024
+      inputs:
+        is_first_time_homebuyer: true
+        home_distribution_used_within_120_days: true
+        prior_first_home_distributions: 0
+        current_year_home_distribution_request: 15000
+      expect: 10000
+    - name: "First home distribution - partial prior use"
+      period: 2024
+      inputs:
+        is_first_time_homebuyer: true
+        home_distribution_used_within_120_days: true
+        prior_first_home_distributions: 4000
+        current_year_home_distribution_request: 10000
+      expect: 6000
+    - name: "First home distribution - lifetime limit exhausted"
+      period: 2024
+      inputs:
+        is_first_time_homebuyer: true
+        home_distribution_used_within_120_days: true
+        prior_first_home_distributions: 10000
+        current_year_home_distribution_request: 5000
+      expect: 0
+    - name: "First home distribution - small request within limit"
+      period: 2024
+      inputs:
+        is_first_time_homebuyer: true
+        home_distribution_used_within_120_days: true
+        prior_first_home_distributions: 0
+        current_year_home_distribution_request: 3000
+      expect: 3000
 
+# 26 USC 408A(d)(2) - Main qualified distribution determination
 variable is_qualified_roth_distribution:
   imports:
     - 26/408A/d#early_withdrawal_penalty_age
@@ -131,20 +482,20 @@ variable is_qualified_roth_distribution:
   period: Year
   dtype: Boolean
   label: "Is Qualified Roth IRA Distribution"
-  description: "Whether distribution meets qualified distribution requirements per 26 USC 408A(d)(2)"
+  description: "Whether distribution meets qualified distribution requirements per 26 USC 408A(d)(2). Must satisfy both (A) one of the four qualifying conditions AND (B) the 5-year holding period."
   syntax: python
   formula: |
-    # Must satisfy 5-year holding period per 408A(d)(2)(B)
+    # Per 408A(d)(2)(B): Must satisfy 5-year holding period
     if not is_roth_ira_5_year_satisfied:
         return False
-    # Must meet one of these conditions per 408A(d)(2)(A):
+    # Per 408A(d)(2)(A): Must meet one of these conditions:
     # (i) Age 59 1/2 or older
     if age >= early_withdrawal_penalty_age:
         return True
-    # (ii) Death
+    # (ii) Death - distribution to beneficiary or estate
     if is_roth_death_distribution:
         return True
-    # (iii) Disability
+    # (iii) Disability per 72(m)(7)
     if is_roth_owner_disabled:
         return True
     # (iv) First-time homebuyer (up to $10,000 lifetime)
@@ -161,7 +512,16 @@ variable is_qualified_roth_distribution:
         is_roth_death_distribution: false
         is_roth_owner_disabled: false
         roth_first_home_distribution: 0
-      expect: true  # Qualifies under (i) - age 59.5+
+      expect: true
+    - name: "Qualified - exactly age 59.5"
+      period: 2024
+      inputs:
+        is_roth_ira_5_year_satisfied: true
+        age: 59.5
+        is_roth_death_distribution: false
+        is_roth_owner_disabled: false
+        roth_first_home_distribution: 0
+      expect: true
     - name: "Qualified - death distribution with 5-year rule"
       period: 2024
       inputs:
@@ -170,7 +530,7 @@ variable is_qualified_roth_distribution:
         is_roth_death_distribution: true
         is_roth_owner_disabled: false
         roth_first_home_distribution: 0
-      expect: true  # Qualifies under (ii) - death
+      expect: true
     - name: "Qualified - disability with 5-year rule"
       period: 2024
       inputs:
@@ -179,7 +539,7 @@ variable is_qualified_roth_distribution:
         is_roth_death_distribution: false
         is_roth_owner_disabled: true
         roth_first_home_distribution: 0
-      expect: true  # Qualifies under (iii) - disability
+      expect: true
     - name: "Qualified - first-time homebuyer with 5-year rule"
       period: 2024
       inputs:
@@ -187,9 +547,9 @@ variable is_qualified_roth_distribution:
         age: 35
         is_roth_death_distribution: false
         is_roth_owner_disabled: false
-        roth_first_home_distribution: 10_000
-      expect: true  # Qualifies under (iv) - first home up to $10,000
-    - name: "Non-qualified - 5-year rule not satisfied"
+        roth_first_home_distribution: 10000
+      expect: true
+    - name: "Non-qualified - 5-year rule not satisfied despite age"
       period: 2024
       inputs:
         is_roth_ira_5_year_satisfied: false
@@ -197,7 +557,7 @@ variable is_qualified_roth_distribution:
         is_roth_death_distribution: false
         is_roth_owner_disabled: false
         roth_first_home_distribution: 0
-      expect: false  # Fails 5-year requirement per (B)
+      expect: false
     - name: "Non-qualified - under 59.5 no special conditions"
       period: 2024
       inputs:
@@ -206,4 +566,22 @@ variable is_qualified_roth_distribution:
         is_roth_death_distribution: false
         is_roth_owner_disabled: false
         roth_first_home_distribution: 0
-      expect: false  # No qualifying condition met
+      expect: false
+    - name: "Non-qualified - 5-year not met despite disability"
+      period: 2024
+      inputs:
+        is_roth_ira_5_year_satisfied: false
+        age: 45
+        is_roth_death_distribution: false
+        is_roth_owner_disabled: true
+        roth_first_home_distribution: 0
+      expect: false
+    - name: "Non-qualified - age 59, just under threshold"
+      period: 2024
+      inputs:
+        is_roth_ira_5_year_satisfied: true
+        age: 59
+        is_roth_death_distribution: false
+        is_roth_owner_disabled: false
+        roth_first_home_distribution: 0
+      expect: false

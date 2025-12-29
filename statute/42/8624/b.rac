@@ -14,8 +14,10 @@ the Social Security Act [SSI];
 (ii) 60 percent of the State median income
 """
 
-# 42 USC 8624(b) - LIHEAP Eligibility and Benefits
+# ============================================================================
+# 42 USC 8624(b) - LIHEAP Eligibility
 # Low Income Home Energy Assistance Program
+# ============================================================================
 
 # Inputs required for LIHEAP calculations
 input household_size:
@@ -100,8 +102,28 @@ input annual_energy_costs:
   description: "Total annual home energy costs"
   default: 0
 
-# Federal Poverty Level parameters (annual, 48 contiguous states + DC)
-# Source: HHS Poverty Guidelines
+input state_median_income:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "State Median Income"
+  description: "State-specific median household income (defaults to national median if 0)"
+  default: 0
+
+input is_energy_crisis:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "Energy Crisis"
+  description: "Whether household is facing an energy crisis (disconnection, fuel shortage, etc.)"
+  default: false
+
+# ============================================================================
+# Federal Poverty Level Parameters
+# Source: HHS Poverty Guidelines (annual, 48 contiguous states + DC)
+# ============================================================================
+
 parameter fpl_base:
   values:
     2024-01-01: 15_060
@@ -110,6 +132,7 @@ parameter fpl_base:
   period: Year
   label: "Federal Poverty Level Base"
   description: "Annual FPL for 1-person household"
+  reference: "HHS Poverty Guidelines"
 
 parameter fpl_additional_per_person:
   values:
@@ -119,6 +142,11 @@ parameter fpl_additional_per_person:
   period: Year
   label: "FPL Additional Per Person"
   description: "Annual FPL increment for each additional household member"
+  reference: "HHS Poverty Guidelines"
+
+# ============================================================================
+# LIHEAP Income Threshold Parameters
+# ============================================================================
 
 parameter fpl_percentage:
   values:
@@ -127,8 +155,45 @@ parameter fpl_percentage:
   period: Year
   label: "LIHEAP FPL Percentage"
   description: "Income limit as percentage of FPL (150%)"
+  reference: "42 USC 8624(b)(2)(B)(i)"
 
-# Calculated variables
+# 60% State Median Income alternative threshold
+# Per 42 USC 8624(b)(2)(B)(ii), eligibility extends to the greater of 150% FPL or 60% SMI
+parameter smi_percentage:
+  values:
+    1981-01-01: 0.60
+  unit: /1
+  period: Year
+  label: "LIHEAP SMI Percentage"
+  description: "Income limit as percentage of state median income (60%)"
+  reference: "42 USC 8624(b)(2)(B)(ii)"
+
+# National median household income (used as fallback for state-specific)
+# Source: U.S. Census Bureau, American Community Survey
+parameter national_median_income:
+  values:
+    2024-01-01: 80_610
+    2023-01-01: 74_580
+  unit: USD
+  period: Year
+  label: "National Median Household Income"
+  description: "U.S. median household income from Census ACS"
+  reference: "U.S. Census Bureau, ACS 1-Year Estimates"
+
+# 110% FPL floor - states cannot exclude households below this threshold
+# Per 42 USC 8624(b)(2)(B), states may prioritize but not exclude those at 110% FPL or below
+parameter fpl_floor_percentage:
+  values:
+    1981-01-01: 1.10
+  unit: /1
+  period: Year
+  label: "LIHEAP FPL Floor Percentage"
+  description: "States cannot exclude households below 110% FPL"
+  reference: "42 USC 8624(b)(2)(B)"
+
+# ============================================================================
+# Federal Poverty Level Calculations
+# ============================================================================
 
 variable liheap_fpl_annual:
   entity: Household
@@ -137,6 +202,7 @@ variable liheap_fpl_annual:
   unit: USD
   label: "LIHEAP Annual FPL"
   description: "Annual Federal Poverty Level for household, scaled by size"
+  reference: "42 USC 8624(b)(2)(B)(i)"
   syntax: python
   formula: |
     # FPL = base for 1 person + additional per person beyond 1
@@ -169,49 +235,138 @@ variable liheap_fpl_annual:
       inputs: {household_size: 1}
       expect: 14_580
 
+# ============================================================================
+# Income Limit Calculations
+# ============================================================================
+
+variable liheap_fpl_income_limit:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "LIHEAP 150% FPL Income Limit"
+  description: "Income limit based on 150% of FPL per 42 USC 8624(b)(2)(B)(i)"
+  reference: "42 USC 8624(b)(2)(B)(i)"
+  syntax: python
+  formula: |
+    return liheap_fpl_annual * fpl_percentage
+  default: 0
+  tests:
+    - name: "Single person at 150% FPL"
+      period: 2024
+      inputs: {household_size: 1}
+      expect: 22_590  # 15_060 * 1.50
+    - name: "Four-person at 150% FPL"
+      period: 2024
+      inputs: {household_size: 4}
+      expect: 46_800  # 31_200 * 1.50
+    - name: "Large household (8 persons) at 150% FPL"
+      period: 2024
+      inputs: {household_size: 8}
+      expect: 63_180  # 42,120 * 1.50
+
+variable liheap_smi_income_limit:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "LIHEAP 60% SMI Income Limit"
+  description: "Income limit based on 60% of state median income per 42 USC 8624(b)(2)(B)(ii)"
+  reference: "42 USC 8624(b)(2)(B)(ii)"
+  syntax: python
+  formula: |
+    # Use state median income if provided, otherwise fall back to national
+    effective_smi = state_median_income if state_median_income > 0 else national_median_income
+    return effective_smi * smi_percentage
+  default: 0
+  tests:
+    - name: "60% of national median (no state input)"
+      period: 2024
+      inputs: {state_median_income: 0}
+      expect: 48_366  # 80_610 * 0.60
+    - name: "60% of state median (state input provided)"
+      period: 2024
+      inputs: {state_median_income: 90_000}
+      expect: 54_000  # 90_000 * 0.60
+    - name: "Prior year national median"
+      period: 2023
+      inputs: {state_median_income: 0}
+      expect: 44_748  # 74_580 * 0.60
+    - name: "High state median income (e.g., Maryland)"
+      period: 2024
+      inputs: {state_median_income: 108_000}
+      expect: 64_800  # 108_000 * 0.60
+    - name: "Low state median income (e.g., Mississippi)"
+      period: 2024
+      inputs: {state_median_income: 52_000}
+      expect: 31_200  # 52_000 * 0.60
+
 variable liheap_income_limit:
   entity: Household
   period: Year
   dtype: Money
   unit: USD
   label: "LIHEAP Income Limit"
-  description: "Maximum income for LIHEAP eligibility (150% FPL)"
+  description: "Maximum income for LIHEAP eligibility - greater of 150% FPL or 60% SMI"
+  reference: "42 USC 8624(b)(2)(B)"
   syntax: python
   formula: |
-    return liheap_fpl_annual * fpl_percentage
+    # Per 42 USC 8624(b)(2)(B), income limit is the GREATER of:
+    # (i) 150% of poverty level, OR
+    # (ii) 60% of state median income
+    return max(liheap_fpl_income_limit, liheap_smi_income_limit)
   default: 0
   tests:
-    - name: "Single person household at 150% FPL"
+    - name: "Single person - SMI higher than 150% FPL"
+      period: 2024
+      inputs: {household_size: 1, state_median_income: 0}
+      expect: 48_366  # 60% SMI (48,366) > 150% FPL (22,590)
+    - name: "Large household - 150% FPL higher"
+      period: 2024
+      inputs: {household_size: 8, state_median_income: 60_000}
+      expect: 63_180  # 150% FPL (63,180) > 60% SMI (36,000)
+    - name: "Four-person with high state median"
+      period: 2024
+      inputs: {household_size: 4, state_median_income: 100_000}
+      expect: 60_000  # 60% SMI (60,000) > 150% FPL (46,800)
+    - name: "Four-person with low state median"
+      period: 2024
+      inputs: {household_size: 4, state_median_income: 50_000}
+      expect: 46_800  # 150% FPL (46,800) > 60% SMI (30,000)
+
+variable liheap_fpl_floor:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "LIHEAP 110% FPL Floor"
+  description: "States cannot exclude households below 110% FPL"
+  reference: "42 USC 8624(b)(2)(B)"
+  syntax: python
+  formula: |
+    return liheap_fpl_annual * fpl_floor_percentage
+  default: 0
+  tests:
+    - name: "Single person at 110% FPL"
       period: 2024
       inputs: {household_size: 1}
-      expect: 22_590  # 15_060 * 1.50
-    - name: "Two-person household at 150% FPL"
-      period: 2024
-      inputs: {household_size: 2}
-      expect: 30_660  # 20_440 * 1.50
-    - name: "Three-person household at 150% FPL"
-      period: 2024
-      inputs: {household_size: 3}
-      expect: 38_730  # 25_820 * 1.50
-    - name: "Four-person household at 150% FPL"
+      expect: 16_566  # 15_060 * 1.10
+    - name: "Four-person at 110% FPL"
       period: 2024
       inputs: {household_size: 4}
-      expect: 46_800  # 31_200 * 1.50
-    - name: "Large household (6 persons) at 150% FPL"
-      period: 2024
-      inputs: {household_size: 6}
-      expect: 62_940  # 41_960 * 1.50
-    - name: "Prior year income limit (2023)"
-      period: 2023
-      inputs: {household_size: 1}
-      expect: 21_870  # 14_580 * 1.50
+      expect: 34_320  # 31_200 * 1.10
+
+# ============================================================================
+# Eligibility Determinations
+# ============================================================================
 
 variable liheap_categorically_eligible:
   entity: Household
   period: Year
   dtype: Boolean
   label: "LIHEAP Categorically Eligible"
-  description: "Categorical eligibility via TANF, SSI, SNAP, or VA benefits per 42 USC 8_624(b)(2)(A)"
+  description: "Categorical eligibility via TANF, SSI, SNAP, or VA benefits per 42 USC 8624(b)(2)(A)"
+  reference: "42 USC 8624(b)(2)(A)"
   syntax: python
   formula: |
     # Per 42 USC 8624(b)(2)(A), households are eligible if any member receives:
@@ -249,50 +404,48 @@ variable liheap_income_eligible:
   period: Year
   dtype: Boolean
   label: "LIHEAP Income Eligible"
-  description: "Income eligibility based on 150% FPL per 42 USC 8_624(b)(2)(B)"
+  description: "Income eligibility based on greater of 150% FPL or 60% SMI per 42 USC 8624(b)(2)(B)"
+  reference: "42 USC 8624(b)(2)(B)"
   syntax: python
   formula: |
-    # Per 42 USC 8624(b)(2)(B), income must not exceed 150% FPL
-    # (or 60% state median income, but we use the FPL test as the baseline)
+    # Per 42 USC 8624(b)(2)(B), income must not exceed the greater of
+    # 150% FPL or 60% state median income
     return annual_gross_income <= liheap_income_limit
   default: false
   tests:
-    - name: "Single person - income exactly at 150% FPL"
+    - name: "Single person - income below SMI limit"
       period: 2024
-      inputs: {household_size: 1, annual_gross_income: 22_590}
-      expect: true
-    - name: "Single person - income below 150% FPL"
+      inputs: {household_size: 1, annual_gross_income: 45_000, state_median_income: 0}
+      expect: true  # Below 60% SMI (48,366)
+    - name: "Single person - income above both limits"
       period: 2024
-      inputs: {household_size: 1, annual_gross_income: 20_000}
-      expect: true
-    - name: "Single person - income just above 150% FPL"
+      inputs: {household_size: 1, annual_gross_income: 50_000, state_median_income: 0}
+      expect: false  # Above 60% SMI (48,366)
+    - name: "Four-person - income at FPL limit"
       period: 2024
-      inputs: {household_size: 1, annual_gross_income: 22_591}
-      expect: false
-    - name: "Four-person household - income at limit"
-      period: 2024
-      inputs: {household_size: 4, annual_gross_income: 46_800}
-      expect: true
-    - name: "Four-person household - income over limit"
-      period: 2024
-      inputs: {household_size: 4, annual_gross_income: 50_000}
-      expect: false
+      inputs: {household_size: 4, annual_gross_income: 46_800, state_median_income: 50_000}
+      expect: true  # At 150% FPL (46,800), which is higher than 60% SMI (30,000)
     - name: "Zero income always eligible"
       period: 2024
-      inputs: {household_size: 2, annual_gross_income: 0}
+      inputs: {household_size: 2, annual_gross_income: 0, state_median_income: 0}
       expect: true
+    - name: "Eligible via high state SMI"
+      period: 2024
+      inputs: {household_size: 1, annual_gross_income: 55_000, state_median_income: 100_000}
+      expect: true  # Below 60% SMI (60,000)
 
 variable liheap_eligible:
   entity: Household
   period: Year
   dtype: Boolean
   label: "LIHEAP Eligible"
-  description: "Overall LIHEAP eligibility per 42 USC 8_624(b)(2)"
+  description: "Overall LIHEAP eligibility per 42 USC 8624(b)(2)"
+  reference: "42 USC 8624(b)(2)"
   syntax: python
   formula: |
     # Eligible if either:
     # (A) Categorically eligible via TANF/SSI/SNAP/VA benefits, OR
-    # (B) Income does not exceed 150% FPL (or 60% state median income)
+    # (B) Income does not exceed the greater of 150% FPL or 60% SMI
     return liheap_categorically_eligible or liheap_income_eligible
   default: false
   tests:
@@ -300,63 +453,66 @@ variable liheap_eligible:
       period: 2024
       inputs:
         household_size: 1
-        annual_gross_income: 50_000
+        annual_gross_income: 60_000
         receives_snap: true
+        state_median_income: 0
       expect: true
-    - name: "Income eligible, no categorical benefits"
+    - name: "Income eligible via SMI, no categorical benefits"
       period: 2024
       inputs:
-        household_size: 4
-        annual_gross_income: 40_000
+        household_size: 1
+        annual_gross_income: 45_000
         receives_tanf: false
         receives_ssi: false
         receives_snap: false
         receives_veterans_benefits: false
-      expect: true
-    - name: "Both categorical and income eligible"
-      period: 2024
-      inputs:
-        household_size: 2
-        annual_gross_income: 20_000
-        receives_ssi: true
-      expect: true
+        state_median_income: 0
+      expect: true  # Below 60% national SMI (48,366)
     - name: "High income, no categorical benefits - ineligible"
       period: 2024
       inputs:
         household_size: 2
-        annual_gross_income: 50_000
+        annual_gross_income: 55_000
         receives_tanf: false
         receives_ssi: false
         receives_snap: false
         receives_veterans_benefits: false
-      expect: false
-    - name: "Single person at income threshold"
-      period: 2024
-      inputs:
-        household_size: 1
-        annual_gross_income: 22_590
-        receives_tanf: false
-        receives_ssi: false
-        receives_snap: false
-        receives_veterans_benefits: false
-      expect: true
-    - name: "Large household with low income"
+        state_median_income: 0
+      expect: false  # Above 60% SMI (48,366) and 150% FPL (30,660)
+    - name: "Large household with moderate income"
       period: 2024
       inputs:
         household_size: 6
-        annual_gross_income: 35_000
+        annual_gross_income: 55_000
         receives_tanf: false
         receives_ssi: false
         receives_snap: false
         receives_veterans_benefits: false
-      expect: true
+        state_median_income: 0
+      expect: true  # 150% FPL (62,940) > 60% SMI (48,366), income below limit
+    - name: "High income but high state SMI makes eligible"
+      period: 2024
+      inputs:
+        household_size: 1
+        annual_gross_income: 55_000
+        receives_tanf: false
+        receives_ssi: false
+        receives_snap: false
+        receives_veterans_benefits: false
+        state_median_income: 100_000
+      expect: true  # Below 60% SMI (60,000)
+
+# ============================================================================
+# Priority Populations
+# ============================================================================
 
 variable liheap_priority_household:
   entity: Household
   period: Year
   dtype: Boolean
   label: "LIHEAP Priority Household"
-  description: "Whether household qualifies for priority/enhanced benefits per 42 USC 8_624(b)(5)"
+  description: "Whether household qualifies for priority/enhanced benefits per 42 USC 8624(b)(5)"
+  reference: "42 USC 8624(b)(5)"
   syntax: python
   formula: |
     # Per 42 USC 8624(b)(5), priority goes to households with:
@@ -392,6 +548,10 @@ variable liheap_priority_household:
       inputs: {has_elderly_member: true, has_disabled_member: true, has_young_children: true}
       expect: true
 
+# ============================================================================
+# Energy Burden
+# ============================================================================
+
 variable liheap_energy_burden:
   entity: Household
   period: Year
@@ -399,6 +559,7 @@ variable liheap_energy_burden:
   unit: /1
   label: "Energy Burden"
   description: "Ratio of energy costs to income, used in benefit targeting"
+  reference: "42 USC 8624(b)(5)(A)(i)"
   syntax: python
   formula: |
     # Energy burden = annual energy costs / annual income

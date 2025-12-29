@@ -1,0 +1,67 @@
+# SNAP Definitions Statute Metadata
+# 7 USC 2012 - Definitions
+
+title: "SNAP Definitions"
+statute: "7 USC 2012"
+program: "Supplemental Nutrition Assistance Program (SNAP)"
+agency: "USDA Food and Nutrition Service"
+
+coverage:
+  subsections:
+    j:
+      title: "Elderly or disabled member"
+      file: "j.rac"
+      status: "implemented"
+      description: "Defines who qualifies as elderly (60+) or disabled for SNAP purposes"
+      variables:
+        - is_snap_elderly
+        - is_snap_disabled
+        - is_snap_elderly_or_disabled
+        - snap_household_has_elderly_or_disabled
+
+elderly_disabled_definition:
+  elderly:
+    statute: "7 USC 2012(j)(1)"
+    age_threshold: 60
+    description: "Persons 60 years of age or older"
+
+  disabled:
+    statute: "7 USC 2012(j)(2)"
+    qualifying_conditions:
+      A:
+        description: "SSI recipient"
+        program: "Supplemental Security Income under SSA Title XVI"
+      B:
+        description: "State supplemental disability benefits"
+        program: "Federally or State administered supplemental assistance meeting SSA Title XVI criteria"
+      C:
+        description: "SSA disability/blindness payments"
+        programs:
+          - "SSA Title I (Old Age Assistance)"
+          - "SSA Title II (SSDI)"
+          - "SSA Title X (Aid to the Blind)"
+          - "SSA Title XIV (Aid to the Permanently and Totally Disabled)"
+          - "SSA Title XVI (SSI)"
+      D:
+        description: "Government disability retirement"
+        criteria: "Disability considered permanent under SSA 221(i)"
+      E:
+        description: "Veterans disability"
+        subconditions:
+          i: "Service-connected or non-service-connected total disability rating from VA"
+          ii: "Veteran needing regular aid and attendance or permanently housebound"
+      F:
+        description: "Surviving spouse/child of veteran"
+        criteria: "Entitled to VA compensation/pension AND has permanent disability per SSA 221(i)"
+      G:
+        description: "Railroad disability annuity"
+        program: "Railroad Retirement Act 2(a)(1)(iv) or 2(a)(1)(v)"
+
+sources:
+  primary:
+    - url: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2012"
+      description: "Official USC text for 7 USC 2012"
+    - url: "https://www.law.cornell.edu/uscode/text/7/2012"
+      description: "Cornell LII - 7 USC 2012"
+
+last_updated: "2024-12-29"
