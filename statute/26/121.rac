@@ -45,7 +45,7 @@ parameter waiting_period:
 input years_owned:
   entity: TaxUnit
   period: Year
-  dtype: Number
+  dtype: Decimal
   label: "Years Owned"
   description: "Number of years property was owned by taxpayer in 5-year lookback"
   default: 0
@@ -53,7 +53,7 @@ input years_owned:
 input years_used_as_residence:
   entity: TaxUnit
   period: Year
-  dtype: Number
+  dtype: Decimal
   label: "Years Used as Residence"
   description: "Number of years property was used as principal residence in 5-year lookback"
   default: 0
@@ -69,7 +69,7 @@ input prior_exclusion_claimed:
 input years_since_last_exclusion:
   entity: TaxUnit
   period: Year
-  dtype: Number
+  dtype: Decimal
   label: "Years Since Last Exclusion"
   description: "Years elapsed since prior Section 121 exclusion claim (if applicable)"
   default: 3

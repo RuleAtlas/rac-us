@@ -8,7 +8,7 @@ new clean vehicle placed in service by the taxpayer during the taxable year.
 input new_clean_vehicle_battery_capacity_kwh:
   entity: TaxUnit
   period: Year
-  dtype: Number
+  dtype: Decimal
   unit: "kWh"
   label: "New Clean Vehicle Battery Capacity"
   description: "Battery capacity in kilowatt-hours of new clean vehicle"

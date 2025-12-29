@@ -1,4 +1,3 @@
-# 26 USC Section 24 - Child Tax Credit
 #
 # This file re-exports the key CTC variables from subsection files.
 # All calculation logic lives in the proper subsection files:
