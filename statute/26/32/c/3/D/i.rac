@@ -1,51 +1,22 @@
-# statute/26/32/c/3/D/i.rac - EITC Qualifying Child TIN Requirement
+# 26 USC § 32(c)(3)(D)(i) - Qualifying Child TIN Requirement
 
 text: """
-26 USC 32(c)(3)(D) Identification requirements
-
-(i) Qualifying child identification requirement
-The term "qualifying child" shall not include any individual who does not have
-a taxpayer identification number.
-
-Note: For EITC purposes, a "taxpayer identification number" for a qualifying
-child must be a Social Security Number (SSN) that is valid for employment.
-An ITIN or ATIN does not satisfy this requirement per IRS guidance.
+(i) In general.— The term "qualifying child" shall not be taken into account
+under subsection (b) unless the taxpayer includes the name, age, and TIN of
+the qualifying child on the return of tax for the taxable year.
 """
 
-variable child_has_valid_tin:
+# Note: Per 26 USC 32(m), for purposes of 32(c)(3)(D), "taxpayer identification
+# number" means a social security number issued by SSA. The SSN must be valid
+# for employment per 26 USC 32(m)(2), but that provision is encoded in 32/m.rac.
+
+input child_tin_on_return:
   entity: Person
   period: Year
   dtype: Boolean
-  label: "Child has valid TIN for EITC"
-  description: "Whether a child has a valid taxpayer identification number (SSN valid for employment) as required by 26 USC 32(c)(3)(D)(i) to be a qualifying child for EITC"
-  tests:
-    - name: "Child with valid SSN"
-      period: 2024
-      inputs:
-        child_has_valid_tin: true
-      expect: true
-    - name: "Child without valid TIN"
-      period: 2024
-      inputs:
-        child_has_valid_tin: false
-      expect: false
-    - name: "Newborn with SSN obtained"
-      period: 2024
-      inputs:
-        child_has_valid_tin: true
-      expect: true
-    - name: "Child with ITIN only - not valid for EITC"
-      period: 2024
-      inputs:
-        child_has_valid_tin: false
-      expect: false
-    - name: "Adopted child with ATIN only - not valid for EITC"
-      period: 2024
-      inputs:
-        child_has_valid_tin: false
-      expect: false
-    - name: "Child with SSN valid for employment"
-      period: 2024
-      inputs:
-        child_has_valid_tin: true
-      expect: true
+  label: "Child TIN on Return"
+  description: "Whether taxpayer included name, age, and TIN for this child on tax return"
+  default: false
+# Note: This is an input variable - tests would verify downstream usage
+# in the qualifying_child determination. The SSN validity checks are
+# in 32/m.rac which handles the SSN requirements.

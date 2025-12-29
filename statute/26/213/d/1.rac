@@ -1,5 +1,6 @@
+# 26 USC § 213(d)(1) - Definition of Medical Care
+
 text: """
-(d) Definitions.—For purposes of this section—
 (1) The term 'medical care' means amounts paid—
 (A) for the diagnosis, cure, mitigation, treatment, or prevention
 of disease, or for the purpose of affecting any structure or
@@ -11,17 +12,19 @@ referred to in subparagraph (A),
 title XVIII of the Social Security Act) covering medical care
 referred to in subparagraphs (A) and (B) or for any qualified
 long-term care insurance contract (as defined in section 7702B(b)).
-Per 213(a), qualifying expenses must be:
-- Not compensated by insurance or otherwise
-- For taxpayer, spouse, or dependent (per Section 152)
 """
+
+# Note: Related provisions:
+# - 213(a): Expenses must be unreimbursed and for taxpayer/spouse/dependent
+# - 213(d)(9): Cosmetic surgery exclusion
+# - 213(d)(10): LTC premium limits by age
 variable qualified_medical_expenses:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
   label: "Qualifying Medical Expenses"
-  description: "Medical expenses eligible for deduction per 26 USC 213(d), net of insurance reimbursement"
+  description: "Medical expenses eligible for deduction, net of insurance reimbursement"
   syntax: python
   formula: |
     # Step 1: Start with gross medical expenses paid during taxable year
