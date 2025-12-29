@@ -47,6 +47,31 @@ variable hcv_voucher_size:
     additional_bedrooms = ceil(additional_members / persons_per_bedroom)
     return head_spouse_bedrooms + additional_bedrooms
   default: 1
+  tests:
+    - name: "Single person household"
+      period: 2024
+      inputs:
+        household_size: 1
+        head_spouse_bedrooms: 1
+      expect: 1
+    - name: "Couple (2 persons)"
+      period: 2024
+      inputs:
+        household_size: 2
+        head_spouse_bedrooms: 1
+      expect: 2
+    - name: "Family of 4"
+      period: 2024
+      inputs:
+        household_size: 4
+        head_spouse_bedrooms: 1
+      expect: 3
+    - name: "Large family of 6"
+      period: 2024
+      inputs:
+        household_size: 6
+        head_spouse_bedrooms: 1
+      expect: 4
 
 variable hcv_payment_standard:
   entity: Household
@@ -68,6 +93,22 @@ variable hcv_payment_standard:
         base = standards[max_bedroom_count]
         return base + ((voucher_size - max_bedroom_count) * additional)
   default: 0
+  tests:
+    - name: "1 bedroom payment standard"
+      period: 2024-01
+      inputs:
+        hcv_voucher_size: 1
+      expect: 1200
+    - name: "2 bedroom payment standard"
+      period: 2024-01
+      inputs:
+        hcv_voucher_size: 2
+      expect: 1400
+    - name: "3 bedroom payment standard"
+      period: 2024-01
+      inputs:
+        hcv_voucher_size: 3
+      expect: 1800
 
 variable hcv_gross_rent:
   entity: Household
@@ -82,6 +123,25 @@ variable hcv_gross_rent:
     # Utility allowance = PHA estimate of tenant-paid utilities
     return contract_rent + utility_allowance
   default: 0
+  tests:
+    - name: "Rent only, no utilities"
+      period: 2024-01
+      inputs:
+        contract_rent: 1200
+        utility_allowance: 0
+      expect: 1200
+    - name: "Rent with utility allowance"
+      period: 2024-01
+      inputs:
+        contract_rent: 1000
+        utility_allowance: 150
+      expect: 1150
+    - name: "High rent with utilities"
+      period: 2024-01
+      inputs:
+        contract_rent: 1500
+        utility_allowance: 200
+      expect: 1700
 
 variable hcv_housing_assistance_payment:
   entity: Household
@@ -105,6 +165,39 @@ variable hcv_housing_assistance_payment:
     # HAP cannot be negative
     return max(0, hap)
   default: 0
+  tests:
+    - name: "Not eligible - no HAP"
+      period: 2024-01
+      inputs:
+        hcv_eligible: false
+        hcv_payment_standard: 1400
+        hcv_gross_rent: 1200
+        hcv_total_tenant_payment: 400
+      expect: 0
+    - name: "Rent below payment standard"
+      period: 2024-01
+      inputs:
+        hcv_eligible: true
+        hcv_payment_standard: 1400
+        hcv_gross_rent: 1200
+        hcv_total_tenant_payment: 400
+      expect: 800
+    - name: "Rent above payment standard"
+      period: 2024-01
+      inputs:
+        hcv_eligible: true
+        hcv_payment_standard: 1400
+        hcv_gross_rent: 1600
+        hcv_total_tenant_payment: 400
+      expect: 1000
+    - name: "High TTP reduces HAP"
+      period: 2024-01
+      inputs:
+        hcv_eligible: true
+        hcv_payment_standard: 1400
+        hcv_gross_rent: 1200
+        hcv_total_tenant_payment: 1000
+      expect: 200
 
 variable hcv_rent_reasonable:
   entity: Household
@@ -122,6 +215,25 @@ variable hcv_rent_reasonable:
         return True
     return False
   default: True
+  tests:
+    - name: "Rent at payment standard - reasonable"
+      period: 2024-01
+      inputs:
+        hcv_payment_standard: 1400
+        hcv_gross_rent: 1400
+      expect: true
+    - name: "Rent below payment standard - reasonable"
+      period: 2024-01
+      inputs:
+        hcv_payment_standard: 1400
+        hcv_gross_rent: 1200
+      expect: true
+    - name: "Rent above payment standard - not reasonable"
+      period: 2024-01
+      inputs:
+        hcv_payment_standard: 1400
+        hcv_gross_rent: 1500
+      expect: false
 
 variable hcv_initial_affordability_check:
   entity: Household
@@ -139,6 +251,28 @@ variable hcv_initial_affordability_check:
         return True
     return False
   default: True
+  tests:
+    - name: "Affordable - family share below 40%"
+      period: 2024-01
+      inputs:
+        hcv_gross_rent: 1200
+        hcv_housing_assistance_payment: 800
+        hcv_monthly_adjusted_income: 2000
+      expect: true
+    - name: "Affordable - family share at 40%"
+      period: 2024-01
+      inputs:
+        hcv_gross_rent: 1200
+        hcv_housing_assistance_payment: 400
+        hcv_monthly_adjusted_income: 2000
+      expect: true
+    - name: "Not affordable - family share exceeds 40%"
+      period: 2024-01
+      inputs:
+        hcv_gross_rent: 1500
+        hcv_housing_assistance_payment: 400
+        hcv_monthly_adjusted_income: 2000
+      expect: false
 
 variable hcv_family_payment:
   entity: Household
@@ -154,6 +288,25 @@ variable hcv_family_payment:
     family_share = hcv_gross_rent - hcv_housing_assistance_payment
     return max(0, family_share)
   default: 0
+  tests:
+    - name: "Standard family payment"
+      period: 2024-01
+      inputs:
+        hcv_gross_rent: 1200
+        hcv_housing_assistance_payment: 800
+      expect: 400
+    - name: "Full HAP covers rent"
+      period: 2024-01
+      inputs:
+        hcv_gross_rent: 800
+        hcv_housing_assistance_payment: 800
+      expect: 0
+    - name: "High rent - higher family payment"
+      period: 2024-01
+      inputs:
+        hcv_gross_rent: 1600
+        hcv_housing_assistance_payment: 900
+      expect: 700
 
 variable hcv_payment_to_owner:
   entity: Household
@@ -170,6 +323,25 @@ variable hcv_payment_to_owner:
     # Payment to owner cannot exceed contract rent
     return min(hap, contract_rent)
   default: 0
+  tests:
+    - name: "HAP less than contract rent"
+      period: 2024-01
+      inputs:
+        hcv_housing_assistance_payment: 800
+        contract_rent: 1200
+      expect: 800
+    - name: "HAP equals contract rent"
+      period: 2024-01
+      inputs:
+        hcv_housing_assistance_payment: 1000
+        contract_rent: 1000
+      expect: 1000
+    - name: "HAP exceeds contract rent - capped"
+      period: 2024-01
+      inputs:
+        hcv_housing_assistance_payment: 1200
+        contract_rent: 900
+      expect: 900
 
 variable hcv:
   entity: Household

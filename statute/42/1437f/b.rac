@@ -18,6 +18,31 @@ variable hcv_childcare_deduction:
     max_deduction = employment_income  # Cannot exceed income earned
     return min(childcare_expense, max_deduction)
   default: 0
+  tests:
+    - name: "No childcare expenses"
+      period: 2024
+      inputs:
+        childcare_expense: 0
+        employment_income: 20_000
+      expect: 0
+    - name: "Childcare less than income"
+      period: 2024
+      inputs:
+        childcare_expense: 5_000
+        employment_income: 20_000
+      expect: 5000
+    - name: "Childcare exceeds income - capped"
+      period: 2024
+      inputs:
+        childcare_expense: 25_000
+        employment_income: 20_000
+      expect: 20000
+    - name: "No employment income - no deduction"
+      period: 2024
+      inputs:
+        childcare_expense: 5_000
+        employment_income: 0
+      expect: 0
 
 variable hcv_medical_deduction:
   entity: Household
@@ -38,6 +63,35 @@ variable hcv_medical_deduction:
     excess = medical_expense - threshold
     return max(0, excess)
   default: 0
+  tests:
+    - name: "Not elderly/disabled - no deduction"
+      period: 2024
+      inputs:
+        has_elderly_disabled: false
+        medical_expense: 5_000
+        hcv_annual_income: 30_000
+      expect: 0
+    - name: "Elderly with expenses over threshold"
+      period: 2024
+      inputs:
+        has_elderly_disabled: true
+        medical_expense: 2_000
+        hcv_annual_income: 30_000
+      expect: 1100
+    - name: "Elderly with expenses below threshold"
+      period: 2024
+      inputs:
+        has_elderly_disabled: true
+        medical_expense: 500
+        hcv_annual_income: 30_000
+      expect: 0
+    - name: "Disabled with high expenses"
+      period: 2024
+      inputs:
+        has_elderly_disabled: true
+        medical_expense: 10_000
+        hcv_annual_income: 20_000
+      expect: 9400
 
 variable hcv_disability_assistance_deduction:
   entity: Household
@@ -57,6 +111,35 @@ variable hcv_disability_assistance_deduction:
     # Deduction limited to income earned
     return min(disability_assistance_expense, employment_income)
   default: 0
+  tests:
+    - name: "No disability expense"
+      period: 2024
+      inputs:
+        has_disability_expense: false
+        disability_assistance_expense: 0
+        employment_income: 20_000
+      expect: 0
+    - name: "Expense less than income"
+      period: 2024
+      inputs:
+        has_disability_expense: true
+        disability_assistance_expense: 5_000
+        employment_income: 20_000
+      expect: 5000
+    - name: "Expense exceeds income - capped"
+      period: 2024
+      inputs:
+        has_disability_expense: true
+        disability_assistance_expense: 25_000
+        employment_income: 18_000
+      expect: 18000
+    - name: "No employment income - no deduction"
+      period: 2024
+      inputs:
+        has_disability_expense: true
+        disability_assistance_expense: 5_000
+        employment_income: 0
+      expect: 0
 
 variable hcv_monthly_adjusted_income:
   entity: Household
