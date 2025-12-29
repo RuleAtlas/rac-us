@@ -14,4 +14,14 @@ parameter basic_single:
   unit: "USD"
   indexed_by: statute/26/63/c/4
   values:
-    1988-01-01: 3000
+    1988-01-01: 3_000
+  tests:
+    - name: "Base statutory amount 1988"
+      period: 1988
+      expect: 3_000
+    - name: "Base statutory amount 1990"
+      period: 1990
+      expect: 3_000
+    - name: "Base statutory amount 2024"
+      period: 2024
+      expect: 3_000

@@ -12,3 +12,10 @@ parameter aged_threshold:
   reference: "26 USC 63(f)(1)"
   values:
     1988-01-01: 65
+  tests:
+    - name: "Statutory threshold 1988"
+      period: 1988
+      expect: 65
+    - name: "Threshold unchanged 2024 (not indexed)"
+      period: 2024
+      expect: 65

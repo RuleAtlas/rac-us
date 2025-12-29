@@ -32,3 +32,43 @@ variable distributions:
         roth_taxable = max(0, roth_401k_distribution - roth_401k_contribution_basis)
     return traditional_taxable + roth_taxable
   default: 0
+  tests:
+    - name: "Traditional 401k distribution, fully taxable"
+      period: 2024
+      inputs:
+        traditional_401k_distribution: 50_000
+        roth_401k_distribution: 0
+        roth_401k_5_year_satisfied: false
+        age: 65
+        early_withdrawal_penalty_age: 59.5
+      expect: 50_000  # Traditional is fully taxable
+    - name: "Qualified Roth distribution, tax-free"
+      period: 2024
+      inputs:
+        traditional_401k_distribution: 0
+        roth_401k_distribution: 30_000
+        roth_401k_5_year_satisfied: true
+        roth_401k_contribution_basis: 25_000
+        age: 62
+        early_withdrawal_penalty_age: 59.5
+      expect: 0  # Qualified Roth is entirely tax-free
+    - name: "Non-qualified Roth, earnings taxable"
+      period: 2024
+      inputs:
+        traditional_401k_distribution: 0
+        roth_401k_distribution: 40_000
+        roth_401k_5_year_satisfied: false
+        roth_401k_contribution_basis: 30_000
+        age: 45
+        early_withdrawal_penalty_age: 59.5
+      expect: 10_000  # Only earnings (40_000 - 30_000) are taxable
+    - name: "Mixed distributions"
+      period: 2024
+      inputs:
+        traditional_401k_distribution: 20_000
+        roth_401k_distribution: 15_000
+        roth_401k_5_year_satisfied: true
+        roth_401k_contribution_basis: 10_000
+        age: 60
+        early_withdrawal_penalty_age: 59.5
+      expect: 20_000  # Traditional taxable, qualified Roth tax-free

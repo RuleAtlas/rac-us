@@ -17,3 +17,20 @@ parameter refundable_max:
   indexed_by: statute/26/24/h/5/B
   values:
     2018-01-01: 1400
+  tests:
+    - name: "tcja_base_2018"
+      description: "Base refundable maximum in first year of TCJA"
+      period: 2018
+      expect: 1_400
+    - name: "tcja_indexed_2024"
+      description: "Refundable maximum during TCJA period (indexed)"
+      period: 2024
+      expect: 1_400
+    - name: "tcja_indexed_2019"
+      description: "Refundable maximum first indexed year"
+      period: 2019
+      expect: 1_400
+    - name: "tcja_final_2025"
+      description: "Refundable maximum in last year of TCJA"
+      period: 2025
+      expect: 1_400

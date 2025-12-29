@@ -44,3 +44,32 @@ variable alimony_income:
     # but the controlling factor is the agreement date, not the tax year
     return alimony_received * alimony_income_inclusion_rate
   default: 0
+  tests:
+    - name: "Pre-2019 agreement, full inclusion"
+      period: 2024
+      inputs:
+        is_pre_2019_divorce_agreement: true
+        alimony_received: 24_000
+        alimony_income_inclusion_rate: 1.0
+      expect: 24_000  # Fully includible in gross income
+    - name: "Post-2018 agreement, no inclusion"
+      period: 2024
+      inputs:
+        is_pre_2019_divorce_agreement: false
+        alimony_received: 36_000
+        alimony_income_inclusion_rate: 1.0
+      expect: 0  # TCJA eliminated alimony income for post-2018 agreements
+    - name: "Pre-2019 agreement, no alimony received"
+      period: 2024
+      inputs:
+        is_pre_2019_divorce_agreement: true
+        alimony_received: 0
+        alimony_income_inclusion_rate: 1.0
+      expect: 0  # No alimony to include
+    - name: "Pre-2019 agreement, partial inclusion rate"
+      period: 2024
+      inputs:
+        is_pre_2019_divorce_agreement: true
+        alimony_received: 20_000
+        alimony_income_inclusion_rate: 0.5
+      expect: 10_000  # Hypothetical partial rate scenario

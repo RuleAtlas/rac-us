@@ -12,4 +12,14 @@ parameter basic_head_of_household:
   unit: "USD"
   indexed_by: statute/26/63/c/4
   values:
-    1988-01-01: 4400
+    1988-01-01: 4_400
+  tests:
+    - name: "Base statutory amount 1988"
+      period: 1988
+      expect: 4_400
+    - name: "Base statutory amount 1989"
+      period: 1989
+      expect: 4_400
+    - name: "Base statutory amount 2024"
+      period: 2024
+      expect: 4_400

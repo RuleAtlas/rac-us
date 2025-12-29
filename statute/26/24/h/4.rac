@@ -18,3 +18,20 @@ parameter other_dependent_credit:
   values:
     2026-01-01: 0    # TCJA sunset - no ODC before TCJA
     2018-01-01: 500  # TCJA created ODC
+  tests:
+    - name: "tcja_period_2024"
+      description: "ODC amount during TCJA period"
+      period: 2024
+      expect: 500
+    - name: "tcja_first_year_2018"
+      description: "ODC in first year TCJA created it"
+      period: 2018
+      expect: 500
+    - name: "tcja_final_year_2025"
+      description: "ODC in last year of TCJA"
+      period: 2025
+      expect: 500
+    - name: "post_tcja_sunset_2026"
+      description: "ODC reverts to zero after TCJA sunset"
+      period: 2026
+      expect: 0

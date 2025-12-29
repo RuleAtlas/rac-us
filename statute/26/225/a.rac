@@ -42,3 +42,53 @@ variable qualified_overtime_deduction:
     # Deduction = capped amount minus phase-out reduction, but not below zero
     return max(0, capped_deduction - reduction)
   default: 0
+  tests:
+    - name: "Single filer below phaseout threshold"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        qualified_overtime_compensation: 8_000
+        adjusted_gross_income: 100_000
+        foreign_earned_income_exclusion: 0
+        guam_income_exclusion: 0
+        american_samoa_income_exclusion: 0
+        max_deduction_single: 10_000
+        phaseout_threshold_single: 150_000
+        tax_year: 2024
+        termination_final_year: 2028
+      expect: 8_000  # Full deduction, no phaseout
+    - name: "Married filing separately, no deduction"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        qualified_overtime_compensation: 10_000
+        adjusted_gross_income: 80_000
+        max_deduction_joint: 20_000
+        tax_year: 2024
+        termination_final_year: 2028
+      expect: 0  # MFS not allowed
+    - name: "Joint filers with phaseout"
+      period: 2024
+      inputs:
+        filing_status: JOINT
+        qualified_overtime_compensation: 15_000
+        adjusted_gross_income: 250_000
+        foreign_earned_income_exclusion: 0
+        guam_income_exclusion: 0
+        american_samoa_income_exclusion: 0
+        max_deduction_joint: 20_000
+        phaseout_threshold_joint: 200_000
+        phaseout_income_increment: 1_000
+        phaseout_reduction_per_increment: 100
+        tax_year: 2024
+        termination_final_year: 2028
+      expect: 10_000  # 15_000 - (50 * 100) = 15_000 - 5_000
+    - name: "After termination year, no deduction"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        qualified_overtime_compensation: 5_000
+        adjusted_gross_income: 75_000
+        tax_year: 2030
+        termination_final_year: 2028
+      expect: 0  # Provision has sunset

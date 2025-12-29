@@ -82,3 +82,37 @@ variable sstb:
     excess = taxable_income - threshold
     return 1.0 - (excess / phaseout_range)
   default: 0
+  tests:
+    # ============================================================================
+    # SSTB APPLICABLE PERCENTAGE TESTS - 26 USC 199A(d)(3)
+    # Tests phase-in percentage for specified service trade or business income
+    # Single filers: threshold $157,500, phaseout range $50,000
+    # Joint filers: threshold $315,000, phaseout range $100,000
+    # ============================================================================
+    - name: "Single filer below threshold - 100% applies"
+      period: 2024
+      inputs:
+        taxable_income: 150_000
+        filing_status: SINGLE
+      expect: 1.0  # Below $157,500 threshold
+
+    - name: "Single filer above phaseout - 0% applies"
+      period: 2024
+      inputs:
+        taxable_income: 220_000
+        filing_status: SINGLE
+      expect: 0.0  # Above $207,500 ($157,500 + $50,000)
+
+    - name: "Joint filer mid-phaseout - partial percentage"
+      period: 2024
+      inputs:
+        taxable_income: 365_000
+        filing_status: JOINT
+      expect: 0.5  # ($365,000 - $315,000) / $100,000 = 0.5 reduction, so 1.0 - 0.5 = 0.5
+
+    - name: "Joint filer at threshold - 100% applies"
+      period: 2024
+      inputs:
+        taxable_income: 315_000
+        filing_status: JOINT
+      expect: 1.0  # Exactly at threshold

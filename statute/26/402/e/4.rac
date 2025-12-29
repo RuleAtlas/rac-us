@@ -47,3 +47,56 @@ variable early_withdrawal:
     # If none of the exceptions apply, penalty applies
     return True
   default: 0
+  tests:
+    - name: "Early withdrawal, no exceptions"
+      period: 2024
+      inputs:
+        taxable_401k_distribution: 25_000
+        age: 45
+        early_withdrawal_penalty_age: 59.5
+        is_death_distribution: false
+        is_disabled: false
+        is_sepp_distribution: false
+        is_qdro_distribution: false
+        is_age_55_separation_distribution: false
+        is_terminal_illness_distribution: false
+      expect: true  # Penalty applies
+    - name: "Age 59.5 or older, no penalty"
+      period: 2024
+      inputs:
+        taxable_401k_distribution: 30_000
+        age: 60
+        early_withdrawal_penalty_age: 59.5
+        is_death_distribution: false
+        is_disabled: false
+        is_sepp_distribution: false
+        is_qdro_distribution: false
+        is_age_55_separation_distribution: false
+        is_terminal_illness_distribution: false
+      expect: false  # Age exception
+    - name: "Disability exception"
+      period: 2024
+      inputs:
+        taxable_401k_distribution: 20_000
+        age: 40
+        early_withdrawal_penalty_age: 59.5
+        is_death_distribution: false
+        is_disabled: true
+        is_sepp_distribution: false
+        is_qdro_distribution: false
+        is_age_55_separation_distribution: false
+        is_terminal_illness_distribution: false
+      expect: false  # Disability exception
+    - name: "No taxable distribution"
+      period: 2024
+      inputs:
+        taxable_401k_distribution: 0
+        age: 35
+        early_withdrawal_penalty_age: 59.5
+        is_death_distribution: false
+        is_disabled: false
+        is_sepp_distribution: false
+        is_qdro_distribution: false
+        is_age_55_separation_distribution: false
+        is_terminal_illness_distribution: false
+      expect: false  # No distribution means no penalty

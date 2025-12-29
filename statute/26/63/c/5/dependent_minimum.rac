@@ -17,3 +17,13 @@ parameter dependent_minimum:
   indexed_by: statute/26/63/c/4
   values:
     1988-01-01: 500
+  tests:
+    - name: "Base statutory amount 1988"
+      period: 1988
+      expect: 500
+    - name: "Base statutory amount 2010"
+      period: 2010
+      expect: 500
+    - name: "Base statutory amount 2024"
+      period: 2024
+      expect: 500

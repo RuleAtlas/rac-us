@@ -16,3 +16,23 @@ variable qualified_overtime_compensation:
   label: "Qualified Overtime Compensation"
   description: "Overtime premium for FLSA Section 7 covered employees (the excess over regular rate)"
   default: 0
+  tests:
+    - name: "Standard overtime premium"
+      period: 2024
+      inputs:
+        qualified_overtime_compensation: 5_000
+      expect: 5_000  # Input variable, returns as provided
+    - name: "No overtime"
+      period: 2024
+      inputs:
+        qualified_overtime_compensation: 0
+      expect: 0
+    - name: "High overtime premium"
+      period: 2024
+      inputs:
+        qualified_overtime_compensation: 15_000
+      expect: 15_000
+    - name: "Default value"
+      period: 2024
+      inputs: {}
+      expect: 0  # Default is 0 when not provided

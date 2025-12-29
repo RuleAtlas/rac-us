@@ -34,3 +34,35 @@ variable qualified_business_income:
   description: "QBI after loss carryforward adjustment"
   formula: return max(0, qualified_business_income - qualified_business_income_loss_carryforward)
   default: 0
+  tests:
+    # ============================================================================
+    # QUALIFIED BUSINESS INCOME TESTS - 26 USC 199A(c)
+    # Tests net QBI after loss carryforward adjustment per 199A(c)(2)
+    # ============================================================================
+    - name: "No loss carryforward - full QBI passes through"
+      period: 2024
+      inputs:
+        qualified_business_income: 100_000
+        qualified_business_income_loss_carryforward: 0
+      expect: 100_000  # max(0, 100_000 - 0) = 100_000
+
+    - name: "Partial loss carryforward reduces QBI"
+      period: 2024
+      inputs:
+        qualified_business_income: 100_000
+        qualified_business_income_loss_carryforward: 30_000
+      expect: 70_000  # max(0, 100_000 - 30_000) = 70_000
+
+    - name: "Loss carryforward exceeds QBI - floors at zero"
+      period: 2024
+      inputs:
+        qualified_business_income: 50_000
+        qualified_business_income_loss_carryforward: 80_000
+      expect: 0  # max(0, 50_000 - 80_000) = max(0, -30_000) = 0
+
+    - name: "Equal QBI and loss carryforward - nets to zero"
+      period: 2024
+      inputs:
+        qualified_business_income: 75_000
+        qualified_business_income_loss_carryforward: 75_000
+      expect: 0  # max(0, 75_000 - 75_000) = 0

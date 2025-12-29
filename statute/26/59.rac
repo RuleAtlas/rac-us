@@ -42,3 +42,32 @@ variable special_rules:
     foreign_ratio = foreign_source_income / worldwide_income
     return amti * foreign_ratio
   default: 0
+  tests:
+    - name: "Foreign income portion of AMTI"
+      period: 2024
+      inputs:
+        foreign_source_income: 50_000
+        worldwide_income: 200_000
+        amti: 180_000
+      expect: 45_000  # 50_000/200_000 * 180_000 = 0.25 * 180_000
+    - name: "All income is foreign"
+      period: 2024
+      inputs:
+        foreign_source_income: 100_000
+        worldwide_income: 100_000
+        amti: 90_000
+      expect: 90_000  # 100% foreign ratio
+    - name: "No foreign income"
+      period: 2024
+      inputs:
+        foreign_source_income: 0
+        worldwide_income: 150_000
+        amti: 140_000
+      expect: 0  # 0% foreign ratio
+    - name: "Zero worldwide income"
+      period: 2024
+      inputs:
+        foreign_source_income: 10_000
+        worldwide_income: 0
+        amti: 50_000
+      expect: 0  # Division by zero protection

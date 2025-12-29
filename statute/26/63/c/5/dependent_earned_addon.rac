@@ -13,3 +13,13 @@ parameter dependent_earned_addon:
   indexed_by: statute/26/63/c/4
   values:
     1988-01-01: 250
+  tests:
+    - name: "Base statutory amount 1988"
+      period: 1988
+      expect: 250
+    - name: "Base statutory amount 2000"
+      period: 2000
+      expect: 250
+    - name: "Base statutory amount 2024"
+      period: 2024
+      expect: 250

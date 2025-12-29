@@ -13,3 +13,13 @@ parameter additional_blind_unmarried:
   indexed_by: statute/26/63/f/3
   values:
     1988-01-01: 750
+  tests:
+    - name: "Base statutory value 1988"
+      period: 1988
+      expect: 750
+    - name: "Indexed value 2023 (Rev. Proc. 2022-38)"
+      period: 2023
+      expect: 1_850
+    - name: "Indexed value 2024 (Rev. Proc. 2023-34)"
+      period: 2024
+      expect: 1_950

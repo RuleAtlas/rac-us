@@ -57,3 +57,52 @@ variable applicable_percentage:
     # 0% rate: AGI above third threshold - no credit
     return 0
   default: 0
+  tests:
+    # ============================================================================
+    # SAVER'S CREDIT APPLICABLE PERCENTAGE TESTS - 26 USC 25B(b)
+    # Tests credit rate based on AGI and filing status
+    # Joint thresholds (2024): $43,500 (50%), $47,500 (20%), $73,000 (10%)
+    # ============================================================================
+    - name: "Joint filer in 50% tier - lowest AGI"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 40_000
+        filing_status: JOINT
+        joint_threshold_50: 43_500
+        joint_threshold_20: 47_500
+        joint_threshold_10: 73_000
+        threshold_adjustments: {JOINT: 1.0, SINGLE: 0.5, HEAD_OF_HOUSEHOLD: 0.75}
+      expect: 0.50  # AGI $40,000 <= $43,500 threshold
+
+    - name: "Joint filer in 20% tier"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 45_000
+        filing_status: JOINT
+        joint_threshold_50: 43_500
+        joint_threshold_20: 47_500
+        joint_threshold_10: 73_000
+        threshold_adjustments: {JOINT: 1.0, SINGLE: 0.5, HEAD_OF_HOUSEHOLD: 0.75}
+      expect: 0.20  # AGI $45,000 > $43,500 but <= $47,500
+
+    - name: "Joint filer in 10% tier"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 60_000
+        filing_status: JOINT
+        joint_threshold_50: 43_500
+        joint_threshold_20: 47_500
+        joint_threshold_10: 73_000
+        threshold_adjustments: {JOINT: 1.0, SINGLE: 0.5, HEAD_OF_HOUSEHOLD: 0.75}
+      expect: 0.10  # AGI $60,000 > $47,500 but <= $73,000
+
+    - name: "Joint filer above all thresholds - no credit"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 80_000
+        filing_status: JOINT
+        joint_threshold_50: 43_500
+        joint_threshold_20: 47_500
+        joint_threshold_10: 73_000
+        threshold_adjustments: {JOINT: 1.0, SINGLE: 0.5, HEAD_OF_HOUSEHOLD: 0.75}
+      expect: 0  # AGI $80,000 > $73,000

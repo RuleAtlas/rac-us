@@ -31,3 +31,48 @@ variable eligible_individual:
     # All conditions must be met
     return meets_age_requirement and is_filer and not_dependent_elsewhere and not_a_student
   default: False
+  tests:
+    # ============================================================================
+    # ELIGIBLE INDIVIDUAL TESTS - 26 USC 25B(c)
+    # Tests eligibility for Saver's Credit per 25B(c)(1) and (2)
+    # Must be: age 18+, filer (head/spouse), not dependent elsewhere, not student
+    # ============================================================================
+    - name: "Eligible adult filer - meets all requirements"
+      period: 2024
+      inputs:
+        age: 35
+        is_tax_unit_head_or_spouse: True
+        claimed_as_dependent_on_another_return: False
+        is_full_time_student: False
+        minimum_age: 18
+      expect: True
+
+    - name: "Under 18 - not eligible per 25B(c)(1)"
+      period: 2024
+      inputs:
+        age: 17
+        is_tax_unit_head_or_spouse: True
+        claimed_as_dependent_on_another_return: False
+        is_full_time_student: False
+        minimum_age: 18
+      expect: False
+
+    - name: "Full-time student - not eligible per 25B(c)(2)(B)"
+      period: 2024
+      inputs:
+        age: 22
+        is_tax_unit_head_or_spouse: True
+        claimed_as_dependent_on_another_return: False
+        is_full_time_student: True
+        minimum_age: 18
+      expect: False
+
+    - name: "Claimed as dependent elsewhere - not eligible per 25B(c)(2)(A)"
+      period: 2024
+      inputs:
+        age: 25
+        is_tax_unit_head_or_spouse: True
+        claimed_as_dependent_on_another_return: True
+        is_full_time_student: False
+        minimum_age: 18
+      expect: False

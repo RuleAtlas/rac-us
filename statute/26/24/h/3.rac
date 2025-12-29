@@ -15,6 +15,23 @@ parameter phaseout_threshold_joint:
     2026-01-01: 110000  # TCJA sunset - revert to pre-TCJA
     2018-01-01: 400000  # TCJA
     1997-01-01: 110000  # TRA97 original
+  tests:
+    - name: "tcja_joint_2024"
+      description: "Joint filer threshold during TCJA period"
+      period: 2024
+      expect: 400_000
+    - name: "tcja_joint_2018"
+      description: "Joint filer threshold in first year of TCJA"
+      period: 2018
+      expect: 400_000
+    - name: "post_tcja_sunset_joint_2026"
+      description: "Joint filer threshold reverts after TCJA sunset"
+      period: 2026
+      expect: 110_000
+    - name: "pre_tcja_joint_2017"
+      description: "Joint filer threshold before TCJA"
+      period: 2017
+      expect: 110_000
 
 parameter phaseout_threshold_other:
   description: "CTC phaseout threshold for all filing statuses except joint under TCJA"
@@ -24,3 +41,20 @@ parameter phaseout_threshold_other:
     2026-01-01: 75000   # TCJA sunset - revert to pre-TCJA
     2018-01-01: 200000  # TCJA
     1997-01-01: 75000   # TRA97 original
+  tests:
+    - name: "tcja_other_2024"
+      description: "Non-joint filer threshold during TCJA period"
+      period: 2024
+      expect: 200_000
+    - name: "tcja_other_2018"
+      description: "Non-joint filer threshold in first year of TCJA"
+      period: 2018
+      expect: 200_000
+    - name: "post_tcja_sunset_other_2026"
+      description: "Non-joint filer threshold reverts after TCJA sunset"
+      period: 2026
+      expect: 75_000
+    - name: "pre_tcja_other_2017"
+      description: "Non-joint filer threshold before TCJA"
+      period: 2017
+      expect: 75_000
