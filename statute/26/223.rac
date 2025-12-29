@@ -71,45 +71,45 @@ input months_of_coverage:
   default: 12
 
 # Parameters
+# 26 USC 223(b)(2)(A) - Self-only coverage limit
 parameter hsa_limit_self_only:
-  values:
-    2024-01-01: 4150
+  description: "Maximum annual HSA contribution for self-only HDHP coverage"
+  reference: "26 USC 223(b)(2)(A)"
   unit: "USD"
-  period: Year
-  label: "HSA Annual Limit - Self-Only Coverage"
-  description: "Maximum annual HSA contribution for self-only HDHP coverage (2024)"
+  values:
+    2024-01-01: 4_150
 
+# 26 USC 223(b)(2)(B) - Family coverage limit
 parameter hsa_limit_family:
-  values:
-    2024-01-01: 8300
+  description: "Maximum annual HSA contribution for family HDHP coverage"
+  reference: "26 USC 223(b)(2)(B)"
   unit: "USD"
-  period: Year
-  label: "HSA Annual Limit - Family Coverage"
-  description: "Maximum annual HSA contribution for family HDHP coverage (2024)"
+  values:
+    2024-01-01: 8_300
 
+# 26 USC 223(b)(3)(B) - Catch-up contribution amount
 parameter hsa_catchup_contribution:
-  values:
-    2024-01-01: 1000
-  unit: "USD"
-  period: Year
-  label: "HSA Catch-up Contribution (Age 55+)"
   description: "Additional annual HSA contribution allowed for individuals age 55+"
+  reference: "26 USC 223(b)(3)(B)"
+  unit: "USD"
+  values:
+    2024-01-01: 1_000
 
+# 26 USC 223(b)(3)(A) - Catch-up age threshold
 parameter catchup_age_threshold:
+  description: "Minimum age to qualify for HSA catch-up contributions"
+  reference: "26 USC 223(b)(3)(A)"
+  unit: "years"
   values:
     1977-01-01: 55
-  unit: "/1"
-  period: Year
-  label: "Age Threshold for Catch-up Contributions"
-  description: "Minimum age to qualify for HSA catch-up contributions"
 
+# Constant - months per year for proration
 parameter months_per_year:
+  description: "Number of months in a calendar year for proration"
+  reference: "26 USC 223(b)(2)"
+  unit: "/1"
   values:
     1977-01-01: 12
-  unit: "/1"
-  period: Year
-  label: "Months Per Year"
-  description: "Number of months in a calendar year"
 
 # Variables
 variable hsa_annual_contribution_limit:

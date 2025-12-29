@@ -25,9 +25,10 @@ taxpayer's self-employment tax.
 received by the taxpayer as a pension or annuity under the Social Security Act.
 """
 
-# Base amounts for tier 1 taxation threshold per 26 USC 86(c)(1)
+# 26 USC 86(c)(1)(A) - Base amount for single/HOH
 parameter base_amount_single:
-  description: "Base amount for single, head of household, and married filing separately"
+  description: "Base amount for single and head of household filers"
+  reference: "26 USC 86(c)(1)(A)"
   unit: "USD"
   values:
     2024-01-01: 25000
@@ -36,8 +37,10 @@ parameter base_amount_single:
     2021-01-01: 25000
     2020-01-01: 25000
 
+# 26 USC 86(c)(1)(B) - Base amount for joint filers
 parameter base_amount_joint:
   description: "Base amount for married filing jointly and qualifying widow(er)"
+  reference: "26 USC 86(c)(1)(B)"
   unit: "USD"
   values:
     2024-01-01: 32000
@@ -46,8 +49,10 @@ parameter base_amount_joint:
     2021-01-01: 32000
     2020-01-01: 32000
 
+# 26 USC 86(c)(1)(C) - Base amount for MFS (zero threshold)
 parameter base_amount_mfs:
   description: "Base amount for married filing separately"
+  reference: "26 USC 86(c)(1)(C)"
   unit: "USD"
   values:
     2024-01-01: 0
@@ -56,10 +61,11 @@ parameter base_amount_mfs:
     2021-01-01: 0
     2020-01-01: 0
 
-# Tier 1 rate: up to 50% of benefits are taxable
+# 26 USC 86(a)(1) - Tier 1 inclusion rate (50%)
 parameter tier1_rate:
   description: "Fraction of benefits subject to tier 1 taxation"
-  unit: "percentage"
+  reference: "26 USC 86(a)(1)"
+  unit: "/1"
   values:
     2024-01-01: 0.5
     2023-01-01: 0.5

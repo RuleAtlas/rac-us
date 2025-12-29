@@ -17,23 +17,51 @@ personal residence is located in an area designated by the Federal Government
 as a disaster area, paragraph (b) shall not apply.
 """
 
+# 26 USC 165(b)(1) - Per-event floor
 parameter casualty_loss_floor:
-  description: "Per-event floor on individual casualty losses per 26 USC §165(b)(1)"
+  description: "Per-event floor on individual casualty losses"
+  reference: "26 USC 165(b)(1)"
   unit: "USD"
   values:
     2018-01-01: 100
     1998-01-01: 500
     1991-01-01: 100
 
+# 26 USC 165(b)(2) - AGI threshold rate
 parameter agi_floor_rate:
-  description: "AGI threshold rate for aggregate casualty losses per 26 USC §165(b)(2)"
-  unit: "rate"
+  description: "AGI threshold rate for aggregate casualty losses"
+  reference: "26 USC 165(b)(2)"
+  unit: "/1"
   values:
     1984-01-01: 0.10
 
+input casualty_loss_amount:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Casualty Loss Amount"
+  description: "Loss from a single casualty or theft event before applying floor"
+  default: 0
+
+input adjusted_gross_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Adjusted Gross Income"
+  description: "AGI per 26 USC 62"
+  default: 0
+
+input federally_declared_disaster:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Federally Declared Disaster"
+  description: "Whether loss is in a federally declared disaster area per 26 USC 165(h)"
+  default: false
+
 variable casualty_loss_per_event:
-  imports:
-    - 26/62/a#adjusted_gross_income
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -50,19 +78,19 @@ variable casualty_loss_per_event:
   default: 0
   tests:
     - name: "Loss exceeds floor - deductible amount"
+      period: 2024
       inputs:
         casualty_loss_amount: 1_500
-        casualty_loss_floor: 100
       expect: 1400
     - name: "Loss below floor - no deduction"
+      period: 2024
       inputs:
         casualty_loss_amount: 75
-        casualty_loss_floor: 100
       expect: 0
     - name: "Loss equals floor - no deduction"
+      period: 2024
       inputs:
         casualty_loss_amount: 100
-        casualty_loss_floor: 100
       expect: 0
 
 variable total_casualty_loss_before_agi_limit:
@@ -93,8 +121,6 @@ variable total_casualty_loss_before_agi_limit:
       expect: 0
 
 variable casualty_loss_deduction:
-  imports:
-    - 26/62/a#adjusted_gross_income
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -115,23 +141,23 @@ variable casualty_loss_deduction:
   default: 0
   tests:
     - name: "Standard case - losses exceed 10% AGI threshold"
+      period: 2024
       inputs:
         adjusted_gross_income: 50_000
         total_casualty_loss_before_agi_limit: 8_000
         federally_declared_disaster: false
-        agi_floor_rate: 0.10
       expect: 3000
     - name: "Standard case - losses below 10% AGI threshold"
+      period: 2024
       inputs:
         adjusted_gross_income: 100_000
         total_casualty_loss_before_agi_limit: 5_000
         federally_declared_disaster: false
-        agi_floor_rate: 0.10
       expect: 0
     - name: "Federally declared disaster - no AGI limitation"
+      period: 2024
       inputs:
         adjusted_gross_income: 100_000
         total_casualty_loss_before_agi_limit: 3_000
         federally_declared_disaster: true
-        agi_floor_rate: 0.10
       expect: 3000
