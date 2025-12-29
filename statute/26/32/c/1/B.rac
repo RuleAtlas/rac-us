@@ -9,6 +9,16 @@ variable is_qualifying_child_of_other:
   dtype: Boolean
   label: "Is Qualifying Child of Another Taxpayer"
   description: "Whether taxpayer could be claimed as qualifying child of another, disqualifying them from EITC per 26 USC §32(c)(1)(B)"
+  formula: |
+    # A person is a qualifying child of another if they meet one of:
+    # 1. Under 19 and lived with parent during the year
+    # 2. Under 24, full-time student, and lived with parent
+    # 3. Permanently disabled (no age limit)
+    (
+      (age < 19 and lived_with_parent) or
+      (age < 24 and is_full_time_student and lived_with_parent) or
+      (is_permanently_disabled and lived_with_parent)
+    )
   tests:
     - name: "independent_adult_qualifies"
       period: 2024

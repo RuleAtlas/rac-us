@@ -22,23 +22,22 @@ parameter rmd_birth_year_thresholds:
   values:
     # Schedule: [72, 73, 75]
 
-variable rmd:
+input rmd:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: "Required Minimum Distribution"
   description: "Minimum amount required to be distributed from qualified retirement plan per 26 USC 402(c)"
-  imports: [26/person/age#age]
 
-variable birth_year:
+input birth_year:
   entity: Person
   period: Year
   dtype: Integer
   label: "Birth Year"
   description: "Year of birth for RMD age determination"
 
-variable prior_year_401k_balance:
+input prior_year_401k_balance:
   entity: Person
   period: Year
   dtype: Money
@@ -47,7 +46,7 @@ variable prior_year_401k_balance:
   description: "Account balance as of December 31 of prior year for RMD calculation"
   default: 0
 
-variable is_still_working_for_plan_sponsor:
+input is_still_working_for_plan_sponsor:
   entity: Person
   period: Year
   dtype: Boolean
@@ -55,7 +54,7 @@ variable is_still_working_for_plan_sponsor:
   description: "Whether employee is still working for the 401(k) plan sponsor"
   default: false
 
-variable is_5_percent_owner:
+input is_5_percent_owner:
   entity: Person
   period: Year
   dtype: Boolean

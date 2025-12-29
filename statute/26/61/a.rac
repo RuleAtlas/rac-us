@@ -18,44 +18,13 @@ text: |
   (13) Income in respect of a decedent; and
   (14) Income from an interest in an estate or trust.
 
-variable other_income:
+input other_income:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: Other Income
   description: Miscellaneous income not categorized as wages, interest, dividends, etc.
-  tests:
-    - name: "Zero other income"
-      period: 2024
-      inputs:
-        other_income: 0
-      expect: 0
-    - name: "Small miscellaneous income (hobby sales)"
-      period: 2024
-      inputs:
-        other_income: 500
-      expect: 500
-    - name: "Moderate other income (side gig)"
-      period: 2024
-      inputs:
-        other_income: 5_000
-      expect: 5_000
-    - name: "Gambling winnings"
-      period: 2024
-      inputs:
-        other_income: 12_500
-      expect: 12_500
-    - name: "Jury duty pay and prizes"
-      period: 2024
-      inputs:
-        other_income: 1_200
-      expect: 1_200
-    - name: "Large miscellaneous income"
-      period: 2024
-      inputs:
-        other_income: 50_000
-      expect: 50_000
 
 variable gross_income:
   imports:

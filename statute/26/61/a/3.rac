@@ -1,19 +1,13 @@
 text: |
   Gross income includes "gains derived from dealings in property."
 
-variable gains_from_property:
+input gains_from_property:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: Gains from Property
   description: Gains derived from dealings in property including capital gains
-  tests:
-    - name: "Zero gains - no property transactions"
-      period: 2024
-      inputs:
-        gains_from_property: 0
-      expect: 0
 
     - name: "Modest stock sale gain"
       period: 2024

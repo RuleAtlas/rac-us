@@ -5,18 +5,14 @@ chapter other than—
 (1) the deductions allowable in arriving at adjusted gross income, and
 (2) the deduction for personal exemptions provided by section 151.
 """
-variable itemized_deductions:
+input itemized_deductions:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Itemized Deductions"
   description: "Deductions allowable under IRC Chapter 1 other than AGI deductions or personal exemptions per 26 USC 63(d)"
-  imports:
-    - 26/163/a#interest_deduction
-    - 26/164/b/6#salt_deduction
-    - 26/170/a#charitable_deduction
-    - 26/213/a#medical_expense_deduction
+  default: 0
 
 variable itemized_taxable_income_deductions:
   entity: TaxUnit

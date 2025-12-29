@@ -13,6 +13,10 @@ variable is_nonresident_alien:
   dtype: Boolean
   label: "Is Nonresident Alien"
   description: "Whether taxpayer is a nonresident alien not electing US tax treatment, disqualifying from EITC per 26 USC §32(c)(1)(D)"
+  formula: |
+    # Disqualified if nonresident alien and hasn't elected US tax treatment
+    # §32(c)(1)(D) disqualifies nonresident aliens unless they elect to be treated as residents
+    (citizenship_status == "NONRESIDENT_ALIEN" or citizenship_status == "PARTIAL_YEAR_NONRESIDENT" or citizenship_status == "DUAL_STATUS_ALIEN") and not elects_us_tax_treatment
   tests:
     - name: "us_citizen_qualifies_for_eitc"
       period: 2024

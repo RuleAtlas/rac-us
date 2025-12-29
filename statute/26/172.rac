@@ -16,7 +16,7 @@ taken into account under subsection (a) shall not exceed 80% of taxable income
 (computed without regard to the deduction allowable under this section).
 """
 
-variable nol_carryforward_pre_2018:
+input nol_carryforward_pre_2018:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -24,23 +24,8 @@ variable nol_carryforward_pre_2018:
   label: "Pre-2018 NOL Carryforward"
   description: "Net operating losses originating before 2018, not subject to 80% limitation"
   default: 0
-  tests:
-    - name: "Default is zero (no carryforward)"
-      period: 2024
-      inputs: {}
-      expect: 0
-    - name: "Pre-2018 NOL of $50k carried forward"
-      period: 2024
-      inputs:
-        nol_carryforward_pre_2018: 50_000
-      expect: 50_000
-    - name: "Large pre-TCJA loss carryforward from 2016 business closure"
-      period: 2024
-      inputs:
-        nol_carryforward_pre_2018: 2_500_000
-      expect: 2_500_000
 
-variable nol_carryforward_post_2017:
+input nol_carryforward_post_2017:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -48,23 +33,8 @@ variable nol_carryforward_post_2017:
   label: "Post-2017 NOL Carryforward"
   description: "Net operating losses originating after 2017, subject to 80% limitation"
   default: 0
-  tests:
-    - name: "Default is zero (no post-2017 carryforward)"
-      period: 2024
-      inputs: {}
-      expect: 0
-    - name: "2020 pandemic-era business loss carried forward"
-      period: 2024
-      inputs:
-        nol_carryforward_post_2017: 75_000
-      expect: 75_000
-    - name: "Multiple years of accumulated post-TCJA losses"
-      period: 2024
-      inputs:
-        nol_carryforward_post_2017: 450_000
-      expect: 450_000
 
-variable farming_loss_carryback:
+input farming_loss_carryback:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -72,46 +42,16 @@ variable farming_loss_carryback:
   label: "Farming Loss Carryback"
   description: "Farming loss available for 2-year carryback under Section 172(b)(1)(B)"
   default: 0
-  tests:
-    - name: "Default is zero (no farming loss carryback)"
-      period: 2024
-      inputs: {}
-      expect: 0
-    - name: "Small farm crop failure loss carried back"
-      period: 2024
-      inputs:
-        farming_loss_carryback: 25_000
-      expect: 25_000
-    - name: "Large agricultural operation weather disaster loss"
-      period: 2024
-      inputs:
-        farming_loss_carryback: 500_000
-      expect: 500_000
 
-variable is_farming_business:
+input is_farming_business:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "Farming Business"
   description: "Whether taxpayer has a farming business per Section 263A(e)(4)"
   default: false
-  tests:
-    - name: "Default is false (not a farming business)"
-      period: 2024
-      inputs: {}
-      expect: false
-    - name: "Active family farm operation"
-      period: 2024
-      inputs:
-        is_farming_business: true
-      expect: true
-    - name: "Non-farming business explicitly marked"
-      period: 2024
-      inputs:
-        is_farming_business: false
-      expect: false
 
-variable current_year_farming_loss:
+input current_year_farming_loss:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -119,23 +59,8 @@ variable current_year_farming_loss:
   label: "Current Year Farming Loss"
   description: "Net operating loss from farming business in current year"
   default: 0
-  tests:
-    - name: "Default is zero (no farming loss)"
-      period: 2024
-      inputs: {}
-      expect: 0
-    - name: "Moderate loss from drought-affected crop season"
-      period: 2024
-      inputs:
-        current_year_farming_loss: 35_000
-      expect: 35_000
-    - name: "Significant loss from livestock disease outbreak"
-      period: 2024
-      inputs:
-        current_year_farming_loss: 200_000
-      expect: 200_000
 
-variable prior_nol_deduction_claimed:
+input prior_nol_deduction_claimed:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -143,18 +68,3 @@ variable prior_nol_deduction_claimed:
   label: "Prior NOL Deduction Claimed"
   description: "NOL deduction amount claimed in current year (for modification calculation)"
   default: 0
-  tests:
-    - name: "Default is zero (no prior deduction claimed)"
-      period: 2024
-      inputs: {}
-      expect: 0
-    - name: "Partial NOL deduction claimed against current income"
-      period: 2024
-      inputs:
-        prior_nol_deduction_claimed: 40_000
-      expect: 40_000
-    - name: "Full utilization of available NOL against high income year"
-      period: 2024
-      inputs:
-        prior_nol_deduction_claimed: 150_000
-      expect: 150_000

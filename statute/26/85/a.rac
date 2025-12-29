@@ -28,7 +28,7 @@ parameter unemployment_inclusion_rate:
     2021-01-01: 1.0
     2020-03-27: 1.0
 
-variable unemployment_compensation:
+input unemployment_compensation:
   entity: Person
   period: Year
   dtype: Money
@@ -36,15 +36,6 @@ variable unemployment_compensation:
   label: "Unemployment Compensation"
   description: "Unemployment compensation received per 26 USC Section 85(a)"
   default: 0
-  tests:
-    - name: "Typical unemployment benefit"
-      period: 2024-01
-      inputs: {}
-      expect: 0  # Default input
-    - name: "Moderate unemployment compensation"
-      period: 2024-01
-      inputs: {}
-      expect: 0
 
 variable person_unemployment_included:
   imports:

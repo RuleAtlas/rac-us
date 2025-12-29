@@ -1,41 +1,10 @@
 text: |
   Gross income includes "dividends."
 
-variable dividend_income:
+input dividend_income:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: Dividend Income
   description: Dividend income including qualified and ordinary dividends
-  tests:
-    - name: "Typical retail investor dividends"
-      period: 2024
-      inputs:
-        dividend_income: 2_500
-      expect: 2_500
-    - name: "High dividend portfolio income"
-      period: 2024
-      inputs:
-        dividend_income: 45_000
-      expect: 45_000
-    - name: "Zero dividends for non-investor"
-      period: 2024
-      inputs:
-        dividend_income: 0
-      expect: 0
-    - name: "REIT dividend income"
-      period: 2024
-      inputs:
-        dividend_income: 12_750
-      expect: 12_750
-    - name: "Small dividend from single stock holding"
-      period: 2024
-      inputs:
-        dividend_income: 350
-      expect: 350
-    - name: "Retiree dividend income portfolio"
-      period: 2024
-      inputs:
-        dividend_income: 85_000
-      expect: 85_000

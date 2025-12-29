@@ -6,7 +6,7 @@ by part VI (sec. 161 and following) as losses from the sale or exchange
 of property.
 """
 
-variable loss_deduction:
+input loss_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -14,34 +14,3 @@ variable loss_deduction:
   label: "Loss Deduction"
   description: "Above-the-line deduction for losses from property sales per 26 USC 62(a)(4)"
   default: 0
-  tests:
-    - name: "Standard capital loss deduction at limit"
-      period: 2024
-      inputs:
-        loss_deduction: 3_000
-      expect: 3_000
-    - name: "No loss deduction"
-      period: 2024
-      inputs:
-        loss_deduction: 0
-      expect: 0
-    - name: "Small loss deduction below limit"
-      period: 2024
-      inputs:
-        loss_deduction: 1_500
-      expect: 1_500
-    - name: "Married filing separately loss limit"
-      period: 2024
-      inputs:
-        loss_deduction: 1_500
-      expect: 1_500
-    - name: "Large business property loss"
-      period: 2024
-      inputs:
-        loss_deduction: 25_000
-      expect: 25_000
-    - name: "Minimal loss amount"
-      period: 2024
-      inputs:
-        loss_deduction: 100
-      expect: 100

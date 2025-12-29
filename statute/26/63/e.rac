@@ -44,6 +44,15 @@ variable deduction_choice:
   imports:
     - 26/63/c#standard_deduction
     - 26/63/d#itemized_taxable_income_deductions
+  syntax: python
+  formula: |
+    # The deduction choice is the maximum of standard and itemized deductions
+    # (unless ineligible for standard deduction)
+    std = standard_deduction
+    itemized = itemized_taxable_income_deductions
+    if is_ineligible_for_standard_deduction:
+      return itemized
+    return max(std, itemized)
 
 variable uses_standard_deduction:
   entity: TaxUnit

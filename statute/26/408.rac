@@ -127,17 +127,14 @@ parameter early_withdrawal_penalty_rate:
   values:
     1977-01-01: 0.10
 
-variable ira_definitions:
+input ira_definitions:
   entity: Person
   period: Year
   dtype: Boolean
   label: "IRA Definitions"
   description: "Imports and references to IRA-related definitions from IRC 402(c)"
-  imports:
-    - 26/402/c#rmd_divisor
-    - 26/402/c#rmd_applicable_age
 
-variable traditional_ira_balance:
+input traditional_ira_balance:
   entity: Person
   period: Year
   dtype: Money
@@ -145,24 +142,8 @@ variable traditional_ira_balance:
   label: "Traditional IRA Balance"
   description: "Total balance in all traditional IRA accounts"
   default: 0
-  tests:
-    - name: "No balance"
-      period: 2024
-      inputs:
-        traditional_ira_balance: 0
-      expect: 0
-    - name: "Positive balance"
-      period: 2024
-      inputs:
-        traditional_ira_balance: 50_000
-      expect: 50000
-    - name: "Large balance"
-      period: 2024
-      inputs:
-        traditional_ira_balance: 500_000
-      expect: 500000
 
-variable roth_ira_balance:
+input roth_ira_balance:
   entity: Person
   period: Year
   dtype: Money
@@ -170,24 +151,8 @@ variable roth_ira_balance:
   label: "Roth IRA Balance"
   description: "Total balance in all Roth IRA accounts"
   default: 0
-  tests:
-    - name: "No Roth IRA balance"
-      period: 2024
-      inputs:
-        roth_ira_balance: 0
-      expect: 0
-    - name: "Positive Roth balance"
-      period: 2024
-      inputs:
-        roth_ira_balance: 75_000
-      expect: 75000
-    - name: "Large Roth balance"
-      period: 2024
-      inputs:
-        roth_ira_balance: 250_000
-      expect: 250000
 
-variable birth_year:
+input birth_year:
   entity: Person
   period: Year
   dtype: Integer
@@ -253,7 +218,7 @@ variable is_ira_reached_rmd_age:
         birth_year: 1942
       expect: true
 
-variable ira_prior_year_balance:
+input ira_prior_year_balance:
   entity: Person
   period: Year
   dtype: Money
@@ -261,22 +226,6 @@ variable ira_prior_year_balance:
   label: "IRA Prior Year Balance"
   description: "Total IRA account balance as of December 31 of prior year"
   default: 0
-  tests:
-    - name: "New account, no prior balance"
-      period: 2024
-      inputs:
-        ira_prior_year_balance: 0
-      expect: 0
-    - name: "Moderate prior year balance"
-      period: 2024
-      inputs:
-        ira_prior_year_balance: 100_000
-      expect: 100000
-    - name: "Large prior year balance at retirement"
-      period: 2024
-      inputs:
-        ira_prior_year_balance: 750_000
-      expect: 750000
 
 variable ira_required_minimum_distribution:
   entity: Person
@@ -341,43 +290,21 @@ variable ira_required_minimum_distribution:
         ira_prior_year_balance: 1_000_000
       expect: 34483
 
-variable has_simple_ira:
+input has_simple_ira:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Has SIMPLE IRA"
   description: "Whether individual has a SIMPLE IRA (higher contribution limits)"
   default: false
-  tests:
-    - name: "No SIMPLE IRA"
-      period: 2024
-      inputs:
-        has_simple_ira: false
-      expect: false
-    - name: "Has SIMPLE IRA"
-      period: 2024
-      inputs:
-        has_simple_ira: true
-      expect: true
 
-variable has_sep_ira:
+input has_sep_ira:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Has SEP IRA"
   description: "Whether individual has a SEP IRA (self-employed)"
   default: false
-  tests:
-    - name: "No SEP IRA"
-      period: 2024
-      inputs:
-        has_sep_ira: false
-      expect: false
-    - name: "Has SEP IRA (self-employed)"
-      period: 2024
-      inputs:
-        has_sep_ira: true
-      expect: true
 
 variable total_ira_balance:
   entity: Person

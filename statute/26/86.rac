@@ -71,7 +71,7 @@ parameter tier1_rate:
     2023-01-01: 0.5
     2020-01-01: 0.5
 
-variable tax_unit_social_security:
+input tax_unit_social_security:
   entity: TaxUnit
   period: Year
   dtype: Money

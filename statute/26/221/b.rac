@@ -41,146 +41,45 @@ parameter minimum_qualified_education_expenses:
     2024-01-01: 0
     2023-01-01: 0
     2000-01-01: 0
-variable qualified_loan:
+input has_qualified_education_loan:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Has Qualified Education Loan"
   description: "Whether the individual has a loan that qualifies under Section 221(d)(1)"
-  tests:
-    - name: "Taxpayer has qualifying education loan"
-      period: 2024-01
-      inputs:
-        has_qualified_education_loan: true
-      expect: true
-    - name: "Taxpayer has no qualifying education loan"
-      period: 2024-01
-      inputs:
-        has_qualified_education_loan: false
-      expect: false
 
-variable has_qualified_education_loan:
+input qualified_higher_education_expenses_221:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: "Qualified Higher Education Expenses"
   description: "Expenses qualifying under Section 221(d)(6), referencing Section 529(e)(3)"
-  tests:
-    - name: "Student has qualified higher education expenses of $15,000"
-      period: 2024-01
-      inputs:
-        qualified_higher_education_expenses_221: 15_000
-      expect: 15000
-    - name: "Student has no qualified higher education expenses"
-      period: 2024-01
-      inputs:
-        qualified_higher_education_expenses_221: 0
-      expect: 0
-    - name: "Student has modest qualified expenses of $5,000"
-      period: 2024-01
-      inputs:
-        qualified_higher_education_expenses_221: 5_000
-      expect: 5000
 
-variable qualified_higher_education_expenses_221:
+input attends_eligible_educational_institution:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Attends Eligible Educational Institution"
   description: "Whether the individual attends an institution eligible under Section 221"
-  tests:
-    - name: "Individual attends eligible institution"
-      period: 2024-01
-      inputs:
-        attends_eligible_educational_institution: true
-      expect: true
-    - name: "Individual does not attend eligible institution"
-      period: 2024-01
-      inputs:
-        attends_eligible_educational_institution: false
-      expect: false
 
-variable attends_eligible_educational_institution:
+input is_qualified_loan_beneficiary:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Qualified Loan Beneficiary"
-  description: "Whether education expenses were for taxpayer, spouse, or dependent"
-  tests:
-    - name: "Education for taxpayer is qualified beneficiary"
-      period: 2024-01
-      inputs:
-        is_qualified_loan_beneficiary: true
-      expect: true
-    - name: "Education for non-qualified person is not eligible"
-      period: 2024-01
-      inputs:
-        is_qualified_loan_beneficiary: false
-      expect: false
+  description: "Whether education expenses were for taxpayer, spouse, or dependent per Section 221(d)(1)(A)"
 
-variable is_qualified_loan_beneficiary:
+input has_excluded_related_party_loan:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Has Excluded Related-Party Loan"
-  description: "Whether the loan is from a related person and thus excluded from Section 221"
-  syntax: python
-  formula: |
-    # The loan must be for education of:
-    # - The taxpayer themselves, OR
-    # - The taxpayer's spouse, OR
-    # - A dependent of the taxpayer (at time debt incurred)
-    #
-    # Note: Dependent status is determined at time loan was incurred,
-    # not at time interest is paid
-    return True  # Typically input-based determination
-  tests:
-    - name: "Loan is for taxpayer's own education"
-      period: 2024-01
-      inputs: {}
-      expect: true
-    - name: "Loan is for spouse's education (married taxpayer)"
-      period: 2024-01
-      inputs: {}
-      expect: true
-    - name: "Loan is for dependent's education at time of incurrence"
-      period: 2024-01
-      inputs: {}
-      expect: true
+  description: "Whether the loan is from a related person and thus excluded from Section 221 per Section 221(d)(1)"
 
-variable has_excluded_related_party_loan:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Has Qualifying Refinanced Loan"
-  description: "Whether a refinanced loan qualifies under Section 221(d)(1)"
-  tests:
-    - name: "Loan is NOT from a related party - qualifies"
-      period: 2024-01
-      inputs:
-        has_qualifying_refinanced_loan: true
-      expect: true
-    - name: "Loan IS from a related party per section 267(b) - excluded"
-      period: 2024-01
-      inputs:
-        has_qualifying_refinanced_loan: false
-      expect: false
-
-variable has_qualifying_refinanced_loan:
+input has_qualifying_refinanced_loan:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Has Qualifying Refinanced Loan"
   description: "Whether the individual has a loan that was refinanced and qualifies under Section 221(d)(1)"
-  tests:
-    - name: "Original loan qualifies and refinance is of that original"
-      period: 2024-01
-      inputs:
-        has_qualifying_refinanced_loan: true
-      expect: true
-    - name: "Refinance of a loan that does not qualify"
-      period: 2024-01
-      inputs:
-        has_qualifying_refinanced_loan: false
-      expect: false

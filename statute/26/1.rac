@@ -1,4 +1,4 @@
-variable filing_status:
+input filing_status:
   entity: TaxUnit
   period: Year
   dtype: Enum(FilingStatus)
@@ -106,13 +106,6 @@ parameter brackets:
       HEAD_OF_HOUSEHOLD: bracket_thresholds_head_of_household
       QUALIFYING_WIDOW: bracket_thresholds_qualifying_widow
     rates: bracket_rates
-
-variable income_tax:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  imports:
-    - 26/1#filing_status
 
 variable income_tax_before_credits:
   imports:

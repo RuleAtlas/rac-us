@@ -29,14 +29,9 @@ beginning in a calendar year, the poverty line used shall be the
 most recently published poverty line as of the 1st day of the
 regular enrollment period for coverage during such calendar year.
 """
-variable definitions:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "PTC Definitions Container"
-  description: "Supporting definitions for household income calculation per 26 USC 36B(d)"
-  imports:
-    - 26/62/a#adjusted_gross_income
+parameter definitions:
+  description: "Container for PTC definitions per 26 USC 36B(d)"
+  reference: "26 USC 36B(d)"
 
 variable ptc_household_size:
   entity: TaxUnit
@@ -116,7 +111,7 @@ variable household_income_pct_fpl:
         return 0
     return income / fpl
 
-variable slcsp_premium:
+input slcsp_premium:
   entity: TaxUnit
   period: Year
   dtype: Money

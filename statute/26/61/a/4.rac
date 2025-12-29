@@ -1,41 +1,10 @@
 text: |
   Gross income includes "interest."
 
-variable interest_income:
+input interest_income:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: Interest Income
   description: Taxable interest income
-  tests:
-    - name: "Savings account interest"
-      period: 2024
-      inputs:
-        interest_income: 1_200
-      expect: 1_200
-    - name: "CD interest income"
-      period: 2024
-      inputs:
-        interest_income: 5_500
-      expect: 5_500
-    - name: "High-yield savings interest"
-      period: 2024
-      inputs:
-        interest_income: 8_750
-      expect: 8_750
-    - name: "Zero interest income"
-      period: 2024
-      inputs:
-        interest_income: 0
-      expect: 0
-    - name: "Bond interest income"
-      period: 2024
-      inputs:
-        interest_income: 15_000
-      expect: 15_000
-    - name: "Treasury bill interest"
-      period: 2024
-      inputs:
-        interest_income: 2_350
-      expect: 2_350

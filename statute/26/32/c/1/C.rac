@@ -8,6 +8,9 @@ variable has_foreign_earned_income:
   dtype: Boolean
   label: "Has Form 2_555 Foreign Earned Income Exclusion"
   description: "Whether taxpayer has elected foreign earned income exclusion under 26 USC §911, disqualifying from EITC per 26 USC §32(c)(1)(C)"
+  formula: |
+    # Disqualified if claimed any foreign earned income exclusion under §911
+    foreign_earned_income_exclusion > 0
   tests:
     - name: "domestic_worker_no_exclusion"
       period: 2024

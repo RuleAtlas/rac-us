@@ -6,7 +6,7 @@ entitled to a deduction under section 151 for such taxable year with
 respect to such individual (or would be so entitled but for section 152(e)).
 """
 
-variable child_is_married_filing_joint:
+input child_is_married_filing_joint:
   entity: Person
   period: Year
   dtype: Boolean
@@ -16,39 +16,3 @@ variable child_is_married_filing_joint:
     Under IRC 32(c)(3)(B), a married child filing jointly is not a qualifying
     child for EITC unless the return was filed solely to claim a refund.
   default: false
-  tests:
-    - name: "Unmarried child qualifies"
-      period: 2024
-      inputs:
-        child_is_married_filing_joint: false
-      expect: false
-
-    - name: "Married child filing jointly disqualifies"
-      period: 2024
-      inputs:
-        child_is_married_filing_joint: true
-      expect: true
-
-    - name: "Multiple children - none married filing joint"
-      period: 2024
-      inputs:
-        child_is_married_filing_joint: [false, false, false]
-      expect: [false, false, false]
-
-    - name: "Multiple children - one married filing joint"
-      period: 2024
-      inputs:
-        child_is_married_filing_joint: [false, true, false]
-      expect: [false, true, false]
-
-    - name: "Multiple children - all married filing joint"
-      period: 2024
-      inputs:
-        child_is_married_filing_joint: [true, true]
-      expect: [true, true]
-
-    - name: "Single child - married filing joint disqualifies for EITC"
-      period: 2024
-      inputs:
-        child_is_married_filing_joint: true
-      expect: true

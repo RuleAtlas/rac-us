@@ -28,6 +28,10 @@ variable applicable_taxpayer:
   description: "Meets applicable taxpayer requirements per 26 USC 36B(c)(1)"
   imports:
     - 26/1#filing_status
+  syntax: python
+  formula: |
+    # Use is_applicable_taxpayer which consolidates all eligibility requirements
+    return is_applicable_taxpayer
 
 variable ptc_filing_status_eligible:
   entity: TaxUnit
@@ -86,7 +90,7 @@ variable is_applicable_taxpayer:
         return False
     return True
 
-variable ptc_coverage_months:
+input ptc_coverage_months:
   entity: TaxUnit
   period: Year
   dtype: Integer
@@ -94,22 +98,13 @@ variable ptc_coverage_months:
   description: "Number of months enrolled in qualified health plan per 26 USC 36B(c)(2)"
   default: 0
 
-variable enrolled_in_qualified_health_plan:
+input enrolled_in_qualified_health_plan:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "Enrolled in Qualified Health Plan"
   description: "Enrolled in QHP through Marketplace per 26 USC 36B(c)(3)"
   default: false
-  tests:
-    # Income Eligibility Tests (100-400% FPL range)
-    # 2024 Single FPL: $15,060
-    # 100% = $15,060
-    # 150% = $22,590
-    # 200% = $30,120
-    # 250% = $37,650
-    # 300% = $45,180
-    # 400% = $60,240
 
     - name: "Income eligible - at 100% FPL (2024)"
       period: 2024-01

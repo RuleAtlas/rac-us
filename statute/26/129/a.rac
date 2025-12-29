@@ -202,7 +202,7 @@ variable dcap_taxable_amount:
         dcap_earned_income_limit: 75_000
       expect: 5_000
 
-variable dcap_benefits_received:
+input dcap_benefits_received:
   entity: TaxUnit
   period: Year
   dtype: Money

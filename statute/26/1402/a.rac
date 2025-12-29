@@ -4,7 +4,7 @@ by an individual from any trade or business carried on by such individual,
 less the deductions allowed by this subtitle which are attributable to such
 trade or business...
 """
-variable net_earnings_self_employment:
+input net_earnings_self_employment:
   entity: Person
   period: Year
   dtype: Money
@@ -12,34 +12,3 @@ variable net_earnings_self_employment:
   label: "Net Earnings from Self-Employment"
   description: "Gross self-employment income less attributable business deductions"
   default: 0
-  tests:
-    - name: "Typical sole proprietor net earnings"
-      period: 2024
-      inputs:
-        net_earnings_self_employment: 75_000
-      expect: 75_000
-    - name: "Zero net earnings (no self-employment)"
-      period: 2024
-      inputs:
-        net_earnings_self_employment: 0
-      expect: 0
-    - name: "Net loss from self-employment"
-      period: 2024
-      inputs:
-        net_earnings_self_employment: -15_000
-      expect: -15_000
-    - name: "High-income self-employed (above SS wage base)"
-      period: 2024
-      inputs:
-        net_earnings_self_employment: 200_000
-      expect: 200_000
-    - name: "Small side business net earnings"
-      period: 2024
-      inputs:
-        net_earnings_self_employment: 5_000
-      expect: 5_000
-    - name: "Near SS wage base threshold"
-      period: 2024
-      inputs:
-        net_earnings_self_employment: 168_600
-      expect: 168_600

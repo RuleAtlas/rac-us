@@ -3,46 +3,11 @@ The term 'capital gain net income' means the excess of the gains from
 sales or exchanges of capital assets over the losses from such sales
 or exchanges.
 """
-variable capital_gain_net_income:
+input capital_gain_net_income:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Capital Gain Net Income"
   description: "Net capital gains (gains minus losses) per 26 USC §1_222(11), counted for EITC investment income test"
-  tests:
-    - name: "No capital gains or losses"
-      period: 2024
-      inputs:
-        capital_gain_net_income: 0
-      expect: 0
-
-    - name: "Modest net gain from stock sale"
-      period: 2024
-      inputs:
-        capital_gain_net_income: 5_000
-      expect: 5_000
-
-    - name: "Large net gain exceeding EITC investment limit"
-      period: 2024
-      inputs:
-        capital_gain_net_income: 15_000
-      expect: 15_000
-
-    - name: "Net capital loss (gains less than losses)"
-      period: 2024
-      inputs:
-        capital_gain_net_income: -3_000
-      expect: -3_000
-
-    - name: "Small gain near EITC threshold"
-      period: 2024
-      inputs:
-        capital_gain_net_income: 11_600
-      expect: 11_600
-
-    - name: "Very large capital gain from property sale"
-      period: 2024
-      inputs:
-        capital_gain_net_income: 250_000
-      expect: 250_000
+  default: 0

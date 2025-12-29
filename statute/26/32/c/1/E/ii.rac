@@ -9,6 +9,10 @@ variable missing_spouse_tin:
   dtype: Boolean
   label: "Missing Spouse SSN for EITC"
   description: "Whether taxpayer's spouse lacks a valid SSN for work when filing jointly, disqualifying from EITC per 26 USC §32(c)(1)(E)(ii) and §32(m)"
+  formula: |
+    # §32(c)(1)(E)(ii) requires spouse to have valid SSN for work when filing jointly
+    # This only applies to married filing jointly; MFS and other statuses don't have this requirement
+    filing_status == "married_filing_jointly" and not spouse_has_valid_ssn
   tests:
     - name: "single_filer_not_applicable"
       period: 2024

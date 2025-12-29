@@ -4,46 +4,11 @@ local bond.
 §32(i)(2)(B): "tax-exempt interest received or accrued during the taxable
 year".
 """
-variable tax_exempt_interest:
+input tax_exempt_interest:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Tax-Exempt Interest Income"
   description: "Interest from state and local bonds excluded from gross income under 26 USC §103, but counted for EITC investment income test"
-  tests:
-    - name: "no_tax_exempt_interest"
-      period: 2024
-      inputs:
-        tax_exempt_interest: 0
-      expect: 0
-
-    - name: "small_municipal_bond_interest"
-      period: 2024
-      inputs:
-        tax_exempt_interest: 500
-      expect: 500
-
-    - name: "moderate_state_bond_interest"
-      period: 2024
-      inputs:
-        tax_exempt_interest: 5_000
-      expect: 5_000
-
-    - name: "substantial_local_bond_portfolio"
-      period: 2024
-      inputs:
-        tax_exempt_interest: 25_000
-      expect: 25_000
-
-    - name: "large_municipal_bond_portfolio"
-      period: 2024
-      inputs:
-        tax_exempt_interest: 100_000
-      expect: 100_000
-
-    - name: "high_net_worth_muni_bond_income"
-      period: 2024
-      inputs:
-        tax_exempt_interest: 500_000
-      expect: 500_000
+  default: 0

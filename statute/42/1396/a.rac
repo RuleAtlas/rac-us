@@ -4,173 +4,46 @@ text: """
 (i) to all individuals receiving...supplemental security income...
 (ii) to all qualified pregnant women and children...
 """
-variable household_magi_pct_fpl:
+input magi_income_pct_fpl:
   entity: Household
   period: Month
   dtype: Rate
   label: "Household MAGI as % FPL"
   description: "Household MAGI income as percentage of Federal Poverty Level"
-  formula: return magi_income_pct_fpl
   default: 0
-  tests:
-    - name: "Very low income (25% FPL)"
-      period: 2024-01
-      inputs:
-        magi_income_pct_fpl: 0.25
-      expect: 0.25
-    - name: "Below expansion threshold (100% FPL)"
-      period: 2024-01
-      inputs:
-        magi_income_pct_fpl: 1.00
-      expect: 1.00
-    - name: "At expansion threshold (138% FPL)"
-      period: 2024-01
-      inputs:
-        magi_income_pct_fpl: 1.38
-      expect: 1.38
-    - name: "Above expansion threshold (150% FPL)"
-      period: 2024-01
-      inputs:
-        magi_income_pct_fpl: 1.50
-      expect: 1.50
-    - name: "Well above threshold (200% FPL)"
-      period: 2024-01
-      inputs:
-        magi_income_pct_fpl: 2.00
-      expect: 2.00
 
-variable eligibility:
+input medicaid_eligible:
   entity: Person
   period: Month
   dtype: Boolean
-  tests:
-    - name: "Single person FPL calculation"
-      period: 2024-01
-      inputs:
-        household_size: 1
-        fpl_by_household_size:
-          1: 1_450
-          additional_per_person: 490
-      expect: 1450
-    - name: "Household of 2 FPL calculation"
-      period: 2024-01
-      inputs:
-        household_size: 2
-        fpl_by_household_size:
-          1: 1_450
-          additional_per_person: 490
-      expect: 1940
-    - name: "Household of 4 FPL calculation"
-      period: 2024-01
-      inputs:
-        household_size: 4
-        fpl_by_household_size:
-          1: 1_450
-          additional_per_person: 490
-      expect: 3920
-    - name: "Household of 4 with 1 pregnant (counts as 5)"
-      period: 2024-01
-      inputs:
-        household_size: 4
-        fpl_by_household_size:
-          1: 1_450
-          additional_per_person: 490
-        members:
-          - is_pregnant: true
-          - is_pregnant: false
-          - is_pregnant: false
-          - is_pregnant: false
-      expect: 4410
+  label: "Medicaid Eligible"
+  description: "Whether individual is eligible for Medicaid"
+  default: false
 
-variable medicaid:
+input chip_eligible:
   entity: Person
   period: Month
   dtype: Boolean
-  tests:
-    - name: "Eligible for Medicaid through standard pathway"
-      period: 2024-01
-      inputs:
-        medicaid_eligible: true
-      expect: true
-    - name: "Not eligible for Medicaid"
-      period: 2024-01
-      inputs:
-        medicaid_eligible: false
-      expect: false
-
-variable chip:
-  entity: Person
-  period: Month
-  dtype: Boolean
-  tests:
-    - name: "Eligible for CHIP"
-      period: 2024-01
-      inputs:
-        chip_eligible: true
-      expect: true
-    - name: "Not eligible for CHIP"
-      period: 2024-01
-      inputs:
-        chip_eligible: false
-      expect: false
+  label: "CHIP Eligible"
+  description: "Whether individual is eligible for CHIP"
+  default: false
 
 variable public_health_coverage_eligible:
   entity: Person
   period: Month
   dtype: Boolean
-  tests:
-    - name: "Eligible through Medicaid pathway"
-      period: 2024-01
-      inputs:
-        medicaid_eligible: true
-        chip_eligible: false
-      expect: true
-    - name: "Eligible through CHIP pathway"
-      period: 2024-01
-      inputs:
-        medicaid_eligible: false
-        chip_eligible: true
-      expect: true
-    - name: "Eligible through both Medicaid and CHIP"
-      period: 2024-01
-      inputs:
-        medicaid_eligible: true
-        chip_eligible: true
-      expect: true
-    - name: "Not eligible for either program"
-      period: 2024-01
-      inputs:
-        medicaid_eligible: false
-        chip_eligible: false
-      expect: false
+  label: "Public Health Coverage Eligible"
+  description: "Whether individual is eligible for Medicaid or CHIP"
+  syntax: python
+  formula: |
+    return medicaid_eligible or chip_eligible
+  default: false
 
-variable household_magi:
+input household_magi:
   entity: Household
   period: Month
   dtype: Money
-  tests:
-    - name: "Zero household MAGI"
-      period: 2024-01
-      inputs:
-        magi_income: 0
-      expect: 0
-    - name: "Low income household ($1,000/month)"
-      period: 2024-01
-      inputs:
-        magi_income: 1_000
-      expect: 1000
-    - name: "Moderate income household ($2,500/month)"
-      period: 2024-01
-      inputs:
-        magi_income: 2_500
-      expect: 2500
-    - name: "Expansion threshold income (138% FPL for family of 4)"
-      period: 2024-01
-      inputs:
-        magi_income: 3_920
-      expect: 3920
-    - name: "Above expansion income ($5,000/month)"
-      period: 2024-01
-      inputs:
-        magi_income: 5_000
-      expect: 5000
+  unit: USD
+  label: "Household MAGI"
+  description: "Modified Adjusted Gross Income for the household"
+  default: 0

@@ -80,7 +80,7 @@ variable elderly_disabled_credit:
         applicable_percentage: 0.15
       expect: 525
 
-variable inputs:
+input taxable_pension_annuity_income:
   entity: TaxUnit
   period: Year
   dtype: Money

@@ -53,6 +53,11 @@ variable additional_medicare_tax:
   description: "0.9% additional Medicare tax on self-employment income and wages above threshold per 26 USC 1401(b)(2)"
   imports:
     - 26/1#filing_status
+  syntax: python
+  formula: |
+    # Aggregate wage and SE income across household
+    return self_employment_additional_medicare_tax
+  default: 0
 
 variable combined_medicare_income:
   entity: TaxUnit

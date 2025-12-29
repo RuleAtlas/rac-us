@@ -30,6 +30,19 @@ variable index:
   imports:
     - 26/36B/a#premium_tax_credit
     - 26/36B/b#applicable_percentage
+  syntax: python
+  formula: |
+    # Premium Assistance Amount per 26 USC 36B(b)(2)
+    # = SLCSP Premium - (Applicable % × 1/12 of Annual Household Income)
+    # = max(0, monthly_slcsp - applicable_percentage_monthly_equivalent)
+    slcsp = slcsp_premium_monthly
+    applicable_pct = applicable_percentage
+    # Monthly household income equivalent
+    monthly_income_pct = applicable_pct / months_per_year
+    household_monthly = household_income / months_per_year
+    contribution = monthly_income_pct * household_monthly
+    # Credit is difference, floored at zero
+    return max(0, slcsp - contribution)
   tests:
     # Premium Assistance Amount Calculation Tests
     # PTC = SLCSP Premium - (Applicable % of Income)

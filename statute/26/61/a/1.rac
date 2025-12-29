@@ -5,109 +5,26 @@ text: |
   Gross income includes "compensation for services, including fees, commissions,
   fringe benefits, and similar items."
 
-variable wages:
+input wages:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: Wages
   description: Compensation for services as an employee
-  tests:
-    - name: "Typical full-time employee wages"
-      period: 2024
-      inputs:
-        wages: 52_000
-      expect: 52_000
-    - name: "Minimum wage worker annual wages"
-      period: 2024
-      inputs:
-        wages: 15_080
-      expect: 15_080
-    - name: "High earner wages"
-      period: 2024
-      inputs:
-        wages: 250_000
-      expect: 250_000
-    - name: "Zero wages for unemployed person"
-      period: 2024
-      inputs:
-        wages: 0
-      expect: 0
-    - name: "Part-time worker wages"
-      period: 2024
-      inputs:
-        wages: 18_500
-      expect: 18_500
 
-variable salaries:
+input salaries:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: Salaries
   description: Fixed periodic compensation for services as an employee
-  tests:
-    - name: "Entry-level professional salary"
-      period: 2024
-      inputs:
-        salaries: 45_000
-      expect: 45_000
-    - name: "Mid-career professional salary"
-      period: 2024
-      inputs:
-        salaries: 85_000
-      expect: 85_000
-    - name: "Executive salary"
-      period: 2024
-      inputs:
-        salaries: 175_000
-      expect: 175_000
-    - name: "Zero salary for non-salaried worker"
-      period: 2024
-      inputs:
-        salaries: 0
-      expect: 0
-    - name: "Public sector salary"
-      period: 2024
-      inputs:
-        salaries: 62_500
-      expect: 62_500
 
-variable tips:
+input tips:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: Tips
   description: Gratuities received for services
-  tests:
-    - name: "Restaurant server tips"
-      period: 2024
-      inputs:
-        tips: 12_000
-      expect: 12_000
-    - name: "Bartender tips"
-      period: 2024
-      inputs:
-        tips: 18_500
-      expect: 18_500
-    - name: "Zero tips for non-tipped worker"
-      period: 2024
-      inputs:
-        tips: 0
-      expect: 0
-    - name: "Valet parking attendant tips"
-      period: 2024
-      inputs:
-        tips: 8_200
-      expect: 8_200
-    - name: "High-end restaurant server tips"
-      period: 2024
-      inputs:
-        tips: 35_000
-      expect: 35_000
-    - name: "Hairdresser tips"
-      period: 2024
-      inputs:
-        tips: 6_500
-      expect: 6_500

@@ -107,18 +107,11 @@ input household_income_pct_fpl:
   description: "Household income expressed as percentage of FPL for family size"
   default: 2.5
 
-variable reconciliation:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "PTC Reconciliation Container"
-  description: "Reconciliation of advance credit and actual credit per 26 USC 36B(f)"
-  imports:
-    - 26/36B/a#premium_tax_credit
-    - 26/1#filing_status
+parameter reconciliation:
+  description: "Container for PTC reconciliation per 26 USC 36B(f)"
+  reference: "26 USC 36B(f)"
 
-variable advance_ptc:
+input advance_ptc:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -126,19 +119,6 @@ variable advance_ptc:
   label: "Advance Premium Tax Credit"
   description: "Advance payments of PTC made during year per 26 USC 36B(f)(1)"
   default: 0
-  tests:
-    - name: "No advance payments"
-      inputs:
-        advance_ptc: 0
-      expect: 0
-    - name: "Advance payments during year"
-      inputs:
-        advance_ptc: 4_800
-      expect: 4800
-    - name: "Large advance payment"
-      inputs:
-        advance_ptc: 8_500
-      expect: 8500
 
 variable net_ptc_adjustment:
   entity: TaxUnit
