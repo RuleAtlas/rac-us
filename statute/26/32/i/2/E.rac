@@ -10,3 +10,39 @@ variable net_passive_income:
   unit: "USD"
   label: "Net Passive Activity Income"
   description: "Income from passive activities under 26 USC §469, counted for EITC investment income test per 26 USC §32(i)(2)(E)"
+  tests:
+    - name: "Zero passive income"
+      period: 2024
+      inputs:
+        net_passive_income: 0
+      expect: 0
+
+    - name: "Small passive income from limited partnership"
+      period: 2024
+      inputs:
+        net_passive_income: 2_500
+      expect: 2_500
+
+    - name: "Moderate passive income near half of EITC limit"
+      period: 2024
+      inputs:
+        net_passive_income: 5_800
+      expect: 5_800
+
+    - name: "Passive income at EITC disqualified income threshold"
+      period: 2024
+      inputs:
+        net_passive_income: 11_600
+      expect: 11_600
+
+    - name: "Net passive loss reduces disqualified income"
+      period: 2024
+      inputs:
+        net_passive_income: -8_000
+      expect: -8_000
+
+    - name: "High passive income from rental real estate"
+      period: 2024
+      inputs:
+        net_passive_income: 35_000
+      expect: 35_000

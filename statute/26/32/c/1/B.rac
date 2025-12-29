@@ -9,3 +9,81 @@ variable is_qualifying_child_of_other:
   dtype: Boolean
   label: "Is Qualifying Child of Another Taxpayer"
   description: "Whether taxpayer could be claimed as qualifying child of another, disqualifying them from EITC per 26 USC §32(c)(1)(B)"
+  tests:
+    - name: "independent_adult_qualifies"
+      period: 2024
+      description: "Adult filer age 30 living independently is not a qualifying child of anyone"
+      inputs:
+        tax_unit:
+          age: 30
+          lived_with_parent: false
+          is_full_time_student: false
+          is_permanently_disabled: false
+          earned_income: 35_000
+      expect:
+        is_qualifying_child_of_other: false
+
+    - name: "young_adult_with_parents_disqualified"
+      period: 2024
+      description: "22-year-old living with parents who could claim them is disqualified per §32(c)(1)(B)"
+      inputs:
+        tax_unit:
+          age: 22
+          lived_with_parent: true
+          is_full_time_student: true
+          is_permanently_disabled: false
+          earned_income: 8_000
+      expect:
+        is_qualifying_child_of_other: true
+
+    - name: "young_adult_not_student_over_18"
+      period: 2024
+      description: "20-year-old non-student not living with parents is not a qualifying child"
+      inputs:
+        tax_unit:
+          age: 20
+          lived_with_parent: false
+          is_full_time_student: false
+          is_permanently_disabled: false
+          earned_income: 22_000
+      expect:
+        is_qualifying_child_of_other: false
+
+    - name: "student_under_24_with_parents"
+      period: 2024
+      description: "23-year-old full-time student living with parents could be qualifying child"
+      inputs:
+        tax_unit:
+          age: 23
+          lived_with_parent: true
+          is_full_time_student: true
+          is_permanently_disabled: false
+          earned_income: 12_000
+      expect:
+        is_qualifying_child_of_other: true
+
+    - name: "adult_over_24_with_parents_qualifies"
+      period: 2024
+      description: "25-year-old living with parents exceeds age limit for qualifying child"
+      inputs:
+        tax_unit:
+          age: 25
+          lived_with_parent: true
+          is_full_time_student: false
+          is_permanently_disabled: false
+          earned_income: 28_000
+      expect:
+        is_qualifying_child_of_other: false
+
+    - name: "disabled_adult_with_parents"
+      period: 2024
+      description: "Permanently disabled adult over 24 living with parents is still qualifying child (no age limit)"
+      inputs:
+        tax_unit:
+          age: 35
+          lived_with_parent: true
+          is_full_time_student: false
+          is_permanently_disabled: true
+          earned_income: 5_000
+      expect:
+        is_qualifying_child_of_other: true

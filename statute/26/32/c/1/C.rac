@@ -8,3 +8,64 @@ variable has_foreign_earned_income:
   dtype: Boolean
   label: "Has Form 2555 Foreign Earned Income Exclusion"
   description: "Whether taxpayer has elected foreign earned income exclusion under 26 USC §911, disqualifying from EITC per 26 USC §32(c)(1)(C)"
+  tests:
+    - name: "domestic_worker_no_exclusion"
+      period: 2024
+      description: "US worker with only domestic income has no foreign exclusion, qualifies for EITC consideration"
+      inputs:
+        tax_unit:
+          foreign_earned_income_exclusion: 0
+          earned_income: 35_000
+      expect:
+        has_foreign_earned_income: false
+
+    - name: "expat_with_full_exclusion"
+      period: 2024
+      description: "US expat claiming full foreign earned income exclusion under §911 is disqualified from EITC"
+      inputs:
+        tax_unit:
+          foreign_earned_income_exclusion: 126_500
+          earned_income: 150_000
+      expect:
+        has_foreign_earned_income: true
+
+    - name: "expat_with_partial_exclusion"
+      period: 2024
+      description: "US expat claiming partial foreign earned income exclusion is still disqualified from EITC"
+      inputs:
+        tax_unit:
+          foreign_earned_income_exclusion: 50_000
+          earned_income: 80_000
+      expect:
+        has_foreign_earned_income: true
+
+    - name: "returned_expat_current_year_domestic"
+      period: 2024
+      description: "Former expat now working domestically with no current exclusion qualifies for EITC consideration"
+      inputs:
+        tax_unit:
+          foreign_earned_income_exclusion: 0
+          earned_income: 42_000
+      expect:
+        has_foreign_earned_income: false
+
+    - name: "low_income_expat_with_exclusion"
+      period: 2024
+      description: "Low-income expat with small exclusion amount is still disqualified from EITC"
+      inputs:
+        tax_unit:
+          foreign_earned_income_exclusion: 10_000
+          earned_income: 25_000
+      expect:
+        has_foreign_earned_income: true
+
+    - name: "housing_exclusion_only"
+      period: 2024
+      description: "Expat claiming foreign housing exclusion but no earned income exclusion qualifies for EITC"
+      inputs:
+        tax_unit:
+          foreign_earned_income_exclusion: 0
+          foreign_housing_exclusion: 15_000
+          earned_income: 60_000
+      expect:
+        has_foreign_earned_income: false

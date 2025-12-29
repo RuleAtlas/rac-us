@@ -13,3 +13,67 @@ variable is_nonresident_alien:
   dtype: Boolean
   label: "Is Nonresident Alien"
   description: "Whether taxpayer is a nonresident alien not electing US tax treatment, disqualifying from EITC per 26 USC §32(c)(1)(D)"
+  tests:
+    - name: "us_citizen_qualifies_for_eitc"
+      period: 2024
+      description: "US citizen with earned income is not disqualified by nonresident alien rule"
+      inputs:
+        tax_unit:
+          citizenship_status: "US_CITIZEN"
+          earned_income: 25_000
+      expect:
+        is_nonresident_alien: false
+
+    - name: "resident_alien_qualifies_for_eitc"
+      period: 2024
+      description: "Lawful permanent resident (green card holder) is not disqualified"
+      inputs:
+        tax_unit:
+          citizenship_status: "LAWFUL_PERMANENT_RESIDENT"
+          earned_income: 30_000
+      expect:
+        is_nonresident_alien: false
+
+    - name: "nonresident_alien_disqualified"
+      period: 2024
+      description: "Nonresident alien without election is disqualified from EITC per §32(c)(1)(D)(i)"
+      inputs:
+        tax_unit:
+          citizenship_status: "NONRESIDENT_ALIEN"
+          elects_us_tax_treatment: false
+          earned_income: 20_000
+      expect:
+        is_nonresident_alien: true
+
+    - name: "nonresident_alien_with_election_qualifies"
+      period: 2024
+      description: "Nonresident alien electing US tax treatment qualifies per §32(c)(1)(D)(ii)"
+      inputs:
+        tax_unit:
+          citizenship_status: "NONRESIDENT_ALIEN"
+          elects_us_tax_treatment: true
+          earned_income: 35_000
+      expect:
+        is_nonresident_alien: false
+
+    - name: "partial_year_nonresident_disqualified"
+      period: 2024
+      description: "Individual who was nonresident alien for any portion of year is disqualified"
+      inputs:
+        tax_unit:
+          citizenship_status: "PARTIAL_YEAR_NONRESIDENT"
+          elects_us_tax_treatment: false
+          earned_income: 40_000
+      expect:
+        is_nonresident_alien: true
+
+    - name: "dual_status_alien_with_election_qualifies"
+      period: 2024
+      description: "Dual-status alien electing full-year US treatment qualifies for EITC"
+      inputs:
+        tax_unit:
+          citizenship_status: "DUAL_STATUS_ALIEN"
+          elects_us_tax_treatment: true
+          earned_income: 28_000
+      expect:
+        is_nonresident_alien: false
