@@ -30,7 +30,7 @@ input annual_gross_income:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Annual Gross Income"
   description: "Total annual gross household income"
   default: 0
@@ -95,7 +95,7 @@ input annual_energy_costs:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Annual Energy Costs"
   description: "Total annual home energy costs"
   default: 0
@@ -106,7 +106,7 @@ parameter fpl_base:
   values:
     2024-01-01: 15_060
     2023-01-01: 14_580
-  unit: "USD"
+  unit: USD
   period: Year
   label: "Federal Poverty Level Base"
   description: "Annual FPL for 1-person household"
@@ -116,7 +116,7 @@ parameter fpl_additional_per_person:
   values:
     2024-01-01: 5_380
     2023-01-01: 5_140
-  unit: "USD"
+  unit: USD
   period: Year
   label: "FPL Additional Per Person"
   description: "Annual FPL increment for each additional household member"
@@ -125,7 +125,7 @@ parameter fpl_additional_per_person:
 parameter fpl_percentage:
   values:
     1981-01-01: 1.50
-  unit: "/1"
+  unit: /1
   period: Year
   label: "LIHEAP FPL Percentage"
   description: "Income limit as percentage of FPL (150%)"
@@ -137,7 +137,7 @@ variable liheap_fpl_annual:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "LIHEAP Annual FPL"
   description: "Annual Federal Poverty Level for household, scaled by size"
   syntax: python
@@ -176,7 +176,7 @@ variable liheap_income_limit:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "LIHEAP Income Limit"
   description: "Maximum income for LIHEAP eligibility (150% FPL)"
   syntax: python
@@ -399,7 +399,7 @@ variable liheap_energy_burden:
   entity: Household
   period: Year
   dtype: Rate
-  unit: "/1"
+  unit: /1
   label: "Energy Burden"
   description: "Ratio of energy costs to income, used in benefit targeting"
   syntax: python

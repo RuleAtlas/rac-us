@@ -13,7 +13,7 @@ input general_exclusion:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SSI General Income Exclusion"
   description: "First $20 of income excluded from SSI"
   default: 20
@@ -22,7 +22,7 @@ variable income_exclusions:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SSI total countable income"
   description: "Sum of countable earned and unearned income per 42 USC 1_382a"
   formula: return general_exclusion

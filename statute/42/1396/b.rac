@@ -11,7 +11,7 @@ variable income_methodology:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Countable scholarship income"
   description: "Scholarship income counted under MAGI"
   syntax: python

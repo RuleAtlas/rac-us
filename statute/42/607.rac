@@ -268,7 +268,7 @@ variable tanf_required_work_hours_weekly:
   entity: Person
   period: Week
   dtype: Integer
-  unit: "hours"
+  unit: hours
   label: "TANF Required Weekly Work Hours"
   description: "Weekly work hours required for TANF participation based on family composition"
   syntax: python
@@ -297,7 +297,7 @@ variable tanf_required_work_hours_monthly:
   entity: Person
   period: Month
   dtype: Integer
-  unit: "hours"
+  unit: hours
   label: "TANF Required Monthly Work Hours"
   description: "Monthly work hours required (weekly hours * weeks_per_month)"
   syntax: python
@@ -310,7 +310,7 @@ variable tanf_hours_in_core_activities:
   entity: Person
   period: Week
   dtype: Integer
-  unit: "hours"
+  unit: hours
   label: "TANF Core Work Activity Hours"
   description: "Hours in core work activities (unsubsidized employment, on-the-job training, etc.)"
   syntax: python

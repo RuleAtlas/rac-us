@@ -437,7 +437,7 @@ variable medicaid_nominal_copayment:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Nominal copayment amount"
   description: "Nominal copayment for individuals below 100% FPL per 42 CFR 447.54"
   syntax: python
@@ -558,7 +558,7 @@ variable medicaid_max_monthly_premium:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Maximum monthly premium"
   description: "Maximum premium that can be charged per 42 USC 1396o(c)"
   syntax: python
@@ -584,7 +584,7 @@ variable medicaid_monthly_cost_share_limit:
   entity: Household
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Monthly cost sharing limit"
   description: "Maximum monthly cost sharing per 42 USC 1396o-1(e)(1)"
   syntax: python
@@ -621,7 +621,7 @@ variable medicaid_annual_cost_share_limit:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Annual cost sharing limit"
   description: "Maximum annual cost sharing per 42 USC 1396o-1(e)(1)"
   syntax: python

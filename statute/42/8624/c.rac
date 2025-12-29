@@ -17,21 +17,21 @@ household size;
 parameter income_factor_weight:
   description: "Weight applied to income factor in benefit calculation"
   reference: "42 USC 8624(c)"
-  unit: "/1"
+  unit: /1
   values:
     1981-01-01: 0.5
 
 parameter burden_factor_weight:
   description: "Weight applied to energy burden factor in benefit calculation"
   reference: "42 USC 8624(c)"
-  unit: "/1"
+  unit: /1
   values:
     1981-01-01: 0.5
 
 parameter priority_multiplier:
   description: "Benefit multiplier for priority households"
   reference: "42 USC 8624(c)"
-  unit: "/1"
+  unit: /1
   values:
     1981-01-01: 1.25
 
@@ -40,21 +40,21 @@ parameter priority_multiplier:
 parameter base_benefit_placeholder:
   description: "Placeholder base benefit amount (actual varies by state/year)"
   reference: "42 USC 8624(c)"
-  unit: "USD"
+  unit: USD
   values:
     1981-01-01: 500
 
 parameter cooling_assistance_fraction:
   description: "Cooling assistance as fraction of total LIHEAP benefit"
   reference: "42 USC 8624(c)"
-  unit: "/1"
+  unit: /1
   values:
     1981-01-01: 0.5
 
 parameter income_factor_floor:
   description: "Minimum value for income factor in benefit calculation"
   reference: "42 USC 8624(c)"
-  unit: "/1"
+  unit: /1
   values:
     1981-01-01: 0.1
 
@@ -63,7 +63,7 @@ variable liheap_energy_burden_factor:
   entity: Household
   period: Year
   dtype: Rate
-  unit: "/1"
+  unit: /1
   label: "LIHEAP Energy Burden Factor"
   description: "Energy burden calculation per 42 USC 8_624(c)(5)(A)(i) - ratio of energy costs to income, used for benefit targeting"
   syntax: python
@@ -107,7 +107,7 @@ variable liheap_income_factor:
   entity: Household
   period: Year
   dtype: Rate
-  unit: "/1"
+  unit: /1
   label: "LIHEAP Income Factor"
   description: "Income-based factor for benefit calculation - lower income yields higher factor"
   syntax: python
@@ -150,7 +150,7 @@ variable liheap_combined_factor:
   entity: Household
   period: Year
   dtype: Rate
-  unit: "/1"
+  unit: /1
   label: "LIHEAP Combined Benefit Factor"
   description: "Weighted combination of income and energy burden factors per 42 USC 8_624(c)(5)"
   syntax: python
@@ -201,7 +201,7 @@ variable liheap_priority_multiplier_applied:
   entity: Household
   period: Year
   dtype: Rate
-  unit: "/1"
+  unit: /1
   label: "LIHEAP Priority Multiplier Applied"
   description: "Benefit multiplier for priority households per 42 USC 8_624(c)(5)(A)(ii-iv)"
   syntax: python
@@ -243,7 +243,7 @@ variable liheap_cooling_assistance:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "LIHEAP Cooling Assistance"
   description: "Home cooling assistance benefit per 42 USC 8_624(b)(1)(B) and (c)(5)"
   syntax: python
@@ -344,7 +344,7 @@ variable liheap_heating_assistance:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "LIHEAP Heating Assistance"
   description: "Home heating assistance benefit per 42 USC 8_624(b)(1)(A) and (c)(5)"
   syntax: python
@@ -442,7 +442,7 @@ variable liheap_total_assistance:
   entity: Household
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "LIHEAP Total Assistance"
   description: "Total LIHEAP assistance (heating + cooling) per 42 USC 8_624"
   syntax: python

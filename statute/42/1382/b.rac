@@ -16,7 +16,7 @@ input has_eligible_spouse:
 parameter fbr_individual:
   description: "Federal Benefit Rate for individual without spouse"
   reference: "42 USC 1382(b)"
-  unit: "USD"
+  unit: USD
   period: Month
   values:
     2024-01-01: 943
@@ -26,7 +26,7 @@ parameter fbr_individual:
 parameter fbr_couple:
   description: "Federal Benefit Rate for couple"
   reference: "42 USC 1382(b)"
-  unit: "USD"
+  unit: USD
   period: Month
   values:
     2024-01-01: 1415
@@ -37,7 +37,7 @@ variable federal_benefit_rate:
   entity: Person
   period: Month
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "SSI applicable FBR"
   description: "FBR after living arrangement reduction per 42 USC 1_382(a)(2)(A)"
   syntax: python
