@@ -35,7 +35,6 @@ defined in section 25A(f)(2))'.
 # 26 USC 221(d)(1) - Loan sourced from eligible institution
 parameter minimum_qualified_education_expenses:
   description: "Minimum qualified higher education expenses threshold (per 26 USC 221(d)(6))"
-  reference: "26 USC 221(b)"
   unit: USD
   values:
     2024-01-01: 0

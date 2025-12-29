@@ -27,14 +27,12 @@ received during the taxable year, exceeds the base amount.
 
 parameter tier1_inclusion_rate:
   description: "Maximum percentage of Social Security benefits includible under tier 1"
-  reference: "26 USC 86(a)(1)(A)(i)"
   unit: /1
   values:
     1984-01-01: 0.50
 
 parameter tier2_inclusion_rate:
   description: "Maximum percentage of Social Security benefits includible under tier 2"
-  reference: "26 USC 86(a)(2)"
   unit: /1
   values:
     1994-01-01: 0.85
@@ -52,7 +50,6 @@ variable tier1_taxable_ss:
   unit: USD
   label: "Tier 1 Taxable Social Security"
   description: "Amount of Social Security benefits taxable under tier 1 (50% threshold) per 26 USC 86(a)(1)"
-  reference: "26 USC 86(a)(1)"
   syntax: python
   formula: |
     # Determine base amount by filing status

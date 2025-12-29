@@ -122,7 +122,6 @@ variable capital_gains:
 
 parameter long_term_holding_days:
   description: "Days held for long-term capital gain treatment (more than one year)"
-  reference: "26 USC 1222"
   unit: days
   values:
     1900-01-01: 366

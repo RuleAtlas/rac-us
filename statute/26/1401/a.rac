@@ -14,7 +14,6 @@ of the amount of the self-employment income for such taxable year.
 parameter se_oasdi_rate:
   values:
     1984-01-01: 0.124  # 12.4% combined employer + employee share
-  reference: "26 USC 1401(a) - OASDI tax rate on self-employment income"
 
 # Social Security wage base
 # Per 26 USC 3121(a)(1), as adjusted annually
@@ -23,7 +22,6 @@ parameter social_security_wage_base:
     2023-01-01: 160_200
     2024-01-01: 168_600
     2025-01-01: 176_100
-  reference: "SSA annual determination - contribution and benefit base"
 
 input net_self_employment_earnings:
   entity: Person

@@ -31,7 +31,6 @@ regular enrollment period for coverage during such calendar year.
 """
 parameter definitions:
   description: "Container for PTC definitions per 26 USC 36B(d)"
-  reference: "26 USC 36B(d)"
 
 variable ptc_household_size:
   entity: TaxUnit

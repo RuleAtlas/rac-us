@@ -19,7 +19,6 @@ In the case of an eligible individual with:
 # These are statutory percentages (not inflation-adjusted)
 parameter credit_percentage_by_children:
   description: "Credit percentage for EITC phase-in calculation, indexed by number of qualifying children"
-  reference: "26 USC 32(b)(1)"
   unit: /1
   values:
     2024-01-01:
@@ -32,7 +31,6 @@ parameter credit_percentage_by_children:
 # These are statutory percentages (not inflation-adjusted)
 parameter phaseout_percentage_by_children:
   description: "Phaseout percentage for EITC reduction calculation, indexed by number of qualifying children"
-  reference: "26 USC 32(b)(1)"
   unit: /1
   values:
     2024-01-01:

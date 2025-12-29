@@ -68,7 +68,6 @@ input has_elderly_disabled:
 
 parameter vehicle_exclusion:
   description: "Fair market value exclusion for one vehicle"
-  reference: "7 USC 2014(g)"
   unit: USD
   period: Month
   label: "SNAP Vehicle Exclusion"
@@ -77,7 +76,6 @@ parameter vehicle_exclusion:
 
 parameter resource_limit:
   description: "Resource limit for non-elderly/disabled households"
-  reference: "7 USC 2014(g)"
   unit: USD
   period: Month
   label: "SNAP Resource Limit"
@@ -88,7 +86,6 @@ parameter resource_limit:
 
 parameter resource_limit_elderly_disabled:
   description: "Resource limit for households with elderly/disabled members"
-  reference: "7 USC 2014(g)"
   unit: USD
   period: Month
   label: "SNAP Resource Limit (Elderly/Disabled)"

@@ -13,7 +13,6 @@ by $500 for each such dependent.
 
 parameter other_dependent_credit:
   description: "CTC credit for dependents who are not qualifying children under TCJA"
-  reference: "26 USC 24(h)(4)"
   unit: USD
   values:
     2026-01-01: 0    # TCJA sunset - no ODC before TCJA

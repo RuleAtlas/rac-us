@@ -13,7 +13,6 @@ minimum taxable income of the taxpayer exceeds the threshold amount.
 
 parameter phaseout_threshold_joint:
   description: "AMT phaseout threshold for married filing jointly"
-  reference: "26 USC 55(d)(2)"
   unit: USD
   indexed_by: statute/26/55/d/4
   values:
@@ -25,7 +24,6 @@ parameter phaseout_threshold_joint:
 
 parameter phaseout_threshold_single:
   description: "AMT phaseout threshold for single filers"
-  reference: "26 USC 55(d)(2)"
   unit: USD
   indexed_by: statute/26/55/d/4
   values:
@@ -40,7 +38,6 @@ parameter phaseout_threshold_single:
 
 parameter phaseout_threshold_married_separate:
   description: "AMT phaseout threshold for married filing separately"
-  reference: "26 USC 55(d)(2)"
   unit: USD
   indexed_by: statute/26/55/d/4
   values:
@@ -56,7 +53,6 @@ parameter phaseout_threshold_married_separate:
 # Statutory rate - not indexed
 parameter phaseout_rate:
   description: "AMT exemption phaseout rate"
-  reference: "26 USC 55(d)(2)"
   unit: /1
   values:
     2018-01-01: 0.25

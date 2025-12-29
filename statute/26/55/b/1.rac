@@ -11,7 +11,6 @@ The tentative minimum tax for the taxable year is the sum of—
 
 parameter amt_rate_low:
   description: "AMT rate for income up to bracket threshold"
-  reference: "26 USC 55(b)(1)"
   unit: /1
   values:
     2018-01-01: 0.26
@@ -22,7 +21,6 @@ parameter amt_rate_low:
 
 parameter amt_rate_high:
   description: "AMT rate for income above bracket threshold"
-  reference: "26 USC 55(b)(1)"
   unit: /1
   values:
     2018-01-01: 0.28

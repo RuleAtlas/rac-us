@@ -19,7 +19,6 @@ the loss of employment. This includes:
 # Unemployment compensation is 100% included in gross income post-2020
 parameter unemployment_inclusion_rate:
   description: "Fraction of unemployment compensation included in gross income"
-  reference: "26 USC 85(a)"
   unit: /1
   values:
     2024-01-01: 1.0

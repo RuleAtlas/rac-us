@@ -8,14 +8,12 @@ subsection (a) shall not exceed --
 
 parameter one_qualifying_limit:
   description: "Dollar limit on expenses for 1 qualifying individual"
-  reference: "26 USC 21(c)"
   unit: USD
   values:
     1976-01-01: 3_000
 
 parameter two_or_more_limit:
   description: "Dollar limit on expenses for 2 or more qualifying individuals"
-  reference: "26 USC 21(c)"
   unit: USD
   values:
     1976-01-01: 6_000

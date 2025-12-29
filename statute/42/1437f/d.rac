@@ -1,6 +1,5 @@
 parameter base_voucher_bedroom_count:
   description: "Base bedroom count for head of household and spouse"
-  reference: "24 CFR 5.653"
   unit: /1
   values:
     1998-10-21: 1
@@ -8,7 +7,6 @@ parameter base_voucher_bedroom_count:
 
 parameter persons_per_bedroom:
   description: "Number of persons allowed per additional bedroom"
-  reference: "24 CFR 5.653"
   unit: /1
   values:
     1998-10-21: 2
@@ -16,7 +14,6 @@ parameter persons_per_bedroom:
 
 parameter max_bedroom_count:
   description: "Maximum bedroom count with specific payment standard"
-  reference: "24 CFR 5.653"
   unit: /1
   values:
     1998-10-21: 5
@@ -24,7 +21,6 @@ parameter max_bedroom_count:
 
 parameter rent_reasonableness_threshold:
   description: "Percentage of payment standard used for rent reasonableness comparison"
-  reference: "24 CFR 5.654"
   unit: /1
   values:
     1998-10-21: 1.0

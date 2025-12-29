@@ -2,7 +2,6 @@
 
 parameter se_tax_deduction_rate:
   description: "Deductible portion of self-employment tax"
-  reference: "26 USC 164(f)"
   unit: /1
   values:
     1990-01-01: 0.5

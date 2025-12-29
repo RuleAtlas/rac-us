@@ -24,25 +24,21 @@ imports:
 parameter additional_medicare_rate:
   values:
     2013-01-01: 0.009  # 0.9% additional rate
-  reference: "26 USC 1401(b)(2) - Additional Medicare Tax rate"
 
 # Threshold for joint returns
 parameter additional_medicare_threshold_joint:
   values:
     2013-01-01: 250_000
-  reference: "26 USC 1401(b)(2)(A) - Joint return threshold"
 
 # Threshold for married filing separately
 parameter additional_medicare_threshold_separate:
   values:
     2013-01-01: 125_000
-  reference: "26 USC 1401(b)(2)(B) - MFS threshold (1/2 of joint)"
 
 # Threshold for single, HOH, surviving spouse
 parameter additional_medicare_threshold_single:
   values:
     2013-01-01: 200_000
-  reference: "26 USC 1401(b)(2)(C) - Single/HOH threshold"
 
 variable additional_medicare_tax:
   entity: TaxUnit

@@ -14,14 +14,12 @@ poverty line applicable to the size of the household.
 
 parameter age_child_max:
   description: "Maximum age for child classification (exclusive)"
-  reference: "42 USC 1396(d)"
   unit: years
   values:
     2010-03-23: 19
 
 parameter age_elderly_min:
   description: "Minimum age for elderly/Medicare classification (inclusive)"
-  reference: "42 USC 1396(d)"
   unit: years
   values:
     2010-03-23: 65

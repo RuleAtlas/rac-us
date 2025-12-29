@@ -31,21 +31,18 @@ input tax_year:
 
 parameter flat_rate:
   description: "Post-TCJA flat corporate income tax rate"
-  reference: "26 USC 11(b)"
   unit: /1
   values:
     2018-01-01: 0.21
 
 parameter tcja_effective_year:
   description: "Year when TCJA flat corporate rate took effect"
-  reference: "26 USC 11(b)"
   unit: year
   values:
     2017-01-01: 2018
 
 parameter graduated_brackets:
   description: "Pre-TCJA graduated corporate tax brackets"
-  reference: "26 USC 11(b)"
   values:
     1993-01-01:
       thresholds: [0, 50_000, 75_000, 100_000, 335_000, 10_000_000, 15_000_000, 18_333_333]

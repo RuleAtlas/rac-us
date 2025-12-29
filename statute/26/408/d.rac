@@ -8,7 +8,6 @@ the case may be, in the manner provided under section 72.
 
 parameter early_withdrawal_penalty_threshold_age:
   description: "Age at which early withdrawal penalty no longer applies"
-  reference: "26 USC 408(d)"
   unit: years
   values:
     1977-01-01: 59.5

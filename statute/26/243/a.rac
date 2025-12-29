@@ -31,28 +31,24 @@ input ownership_percentage:
 
 parameter ownership_threshold_affiliated:
   description: "Ownership threshold for affiliated corporation status (80%)"
-  reference: "26 USC 243(a)"
   unit: /1
   values:
     1987-01-01: 0.80
 
 parameter ownership_threshold_20_percent:
   description: "Ownership threshold for 20-percent owned corporation status"
-  reference: "26 USC 243(a)"
   unit: /1
   values:
     1987-01-01: 0.20
 
 parameter deduction_rate_affiliated:
   description: "Deduction rate for dividends from affiliated corporations (80%+ ownership)"
-  reference: "26 USC 243(a)"
   unit: /1
   values:
     1987-01-01: 1.00
 
 parameter deduction_rate_20_percent:
   description: "Deduction rate for dividends from 20-percent owned corporations"
-  reference: "26 USC 243(a)"
   unit: /1
   values:
     2018-01-01: 0.65
@@ -60,7 +56,6 @@ parameter deduction_rate_20_percent:
 
 parameter deduction_rate_portfolio:
   description: "Deduction rate for portfolio dividends (less than 20% ownership)"
-  reference: "26 USC 243(a)"
   unit: /1
   values:
     2018-01-01: 0.50

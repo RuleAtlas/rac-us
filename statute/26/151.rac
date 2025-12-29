@@ -6,7 +6,6 @@ in computing taxable income.
 
 parameter exemption_amount:
   description: "Personal exemption amount per exemption"
-  reference: "26 USC 151"
   unit: USD
   values:
     2018-01-01: 0  # Suspended by TCJA

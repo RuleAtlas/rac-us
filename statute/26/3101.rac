@@ -37,7 +37,6 @@ text: |
 # 26 USC 3101(a) - OASDI tax rate
 parameter oasdi_employee_rate:
   description: "Employee OASDI (Social Security) tax rate"
-  reference: "26 USC 3101(a)"
   unit: /1
   values:
     1990-01-01: 0.062
@@ -45,7 +44,6 @@ parameter oasdi_employee_rate:
 # 42 USC 430 - Social Security wage base (contribution and benefit base)
 parameter social_security_wage_base:
   description: "Maximum wages subject to OASDI tax (contribution and benefit base)"
-  reference: "42 USC 430"
   unit: USD
   values:
     2025-01-01: 176_100
@@ -62,7 +60,6 @@ parameter social_security_wage_base:
 # 26 USC 3101(b)(1) - Medicare tax rate
 parameter medicare_employee_rate:
   description: "Employee Hospital Insurance (Medicare) tax rate"
-  reference: "26 USC 3101(b)(1)"
   unit: /1
   values:
     1986-01-01: 0.0145
@@ -70,7 +67,6 @@ parameter medicare_employee_rate:
 # 26 USC 3101(b)(2) - Additional Medicare Tax rate
 parameter additional_medicare_tax_rate:
   description: "Additional Medicare Tax rate on high earners"
-  reference: "26 USC 3101(b)(2)"
   unit: /1
   values:
     2013-01-01: 0.009
@@ -78,7 +74,6 @@ parameter additional_medicare_tax_rate:
 # 26 USC 3101(b)(2)(A) - Additional Medicare Tax threshold (joint)
 parameter additional_medicare_threshold_joint:
   description: "Wage threshold for Additional Medicare Tax on joint returns"
-  reference: "26 USC 3101(b)(2)(A)"
   unit: USD
   values:
     2013-01-01: 250_000
@@ -86,7 +81,6 @@ parameter additional_medicare_threshold_joint:
 # 26 USC 3101(b)(2)(B) - Additional Medicare Tax threshold (MFS)
 parameter additional_medicare_threshold_separate:
   description: "Wage threshold for Additional Medicare Tax for married filing separately"
-  reference: "26 USC 3101(b)(2)(B)"
   unit: USD
   values:
     2013-01-01: 125_000
@@ -94,7 +88,6 @@ parameter additional_medicare_threshold_separate:
 # 26 USC 3101(b)(2)(C) - Additional Medicare Tax threshold (other)
 parameter additional_medicare_threshold_other:
   description: "Wage threshold for Additional Medicare Tax for single filers"
-  reference: "26 USC 3101(b)(2)(C)"
   unit: USD
   values:
     2013-01-01: 200_000

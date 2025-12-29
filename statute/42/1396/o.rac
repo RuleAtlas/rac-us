@@ -32,55 +32,46 @@ parameter nominal_copayment_max:
     1982-01-01: 1.00  # Original nominal amount
     2003-01-01: 3.00  # Increased per DRA implementation
     2006-01-01: 4.00  # Current maximum per 42 CFR 447.54
-  reference: "42 CFR 447.54(a)(1) - Federal maximum nominal copayment"
 
 # Copayment rate for individuals 100-150% FPL
 parameter copayment_rate_100_150_fpl:
   values:
     2006-01-01: 0.10
-  reference: "42 CFR 447.52(b)(1) - Cost sharing for services at 100-150% FPL"
 
 # Copayment rate for individuals above 150% FPL
 parameter copayment_rate_150_plus_fpl:
   values:
     2006-01-01: 0.20
-  reference: "42 CFR 447.52(b)(2) - Cost sharing for services above 150% FPL"
 
 # FPL threshold for nominal cost sharing tier
 parameter nominal_tier_fpl_threshold:
   values:
     1982-01-01: 1.00
-  reference: "42 USC 1396o(a)(3) - Nominal cost sharing for individuals below 100% FPL"
 
 # FPL threshold for moderate cost sharing tier
 parameter moderate_tier_fpl_threshold:
   values:
     2006-01-01: 1.50
-  reference: "42 USC 1396o-1(a)(3)(A)(ii) - Higher cost sharing above 150% FPL"
 
 # FPL threshold for premium eligibility
 parameter premium_fpl_threshold:
   values:
     2006-01-01: 1.50
-  reference: "42 USC 1396o(c) - Premium threshold at 150% FPL"
 
 # Child age threshold for cost sharing exemption
 parameter child_age_threshold:
   values:
     1982-01-01: 18
-  reference: "42 USC 1396o(a)(2)(B) - Children under 18 exempt from cost sharing"
 
 # Aggregate cost share limit as percentage of income
 parameter aggregate_cost_share_limit:
   values:
     2006-01-01: 0.05
-  reference: "42 USC 1396o-1(e)(1) - Aggregate limit of 5% of family income"
 
 # Months per year (for annual calculations)
 parameter months_per_year:
   values:
     1900-01-01: 12
-  reference: "Standard calendar conversion"
 
 variable medicaid_preventive_cost_share_exempt:
   entity: Person

@@ -63,7 +63,6 @@ input qualified_dividends:
 
 parameter capital_gains_brackets:
   description: "Capital gains rate brackets by filing status"
-  reference: "26 USC 1(h)"
   indexed_by: statute/26/1/h
   values:
     # TCJA base thresholds (2018)

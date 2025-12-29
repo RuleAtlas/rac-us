@@ -17,7 +17,6 @@ input irs_employment_income:
 
 parameter employee_rate:
   description: "Employee Medicare tax rate"
-  reference: "26 USC 3101(b)"
   unit: /1
   values:
     1986-01-01: 0.0145

@@ -15,7 +15,6 @@ greater of--
 # 63(c)(5)(A)(i): Minimum floor
 parameter dependent_minimum:
   description: "Minimum standard deduction floor for dependents"
-  reference: "26 USC 63(c)(5)"
   unit: USD
   indexed_by: statute/26/63/c/4
   values:
@@ -28,7 +27,6 @@ parameter dependent_minimum:
 # 63(c)(5)(A)(ii): Earned income add-on
 parameter dependent_earned_addon:
   description: "Amount added to dependent's earned income for standard deduction calculation"
-  reference: "26 USC 63(c)(5)"
   unit: USD
   indexed_by: statute/26/63/c/4
   values:

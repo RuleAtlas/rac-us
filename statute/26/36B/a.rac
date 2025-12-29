@@ -18,7 +18,6 @@ of the taxpayer for the taxable year.
 
 parameter months_per_year:
   description: "Months in a year for annual/monthly conversion"
-  reference: "26 USC 36B(b)(3)(A)(ii)"
   unit: months
   values:
     1900-01-01: 12

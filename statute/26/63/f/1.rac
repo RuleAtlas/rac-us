@@ -16,7 +16,6 @@ for "$600".
 
 parameter aged_threshold:
   description: "Age threshold for additional aged standard deduction"
-  reference: "26 USC 63(f)(1)"
   unit: years
   values:
     1988-01-01: 65
@@ -27,7 +26,6 @@ parameter aged_threshold:
 
 parameter additional_aged_married:
   description: "Additional standard deduction for aged taxpayer who is married or surviving spouse"
-  reference: "26 USC 63(f)(1)"
   unit: USD
   indexed_by: statute/26/63/c/4
   values:
@@ -39,7 +37,6 @@ parameter additional_aged_married:
 
 parameter additional_aged_unmarried:
   description: "Additional standard deduction for aged taxpayer who is single or head of household"
-  reference: "26 USC 63(f)(1)"
   unit: USD
   indexed_by: statute/26/63/c/4
   values:

@@ -7,42 +7,36 @@ adjusted gross income for the taxable year exceeds $15,000.
 
 parameter maximum_rate:
   description: "Maximum applicable percentage for CDCC"
-  reference: "26 USC 21(b)"
   unit: /1
   values:
     1976-01-01: 0.35
 
 parameter minimum_rate:
   description: "Minimum applicable percentage for CDCC (floor rate)"
-  reference: "26 USC 21(b)"
   unit: /1
   values:
     1976-01-01: 0.20
 
 parameter phase_down_threshold:
   description: "AGI threshold above which applicable percentage begins to decrease"
-  reference: "26 USC 21(b)"
   unit: USD
   values:
     1976-01-01: 15_000
 
 parameter phase_down_increment:
   description: "AGI increment for each 1% reduction in applicable percentage"
-  reference: "26 USC 21(b)"
   unit: USD
   values:
     1976-01-01: 2_000
 
 parameter phase_down_rate:
   description: "Rate reduction per AGI increment"
-  reference: "26 USC 21(b)"
   unit: /1
   values:
     1976-01-01: 0.01
 
 parameter arpa_complete_phaseout_threshold:
   description: "AGI threshold above which ARPA 2021 rate phases out completely (set to infinity for permanent law)"
-  reference: "26 USC 21(b)"
   unit: USD
   values:
     # Under permanent law, there is no complete phaseout - use infinity

@@ -26,7 +26,6 @@ insurance coverage...
 
 parameter max_age:
   description: "Maximum age for CHIP eligibility (child must be under this age)"
-  reference: "42 USC 1397aa-1397mm(1397aa)(a)"
   unit: years
   values:
     1997-08-05: 19  # CHIP enacted by Balanced Budget Act of 1997

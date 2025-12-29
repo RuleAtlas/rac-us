@@ -40,7 +40,6 @@ which may be taken into account under subsection (a) shall not exceed--
 # 26 USC 21(c)(1) - One qualifying individual limit
 parameter cdcc_expense_limit_one:
   description: "Maximum expenses for one qualifying individual"
-  reference: "26 USC 21(c)(1)"
   unit: USD
   values:
     1976-01-01: 3_000
@@ -48,7 +47,6 @@ parameter cdcc_expense_limit_one:
 # 26 USC 21(c)(2) - Two or more qualifying individuals limit
 parameter cdcc_expense_limit_two_plus:
   description: "Maximum expenses for two or more qualifying individuals"
-  reference: "26 USC 21(c)(2)"
   unit: USD
   values:
     1976-01-01: 6_000
@@ -60,7 +58,6 @@ parameter cdcc_expense_limit_two_plus:
 # 26 USC 21(a)(2) - Maximum applicable percentage
 parameter cdcc_maximum_rate:
   description: "Maximum applicable percentage for CDCC"
-  reference: "26 USC 21(a)(2)"
   unit: /1
   values:
     1976-01-01: 0.35
@@ -68,7 +65,6 @@ parameter cdcc_maximum_rate:
 # 26 USC 21(a)(2) - Minimum applicable percentage (floor)
 parameter cdcc_minimum_rate:
   description: "Minimum applicable percentage floor for CDCC"
-  reference: "26 USC 21(a)(2)"
   unit: /1
   values:
     1976-01-01: 0.20
@@ -76,7 +72,6 @@ parameter cdcc_minimum_rate:
 # 26 USC 21(a)(2) - Phase-down threshold
 parameter cdcc_phase_down_threshold:
   description: "AGI threshold above which applicable percentage reduces"
-  reference: "26 USC 21(a)(2)"
   unit: USD
   values:
     1976-01-01: 15_000
@@ -84,7 +79,6 @@ parameter cdcc_phase_down_threshold:
 # 26 USC 21(a)(2) - Phase-down increment
 parameter cdcc_phase_down_increment:
   description: "AGI increment for each 1% reduction in applicable percentage"
-  reference: "26 USC 21(a)(2)"
   unit: USD
   values:
     1976-01-01: 2_000
@@ -92,7 +86,6 @@ parameter cdcc_phase_down_increment:
 # 26 USC 21(a)(2) - Phase-down rate per increment
 parameter cdcc_phase_down_rate:
   description: "Percentage reduction per increment above threshold"
-  reference: "26 USC 21(a)(2)"
   unit: /1
   values:
     1976-01-01: 0.01

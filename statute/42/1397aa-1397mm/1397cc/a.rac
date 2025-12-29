@@ -29,7 +29,6 @@ cost sharing... the cumulative amount of which exceeds
 
 parameter cost_sharing_exempt_threshold:
   description: "Income level (as % FPL) below which children are exempt from most cost-sharing"
-  reference: "42 USC 1397aa-1397mm(1397cc)(a)"
   unit: /1
   values:
     2024-01-01: 150

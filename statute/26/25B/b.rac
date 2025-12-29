@@ -13,19 +13,16 @@ household (as defined in section 2(b)), the applicable percentage...
 
 parameter savers_credit_rate_tier1:
   description: "Saver's credit rate for lowest AGI tier (50%)"
-  reference: "26 USC 25B(b)"
   values:
     2002-01-01: 0.50
 
 parameter savers_credit_rate_tier2:
   description: "Saver's credit rate for second AGI tier (20%)"
-  reference: "26 USC 25B(b)"
   values:
     2002-01-01: 0.20
 
 parameter savers_credit_rate_tier3:
   description: "Saver's credit rate for third AGI tier (10%)"
-  reference: "26 USC 25B(b)"
   values:
     2002-01-01: 0.10
 

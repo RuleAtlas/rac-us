@@ -15,7 +15,6 @@ section 2(b)), or
 # 63(c)(2)(A): Joint return or surviving spouse
 parameter basic_joint:
   description: "Basic standard deduction for married filing jointly or surviving spouse"
-  reference: "26 USC 63(c)(2)"
   unit: USD
   indexed_by: statute/26/63/c/4
   values:
@@ -28,7 +27,6 @@ parameter basic_joint:
 # 63(c)(2)(B): Head of household
 parameter basic_head_of_household:
   description: "Basic standard deduction for head of household filing status"
-  reference: "26 USC 63(c)(2)"
   unit: USD
   indexed_by: statute/26/63/c/4
   values:
@@ -41,7 +39,6 @@ parameter basic_head_of_household:
 # 63(c)(2)(C): Single or married filing separately
 parameter basic_single:
   description: "Basic standard deduction for single or married filing separately"
-  reference: "26 USC 63(c)(2)"
   unit: USD
   indexed_by: statute/26/63/c/4
   values:

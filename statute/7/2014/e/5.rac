@@ -28,7 +28,6 @@ parameter medical_expense_threshold:
   period: Month
   label: "SNAP Medical Expense Deduction Threshold"
   description: "Monthly threshold above which medical expenses are deductible"
-  reference: "7 USC 2014(e)(5)"
 
 variable snap_medical_expense_deduction:
   entity: Household

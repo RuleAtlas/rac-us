@@ -15,7 +15,6 @@ input student_loan_interest_paid:
 # 26 USC 221(b)(1) - Maximum deduction cap
 parameter max_deduction:
   description: "Maximum annual student loan interest deduction"
-  reference: "26 USC 62(a)(17)"
   unit: USD
   values:
     2024-01-01: 2_500

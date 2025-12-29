@@ -37,42 +37,36 @@ exceed
 
 parameter allowance_amount:
   description: "Base rental real estate allowance amount"
-  reference: "26 USC 469(i)(2)"
   unit: USD
   values:
     1986-01-01: 25_000
 
 parameter allowance_amount_mfs:
   description: "Rental real estate allowance for MFS living apart"
-  reference: "26 USC 469(i)(5)(B)"
   unit: USD
   values:
     1986-01-01: 12_500
 
 parameter phaseout_start:
   description: "AGI threshold where phaseout begins"
-  reference: "26 USC 469(i)(3)(A)"
   unit: USD
   values:
     1986-01-01: 100_000
 
 parameter phaseout_start_mfs:
   description: "AGI threshold for MFS living apart"
-  reference: "26 USC 469(i)(5)(B)"
   unit: USD
   values:
     1986-01-01: 50_000
 
 parameter phaseout_rate:
   description: "Rate at which allowance phases out (50%)"
-  reference: "26 USC 469(i)(3)(A)"
   unit: /1
   values:
     1986-01-01: 0.5
 
 parameter hours_threshold:
   description: "Hours required to qualify as real estate professional"
-  reference: "26 USC 469(c)(7)(B)(ii)"
   unit: hours
   values:
     1993-01-01: 750

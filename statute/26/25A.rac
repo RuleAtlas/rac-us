@@ -15,7 +15,6 @@ not exceed $4,000.
 # 26 USC 25A(i)(1)(A) - First tier limit for AOC
 parameter aoc_first_tier_limit:
   description: "Maximum expenses at 100% rate for American Opportunity Credit"
-  reference: "26 USC 25A(i)(1)(A), indexed under 26 USC 25A(h)"
   indexed_by: statute/26/25A/h
   unit: USD
   values:
@@ -24,7 +23,6 @@ parameter aoc_first_tier_limit:
 # 26 USC 25A(i)(1)(A) - First tier rate for AOC
 parameter aoc_first_tier_rate:
   description: "Credit rate for first tier of qualified expenses per 26 USC 25A(i)(1)(A)"
-  reference: "26 USC 25A(i)(1)(A)"
   unit: /1
   values:
     2009-01-01: 1.0
@@ -32,7 +30,6 @@ parameter aoc_first_tier_rate:
 # 26 USC 25A(i)(1)(B) - Second tier limit for AOC
 parameter aoc_second_tier_limit:
   description: "Maximum total expenses eligible for American Opportunity Credit"
-  reference: "26 USC 25A(i)(1)(B), indexed under 26 USC 25A(h)"
   indexed_by: statute/26/25A/h
   unit: USD
   values:
@@ -41,7 +38,6 @@ parameter aoc_second_tier_limit:
 # 26 USC 25A(i)(1)(B) - Second tier rate for AOC
 parameter aoc_second_tier_rate:
   description: "Credit rate for second tier of qualified expenses per 26 USC 25A(i)(1)(B)"
-  reference: "26 USC 25A(i)(1)(B)"
   unit: /1
   values:
     2009-01-01: 0.25

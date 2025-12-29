@@ -48,7 +48,6 @@ text: |
 # 26 USC 1411(a)(1) - NIIT rate
 parameter niit_rate:
   description: "Net Investment Income Tax rate per 26 USC 1411(a)(1)"
-  reference: "26 USC 1411(a)(1)"
   unit: /1
   values:
     2013-01-01: 0.038
@@ -56,7 +55,6 @@ parameter niit_rate:
 # 26 USC 1411(b)(1) - Joint return threshold
 parameter niit_threshold_joint:
   description: "NIIT threshold for joint returns and surviving spouses"
-  reference: "26 USC 1411(b)(1)"
   unit: USD
   values:
     2013-01-01: 250_000
@@ -64,7 +62,6 @@ parameter niit_threshold_joint:
 # 26 USC 1411(b)(2) - Married filing separately threshold
 parameter niit_threshold_separate:
   description: "NIIT threshold for married filing separately"
-  reference: "26 USC 1411(b)(2)"
   unit: USD
   values:
     2013-01-01: 125_000
@@ -72,7 +69,6 @@ parameter niit_threshold_separate:
 # 26 USC 1411(b)(3) - Other threshold (single, HOH)
 parameter niit_threshold_other:
   description: "NIIT threshold for single filers and heads of household"
-  reference: "26 USC 1411(b)(3)"
   unit: USD
   values:
     2013-01-01: 200_000

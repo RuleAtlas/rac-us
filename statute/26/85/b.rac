@@ -22,7 +22,6 @@ variable unemployment_exclusion:
   unit: USD
   label: "Excluded Unemployment Compensation"
   description: "Unemployment compensation excluded from gross income per 26 USC 85(b)(1) and 104(a)(1)"
-  reference: "26 USC 85(b)(1)"
   syntax: python
   formula: |
     # Most unemployment compensation is fully taxable

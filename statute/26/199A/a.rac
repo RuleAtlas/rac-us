@@ -29,7 +29,6 @@ input qualified_coop_dividends:
 
 parameter qbi_deduction_rate:
   description: "Section 199A deduction rate for pass-through income per 26 USC 199A(a)(2)"
-  reference: "26 USC 199A(a)(2)"
   unit: /1
   values:
     2018-01-01: 0.20

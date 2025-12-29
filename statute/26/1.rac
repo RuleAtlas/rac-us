@@ -17,7 +17,6 @@ a tax determined in accordance with the following table
 
 parameter bracket_thresholds_single:
   description: "Income tax bracket thresholds for single filers"
-  reference: "26 USC 1(c); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
   indexed_by: statute/26/1/f
   values:
     2018: [0, 9_525, 38_700, 82_500, 157_500, 200_000, 500_000]
@@ -30,7 +29,6 @@ parameter bracket_thresholds_single:
 
 parameter bracket_thresholds_married_filing_jointly:
   description: "Income tax bracket thresholds for married filing jointly"
-  reference: "26 USC 1(a); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
   indexed_by: statute/26/1/f
   values:
     2018: [0, 19_050, 77_400, 165_000, 315_000, 400_000, 600_000]
@@ -43,7 +41,6 @@ parameter bracket_thresholds_married_filing_jointly:
 
 parameter bracket_thresholds_married_filing_separately:
   description: "Income tax bracket thresholds for married filing separately"
-  reference: "26 USC 1(d); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
   indexed_by: statute/26/1/f
   values:
     2018: [0, 9_525, 38_700, 82_500, 157_500, 200_000, 300_000]
@@ -56,7 +53,6 @@ parameter bracket_thresholds_married_filing_separately:
 
 parameter bracket_thresholds_head_of_household:
   description: "Income tax bracket thresholds for head of household filers"
-  reference: "26 USC 1(b); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
   indexed_by: statute/26/1/f
   values:
     2018: [0, 13_600, 51_800, 82_500, 157_500, 200_000, 500_000]
@@ -69,7 +65,6 @@ parameter bracket_thresholds_head_of_household:
 
 parameter bracket_thresholds_qualifying_widow:
   description: "Income tax bracket thresholds for qualifying surviving spouse"
-  reference: "26 USC 1(a); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
   indexed_by: statute/26/1/f
   values:
     # Same as married filing jointly per 26 USC 1(a)
@@ -83,7 +78,6 @@ parameter bracket_thresholds_qualifying_widow:
 
 parameter bracket_rates:
   description: "Marginal tax rates for each income bracket"
-  reference: "26 USC 1(a)-(d), as amended by P.L. 115-97 (TCJA)"
   values:
     # Statutory rates from TCJA, effective 2018-2025
     2018: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
@@ -97,7 +91,6 @@ parameter bracket_rates:
 # Composite brackets parameter for use in formulas
 parameter brackets:
   description: "Federal income tax brackets (composite)"
-  reference: "26 USC 1"
   values:
     thresholds_by_filing_status:
       SINGLE: bracket_thresholds_single

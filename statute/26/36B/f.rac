@@ -20,7 +20,6 @@ dollar amount determined in accordance with the following table...
 """
 parameter repay_cap_under_200_single:
   description: "Maximum excess APTC repayment for single filers under 200% FPL per 26 USC 36B(f)(2)(B)(i)"
-  reference: "26 USC 36B(f)(2)(B)(i), table row for income under 200%"
   unit: USD
   values:
     2024-01-01: 300
@@ -29,7 +28,6 @@ parameter repay_cap_under_200_single:
 
 parameter repay_cap_under_200_joint:
   description: "Maximum excess APTC repayment for joint filers under 200% FPL per 26 USC 36B(f)(2)(B)(i)"
-  reference: "26 USC 36B(f)(2)(B)(i), table row for income under 200%"
   unit: USD
   values:
     2024-01-01: 600
@@ -38,7 +36,6 @@ parameter repay_cap_under_200_joint:
 
 parameter repay_cap_200_300_single:
   description: "Maximum excess APTC repayment for single filers 200-300% FPL per 26 USC 36B(f)(2)(B)(i)"
-  reference: "26 USC 36B(f)(2)(B)(i), table row for income 200% to 300%"
   unit: USD
   values:
     2024-01-01: 750
@@ -47,7 +44,6 @@ parameter repay_cap_200_300_single:
 
 parameter repay_cap_200_300_joint:
   description: "Maximum excess APTC repayment for joint filers 200-300% FPL per 26 USC 36B(f)(2)(B)(i)"
-  reference: "26 USC 36B(f)(2)(B)(i), table row for income 200% to 300%"
   unit: USD
   values:
     2024-01-01: 1_500
@@ -56,7 +52,6 @@ parameter repay_cap_200_300_joint:
 
 parameter repay_cap_300_400_single:
   description: "Maximum excess APTC repayment for single filers 300-400% FPL per 26 USC 36B(f)(2)(B)(i)"
-  reference: "26 USC 36B(f)(2)(B)(i), table row for income 300% to 400%"
   unit: USD
   values:
     2024-01-01: 1_200
@@ -65,7 +60,6 @@ parameter repay_cap_300_400_single:
 
 parameter repay_cap_300_400_joint:
   description: "Maximum excess APTC repayment for joint filers 300-400% FPL per 26 USC 36B(f)(2)(B)(i)"
-  reference: "26 USC 36B(f)(2)(B)(i), table row for income 300% to 400%"
   unit: USD
   values:
     2024-01-01: 2_400
@@ -74,7 +68,6 @@ parameter repay_cap_300_400_joint:
 
 parameter bracket_200_pct:
   description: "200% of federal poverty line threshold per 26 USC 36B(f)(2)(B)(i)"
-  reference: "26 USC 36B(f)(2)(B)(i), income bracket constant"
   unit: /1
   values:
     2024-01-01: 2.0
@@ -83,7 +76,6 @@ parameter bracket_200_pct:
 
 parameter bracket_300_pct:
   description: "300% of federal poverty line threshold per 26 USC 36B(f)(2)(B)(i)"
-  reference: "26 USC 36B(f)(2)(B)(i), income bracket constant"
   unit: /1
   values:
     2024-01-01: 3.0
@@ -92,7 +84,6 @@ parameter bracket_300_pct:
 
 parameter bracket_400_pct:
   description: "400% of federal poverty line threshold per 26 USC 36B(f)(2)(B)(i)"
-  reference: "26 USC 36B(f)(2)(B)(i), income bracket constant"
   unit: /1
   values:
     2024-01-01: 4.0
@@ -109,7 +100,6 @@ input household_income_pct_fpl:
 
 parameter reconciliation:
   description: "Container for PTC reconciliation per 26 USC 36B(f)"
-  reference: "26 USC 36B(f)"
 
 input advance_ptc:
   entity: TaxUnit

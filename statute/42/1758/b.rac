@@ -116,7 +116,6 @@ parameter school_meal_fpl_base:
   period: Year
   label: "Annual FPL Base"
   description: "Annual Federal Poverty Level for 1-person household"
-  reference: "42 USC 1758(b)"
 
 parameter school_meal_fpl_increment:
   values:
@@ -126,7 +125,6 @@ parameter school_meal_fpl_increment:
   period: Year
   label: "FPL Additional Per Person"
   description: "Annual FPL increment per additional household member"
-  reference: "42 USC 1758(b)"
 
 parameter free_meal_limit_pct_fpl:
   values:
@@ -134,7 +132,6 @@ parameter free_meal_limit_pct_fpl:
   unit: /1
   label: "Free Meal Income Limit"
   description: "Free meals for households at or below this percentage of FPL"
-  reference: "42 USC 1758(b)"
 
 parameter reduced_price_limit_pct_fpl:
   values:
@@ -142,7 +139,6 @@ parameter reduced_price_limit_pct_fpl:
   unit: /1
   label: "Reduced-Price Meal Income Limit"
   description: "Reduced-price meals for households up to this percentage of FPL"
-  reference: "42 USC 1758(b)"
 
 # School Meal Subsidy Parameters (annual per student)
 parameter school_meal_subsidy_free:
@@ -153,7 +149,6 @@ parameter school_meal_subsidy_free:
   period: Year
   label: "Free School Meal Annual Value"
   description: "Annual value of free school meals (lunch + breakfast)"
-  reference: "42 USC 1758(b)"
 
 parameter school_meal_subsidy_reduced:
   values:
@@ -163,7 +158,6 @@ parameter school_meal_subsidy_reduced:
   period: Year
   label: "Reduced-Price School Meal Annual Value"
   description: "Annual value of reduced-price school meals (lunch + breakfast)"
-  reference: "42 USC 1758(b)"
 
 # Helper variable to calculate FPL for household size
 variable school_meal_fpl:

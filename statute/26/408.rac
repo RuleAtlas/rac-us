@@ -7,7 +7,6 @@ beneficiaries...
 
 parameter traditional_ira_contribution_limit:
   description: "Annual contribution limit for traditional IRA accounts"
-  reference: "26 USC 408"
   unit: USD
   values:
     2024-01-01: 7_000
@@ -16,7 +15,6 @@ parameter traditional_ira_contribution_limit:
 
 parameter traditional_ira_contribution_limit_age50plus:
   description: "Annual contribution limit for traditional IRA accounts for individuals age 50+"
-  reference: "26 USC 408"
   unit: USD
   values:
     2024-01-01: 8_000
@@ -25,7 +23,6 @@ parameter traditional_ira_contribution_limit_age50plus:
 
 parameter simple_ira_contribution_limit:
   description: "Annual contribution limit for SIMPLE IRA accounts (employee deferral)"
-  reference: "26 USC 408"
   unit: USD
   values:
     2024-01-01: 16_000
@@ -34,7 +31,6 @@ parameter simple_ira_contribution_limit:
 
 parameter simple_ira_contribution_limit_age50plus:
   description: "Annual contribution limit for SIMPLE IRA accounts for individuals age 50+ (catch-up)"
-  reference: "26 USC 408"
   unit: USD
   values:
     2024-01-01: 19_500
@@ -43,14 +39,12 @@ parameter simple_ira_contribution_limit_age50plus:
 
 parameter sep_ira_contribution_rate:
   description: "Maximum annual SEP IRA contribution as percentage of net self-employment income"
-  reference: "26 USC 408"
   unit: /1
   values:
     1977-01-01: 0.20
 
 parameter roth_ira_contribution_phase_out_mfj_low:
   description: "Lower MAGI threshold for Roth IRA deduction phaseout (Married Filing Jointly)"
-  reference: "26 USC 408"
   unit: USD
   values:
     2024-01-01: 230_000
@@ -59,7 +53,6 @@ parameter roth_ira_contribution_phase_out_mfj_low:
 
 parameter roth_ira_contribution_phase_out_mfj_high:
   description: "Upper MAGI threshold for Roth IRA deduction phaseout (Married Filing Jointly)"
-  reference: "26 USC 408"
   unit: USD
   values:
     2024-01-01: 240_000
@@ -68,7 +61,6 @@ parameter roth_ira_contribution_phase_out_mfj_high:
 
 parameter roth_ira_contribution_phase_out_single_low:
   description: "Lower MAGI threshold for Roth IRA deduction phaseout (Single filer)"
-  reference: "26 USC 408"
   unit: USD
   values:
     2024-01-01: 146_000
@@ -77,7 +69,6 @@ parameter roth_ira_contribution_phase_out_single_low:
 
 parameter roth_ira_contribution_phase_out_single_high:
   description: "Upper MAGI threshold for Roth IRA deduction phaseout (Single filer)"
-  reference: "26 USC 408"
   unit: USD
   values:
     2024-01-01: 161_000
@@ -86,7 +77,6 @@ parameter roth_ira_contribution_phase_out_single_high:
 
 parameter traditional_ira_deduction_phase_out_mfj_low:
   description: "Lower AGI threshold for traditional IRA deduction phaseout (Married Filing Jointly, covered by workplace plan)"
-  reference: "26 USC 408"
   unit: USD
   values:
     2024-01-01: 77_000
@@ -95,7 +85,6 @@ parameter traditional_ira_deduction_phase_out_mfj_low:
 
 parameter traditional_ira_deduction_phase_out_mfj_high:
   description: "Upper AGI threshold for traditional IRA deduction phaseout (Married Filing Jointly, covered by workplace plan)"
-  reference: "26 USC 408"
   unit: USD
   values:
     2024-01-01: 87_000
@@ -104,7 +93,6 @@ parameter traditional_ira_deduction_phase_out_mfj_high:
 
 parameter traditional_ira_deduction_phase_out_single_low:
   description: "Lower AGI threshold for traditional IRA deduction phaseout (Single filer, covered by workplace plan)"
-  reference: "26 USC 408"
   unit: USD
   values:
     2024-01-01: 46_000
@@ -113,7 +101,6 @@ parameter traditional_ira_deduction_phase_out_single_low:
 
 parameter traditional_ira_deduction_phase_out_single_high:
   description: "Upper AGI threshold for traditional IRA deduction phaseout (Single filer, covered by workplace plan)"
-  reference: "26 USC 408"
   unit: USD
   values:
     2024-01-01: 56_000
@@ -122,7 +109,6 @@ parameter traditional_ira_deduction_phase_out_single_high:
 
 parameter early_withdrawal_penalty_rate:
   description: "Additional tax rate on early IRA distributions (before age 59.5)"
-  reference: "26 USC 408"
   unit: /1
   values:
     1977-01-01: 0.10

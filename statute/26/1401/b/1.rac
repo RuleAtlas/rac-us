@@ -19,7 +19,6 @@ imports:
 parameter se_hospital_insurance_rate:
   values:
     1984-01-01: 0.029  # 2.9% combined employer + employee share
-  reference: "26 USC 1401(b)(1) - Hospital Insurance tax rate on self-employment income"
 
 variable self_employment_medicare_tax:
   entity: Person

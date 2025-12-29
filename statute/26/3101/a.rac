@@ -8,14 +8,12 @@ individual a tax equal to 6.2 percent of the wages (as defined in section
 
 parameter employee_rate:
   description: "Employee Social Security tax rate"
-  reference: "26 USC 3101(a)"
   unit: /1
   values:
     1990-01-01: 0.062
 
 parameter wage_base:
   description: "Social Security wage base (maximum taxable earnings)"
-  reference: "26 USC 3101(a)"
   unit: USD
   values:
     2024-01-01: 168_600

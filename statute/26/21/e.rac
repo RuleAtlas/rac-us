@@ -10,7 +10,6 @@ incapable of caring for himself or herself...
 
 parameter child_age_limit:
   description: "Maximum age (exclusive) for CDCC qualifying child"
-  reference: "26 USC 21(e)"
   unit: years
   values:
     1976-01-01: 13

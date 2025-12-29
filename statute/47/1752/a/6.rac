@@ -131,7 +131,6 @@ input receives_head_start:
 # Parameters
 parameter acp_standard_benefit:
   description: "Standard monthly ACP benefit"
-  reference: "47 USC 1752(a)(6)"
   unit: USD
   values:
     2024-04-01: 0
@@ -140,21 +139,18 @@ parameter acp_standard_benefit:
 
 parameter fpg_limit:
   description: "FPL percentage limit for ACP eligibility"
-  reference: "47 USC 1752(a)(6)"
   values:
     2021-11-15: 2.0
   label: "ACP FPL Limit"
 
 parameter months_per_year:
   description: "Months per year for annual conversion"
-  reference: "47 USC 1752(a)(6)"
   values:
     2021-11-15: 12
   label: "Months Per Year"
 
 parameter fpl_base:
   description: "Annual FPL base for 1-person household"
-  reference: "47 USC 1752(a)(6)"
   unit: USD
   values:
     2024-01-01: 15_060
@@ -163,7 +159,6 @@ parameter fpl_base:
 
 parameter fpl_additional_per_person:
   description: "Annual FPL additional per person"
-  reference: "47 USC 1752(a)(6)"
   unit: USD
   values:
     2024-01-01: 5_380

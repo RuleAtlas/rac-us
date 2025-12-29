@@ -16,21 +16,18 @@ household size;
 
 parameter income_factor_weight:
   description: "Weight applied to income factor in benefit calculation"
-  reference: "42 USC 8624(c)"
   unit: /1
   values:
     1981-01-01: 0.5
 
 parameter burden_factor_weight:
   description: "Weight applied to energy burden factor in benefit calculation"
-  reference: "42 USC 8624(c)"
   unit: /1
   values:
     1981-01-01: 0.5
 
 parameter priority_multiplier:
   description: "Benefit multiplier for priority households"
-  reference: "42 USC 8624(c)"
   unit: /1
   values:
     1981-01-01: 1.25
@@ -39,21 +36,18 @@ parameter priority_multiplier:
 # This is a placeholder for demonstration - actual amounts vary by state/year
 parameter base_benefit_placeholder:
   description: "Placeholder base benefit amount (actual varies by state/year)"
-  reference: "42 USC 8624(c)"
   unit: USD
   values:
     1981-01-01: 500
 
 parameter cooling_assistance_fraction:
   description: "Cooling assistance as fraction of total LIHEAP benefit"
-  reference: "42 USC 8624(c)"
   unit: /1
   values:
     1981-01-01: 0.5
 
 parameter income_factor_floor:
   description: "Minimum value for income factor in benefit calculation"
-  reference: "42 USC 8624(c)"
   unit: /1
   values:
     1981-01-01: 0.1

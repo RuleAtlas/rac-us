@@ -8,7 +8,6 @@ the sum of—
 
 parameter aotc_phaseout_start_mfj:
   description: "Income threshold for AOTC phaseout (Married Filing Jointly)"
-  reference: "26 USC 25A(a)"
   unit: USD
   values:
     2024-01-01: 160_000
@@ -16,7 +15,6 @@ parameter aotc_phaseout_start_mfj:
 
 parameter aotc_phaseout_end_mfj:
   description: "Income threshold for complete AOTC phaseout (Married Filing Jointly)"
-  reference: "26 USC 25A(a)"
   unit: USD
   values:
     2024-01-01: 180_000
@@ -24,7 +22,6 @@ parameter aotc_phaseout_end_mfj:
 
 parameter aotc_phaseout_start_single:
   description: "Income threshold for AOTC phaseout (Single)"
-  reference: "26 USC 25A(a)"
   unit: USD
   values:
     2024-01-01: 80_000
@@ -32,7 +29,6 @@ parameter aotc_phaseout_start_single:
 
 parameter aotc_phaseout_end_single:
   description: "Income threshold for complete AOTC phaseout (Single)"
-  reference: "26 USC 25A(a)"
   unit: USD
   values:
     2024-01-01: 90_000
@@ -40,7 +36,6 @@ parameter aotc_phaseout_end_single:
 
 parameter llc_phaseout_start_mfj:
   description: "Income threshold for LLC phaseout (Married Filing Jointly)"
-  reference: "26 USC 25A(a)"
   unit: USD
   values:
     2024-01-01: 160_000
@@ -48,7 +43,6 @@ parameter llc_phaseout_start_mfj:
 
 parameter llc_phaseout_end_mfj:
   description: "Income threshold for complete LLC phaseout (Married Filing Jointly)"
-  reference: "26 USC 25A(a)"
   unit: USD
   values:
     2024-01-01: 180_000
@@ -56,7 +50,6 @@ parameter llc_phaseout_end_mfj:
 
 parameter llc_phaseout_start_single:
   description: "Income threshold for LLC phaseout (Single)"
-  reference: "26 USC 25A(a)"
   unit: USD
   values:
     2024-01-01: 80_000
@@ -64,7 +57,6 @@ parameter llc_phaseout_start_single:
 
 parameter llc_phaseout_end_single:
   description: "Income threshold for complete LLC phaseout (Single)"
-  reference: "26 USC 25A(a)"
   unit: USD
   values:
     2024-01-01: 90_000

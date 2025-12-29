@@ -22,7 +22,6 @@ individual made a contribution to a Roth IRA...
 parameter early_withdrawal_penalty_age:
   description: "Age at which distributions qualify under 408A(d)(2)(A)(i) - 59 1/2"
   unit: years
-  reference: "26 USC 408A(d)(2)(A)(i)"
   values:
     1998-01-01: 59.5
 
@@ -42,7 +41,6 @@ variable is_roth_ira_5_year_satisfied:
   dtype: Boolean
   label: "Roth IRA 5-Year Rule Satisfied"
   description: "Whether the 5-year holding period for qualified Roth distributions has been met per 26 USC 408A(d)(2)(B)"
-  reference: "26 USC 408A(d)(2)(B)"
   formula: |
     # Placeholder: Would require tracking first Roth contribution date
     # and comparing to distribution date (5 years)
@@ -56,7 +54,6 @@ variable is_roth_death_distribution:
   dtype: Boolean
   label: "Roth Death Distribution"
   description: "Whether distribution is made to beneficiary/estate due to death per 26 USC 408A(d)(2)(A)(ii)"
-  reference: "26 USC 408A(d)(2)(A)(ii)"
   formula: |
     # Placeholder: Would require estate information
     return False
@@ -69,7 +66,6 @@ variable is_roth_owner_disabled:
   dtype: Boolean
   label: "Roth IRA Owner Disabled"
   description: "Whether owner is disabled as defined in 22 USC 72(m)(7) per 26 USC 408A(d)(2)(A)(iii)"
-  reference: "26 USC 408A(d)(2)(A)(iii)"
   formula: |
     # Placeholder: Would require disability determination
     return False
@@ -83,7 +79,6 @@ variable roth_first_home_distribution:
   unit: USD
   label: "Roth First Home Distribution"
   description: "Amount of Roth IRA distributed as first-time homebuyer (max $10,000 lifetime) per 26 USC 408A(d)(2)(A)(iv)"
-  reference: "26 USC 408A(d)(2)(A)(iv)"
   formula: |
     # Placeholder: Would require tracking lifetime first-home distributions
     return 0
@@ -97,7 +92,6 @@ variable is_qualified_roth_distribution:
   dtype: Boolean
   label: "Is Qualified Roth IRA Distribution"
   description: "Whether distribution meets qualified distribution requirements per 26 USC 408A(d)(2)"
-  reference: "26 USC 408A(d)(2)"
   syntax: python
   formula: |
     # Must satisfy 5-year holding period per 408A(d)(2)(B)

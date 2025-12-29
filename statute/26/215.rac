@@ -19,7 +19,6 @@ rules apply.
 # 26 USC 215(a) - Alimony deduction rate
 parameter alimony_deduction_rate:
   description: "Rate at which alimony paid is deductible (1.0 for pre-2019 agreements)"
-  reference: "26 USC 215(a)"
   unit: /1
   values:
     2024-01-01: 1.0

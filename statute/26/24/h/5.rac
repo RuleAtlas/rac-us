@@ -13,7 +13,6 @@ In the case of a taxable year beginning after 2018...
 # Indexed values in IRS guidance files
 parameter refundable_max:
   description: "Maximum refundable CTC (ACTC) per qualifying child under TCJA"
-  reference: "26 USC 24(h)(5)"
   unit: USD
   indexed_by: statute/26/24/h/5/B
   values:

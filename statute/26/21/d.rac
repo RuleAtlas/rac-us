@@ -21,14 +21,12 @@ incapable to be gainfully employed and to have earned income of not less than --
 # Parameter for imputed earned income for disabled/student spouse per 26 USC 21(d)(2)
 parameter imputed_earned_income_one_individual:
   description: "Monthly imputed earned income for disabled/student spouse with 1 qualifying individual"
-  reference: "26 USC 21(d)"
   unit: USD
   values:
     1976-01-01: 250
 
 parameter imputed_earned_income_two_or_more:
   description: "Monthly imputed earned income for disabled/student spouse with 2+ qualifying individuals"
-  reference: "26 USC 21(d)"
   unit: USD
   values:
     1976-01-01: 500

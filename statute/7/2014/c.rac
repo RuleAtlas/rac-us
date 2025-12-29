@@ -40,7 +40,6 @@ parameter fpl_base:
   period: Month
   label: "Federal Poverty Level Base"
   description: "Monthly FPL for 1-person household"
-  reference: "7 USC 2014(c)"
 
 parameter fpl_additional_per_person:
   values:
@@ -49,7 +48,6 @@ parameter fpl_additional_per_person:
   period: Month
   label: "FPL Additional Per Person"
   description: "Monthly FPL increment for each additional person"
-  reference: "7 USC 2014(c)"
 
 parameter gross_income_limit_pct:
   values:
@@ -58,7 +56,6 @@ parameter gross_income_limit_pct:
   period: Month
   label: "SNAP Gross Income Limit"
   description: "Gross income must be at or below this percentage of FPL"
-  reference: "7 USC 2014(c)"
 
 parameter net_income_limit_pct:
   values:
@@ -67,7 +64,6 @@ parameter net_income_limit_pct:
   period: Month
   label: "SNAP Net Income Limit"
   description: "Net income must be at or below this percentage of FPL"
-  reference: "7 USC 2014(c)"
 
 variable snap_fpl_monthly:
   entity: Household

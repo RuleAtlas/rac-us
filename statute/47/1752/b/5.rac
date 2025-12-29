@@ -11,21 +11,18 @@ device per eligible household.
 # Parameters for device subsidy
 parameter acp_device_min_copay:
   description: "Minimum copay for connected device per 47 USC 1_752(b)(5)(A)"
-  reference: "47 USC 1752(b)(5)"
   unit: USD
   values:
     2021-11-15: 10
 
 parameter acp_device_max_copay:
   description: "Maximum copay for connected device per 47 USC 1_752(b)(5)(A)"
-  reference: "47 USC 1752(b)(5)"
   unit: USD
   values:
     2021-11-15: 50
 
 parameter acp_device_max_reimbursement:
   description: "Maximum reimbursement per device per 47 USC 1_752(b)(5)(B)"
-  reference: "47 USC 1752(b)(5)"
   unit: USD
   values:
     2021-11-15: 100

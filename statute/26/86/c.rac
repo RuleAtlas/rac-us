@@ -22,21 +22,18 @@ of section 7703) but does not file a joint return for such year, and
 
 parameter base_amount_single:
   description: "Base amount for single filers (tier 1 threshold)"
-  reference: "26 USC 86(c)(1)(A)"
   unit: USD
   values:
     1984-01-01: 25_000
 
 parameter base_amount_joint:
   description: "Base amount for joint filers (tier 1 threshold)"
-  reference: "26 USC 86(c)(1)(B)"
   unit: USD
   values:
     1984-01-01: 32_000
 
 parameter base_amount_mfs_living_together:
   description: "Base amount for MFS living with spouse (zero)"
-  reference: "26 USC 86(c)(1)(C)"
   unit: USD
   values:
     1984-01-01: 0
@@ -46,21 +43,18 @@ parameter base_amount_mfs_living_together:
 
 parameter adjusted_base_amount_single:
   description: "Adjusted base amount for single filers (tier 2 threshold)"
-  reference: "26 USC 86(c)(2)(A)"
   unit: USD
   values:
     1994-01-01: 34_000
 
 parameter adjusted_base_amount_joint:
   description: "Adjusted base amount for joint filers (tier 2 threshold)"
-  reference: "26 USC 86(c)(2)(B)"
   unit: USD
   values:
     1994-01-01: 44_000
 
 parameter adjusted_base_amount_mfs_living_together:
   description: "Adjusted base amount for MFS living with spouse (zero)"
-  reference: "26 USC 86(c)(2)(C)"
   unit: USD
   values:
     1994-01-01: 0
@@ -75,7 +69,6 @@ variable base_amount:
   unit: USD
   label: "Base Amount for Social Security Taxation"
   description: "Base amount threshold for tier 1 Social Security taxation per 26 USC 86(c)(1)"
-  reference: "26 USC 86(c)(1)"
   syntax: python
   formula: |
     if filing_status == MARRIED_FILING_JOINTLY:
@@ -120,7 +113,6 @@ variable adjusted_base_amount:
   unit: USD
   label: "Adjusted Base Amount for Social Security Taxation"
   description: "Adjusted base amount threshold for tier 2 Social Security taxation per 26 USC 86(c)(2)"
-  reference: "26 USC 86(c)(2)"
   syntax: python
   formula: |
     if filing_status == MARRIED_FILING_JOINTLY:

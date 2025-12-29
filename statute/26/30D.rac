@@ -177,7 +177,6 @@ variable new_vehicle_meets_battery_capacity:
   dtype: Boolean
   label: "Meets Minimum Battery Capacity"
   description: "Whether vehicle meets the minimum 7 kWh battery capacity requirement"
-  reference: "26 USC 30D(d)(1)(F)"
   formula: |
     return new_clean_vehicle_battery_capacity_kwh >= p.eligibility.min_battery_capacity_kwh
 
@@ -189,7 +188,6 @@ variable new_vehicle_msrp_limit:
   unit: USD
   label: "Applicable MSRP Limit"
   description: "MSRP limit based on vehicle classification"
-  reference: "26 USC 30D(f)(11)(B)"
   formula: |
     if new_clean_vehicle_is_van_suv_pickup:
       return p.eligibility.msrp_limit_van_suv_pickup
@@ -202,7 +200,6 @@ variable new_vehicle_meets_msrp_limit:
   dtype: Boolean
   label: "Meets MSRP Limit"
   description: "Whether vehicle MSRP is within the applicable limit"
-  reference: "26 USC 30D(f)(11)"
   formula: |
     return new_clean_vehicle_msrp <= new_vehicle_msrp_limit
 
@@ -216,7 +213,6 @@ variable new_vehicle_agi_limit:
   unit: USD
   label: "Applicable AGI Limit"
   description: "Modified AGI limit based on filing status"
-  reference: "26 USC 30D(f)(10)(B)"
   formula: |
     return p.eligibility.income_limit[filing_status]
 
@@ -230,7 +226,6 @@ variable new_vehicle_meets_income_limit:
   dtype: Boolean
   label: "Meets Income Limit"
   description: "Whether taxpayer's AGI is within the applicable limit"
-  reference: "26 USC 30D(f)(10)"
   formula: |
     # Note: Law allows lesser of current year or prior year MAGI
     # For simplicity, using current year AGI
@@ -243,7 +238,6 @@ variable new_vehicle_credit_eligible:
   dtype: Boolean
   label: "Eligible for New Clean Vehicle Credit"
   description: "Whether taxpayer meets all eligibility requirements for the credit"
-  reference: "26 USC 30D(d), (f)(10), (f)(11)"
   formula: |
     if not purchased_new_clean_vehicle:
       return false
@@ -265,7 +259,6 @@ variable new_vehicle_critical_minerals_credit:
   unit: USD
   label: "Critical Minerals Credit Component"
   description: "Credit amount for meeting critical minerals requirements"
-  reference: "26 USC 30D(b)(2)"
   formula: |
     if not new_vehicle_credit_eligible:
       return 0
@@ -281,7 +274,6 @@ variable new_vehicle_battery_components_credit:
   unit: USD
   label: "Battery Components Credit Component"
   description: "Credit amount for meeting battery components requirements"
-  reference: "26 USC 30D(b)(3)"
   formula: |
     if not new_vehicle_credit_eligible:
       return 0
@@ -300,7 +292,6 @@ variable new_vehicle_credit:
   unit: USD
   label: "New Clean Vehicle Credit"
   description: "Credit for new clean vehicles per 26 USC 30D"
-  reference: "26 USC 30D(a), (b)"
   syntax: python
   formula: |
     # Sum of critical minerals and battery components credits

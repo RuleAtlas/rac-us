@@ -9,7 +9,6 @@ of a joint return ($200,000 in any other case).
 
 parameter phaseout_threshold_joint:
   description: "CTC phaseout threshold for married filing jointly under TCJA"
-  reference: "26 USC 24(h)(3)"
   unit: USD
   values:
     2026-01-01: 110_000  # TCJA sunset - revert to pre-TCJA
@@ -35,7 +34,6 @@ parameter phaseout_threshold_joint:
 
 parameter phaseout_threshold_other:
   description: "CTC phaseout threshold for all filing statuses except joint under TCJA"
-  reference: "26 USC 24(h)(3)"
   unit: USD
   values:
     2026-01-01: 75_000   # TCJA sunset - revert to pre-TCJA

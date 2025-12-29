@@ -15,28 +15,24 @@ account at the end of the tax year.
 
 parameter contribution_limit_excess_tax_rate:
   description: "Excise tax rate on excess IRA contributions"
-  reference: "26 USC 408(o)"
   unit: /1
   values:
     1977-01-01: 0.06
 
 parameter ira_catchup_age_threshold:
   description: "Age threshold for IRA catch-up contributions"
-  reference: "26 USC 219(b)(5)(B)"
   unit: years
   values:
     2002-01-01: 50
 
 parameter ira_contribution_limit_under_catchup_age:
   description: "IRA contribution limit for individuals under catch-up age"
-  reference: "26 USC 219(b)(5)(A)"
   unit: USD
   values:
     2024-01-01: 7_000
 
 parameter ira_contribution_limit_catchup_age:
   description: "IRA contribution limit for individuals at or above catch-up age"
-  reference: "26 USC 219(b)(5)(B)"
   unit: USD
   values:
     2024-01-01: 8_000

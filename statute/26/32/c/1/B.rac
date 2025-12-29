@@ -6,14 +6,12 @@ taxable year.
 
 parameter qualifying_child_age_under_threshold:
   description: "Age threshold for qualifying child (under this age)"
-  reference: "26 USC 152(c)(3)(A)(i)"
   unit: years
   values:
     1984-01-01: 19
 
 parameter qualifying_child_student_age_threshold:
   description: "Age threshold for qualifying child who is full-time student"
-  reference: "26 USC 152(c)(3)(A)(ii)"
   unit: years
   values:
     1984-01-01: 24

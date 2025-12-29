@@ -46,14 +46,12 @@ dependent care services necessary for gainful employment).
 
 parameter max_shareholder_benefit_share:
   description: "Maximum share of DCAP benefits that can go to 5%+ shareholders/owners"
-  reference: "26 USC 129(d)"
   unit: /1
   values:
     1981-01-01: 0.25
 
 parameter shareholder_ownership_threshold:
   description: "Ownership threshold above which shareholder limitation applies"
-  reference: "26 USC 129(d)"
   unit: /1
   values:
     1981-01-01: 0.05

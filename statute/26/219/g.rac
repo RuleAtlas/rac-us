@@ -49,7 +49,6 @@ input spouse_is_active_retirement_plan_participant:
 
 parameter ira_phaseout_single_start:
   description: "IRA deduction phaseout starts at this MAGI for single filers who are active participants"
-  reference: "26 USC 219(g)"
   unit: USD
   values:
     2024-01-01: 146_000
@@ -58,7 +57,6 @@ parameter ira_phaseout_single_start:
 
 parameter ira_phaseout_single_end:
   description: "IRA deduction completely phased out at this MAGI for single filers"
-  reference: "26 USC 219(g)"
   unit: USD
   values:
     2024-01-01: 161_000
@@ -67,7 +65,6 @@ parameter ira_phaseout_single_end:
 
 parameter ira_phaseout_joint_start:
   description: "IRA deduction phaseout starts at this MAGI for married filing jointly with active participant"
-  reference: "26 USC 219(g)"
   unit: USD
   values:
     2024-01-01: 123_000
@@ -76,7 +73,6 @@ parameter ira_phaseout_joint_start:
 
 parameter ira_phaseout_joint_end:
   description: "IRA deduction completely phased out at this MAGI for married filing jointly"
-  reference: "26 USC 219(g)"
   unit: USD
   values:
     2024-01-01: 143_000
@@ -85,14 +81,12 @@ parameter ira_phaseout_joint_end:
 
 parameter ira_phaseout_mfs_start:
   description: "IRA deduction phaseout starts at this MAGI for married filing separately"
-  reference: "26 USC 219(g)"
   unit: USD
   values:
     1974-01-01: 0
 
 parameter ira_phaseout_mfs_end:
   description: "IRA deduction completely phased out at this MAGI for married filing separately"
-  reference: "26 USC 219(g)"
   unit: USD
   values:
     2024-01-01: 10_000
@@ -100,7 +94,6 @@ parameter ira_phaseout_mfs_end:
 
 parameter ira_phaseout_spouse_covered_start:
   description: "IRA deduction phaseout starts at this MAGI when spouse is covered but taxpayer is not"
-  reference: "26 USC 219(g)"
   unit: USD
   values:
     2024-01-01: 236_000
@@ -109,7 +102,6 @@ parameter ira_phaseout_spouse_covered_start:
 
 parameter ira_phaseout_spouse_covered_end:
   description: "IRA deduction completely phased out at this MAGI when spouse is covered but taxpayer is not"
-  reference: "26 USC 219(g)"
   unit: USD
   values:
     2024-01-01: 246_000
@@ -118,14 +110,12 @@ parameter ira_phaseout_spouse_covered_end:
 
 parameter phaseout_range_single:
   description: "Width of phaseout range for single filers"
-  reference: "26 USC 219(g)"
   unit: USD
   values:
     1974-01-01: 15_000
 
 parameter phaseout_range_joint:
   description: "Width of phaseout range for married filing jointly"
-  reference: "26 USC 219(g)"
   unit: USD
   values:
     1974-01-01: 20_000

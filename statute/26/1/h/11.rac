@@ -25,14 +25,12 @@ section 246(c) are not met...
 
 parameter min_holding_days:
   description: "Minimum holding period in days to qualify for preferential rate on dividends"
-  reference: "26 USC 1(h)(11)"
   unit: days
   values:
     2003-01-01: 60
 
 parameter holding_period_window:
   description: "Window period around ex-dividend date for measuring holding period"
-  reference: "26 USC 1(h)(11)"
   unit: days
   values:
     2003-01-01: 121

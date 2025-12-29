@@ -9,14 +9,12 @@ input broadband_monthly_charge:
 
 parameter months_per_year:
   description: "Months per year for annual conversion"
-  reference: "47 USC 1752(a)(7)"
   values:
     2021-11-15: 12
   label: "Months Per Year"
 
 parameter standard_benefit:
   description: "Standard monthly ACP benefit"
-  reference: "47 USC 1752(a)(7)"
   unit: USD
   values:
     2024-04-01: 0
@@ -25,7 +23,6 @@ parameter standard_benefit:
 
 parameter tribal_benefit:
   description: "Tribal land monthly ACP benefit"
-  reference: "47 USC 1752(a)(7)"
   unit: USD
   values:
     2024-04-01: 0

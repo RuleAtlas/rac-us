@@ -20,7 +20,6 @@ as a disaster area, paragraph (b) shall not apply.
 # 26 USC 165(b)(1) - Per-event floor
 parameter casualty_loss_floor:
   description: "Per-event floor on individual casualty losses"
-  reference: "26 USC 165(b)(1)"
   unit: USD
   values:
     2018-01-01: 100
@@ -30,7 +29,6 @@ parameter casualty_loss_floor:
 # 26 USC 165(b)(2) - AGI threshold rate
 parameter agi_floor_rate:
   description: "AGI threshold rate for aggregate casualty losses"
-  reference: "26 USC 165(b)(2)"
   unit: /1
   values:
     1984-01-01: 0.10
