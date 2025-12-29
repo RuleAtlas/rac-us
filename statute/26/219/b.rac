@@ -27,25 +27,31 @@ input age:
   description: "Person's age at year-end"
   default: 0
 
+# 26 USC 219(b)(1)(A) - Base IRA contribution limit
 parameter ira_base_limit:
   description: "Standard IRA contribution limit per taxpayer"
-  unit: currency-USD
+  reference: "26 USC 219(b)(1)(A)"
+  unit: "USD"
   values:
-    2024-01-01: 7000
-    2023-01-01: 6500
-    2022-01-01: 6000
+    2024-01-01: 7_000
+    2023-01-01: 6_500
+    2022-01-01: 6_000
 
+# 26 USC 219(b)(5)(B) - Catch-up contribution amount
 parameter ira_catch_up_amount:
   description: "Additional catch-up contribution for taxpayers age 50 or older"
-  unit: currency-USD
+  reference: "26 USC 219(b)(5)(B)"
+  unit: "USD"
   values:
-    2024-01-01: 1000
-    2023-01-01: 1000
-    2022-01-01: 1000
+    2024-01-01: 1_000
+    2023-01-01: 1_000
+    2022-01-01: 1_000
 
+# 26 USC 219(b)(5) - Catch-up eligibility age
 parameter catch_up_age:
   description: "Age at which taxpayer becomes eligible for catch-up contributions"
-  unit: years
+  reference: "26 USC 219(b)(5)"
+  unit: "years"
   values:
     1974-01-01: 50
 
