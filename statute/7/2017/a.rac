@@ -18,7 +18,8 @@ imports:
 
 parameter max_allotment_schedule:
   description: "SNAP maximum allotment by household size, for use with cut()"
-  unit: currency-USD
+  reference: "7 USC 2017(a)"
+  unit: USD
   values:
     2024-10-01: [292, 536, 768, 975, 1158, 1390, 1536, 1756]
     2023-10-01: [291, 535, 766, 973, 1155, 1386, 1532, 1751]
@@ -26,13 +27,15 @@ parameter max_allotment_schedule:
 
 parameter max_schedule_size:
   description: "Maximum household size with specific allotment in schedule"
+  reference: "7 USC 2017(a)"
   unit: persons
   values:
     1977-01-01: 8
 
 parameter additional_per_person:
   description: "USDA adds this amount for each person beyond 8 in the SNAP household."
-  unit: currency-USD
+  reference: "7 USC 2017(a)"
+  unit: USD
   values:
     2024-10-01: 220
     2023-10-01: 219
@@ -40,13 +43,15 @@ parameter additional_per_person:
 
 parameter minimum_benefit_max_size:
   description: "Maximum household size eligible for minimum benefit"
+  reference: "7 USC 2017(a)"
   unit: persons
   values:
     1977-01-01: 2
 
 parameter minimum_amount:
   description: "USDA guarantees this minimum monthly benefit for 1-2 person SNAP households."
-  unit: currency-USD
+  reference: "7 USC 2017(a)"
+  unit: USD
   values:
     2024-10-01: 23
     2023-10-01: 23
@@ -55,6 +60,7 @@ parameter minimum_amount:
 
 parameter contribution_rate:
   description: "Household contribution as share of net income"
+  reference: "7 USC 2017(a)"
   unit: "/1"
   values:
     1977-01-01: 0.30

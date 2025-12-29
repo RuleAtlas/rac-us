@@ -15,6 +15,7 @@ for "$600".
 
 parameter additional_blind_married:
   description: "Additional standard deduction for blind taxpayer who is married or surviving spouse"
+  reference: "26 USC 63(f)(2)"
   unit: "USD"
   indexed_by: statute/26/63/c/4
   values:
@@ -26,6 +27,7 @@ parameter additional_blind_married:
 
 parameter additional_blind_unmarried:
   description: "Additional standard deduction for blind taxpayer who is single or head of household"
+  reference: "26 USC 63(f)(2)"
   unit: "USD"
   indexed_by: statute/26/63/c/4
   values:

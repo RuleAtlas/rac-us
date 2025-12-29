@@ -135,6 +135,7 @@ input conception_from_assault:
 
 parameter child_support_noncompliance_rate:
   description: "Minimum benefit reduction rate for child support non-cooperation"
+  reference: "42 USC 608"
   values:
     1996-01-01: 0.25
   label: "Child Support Sanction Rate"

@@ -14,6 +14,7 @@ The term "exemption amount" means—
 # Current values in IRS guidance files
 parameter exemption_joint:
   description: "AMT exemption for married filing jointly"
+  reference: "26 USC 55(d)(1)"
   unit: "USD"
   indexed_by: statute/26/55/d/4
   values:
@@ -25,6 +26,7 @@ parameter exemption_joint:
 
 parameter exemption_single:
   description: "AMT exemption for single filers"
+  reference: "26 USC 55(d)(1)"
   unit: "USD"
   indexed_by: statute/26/55/d/4
   values:
@@ -36,6 +38,7 @@ parameter exemption_single:
 
 parameter exemption_married_separate:
   description: "AMT exemption for married filing separately"
+  reference: "26 USC 55(d)(1)"
   unit: "USD"
   indexed_by: statute/26/55/d/4
   values:

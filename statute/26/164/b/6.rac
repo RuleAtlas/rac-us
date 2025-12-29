@@ -9,6 +9,7 @@ $10,000 ($5,000 in the case of a married individual filing a separate return).
 
 parameter salt_cap:
   description: "SALT deduction cap for most filing statuses"
+  reference: "26 USC 164(b)(6)"
   unit: USD
   values:
     2026-01-01: .inf
@@ -17,6 +18,7 @@ parameter salt_cap:
 
 parameter salt_cap_married_separate:
   description: "SALT deduction cap for married filing separately"
+  reference: "26 USC 164(b)(6)"
   unit: USD
   values:
     2026-01-01: .inf

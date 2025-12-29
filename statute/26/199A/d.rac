@@ -28,24 +28,28 @@ specified service trade or business shall be taken into account...
 
 parameter threshold_single:
   description: "QBI deduction threshold amount for single filers"
+  reference: "26 USC 199A(d)"
   unit: "USD"
   values:
     2018-01-01: 157500
 
 parameter threshold_joint:
   description: "QBI deduction threshold amount for joint filers"
+  reference: "26 USC 199A(d)"
   unit: "USD"
   values:
     2018-01-01: 315000
 
 parameter phaseout_range_single:
   description: "QBI deduction phaseout range for single filers"
+  reference: "26 USC 199A(d)"
   unit: "USD"
   values:
     2018-01-01: 50000
 
 parameter phaseout_range_joint:
   description: "QBI deduction phaseout range for joint filers"
+  reference: "26 USC 199A(d)"
   unit: "USD"
   values:
     2018-01-01: 100000

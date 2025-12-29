@@ -20,6 +20,7 @@ dollar amount determined in accordance with the following table...
 """
 parameter repay_cap_under_200_single:
   description: "Maximum excess APTC repayment for single filers under 200% FPL"
+  reference: "26 USC 36B(f)"
   unit: USD
   values:
     2024-01-01: 300
@@ -28,6 +29,7 @@ parameter repay_cap_under_200_single:
 
 parameter repay_cap_under_200_joint:
   description: "Maximum excess APTC repayment for joint filers under 200% FPL"
+  reference: "26 USC 36B(f)"
   unit: USD
   values:
     2024-01-01: 600
@@ -36,6 +38,7 @@ parameter repay_cap_under_200_joint:
 
 parameter repay_cap_200_300_single:
   description: "Maximum excess APTC repayment for single filers 200-300% FPL"
+  reference: "26 USC 36B(f)"
   unit: USD
   values:
     2024-01-01: 750
@@ -44,6 +47,7 @@ parameter repay_cap_200_300_single:
 
 parameter repay_cap_200_300_joint:
   description: "Maximum excess APTC repayment for joint filers 200-300% FPL"
+  reference: "26 USC 36B(f)"
   unit: USD
   values:
     2024-01-01: 1500
@@ -52,6 +56,7 @@ parameter repay_cap_200_300_joint:
 
 parameter repay_cap_300_400_single:
   description: "Maximum excess APTC repayment for single filers 300-400% FPL"
+  reference: "26 USC 36B(f)"
   unit: USD
   values:
     2024-01-01: 1200
@@ -60,6 +65,7 @@ parameter repay_cap_300_400_single:
 
 parameter repay_cap_300_400_joint:
   description: "Maximum excess APTC repayment for joint filers 300-400% FPL"
+  reference: "26 USC 36B(f)"
   unit: USD
   values:
     2024-01-01: 2400
@@ -68,6 +74,7 @@ parameter repay_cap_300_400_joint:
 
 parameter no_repayment_cap:
   description: "No repayment cap for taxpayers at or above 400% FPL"
+  reference: "26 USC 36B(f)"
   unit: USD
   values:
     2024-01-01: 999999
@@ -76,7 +83,8 @@ parameter no_repayment_cap:
 
 parameter bracket_200_pct:
   description: "200% of federal poverty line threshold"
-  unit: rate
+  reference: "26 USC 36B(f)"
+  unit: "/1"
   values:
     2024-01-01: 2.0
     2023-01-01: 2.0
@@ -84,7 +92,8 @@ parameter bracket_200_pct:
 
 parameter bracket_300_pct:
   description: "300% of federal poverty line threshold"
-  unit: rate
+  reference: "26 USC 36B(f)"
+  unit: "/1"
   values:
     2024-01-01: 3.0
     2023-01-01: 3.0
@@ -92,7 +101,8 @@ parameter bracket_300_pct:
 
 parameter bracket_400_pct:
   description: "400% of federal poverty line threshold"
-  unit: rate
+  reference: "26 USC 36B(f)"
+  unit: "/1"
   values:
     2024-01-01: 4.0
     2023-01-01: 4.0

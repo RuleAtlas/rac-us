@@ -15,6 +15,7 @@ input has_eligible_spouse:
 
 parameter fbr_individual:
   description: "Federal Benefit Rate for individual without spouse"
+  reference: "42 USC 1382(b)"
   unit: "USD"
   period: Month
   values:
@@ -24,6 +25,7 @@ parameter fbr_individual:
 
 parameter fbr_couple:
   description: "Federal Benefit Rate for couple"
+  reference: "42 USC 1382(b)"
   unit: "USD"
   period: Month
   values:

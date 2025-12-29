@@ -48,12 +48,14 @@ input in_snap_employment_training:
 
 parameter abawd_min_age:
   description: "Minimum age for ABAWD work requirements"
+  reference: "7 USC 2015(d)"
   values:
     1977-01-01: 18
   label: "ABAWD Minimum Age"
 
 parameter abawd_max_age:
   description: "Maximum age for ABAWD work requirements"
+  reference: "7 USC 2015(d)"
   values:
     2025-10-01: 54
     2024-10-01: 52
@@ -62,6 +64,7 @@ parameter abawd_max_age:
 
 parameter abawd_work_hours:
   description: "Required monthly work hours for ABAWD compliance"
+  reference: "7 USC 2015(d)"
   values:
     1977-01-01: 80
   label: "ABAWD Monthly Work Hours"

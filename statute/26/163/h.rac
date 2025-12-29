@@ -15,6 +15,7 @@ separate return).
 
 parameter acquisition_debt_limit:
   description: "Maximum acquisition indebtedness for mortgage interest deduction"
+  reference: "26 USC 163(h)"
   unit: "USD"
   values:
     1987-01-01: 1000000
@@ -22,6 +23,7 @@ parameter acquisition_debt_limit:
 
 parameter acquisition_debt_limit_mfs:
   description: "Maximum acquisition indebtedness for married filing separately"
+  reference: "26 USC 163(h)"
   unit: "USD"
   values:
     1987-01-01: 500000

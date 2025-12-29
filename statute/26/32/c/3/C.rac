@@ -15,6 +15,7 @@ for more than one-half of the time the child was alive during the year.
 
 parameter days_in_year:
   description: "Number of days in the tax year"
+  reference: "26 USC 32(c)(3)(C)"
   values:
     2024-01-01: 366
     2023-01-01: 365
@@ -23,6 +24,7 @@ parameter days_in_year:
 
 parameter minimum_residency_fraction:
   description: "Minimum fraction of year child must reside with taxpayer"
+  reference: "26 USC 32(c)(3)(C)"
   values:
     2024-01-01: 0.5
 

@@ -47,6 +47,7 @@ variable educator_expense_deduction:
 
 parameter max_deduction:
   description: "Maximum educator expense deduction per taxpayer per year"
+  reference: "26 USC 62(a)(2)(D)"
   unit: "USD"
   values:
     2002-01-01: 250

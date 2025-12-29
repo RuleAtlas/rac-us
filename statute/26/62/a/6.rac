@@ -26,11 +26,13 @@ input self_employed_pension_contributions:
 
 parameter sep_contribution_rate:
   description: "Maximum contribution rate for SEP plans (25% of net self-employment income)"
+  reference: "26 USC 62(a)(6)"
   values:
     1996-01-01: 0.25
 
 parameter solo_401k_employee_limit:
   description: "Employee deferral limit for Solo 401(k) plans"
+  reference: "26 USC 62(a)(6)"
   unit: "USD"
   values:
     2018-01-01: 18500
@@ -38,6 +40,7 @@ parameter solo_401k_employee_limit:
 
 parameter solo_401k_employer_limit:
   description: "Employer contribution limit for Solo 401(k) plans (25% of net SE income)"
+  reference: "26 USC 62(a)(6)"
   values:
     1996-01-01: 0.25
 

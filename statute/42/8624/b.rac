@@ -110,6 +110,7 @@ parameter fpl_base:
   period: Year
   label: "Federal Poverty Level Base"
   description: "Annual FPL for 1-person household"
+  reference: "42 USC 8624(b)"
 
 parameter fpl_additional_per_person:
   values:
@@ -119,6 +120,7 @@ parameter fpl_additional_per_person:
   period: Year
   label: "FPL Additional Per Person"
   description: "Annual FPL increment for each additional household member"
+  reference: "42 USC 8624(b)"
 
 parameter fpl_percentage:
   values:
@@ -127,6 +129,7 @@ parameter fpl_percentage:
   period: Year
   label: "LIHEAP FPL Percentage"
   description: "Income limit as percentage of FPL (150%)"
+  reference: "42 USC 8624(b)"
 
 # Calculated variables
 

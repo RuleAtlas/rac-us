@@ -217,42 +217,49 @@ input tanf_unit_adults:
 # Parameters for work requirements
 parameter young_child_age_threshold:
   description: "Age threshold for young child exemption"
+  reference: "42 USC 607"
   values:
     1996-01-01: 6
   label: "Young Child Age Threshold"
 
 parameter hours_single_parent_young_child:
   description: "Weekly work hours for single parent with young child"
+  reference: "42 USC 607"
   values:
     1996-01-01: 20
   label: "Single Parent Young Child Work Hours"
 
 parameter hours_single_parent:
   description: "Weekly work hours for single parent"
+  reference: "42 USC 607"
   values:
     1996-01-01: 30
   label: "Single Parent Work Hours"
 
 parameter hours_two_parent:
   description: "Weekly work hours for two-parent families"
+  reference: "42 USC 607"
   values:
     1996-01-01: 35
   label: "Two-Parent Work Hours"
 
 parameter hours_two_parent_with_childcare:
   description: "Weekly work hours for two-parent families with federal childcare"
+  reference: "42 USC 607"
   values:
     1996-01-01: 55
   label: "Two-Parent Work Hours (With Childcare)"
 
 parameter weeks_per_month:
   description: "Average weeks per month for hour conversion"
+  reference: "42 USC 607"
   values:
     1996-01-01: 4.33
   label: "Weeks Per Month"
 
 parameter teen_parent_max_age:
   description: "Maximum age for teen parent requirements"
+  reference: "42 USC 607"
   values:
     1996-01-01: 20
   label: "Teen Parent Maximum Age"

@@ -14,12 +14,14 @@ input qualified_tip_income:
 
 parameter max_deduction:
   description: "Maximum annual tip income deduction"
+  reference: "26 USC 62(a)(23)"
   unit: USD
   values:
     2025-01-01: 25_000
 
 parameter termination_year:
   description: "Final year the tip income deduction is available"
+  reference: "26 USC 62(a)(23)"
   unit: years
   values:
     2025-01-01: 2028

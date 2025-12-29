@@ -81,10 +81,12 @@ variable food_package:
 
 
 parameter priority_by_category:
+  reference: "42 USC 1786(f)"
   values:
     # TODO: add values
 
 parameter priority_ranges:
+  reference: "42 USC 1786(f)"
   values:
     # TODO: add values
 

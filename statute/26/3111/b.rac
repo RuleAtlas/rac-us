@@ -8,7 +8,8 @@ paid by him with respect to employment (as defined in section 3121(b)).
 
 parameter employer_medicare_rate:
   description: "Employer Medicare tax rate"
-  unit: rate
+  reference: "26 USC 3111(b)"
+  unit: "/1"
   values:
     1986-01-01: 0.0145
 

@@ -218,7 +218,7 @@ variable taxable_social_security:
   entity: TaxUnit
   period: Year
   dtype: Rate
-  unit: "percentage"
+  unit: "/1"
   label: "Taxable Fraction of Social Security"
   description: "Portion of Social Security benefits included in taxable income (as a percentage)"
   syntax: python

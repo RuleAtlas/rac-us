@@ -46,12 +46,14 @@ input countable_resources:
 
 parameter age_threshold:
   description: "Age threshold for SSI aged category"
+  reference: "42 USC 1382(a)"
   values:
     1974-01-01: 65
   label: "SSI Age Threshold"
 
 parameter resource_limit_individual:
   description: "SSI resource limit for individual"
+  reference: "42 USC 1382(a)"
   unit: "USD"
   values:
     2024-01-01: 2000
@@ -59,6 +61,7 @@ parameter resource_limit_individual:
 
 parameter resource_limit_couple:
   description: "SSI resource limit for couple"
+  reference: "42 USC 1382(a)"
   unit: "USD"
   values:
     2024-01-01: 3000

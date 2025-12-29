@@ -33,6 +33,7 @@ in which such individual's taxable year begins.
 # 26 USC 221(b)(1) - Maximum student loan interest deduction
 parameter max_deduction:
   description: "Maximum annual student loan interest deduction"
+  reference: "26 USC 221(a)"
   unit: "USD"
   values:
     2024-01-01: 2500
@@ -42,6 +43,7 @@ parameter max_deduction:
 # 26 USC 221(b)(2)(B) - Income phaseout start for single/HOH/QW filers
 parameter phaseout_single_start:
   description: "Modified AGI threshold where student loan deduction phases out (single filers)"
+  reference: "26 USC 221(a)"
   unit: "USD"
   values:
     2024-01-01: 50000
@@ -51,6 +53,7 @@ parameter phaseout_single_start:
 # 26 USC 221(b)(2)(B) - Income phaseout range for single/HOH/QW filers
 parameter phaseout_single_end:
   description: "Modified AGI threshold where student loan deduction fully phases out (single filers)"
+  reference: "26 USC 221(a)"
   unit: "USD"
   values:
     2024-01-01: 65000
@@ -60,6 +63,7 @@ parameter phaseout_single_end:
 # 26 USC 221(b)(2)(B) - Income phaseout start for married filing jointly
 parameter phaseout_joint_start:
   description: "Modified AGI threshold where student loan deduction phases out (MFJ)"
+  reference: "26 USC 221(a)"
   unit: "USD"
   values:
     2024-01-01: 100000
@@ -69,6 +73,7 @@ parameter phaseout_joint_start:
 # 26 USC 221(b)(2)(B) - Income phaseout range for married filing jointly
 parameter phaseout_joint_end:
   description: "Modified AGI threshold where student loan deduction fully phases out (MFJ)"
+  reference: "26 USC 221(a)"
   unit: "USD"
   values:
     2024-01-01: 130000

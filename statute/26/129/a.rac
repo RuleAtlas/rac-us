@@ -12,6 +12,7 @@ separate return by a married individual).
 
 parameter exclusion_limit:
   description: "Maximum DCAP exclusion for most filing statuses"
+  reference: "26 USC 129(a)"
   unit: USD
   values:
     2024-01-01: 5_000
@@ -19,6 +20,7 @@ parameter exclusion_limit:
 
 parameter exclusion_limit_mfs:
   description: "Maximum DCAP exclusion for married filing separately"
+  reference: "26 USC 129(a)"
   unit: USD
   values:
     2024-01-01: 2_500

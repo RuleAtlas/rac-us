@@ -118,78 +118,91 @@ text: |
 # Parameters for EITC credit rates and caps
 parameter credit_rate_0:
   description: "EITC credit rate for taxpayers with no qualifying children"
-  unit: rate
+  reference: "26 USC 32"
+  unit: "/1"
   values:
     2024-01-01: 0.0765
 
 parameter credit_rate_1:
   description: "EITC credit rate for taxpayers with one qualifying child"
-  unit: rate
+  reference: "26 USC 32"
+  unit: "/1"
   values:
     2024-01-01: 0.34
 
 parameter credit_rate_2:
   description: "EITC credit rate for taxpayers with two qualifying children"
-  unit: rate
+  reference: "26 USC 32"
+  unit: "/1"
   values:
     2024-01-01: 0.40
 
 parameter credit_rate_3:
   description: "EITC credit rate for taxpayers with three or more qualifying children"
-  unit: rate
+  reference: "26 USC 32"
+  unit: "/1"
   values:
     2024-01-01: 0.45
 
 parameter earned_income_cap_0:
   description: "EITC earned income cap for taxpayers with no qualifying children"
+  reference: "26 USC 32"
   unit: "USD"
   values:
     2024-01-01: 8260
 
 parameter earned_income_cap_1:
   description: "EITC earned income cap for taxpayers with one qualifying child"
+  reference: "26 USC 32"
   unit: "USD"
   values:
     2024-01-01: 12390
 
 parameter earned_income_cap_2:
   description: "EITC earned income cap for taxpayers with two or more qualifying children"
+  reference: "26 USC 32"
   unit: "USD"
   values:
     2024-01-01: 17400
 
 parameter phaseout_rate_0:
   description: "EITC phaseout rate for taxpayers with no qualifying children"
-  unit: rate
+  reference: "26 USC 32"
+  unit: "/1"
   values:
     2024-01-01: 0.0765
 
 parameter phaseout_rate_1:
   description: "EITC phaseout rate for taxpayers with one qualifying child"
-  unit: rate
+  reference: "26 USC 32"
+  unit: "/1"
   values:
     2024-01-01: 0.1598
 
 parameter phaseout_rate_2:
   description: "EITC phaseout rate for taxpayers with two or more qualifying children"
-  unit: rate
+  reference: "26 USC 32"
+  unit: "/1"
   values:
     2024-01-01: 0.2106
 
 parameter phaseout_start_0:
   description: "EITC phaseout start for taxpayers with no qualifying children"
+  reference: "26 USC 32"
   unit: "USD"
   values:
     2024-01-01: 10330
 
 parameter phaseout_start_1:
   description: "EITC phaseout start for taxpayers with qualifying children"
+  reference: "26 USC 32"
   unit: "USD"
   values:
     2024-01-01: 22720
 
 parameter joint_adjustment:
   description: "Additional phaseout threshold amount for joint filers"
+  reference: "26 USC 32"
   unit: "USD"
   values:
     2024-01-01: 6920

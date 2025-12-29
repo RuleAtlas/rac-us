@@ -7,18 +7,21 @@ period beginning in such taxable year) as does not exceed $10,000.
 
 parameter llc_expense_limit:
   description: "Maximum qualified expenses eligible for LLC"
+  reference: "26 USC 25A(c)(llc)"
   unit: USD
   values:
     2009-01-01: 10000
 
 parameter llc_credit_rate:
   description: "Credit rate for lifetime learning credit"
-  unit: rate
+  reference: "26 USC 25A(c)(llc)"
+  unit: "/1"
   values:
     2009-01-01: 0.20
 
 parameter llc_max_credit:
   description: "Maximum lifetime learning credit per taxpayer"
+  reference: "26 USC 25A(c)(llc)"
   unit: USD
   values:
     2009-01-01: 2000

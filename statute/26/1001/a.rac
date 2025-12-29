@@ -533,7 +533,7 @@ variable preferential_rates:
   entity: TaxUnit
   period: Year
   dtype: Rate
-  unit: "rate"
+  unit: "/1"
   label: "Preferential Capital Gains Tax Rate"
   description: "Weighted average tax rate on capital gains under IRC 1(h)"
   syntax: python

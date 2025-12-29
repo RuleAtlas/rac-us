@@ -17,6 +17,7 @@ the spouse is deemed to have earned income of not less than --
 
 parameter imputed_monthly_one:
   description: "Monthly imputed income for student/disabled spouse with 1 qualifying individual"
+  reference: "26 USC 129(b)"
   unit: USD
   values:
     2024-01-01: 250
@@ -24,6 +25,7 @@ parameter imputed_monthly_one:
 
 parameter imputed_monthly_two:
   description: "Monthly imputed income for student/disabled spouse with 2+ qualifying individuals"
+  reference: "26 USC 129(b)"
   unit: USD
   values:
     2024-01-01: 500
@@ -31,6 +33,7 @@ parameter imputed_monthly_two:
 
 parameter qualifying_individuals_higher_imputed_threshold:
   description: "Number of qualifying individuals at which higher imputed income applies"
+  reference: "26 USC 129(b)"
   unit: count
   values:
     2024-01-01: 2
@@ -38,6 +41,7 @@ parameter qualifying_individuals_higher_imputed_threshold:
 
 parameter months_per_year:
   description: "Months in a year for annualizing monthly amounts"
+  reference: "26 USC 129(b)"
   unit: count
   values:
     2024-01-01: 12

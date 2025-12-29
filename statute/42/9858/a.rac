@@ -5,60 +5,70 @@
 
 parameter infant_max_months_center:
   description: "Maximum age in months for infant rate (center-based)"
+  reference: "42 USC 9858(a)"
   unit: month
   values:
     1991-01-01: 18
 
 parameter infant_max_months_home:
   description: "Maximum age in months for infant rate (home-based)"
+  reference: "42 USC 9858(a)"
   unit: month
   values:
     1991-01-01: 24
 
 parameter toddler_max_months_center:
   description: "Maximum age in months for toddler rate (center-based)"
+  reference: "42 USC 9858(a)"
   unit: month
   values:
     1991-01-01: 24
 
 parameter toddler_max_months_home:
   description: "Maximum age in months for toddler rate (home-based)"
+  reference: "42 USC 9858(a)"
   unit: month
   values:
     1991-01-01: 36
 
 parameter preschool_max_years:
   description: "Maximum age in years for preschool rate"
+  reference: "42 USC 9858(a)"
   unit: year
   values:
     1991-01-01: 6
 
 parameter months_per_year:
   description: "Number of months per year for monthly conversion"
+  reference: "42 USC 9858(a)"
   unit: month
   values:
     1937-01-01: 12
 
 parameter weekly_min_hours:
   description: "Minimum hours per week for weekly rate"
+  reference: "42 USC 9858(a)"
   unit: hour
   values:
     1991-01-01: 30
 
 parameter daily_min_hours:
   description: "Minimum hours per day for daily rate"
+  reference: "42 USC 9858(a)"
   unit: hour
   values:
     1991-01-01: 6
 
 parameter part_day_min_hours:
   description: "Minimum hours per day for part-day rate"
+  reference: "42 USC 9858(a)"
   unit: hour
   values:
     1991-01-01: 3
 
 parameter weeks_per_year:
   description: "Number of weeks per year for annualization"
+  reference: "42 USC 9858(a)"
   unit: week
   values:
     1991-01-01: 52
@@ -153,66 +163,77 @@ variable benefit:
 
 parameter smi_threshold_1:
   description: "First SMI bracket threshold"
-  unit: rate
+  reference: "42 USC 9858(a)"
+  unit: "/1"
   values:
     2015-01-01: 0.5
 
 parameter smi_threshold_2:
   description: "Second SMI bracket threshold"
-  unit: rate
+  reference: "42 USC 9858(a)"
+  unit: "/1"
   values:
     2015-01-01: 0.65
 
 parameter smi_threshold_3:
   description: "Third SMI bracket threshold"
-  unit: rate
+  reference: "42 USC 9858(a)"
+  unit: "/1"
   values:
     2015-01-01: 0.75
 
 parameter smi_threshold_4:
   description: "Fourth SMI bracket threshold"
-  unit: rate
+  reference: "42 USC 9858(a)"
+  unit: "/1"
   values:
     2015-01-01: 0.85
 
 parameter copay_rate_1:
   description: "Copay rate for income at or below first SMI threshold"
-  unit: rate
+  reference: "42 USC 9858(a)"
+  unit: "/1"
   values:
     2015-01-01: 0.05
 
 parameter copay_rate_2:
   description: "Copay rate for income between first and second SMI threshold"
-  unit: rate
+  reference: "42 USC 9858(a)"
+  unit: "/1"
   values:
     2015-01-01: 0.1
 
 parameter copay_rate_3:
   description: "Copay rate for income between second and third SMI threshold"
-  unit: rate
+  reference: "42 USC 9858(a)"
+  unit: "/1"
   values:
     2015-01-01: 0.15
 
 parameter copay_rate_4:
   description: "Copay rate for income between third and fourth SMI threshold"
-  unit: rate
+  reference: "42 USC 9858(a)"
+  unit: "/1"
   values:
     2015-01-01: 0.2
 
 parameter copay_rate_5:
   description: "Copay rate for income above fourth SMI threshold"
-  unit: rate
+  reference: "42 USC 9858(a)"
+  unit: "/1"
   values:
     2015-01-01: 0.25
 
 parameter maximum_percent_of_income:
   description: "Federal maximum copay as percentage of family income"
-  unit: rate
+  reference: "42 USC 9858(a)"
+  unit: "/1"
   values:
     2014-09-30: 0.07
 
 parameter minimum_weekly_fee:
   description: "Minimum copay fee per week"
+  reference: "42 USC 9858(a)"
   unit: "USD"
   period: Week
   values:
@@ -337,19 +358,22 @@ variable copayment:
 
 parameter maximum_age:
   description: "Standard maximum age for CCDF eligibility"
+  reference: "42 USC 9858(a)"
   unit: year
   values:
     1990-01-01: 13
 
 parameter maximum_age_with_disability:
   description: "Maximum age for CCDF eligibility with disability"
+  reference: "42 USC 9858(a)"
   unit: year
   values:
     1990-01-01: 19
 
 parameter smi_income_limit_pct:
   description: "State Median Income threshold for CCDF income eligibility"
-  unit: rate
+  reference: "42 USC 9858(a)"
+  unit: "/1"
   values:
     2014-09-30: 0.85
 

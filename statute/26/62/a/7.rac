@@ -4,6 +4,7 @@ to deduction for retirement savings).
 """
 parameter contribution_limit:
   description: "IRA regular contribution limit"
+  reference: "26 USC 62(a)(7)"
   unit: "USD"
   indexed_by: statute/26/219/b/5
   values:
@@ -12,6 +13,7 @@ parameter contribution_limit:
 # Statutory fixed amount - not indexed
 parameter catch_up_amount:
   description: "IRA catch-up contribution for age 50+"
+  reference: "26 USC 62(a)(7)"
   unit: "USD"
   values:
     2006-01-01: 1000
@@ -19,12 +21,14 @@ parameter catch_up_amount:
 # Statutory age threshold - not indexed
 parameter catch_up_age:
   description: "Age at which catch-up contributions allowed"
+  reference: "26 USC 62(a)(7)"
   values:
     2002-01-01: 50
 
 # Phase-out thresholds - indexed annually
 parameter phaseout_single_start:
   description: "IRA phase-out start for single filers covered by employer plan"
+  reference: "26 USC 62(a)(7)"
   unit: "USD"
   indexed_by: statute/26/219/g
   values:
@@ -32,6 +36,7 @@ parameter phaseout_single_start:
 
 parameter phaseout_single_end:
   description: "IRA phase-out end for single filers covered by employer plan"
+  reference: "26 USC 62(a)(7)"
   unit: "USD"
   indexed_by: statute/26/219/g
   values:
@@ -39,6 +44,7 @@ parameter phaseout_single_end:
 
 parameter phaseout_joint_start:
   description: "IRA phase-out start for joint filers (contributor covered)"
+  reference: "26 USC 62(a)(7)"
   unit: "USD"
   indexed_by: statute/26/219/g
   values:
@@ -46,6 +52,7 @@ parameter phaseout_joint_start:
 
 parameter phaseout_joint_end:
   description: "IRA phase-out end for joint filers (contributor covered)"
+  reference: "26 USC 62(a)(7)"
   unit: "USD"
   indexed_by: statute/26/219/g
   values:
@@ -53,6 +60,7 @@ parameter phaseout_joint_end:
 
 parameter phaseout_spouse_covered_start:
   description: "IRA phase-out start when only spouse is covered"
+  reference: "26 USC 62(a)(7)"
   unit: "USD"
   indexed_by: statute/26/219/g
   values:
@@ -60,6 +68,7 @@ parameter phaseout_spouse_covered_start:
 
 parameter phaseout_spouse_covered_end:
   description: "IRA phase-out end when only spouse is covered"
+  reference: "26 USC 62(a)(7)"
   unit: "USD"
   indexed_by: statute/26/219/g
   values:
@@ -68,12 +77,14 @@ parameter phaseout_spouse_covered_end:
 # Statutory fixed threshold - not indexed
 parameter phaseout_mfs_start:
   description: "IRA phase-out start for MFS when spouse is covered"
+  reference: "26 USC 62(a)(7)"
   unit: "USD"
   values:
     2018-01-01: 0
 
 parameter phaseout_mfs_end:
   description: "IRA phase-out end for MFS when spouse is covered"
+  reference: "26 USC 62(a)(7)"
   unit: "USD"
   values:
     2018-01-01: 10000

@@ -61,6 +61,7 @@ input is_adult_tanf_recipient:
 # Parameters for time limits
 parameter federal_time_limit_months:
   description: "Federal lifetime limit on TANF assistance for adults"
+  reference: "42 USC 607(b)"
   unit: months
   values:
     1996-08-22: 60
@@ -68,7 +69,8 @@ parameter federal_time_limit_months:
 
 parameter hardship_exemption_cap:
   description: "Maximum percentage of caseload that can receive hardship exemption"
-  unit: rate
+  reference: "42 USC 607(b)"
+  unit: "/1"
   values:
     1996-08-22: 0.20
   label: "Hardship Exemption Cap"

@@ -6,6 +6,7 @@ section 1401 for such taxable year.
 
 parameter se_tax_deduction_rate:
   description: "Fraction of self-employment tax that is deductible"
+  reference: "26 USC 164(f)"
   values:
     1990-01-01: 0.5  # One-half per statute
 

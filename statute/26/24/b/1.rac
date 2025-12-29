@@ -10,12 +10,14 @@ the taxpayer's modified adjusted gross income exceeds the threshold amount.
 
 parameter phaseout_rate:
   description: "CTC reduction amount per income increment above threshold"
+  reference: "26 USC 24(b)(1)"
   unit: USD
   values:
     1997-01-01: 50  # $50 per $1,000 excess
 
 parameter phaseout_increment:
   description: "Income increment for CTC phaseout calculation"
+  reference: "26 USC 24(b)(1)"
   unit: USD
   values:
     1997-01-01: 1000  # Per $1,000 (or fraction thereof)

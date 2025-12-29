@@ -38,6 +38,7 @@ input age:
 
 parameter self_only_limit:
   description: "HSA contribution limit for self-only coverage"
+  reference: "26 USC 62(a)(12)"
   unit: "USD"
   values:
     2018-01-01: 3450
@@ -45,6 +46,7 @@ parameter self_only_limit:
 
 parameter family_limit:
   description: "HSA contribution limit for family coverage"
+  reference: "26 USC 62(a)(12)"
   unit: "USD"
   values:
     2018-01-01: 6900
@@ -52,11 +54,13 @@ parameter family_limit:
 
 parameter catch_up_age:
   description: "Age at which catch-up contributions allowed (55+)"
+  reference: "26 USC 62(a)(12)"
   values:
     2003-01-01: 55
 
 parameter catch_up_amount:
   description: "HSA catch-up contribution for age 55+"
+  reference: "26 USC 62(a)(12)"
   unit: "USD"
   values:
     2003-01-01: 1000

@@ -2,7 +2,8 @@
 
 parameter contribution_limit_excess_tax_rate:
   description: "Excise tax rate on excess IRA contributions"
-  unit: rate
+  reference: "26 USC 408(o)"
+  unit: "/1"
   values:
     1977-01-01: 0.06
 

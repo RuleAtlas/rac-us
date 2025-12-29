@@ -87,6 +87,7 @@ input life_insurance_cash_value:
 
 parameter burial_funds_limit_individual:
   description: "Maximum burial funds exclusion for individual"
+  reference: "42 USC 1382b(a)"
   unit: "USD"
   values:
     1974-01-01: 1500
@@ -94,6 +95,7 @@ parameter burial_funds_limit_individual:
 
 parameter burial_funds_limit_couple:
   description: "Maximum burial funds exclusion for couple"
+  reference: "42 USC 1382b(a)"
   unit: "USD"
   values:
     1974-01-01: 3000
@@ -101,6 +103,7 @@ parameter burial_funds_limit_couple:
 
 parameter life_insurance_limit:
   description: "Maximum face value of life insurance to qualify for exclusion"
+  reference: "42 USC 1382b(a)"
   unit: "USD"
   values:
     1974-01-01: 1500

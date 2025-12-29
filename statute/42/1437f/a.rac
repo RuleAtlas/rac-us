@@ -11,6 +11,7 @@ admissions must be "extremely low income" (30% AMI or below).
 
 parameter max_table_size:
   description: "Maximum household size with specific income limit in tables"
+  reference: "42 USC 1437f(a)"
   unit: persons
   values:
     1937-01-01: 8
