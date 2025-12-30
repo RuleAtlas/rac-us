@@ -1,26 +1,337 @@
-#
+# 26 USC 35 - Health Coverage Tax Credit (HCTC)
 # Reference: https://www.law.cornell.edu/uscode/text/26/35
+# Note: This credit expired for coverage months beginning after January 1, 2022
 
 text: """
-Section 35 provides a refundable credit (Health Coverage Tax Credit or HCTC)
-for a percentage of health insurance premiums paid by eligible individuals
-who receive trade adjustment assistance (TAA) or are PBGC pension recipients.
-
 (a) In general - In the case of an individual, there shall be allowed as a
-credit against the tax imposed by subtitle A an amount equal to the
-applicable percentage of the amount paid by the taxpayer for coverage of
-the taxpayer and qualifying family members under qualified health insurance
-for eligible coverage months.
+credit against the tax imposed by subtitle A an amount equal to 72.5 percent
+of the amount paid by the taxpayer for coverage of the taxpayer and qualifying
+family members under qualified health insurance for eligible coverage months
+beginning in the taxable year.
 
-Note: This credit has been largely superseded by the Premium Tax Credit
-(Section 36B) under the Affordable Care Act for most taxpayers.
+(b) Eligible coverage month - For purposes of this section -
+(1) In general - The term "eligible coverage month" means any month if -
+    (A) as of the first day of such month, the taxpayer -
+        (i) is an eligible individual,
+        (ii) is covered by qualified health insurance, the premium for which
+             is paid by the taxpayer,
+        (iii) does not have other specified coverage, and
+        (iv) is not imprisoned under Federal, State, or local authority; and
+    (B) such month begins more than 90 days after the date of the enactment
+        of the Trade Act of 2002 [Aug 6, 2002], and before January 1, 2022.
+
+(c) Eligible individual - For purposes of this section -
+(1) In general - The term "eligible individual" means -
+    (A) an eligible TAA recipient,
+    (B) an eligible alternative TAA recipient, and
+    (C) an eligible PBGC pension recipient.
+(2) Eligible TAA recipient - The term "eligible TAA recipient" means, with
+    respect to any month, any individual who is receiving for any day of such
+    month a trade readjustment allowance under chapter 2 of title II of the
+    Trade Act of 1974.
+(3) Eligible alternative TAA recipient - The term "eligible alternative TAA
+    recipient" means, with respect to any month, any individual who would be
+    described in paragraph (2) for such month if section 246(a)(3)(B) of the
+    Trade Act of 1974 were applied without regard to the 30-day requirement.
+(4) Eligible PBGC pension recipient - The term "eligible PBGC pension
+    recipient" means, with respect to any month, any individual who -
+    (A) has attained age 55 as of the first day of such month, and
+    (B) is receiving a benefit any portion of which is paid by the Pension
+        Benefit Guaranty Corporation.
 """
 
-input health_coverage_tax_credit:
+# Parameters for section 35
+parameter applicable_percentage:
+  description: "Applicable percentage for HCTC per 26 USC 35(a)"
+  unit: /1
+  values:
+    2021-01-01: 0.725
+    2020-01-01: 0.725
+    2019-01-01: 0.725
+    2018-01-01: 0.725
+    2017-01-01: 0.725
+    2016-01-01: 0.725
+    2015-01-01: 0.725
+    2010-01-01: 0.725
+    2002-08-06: 0.65  # Original rate before amendment
+
+parameter program_end_date:
+  description: "End date for HCTC eligibility per 26 USC 35(b)(1)(B)"
+  unit: date
+  values:
+    2002-08-06: "2022-01-01"
+
+parameter pbgc_minimum_age:
+  description: "Minimum age for PBGC pension recipient eligibility per 26 USC 35(c)(4)(A)"
+  unit: years
+  values:
+    2002-08-06: 55
+
+# Input variables
+
+input is_taa_recipient:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "TAA Recipient"
+  description: "Whether person receives trade readjustment allowance under Trade Act of 1974 chapter 2"
+  default: false
+
+input is_alternative_taa_recipient:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Alternative TAA Recipient"
+  description: "Whether person is an eligible alternative TAA recipient per 26 USC 35(c)(3)"
+  default: false
+
+input is_pbgc_pension_recipient:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "PBGC Pension Recipient"
+  description: "Whether person receives pension benefits paid by Pension Benefit Guaranty Corporation"
+  default: false
+
+input age:
+  entity: Person
+  period: Month
+  dtype: Integer
+  unit: years
+  label: "Age"
+  description: "Age of person"
+  default: 0
+
+input qualified_health_insurance_premium_paid:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Qualified Health Insurance Premiums Paid"
+  description: "Amount paid for qualified health insurance premiums per 26 USC 35"
+  default: 0
+
+input has_other_specified_coverage:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Has Other Specified Coverage"
+  description: "Whether person has Medicare, Medicaid, SCHIP, FEHB, or other specified coverage"
+  default: false
+
+input is_imprisoned:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Is Imprisoned"
+  description: "Whether person is imprisoned under Federal, State, or local authority"
+  default: false
+
+input has_qualified_health_insurance:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Has Qualified Health Insurance"
+  description: "Whether person is covered by qualified health insurance per 26 USC 35(e)"
+  default: false
+
+input advance_hctc_payments:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Advance HCTC Payments"
+  description: "Advance payments of HCTC received during taxable year per 26 USC 35(g)(1)"
+  default: 0
+
+# Eligibility variables
+
+variable is_eligible_pbgc_recipient:
+  imports:
+    - 26/35#is_pbgc_pension_recipient
+    - 26/35#age
+    - 26/35#pbgc_minimum_age
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Eligible PBGC Pension Recipient"
+  description: "Whether person meets PBGC pension recipient eligibility per 26 USC 35(c)(4)"
+  syntax: python
+  formula: |
+    # Must be age 55+ and receiving PBGC pension benefits
+    return is_pbgc_pension_recipient and age >= pbgc_minimum_age
+  default: false
+  tests:
+    - name: "PBGC recipient age 55+ is eligible"
+      period: 2021-01
+      inputs:
+        is_pbgc_pension_recipient: true
+        age: 55
+      expect: true
+    - name: "PBGC recipient age 54 is not eligible"
+      period: 2021-01
+      inputs:
+        is_pbgc_pension_recipient: true
+        age: 54
+      expect: false
+    - name: "Non-PBGC recipient age 55+ is not eligible"
+      period: 2021-01
+      inputs:
+        is_pbgc_pension_recipient: false
+        age: 60
+      expect: false
+
+variable is_eligible_individual:
+  imports:
+    - 26/35#is_taa_recipient
+    - 26/35#is_alternative_taa_recipient
+    - 26/35#is_eligible_pbgc_recipient
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Eligible Individual"
+  description: "Whether person is an eligible individual for HCTC per 26 USC 35(c)(1)"
+  syntax: python
+  formula: |
+    # Eligible if TAA recipient, alternative TAA recipient, or eligible PBGC pension recipient
+    return is_taa_recipient or is_alternative_taa_recipient or is_eligible_pbgc_recipient
+  default: false
+  tests:
+    - name: "TAA recipient is eligible"
+      period: 2021-01
+      inputs:
+        is_taa_recipient: true
+        is_alternative_taa_recipient: false
+        is_eligible_pbgc_recipient: false
+      expect: true
+    - name: "Alternative TAA recipient is eligible"
+      period: 2021-01
+      inputs:
+        is_taa_recipient: false
+        is_alternative_taa_recipient: true
+        is_eligible_pbgc_recipient: false
+      expect: true
+    - name: "Eligible PBGC recipient is eligible"
+      period: 2021-01
+      inputs:
+        is_taa_recipient: false
+        is_alternative_taa_recipient: false
+        is_eligible_pbgc_recipient: true
+      expect: true
+    - name: "Non-eligible individual"
+      period: 2021-01
+      inputs:
+        is_taa_recipient: false
+        is_alternative_taa_recipient: false
+        is_eligible_pbgc_recipient: false
+      expect: false
+
+variable is_eligible_coverage_month:
+  imports:
+    - 26/35#is_eligible_individual
+    - 26/35#has_qualified_health_insurance
+    - 26/35#has_other_specified_coverage
+    - 26/35#is_imprisoned
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Eligible Coverage Month"
+  description: "Whether month qualifies as eligible coverage month per 26 USC 35(b)(1)"
+  syntax: python
+  formula: |
+    # All conditions must be met:
+    # (A)(i) is an eligible individual
+    # (A)(ii) is covered by qualified health insurance
+    # (A)(iii) does not have other specified coverage
+    # (A)(iv) is not imprisoned
+    # Note: Date restrictions (after Aug 6, 2002 and before Jan 1, 2022) enforced separately
+    return (is_eligible_individual and
+            has_qualified_health_insurance and
+            not has_other_specified_coverage and
+            not is_imprisoned)
+  default: false
+  tests:
+    - name: "All conditions met - eligible month"
+      period: 2021-01
+      inputs:
+        is_eligible_individual: true
+        has_qualified_health_insurance: true
+        has_other_specified_coverage: false
+        is_imprisoned: false
+      expect: true
+    - name: "Not eligible individual"
+      period: 2021-01
+      inputs:
+        is_eligible_individual: false
+        has_qualified_health_insurance: true
+        has_other_specified_coverage: false
+        is_imprisoned: false
+      expect: false
+    - name: "Has other specified coverage"
+      period: 2021-01
+      inputs:
+        is_eligible_individual: true
+        has_qualified_health_insurance: true
+        has_other_specified_coverage: true
+        is_imprisoned: false
+      expect: false
+    - name: "Is imprisoned"
+      period: 2021-01
+      inputs:
+        is_eligible_individual: true
+        has_qualified_health_insurance: true
+        has_other_specified_coverage: false
+        is_imprisoned: true
+      expect: false
+
+# Main credit calculation
+
+variable health_coverage_tax_credit:
+  imports:
+    - 26/35#qualified_health_insurance_premium_paid
+    - 26/35#applicable_percentage
+    - 26/35#advance_hctc_payments
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Health Coverage Tax Credit"
-  description: "Refundable credit for health insurance costs of TAA recipients per 26 USC 35"
+  description: "Refundable credit for health insurance costs of TAA and PBGC recipients per 26 USC 35(a)"
+  syntax: python
+  formula: |
+    # Credit = applicable percentage (72.5%) of qualified health insurance premiums
+    # Reduced by any advance payments received
+    gross_credit = qualified_health_insurance_premium_paid * applicable_percentage
+    return max(0, gross_credit - advance_hctc_payments)
   default: 0
+  tests:
+    - name: "Full credit calculation - no advance payments"
+      period: 2021
+      inputs:
+        qualified_health_insurance_premium_paid: 10000
+        advance_hctc_payments: 0
+      expect: 7250
+    - name: "Credit with advance payments"
+      period: 2021
+      inputs:
+        qualified_health_insurance_premium_paid: 10000
+        advance_hctc_payments: 5000
+      expect: 2250
+    - name: "Advance payments exceed credit"
+      period: 2021
+      inputs:
+        qualified_health_insurance_premium_paid: 5000
+        advance_hctc_payments: 5000
+      expect: 0
+    - name: "No premiums paid"
+      period: 2021
+      inputs:
+        qualified_health_insurance_premium_paid: 0
+        advance_hctc_payments: 0
+      expect: 0
+    - name: "Credit at 72.5% rate"
+      period: 2021
+      inputs:
+        qualified_health_insurance_premium_paid: 1000
+        advance_hctc_payments: 0
+      expect: 725

@@ -1,0 +1,254 @@
+# 26 USC 32 - Earned Income Tax Credit (EITC) Parameters
+#
+# This file contains all inflation-adjusted thresholds and statutory rates
+# for the Earned Income Tax Credit.
+#
+# Sources:
+# - 26 USC 32: https://www.law.cornell.edu/uscode/text/26/32
+# - Rev. Proc. 2023-34, Section 3.06 (2024 amounts)
+# - Rev. Proc. 2022-38, Section 3.06 (2023 amounts)
+# - Rev. Proc. 2021-45, Section 3.06 (2022 amounts)
+
+# =============================================================================
+# SECTION (b)(1) - CREDIT AND PHASEOUT PERCENTAGES
+# =============================================================================
+# These are statutory percentages that are NOT inflation-adjusted.
+# The percentages vary by number of qualifying children (0, 1, 2, or 3+).
+
+credit_percentage:
+  description: "Credit percentage for EITC phase-in calculation, indexed by number of qualifying children"
+  unit: /1
+  period: year
+  label: "EITC Credit Percentage"
+  reference:
+    - title: "26 U.S. Code 32(b)(1)"
+      href: "https://www.law.cornell.edu/uscode/text/26/32#b_1"
+  values:
+    # Key is number of qualifying children (0, 1, 2, 3+ uses 3)
+    2024-01-01:
+      0: 0.0765
+      1: 0.34
+      2: 0.40
+      3: 0.45
+    # These are statutory rates, unchanged since 2009 (ARRA)
+    1996-01-01:
+      0: 0.0765
+      1: 0.34
+      2: 0.40
+      3: 0.45
+
+phaseout_percentage:
+  description: "Phaseout percentage for EITC reduction calculation, indexed by number of qualifying children"
+  unit: /1
+  period: year
+  label: "EITC Phaseout Percentage"
+  reference:
+    - title: "26 U.S. Code 32(b)(1)"
+      href: "https://www.law.cornell.edu/uscode/text/26/32#b_1"
+  values:
+    # Key is number of qualifying children (0, 1, 2, 3+ uses 3)
+    2024-01-01:
+      0: 0.0765
+      1: 0.1598
+      2: 0.2106
+      3: 0.2106
+    # These are statutory rates, unchanged since 2009 (ARRA)
+    1996-01-01:
+      0: 0.0765
+      1: 0.1598
+      2: 0.2106
+      3: 0.2106
+
+# =============================================================================
+# SECTION (b)(2)(A) - EARNED INCOME AND PHASEOUT AMOUNTS
+# =============================================================================
+# These amounts ARE inflation-adjusted per 26 USC 32(j).
+# The earned income amount is the cap for phase-in calculation.
+# The phaseout amount is the income threshold where phaseout begins.
+
+earned_income_amount:
+  description: "Maximum earned income for phase-in credit calculation, indexed by number of qualifying children"
+  unit: currency-USD
+  period: year
+  label: "EITC Earned Income Amount"
+  indexed: true
+  index_reference: "26 USC 32(j)"
+  reference:
+    - title: "26 U.S. Code 32(b)(2)(A)"
+      href: "https://www.law.cornell.edu/uscode/text/26/32#b_2_A"
+    - title: "Rev. Proc. 2023-34, Section 3.06"
+      href: "https://www.irs.gov/irb/2023-48_IRB#REV-PROC-2023-34"
+  values:
+    # Key is number of qualifying children (0, 1, 2, 3+ uses 3)
+    2024-01-01:
+      0: 8260
+      1: 12390
+      2: 17400
+      3: 17400
+    2023-01-01:
+      0: 7920
+      1: 11850
+      2: 16660
+      3: 16660
+    2022-01-01:
+      0: 7320
+      1: 10980
+      2: 15410
+      3: 15410
+    2021-01-01:
+      0: 7100
+      1: 10640
+      2: 14950
+      3: 14950
+
+phaseout_amount:
+  description: "Income threshold where EITC phaseout begins (single/HOH), indexed by number of qualifying children"
+  unit: currency-USD
+  period: year
+  label: "EITC Phaseout Threshold"
+  indexed: true
+  index_reference: "26 USC 32(j)"
+  reference:
+    - title: "26 U.S. Code 32(b)(2)(A)"
+      href: "https://www.law.cornell.edu/uscode/text/26/32#b_2_A"
+    - title: "Rev. Proc. 2023-34, Section 3.06"
+      href: "https://www.irs.gov/irb/2023-48_IRB#REV-PROC-2023-34"
+  values:
+    # Key is number of qualifying children (0, 1, 2, 3+ uses 3)
+    2024-01-01:
+      0: 10330
+      1: 22720
+      2: 22720
+      3: 22720
+    2023-01-01:
+      0: 9880
+      1: 21710
+      2: 21710
+      3: 21710
+    2022-01-01:
+      0: 9160
+      1: 20130
+      2: 20130
+      3: 20130
+    2021-01-01:
+      0: 8880
+      1: 19520
+      2: 19520
+      3: 19520
+
+# =============================================================================
+# SECTION (b)(2)(B) - JOINT RETURN ADJUSTMENT
+# =============================================================================
+# Additional phaseout threshold for married filing jointly.
+# This amount IS inflation-adjusted per 26 USC 32(j).
+
+joint_return_adjustment:
+  description: "Additional phaseout threshold amount for married filing jointly taxpayers"
+  unit: currency-USD
+  period: year
+  label: "EITC Joint Return Adjustment"
+  indexed: true
+  index_reference: "26 USC 32(j)"
+  reference:
+    - title: "26 U.S. Code 32(b)(2)(B)"
+      href: "https://www.law.cornell.edu/uscode/text/26/32#b_2_B"
+    - title: "Rev. Proc. 2023-34, Section 3.06"
+      href: "https://www.irs.gov/irb/2023-48_IRB#REV-PROC-2023-34"
+  values:
+    2024-01-01: 6920
+    2023-01-01: 6570
+    2022-01-01: 5980
+    2021-01-01: 5700
+    2020-01-01: 5600
+    # Base amount from P.L. 110-351 (2008)
+    2008-01-01: 3000
+
+# =============================================================================
+# SECTION (i)(1) - DISQUALIFIED INCOME LIMIT
+# =============================================================================
+# Maximum investment income before EITC is disallowed.
+# This amount IS inflation-adjusted per 26 USC 32(j).
+
+disqualified_income_limit:
+  description: "Maximum investment income allowed before EITC disqualification"
+  unit: currency-USD
+  period: year
+  label: "Investment Income Limit"
+  indexed: true
+  index_reference: "26 USC 32(j)"
+  reference:
+    - title: "26 U.S. Code 32(i)(1)"
+      href: "https://www.law.cornell.edu/uscode/text/26/32#i_1"
+    - title: "Rev. Proc. 2023-34, Section 3.06"
+      href: "https://www.irs.gov/irb/2023-48_IRB#REV-PROC-2023-34"
+  values:
+    2024-01-01: 11600
+    2023-01-01: 11000
+    2022-01-01: 10300
+    2021-01-01: 10000
+    # Pre-ARPA base amount
+    2020-01-01: 3650
+
+# =============================================================================
+# DERIVED AMOUNTS - MAXIMUM CREDIT
+# =============================================================================
+# Maximum credit = credit_percentage * earned_income_amount
+# These are for reference/validation; computed from above parameters.
+
+maximum_credit:
+  description: "Maximum EITC by number of qualifying children (derived: credit_percentage * earned_income_amount)"
+  unit: currency-USD
+  period: year
+  label: "Maximum EITC"
+  reference:
+    - title: "IRS EITC Tables"
+      href: "https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit/earned-income-and-earned-income-tax-credit-eitc-tables"
+  values:
+    # Key is number of qualifying children (0, 1, 2, 3+ uses 3)
+    2024-01-01:
+      0: 632      # 0.0765 * 8260 = 631.89, rounded
+      1: 4213     # 0.34 * 12390 = 4212.60, rounded
+      2: 6960     # 0.40 * 17400 = 6960.00
+      3: 7830     # 0.45 * 17400 = 7830.00
+    2023-01-01:
+      0: 606      # 0.0765 * 7920 = 605.88, rounded
+      1: 4029     # 0.34 * 11850 = 4029.00
+      2: 6664     # 0.40 * 16660 = 6664.00
+      3: 7497     # 0.45 * 16660 = 7497.00
+
+# =============================================================================
+# DERIVED AMOUNTS - AGI LIMITS
+# =============================================================================
+# Maximum AGI to receive any EITC by filing status and children.
+# Single/HOH: phaseout_amount + (max_credit / phaseout_percentage)
+# Joint: phaseout_amount + joint_return_adjustment + (max_credit / phaseout_percentage)
+
+agi_limit_single:
+  description: "Maximum AGI to receive any EITC for single/HOH filers"
+  unit: currency-USD
+  period: year
+  label: "EITC AGI Limit (Single/HOH)"
+  reference:
+    - title: "IRS EITC Tables"
+      href: "https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit/earned-income-and-earned-income-tax-credit-eitc-tables"
+  values:
+    2024-01-01:
+      0: 18591
+      1: 49084
+      2: 55768
+      3: 59899
+
+agi_limit_joint:
+  description: "Maximum AGI to receive any EITC for married filing jointly"
+  unit: currency-USD
+  period: year
+  label: "EITC AGI Limit (Joint)"
+  reference:
+    - title: "IRS EITC Tables"
+      href: "https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit/earned-income-and-earned-income-tax-credit-eitc-tables"
+  values:
+    2024-01-01:
+      0: 25511
+      1: 56004
+      2: 62688
+      3: 66819

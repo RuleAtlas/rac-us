@@ -12,25 +12,329 @@ there shall be allowed as a credit against the tax imposed by this subtitle
 for such taxable year an amount equal to 10 percent of the purchase price
 of the residence.
 
+(f) Recapture of credit -
+  (1) In general - For 2008 purchases, tax increased by 6 2/3% of credit
+      for each year during the 15-year recapture period.
+  (2) Acceleration - If home is disposed of or ceases to be principal
+      residence before end of recapture period, remaining credit is due.
+  (4)(D) Waiver for 2009-2010 purchases - Paragraph (1) annual recapture
+      does not apply. Paragraph (2) applies only if disposition occurs
+      within 36 months of purchase date.
+
 Note: While expired for new claims, some taxpayers may still have recapture
-obligations if they sold their home within 36 months of purchase or converted
-it to non-principal residence use.
+obligations from 2008 purchases (15-year rule) or 2009-2010 purchases
+(36-month disposition rule).
 """
 
-input first_time_homebuyer_credit:
+# --- Inputs ---
+
+input first_time_homebuyer_credit_claimed:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
-  label: "First-Time Homebuyer Credit"
-  description: "Expired refundable credit for first-time homebuyers per 26 USC 36 (2008-2010)"
+  label: "First-Time Homebuyer Credit Claimed"
+  description: "Original credit claimed under 26 USC 36 (2008-2010)"
   default: 0
 
-input first_time_homebuyer_credit_recapture:
+input first_time_homebuyer_credit_purchase_year:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "First-Time Homebuyer Credit Purchase Year"
+  description: "Year the home was purchased (2008, 2009, or 2010)"
+  default: 0
+
+input first_time_homebuyer_credit_prior_repayments:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "First-Time Homebuyer Credit Prior Repayments"
+  description: "Total amount already repaid in prior years (for 2008 purchases)"
+  default: 0
+
+input first_time_homebuyer_home_disposed:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "First-Time Homebuyer Home Disposed"
+  description: "Whether the home was sold or ceased to be principal residence this year"
+  default: false
+
+input first_time_homebuyer_months_since_purchase:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "Months Since Home Purchase"
+  description: "Number of months from purchase date to disposition date"
+  default: 0
+
+input first_time_homebuyer_gain_on_sale:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Gain on Sale of First-Time Homebuyer Home"
+  description: "Gain realized on sale of home (for limiting recapture)"
+  default: 0
+
+input first_time_homebuyer_recapture_exception:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "First-Time Homebuyer Recapture Exception Applies"
+  description: "True if an exception applies (death, involuntary conversion with replacement, military service)"
+  default: false
+
+# --- Annual Recapture for 2008 Purchases (26 USC 36(f)(1)) ---
+
+variable first_time_homebuyer_annual_recapture:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "First-Time Homebuyer Annual Recapture"
+  reference: "26 USC 36(f)(1)"
+  description: "Annual recapture amount (6 2/3% of credit) - applies only to 2008 purchases"
+
+  formula:
+    # Per 36(f)(4)(D), annual recapture is waived for 2009-2010 purchases
+    if first_time_homebuyer_credit_purchase_year != 2008:
+      return 0
+
+    # Exception applies - no recapture
+    if first_time_homebuyer_recapture_exception:
+      return 0
+
+    # 6 2/3% annual recapture for 2008 purchases
+    # This applies for 15 years starting with second tax year after purchase
+    annual_amount = first_time_homebuyer_credit_claimed * (2 / 30)  # 6.67% = 2/30
+
+    # Cap at remaining balance
+    remaining_balance = first_time_homebuyer_credit_claimed - first_time_homebuyer_credit_prior_repayments
+    return min(annual_amount, remaining_balance)
+
+  tests:
+    - name: "2008 purchase - annual recapture applies"
+      inputs:
+        first_time_homebuyer_credit_claimed: 7500
+        first_time_homebuyer_credit_purchase_year: 2008
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_recapture_exception: false
+      output: 500  # 7500 * (2/30) = 500
+
+    - name: "2009 purchase - no annual recapture (waived)"
+      inputs:
+        first_time_homebuyer_credit_claimed: 8000
+        first_time_homebuyer_credit_purchase_year: 2009
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_recapture_exception: false
+      output: 0
+
+    - name: "2010 purchase - no annual recapture (waived)"
+      inputs:
+        first_time_homebuyer_credit_claimed: 8000
+        first_time_homebuyer_credit_purchase_year: 2010
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_recapture_exception: false
+      output: 0
+
+    - name: "2008 purchase with partial prior repayments"
+      inputs:
+        first_time_homebuyer_credit_claimed: 7500
+        first_time_homebuyer_credit_purchase_year: 2008
+        first_time_homebuyer_credit_prior_repayments: 7000
+        first_time_homebuyer_recapture_exception: false
+      output: 500  # Remaining balance is 500, which equals annual amount
+
+    - name: "2008 purchase - exception applies"
+      inputs:
+        first_time_homebuyer_credit_claimed: 7500
+        first_time_homebuyer_credit_purchase_year: 2008
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_recapture_exception: true
+      output: 0
+
+# --- Disposition Recapture (26 USC 36(f)(2) and (f)(4)(D)) ---
+
+variable first_time_homebuyer_disposition_recapture:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "First-Time Homebuyer Disposition Recapture"
+  reference: "26 USC 36(f)(2), 36(f)(4)(D)"
+  description: "Accelerated recapture on disposition - different rules for 2008 vs 2009+ purchases"
+
+  formula:
+    # No disposition this year - no accelerated recapture
+    if not first_time_homebuyer_home_disposed:
+      return 0
+
+    # Exception applies - no recapture
+    if first_time_homebuyer_recapture_exception:
+      return 0
+
+    # Calculate remaining balance
+    remaining_balance = first_time_homebuyer_credit_claimed - first_time_homebuyer_credit_prior_repayments
+
+    # 2008 purchases: Full recapture on any disposition during 15-year period
+    # (handled by remaining balance, since annual payments continue)
+    if first_time_homebuyer_credit_purchase_year == 2008:
+      # For sales to unrelated parties, limited to gain
+      if first_time_homebuyer_gain_on_sale >= 0:
+        return min(remaining_balance, first_time_homebuyer_gain_on_sale)
+      return remaining_balance
+
+    # 2009-2010 purchases: Recapture ONLY if disposed within 36 months
+    # Per 36(f)(4)(D): "paragraph (2) shall apply only if the disposition
+    # or cessation described in paragraph (2) occurs during the 36-month period"
+    if first_time_homebuyer_credit_purchase_year >= 2009:
+      # No recapture if disposition after 36 months
+      if first_time_homebuyer_months_since_purchase > 36:
+        return 0
+
+      # Within 36 months - full recapture, limited to gain for sales
+      if first_time_homebuyer_gain_on_sale >= 0:
+        return min(remaining_balance, first_time_homebuyer_gain_on_sale)
+      return remaining_balance
+
+    return 0
+
+  tests:
+    - name: "2009 purchase - sold within 36 months - full recapture"
+      inputs:
+        first_time_homebuyer_credit_claimed: 8000
+        first_time_homebuyer_credit_purchase_year: 2009
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_home_disposed: true
+        first_time_homebuyer_months_since_purchase: 24
+        first_time_homebuyer_gain_on_sale: 50000
+        first_time_homebuyer_recapture_exception: false
+      output: 8000
+
+    - name: "2009 purchase - sold after 36 months - NO recapture"
+      inputs:
+        first_time_homebuyer_credit_claimed: 8000
+        first_time_homebuyer_credit_purchase_year: 2009
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_home_disposed: true
+        first_time_homebuyer_months_since_purchase: 48
+        first_time_homebuyer_gain_on_sale: 50000
+        first_time_homebuyer_recapture_exception: false
+      output: 0
+
+    - name: "2010 purchase - sold after 36 months - NO recapture"
+      inputs:
+        first_time_homebuyer_credit_claimed: 8000
+        first_time_homebuyer_credit_purchase_year: 2010
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_home_disposed: true
+        first_time_homebuyer_months_since_purchase: 37
+        first_time_homebuyer_gain_on_sale: 50000
+        first_time_homebuyer_recapture_exception: false
+      output: 0
+
+    - name: "2009 purchase - sold within 36 months - gain limits recapture"
+      inputs:
+        first_time_homebuyer_credit_claimed: 8000
+        first_time_homebuyer_credit_purchase_year: 2009
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_home_disposed: true
+        first_time_homebuyer_months_since_purchase: 12
+        first_time_homebuyer_gain_on_sale: 3000
+        first_time_homebuyer_recapture_exception: false
+      output: 3000  # Limited to gain
+
+    - name: "2008 purchase - disposition triggers full remaining balance"
+      inputs:
+        first_time_homebuyer_credit_claimed: 7500
+        first_time_homebuyer_credit_purchase_year: 2008
+        first_time_homebuyer_credit_prior_repayments: 2500
+        first_time_homebuyer_home_disposed: true
+        first_time_homebuyer_months_since_purchase: 60
+        first_time_homebuyer_gain_on_sale: 100000
+        first_time_homebuyer_recapture_exception: false
+      output: 5000  # Remaining balance
+
+    - name: "No disposition - no recapture"
+      inputs:
+        first_time_homebuyer_credit_claimed: 8000
+        first_time_homebuyer_credit_purchase_year: 2009
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_home_disposed: false
+        first_time_homebuyer_months_since_purchase: 0
+        first_time_homebuyer_gain_on_sale: 0
+        first_time_homebuyer_recapture_exception: false
+      output: 0
+
+    - name: "Exception applies - no recapture"
+      inputs:
+        first_time_homebuyer_credit_claimed: 8000
+        first_time_homebuyer_credit_purchase_year: 2009
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_home_disposed: true
+        first_time_homebuyer_months_since_purchase: 12
+        first_time_homebuyer_gain_on_sale: 50000
+        first_time_homebuyer_recapture_exception: true
+      output: 0
+
+# --- Total Recapture (sum of annual and disposition) ---
+
+variable first_time_homebuyer_credit_recapture:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "First-Time Homebuyer Credit Recapture"
-  description: "Amount to be recaptured if home sold within 36 months"
-  default: 0
+  reference: "26 USC 36(f)"
+  description: "Total recapture amount added to tax liability"
+
+  formula:
+    # For 2008: annual recapture OR disposition recapture (not both in same year)
+    # For 2009+: only disposition recapture (annual is waived)
+    if first_time_homebuyer_home_disposed:
+      return first_time_homebuyer_disposition_recapture
+    return first_time_homebuyer_annual_recapture
+
+  tests:
+    - name: "2008 purchase with annual recapture"
+      inputs:
+        first_time_homebuyer_credit_claimed: 7500
+        first_time_homebuyer_credit_purchase_year: 2008
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_home_disposed: false
+        first_time_homebuyer_recapture_exception: false
+      output: 500
+
+    - name: "2009 purchase - no annual recapture"
+      inputs:
+        first_time_homebuyer_credit_claimed: 8000
+        first_time_homebuyer_credit_purchase_year: 2009
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_home_disposed: false
+        first_time_homebuyer_recapture_exception: false
+      output: 0
+
+    - name: "2009 purchase sold within 36 months"
+      inputs:
+        first_time_homebuyer_credit_claimed: 8000
+        first_time_homebuyer_credit_purchase_year: 2009
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_home_disposed: true
+        first_time_homebuyer_months_since_purchase: 30
+        first_time_homebuyer_gain_on_sale: 100000
+        first_time_homebuyer_recapture_exception: false
+      output: 8000
+
+    - name: "2009 purchase sold after 36 months - NO recapture"
+      inputs:
+        first_time_homebuyer_credit_claimed: 8000
+        first_time_homebuyer_credit_purchase_year: 2009
+        first_time_homebuyer_credit_prior_repayments: 0
+        first_time_homebuyer_home_disposed: true
+        first_time_homebuyer_months_since_purchase: 48
+        first_time_homebuyer_gain_on_sale: 100000
+        first_time_homebuyer_recapture_exception: false
+      output: 0

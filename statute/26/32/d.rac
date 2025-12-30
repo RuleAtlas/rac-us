@@ -1,45 +1,139 @@
 text: """
-(d) Married individuals filing separate returns
-In the case of an individual who is married (within the meaning of
-section 7703), this section shall apply only if a joint return is filed
-for the taxable year under section 6013.
-For purposes of this paragraph, marital status shall be determined
-under section 7703.
+(d) Married individuals
+
+(1) In general
+In the case of an individual who is married, this section shall apply
+only if a joint return is filed for the taxable year under section 6013.
+
+(2) Determination of marital status
+  (A) In general
+  Except as provided in subparagraph (B), marital status shall be
+  determined under section 7703(a).
+
+  (B) Special rule for separated spouse
+  An individual shall not be treated as married if such individual—
+    (i) is married (as determined under section 7703(a)) and does not
+        file a joint return for the taxable year,
+    (ii) resides with a qualifying child of the individual for more
+         than one-half of such taxable year, and
+    (iii)(I) during the last 6 months of such taxable year, does not
+             have the same principal place of abode as the individual's
+             spouse, or
+         (II) has a decree, instrument, or agreement (other than a
+              decree of divorce) described in section 121(d)(3)(C) with
+              respect to the individual's spouse and is not a member of
+              the same household with the individual's spouse by the end
+              of the taxable year.
 """
-variable is_mfs_filing_status:
+
+# 26 USC 32(d)(1) - Joint return requirement for married individuals
+variable eitc_requires_joint_return:
   imports: [26/1#filing_status]
   entity: TaxUnit
   period: Year
   dtype: Boolean
-  label: "Is Married Filing Separately"
-  description: "Whether filing status is MFS, disqualifying from EITC per 26 USC 32(d)"
+  label: "EITC Requires Joint Return"
+  description: "Per 26 USC 32(d)(1), married individuals must file jointly to claim EITC"
+  reference: "26 USC 32(d)(1)"
   syntax: python
   formula: |
-    # MARRIED_FILING_SEPARATELY filing status disqualifies from EITC
+    # Married filing separately disqualifies from EITC
+    # unless the separated spouse exception in (d)(2)(B) applies
     return filing_status == MARRIED_FILING_SEPARATELY
   tests:
-    - name: "Married filing separately - disqualified"
+    - name: "Married filing separately - fails joint return requirement"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_SEPARATELY
       expect: true
-    - name: "Single - not disqualified"
+    - name: "Single - no joint return required"
       period: 2024-01
       inputs:
         filing_status: SINGLE
       expect: false
-    - name: "Married filing jointly - not disqualified"
+    - name: "Married filing jointly - meets requirement"
       period: 2024-01
       inputs:
         filing_status: JOINT
       expect: false
-    - name: "Head of household - not disqualified"
+    - name: "Head of household - not required"
       period: 2024-01
       inputs:
         filing_status: HEAD_OF_HOUSEHOLD
       expect: false
-    - name: "Surviving spouse - not disqualified"
+    - name: "Surviving spouse - not required"
       period: 2024-01
       inputs:
         filing_status: SURVIVING_SPOUSE
       expect: false
+
+# 26 USC 32(d)(2)(B) - Separated spouse exception
+# An individual is not treated as married if ALL THREE conditions are met:
+#   (i) is married and does not file joint return
+#   (ii) resides with qualifying child for more than half the year
+#   (iii) EITHER:
+#        (I) no same principal abode as spouse during last 6 months, OR
+#        (II) has separation decree/agreement and not same household at year end
+variable eitc_separated_spouse_exception:
+  imports:
+    - 26/7703#is_married
+    - 26/1#filing_status
+    - 26/32/c/3#has_qualifying_child
+    - person#months_living_with_qualifying_child
+    - person#months_same_abode_as_spouse
+    - person#has_separation_agreement
+    - person#same_household_as_spouse_at_year_end
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "EITC Separated Spouse Exception"
+  description: "Per 26 USC 32(d)(2)(B), individual not treated as married if conditions (i)-(iii) met"
+  reference: "26 USC 32(d)(2)(B)"
+  syntax: python
+  formula: |
+    # Condition (i): is married and does not file joint return
+    condition_i = is_married and filing_status != JOINT
+
+    # Condition (ii): resides with qualifying child for more than half the year
+    condition_ii = has_qualifying_child and months_living_with_qualifying_child > 6
+
+    # Condition (iii)(I): no same principal abode as spouse during last 6 months
+    condition_iii_I = months_same_abode_as_spouse <= 6
+
+    # Condition (iii)(II): has separation decree/agreement and not same household at year end
+    condition_iii_II = has_separation_agreement and not same_household_as_spouse_at_year_end
+
+    # Condition (iii): either (I) or (II)
+    condition_iii = condition_iii_I or condition_iii_II
+
+    # All three conditions must be met
+    return condition_i and condition_ii and condition_iii
+
+# 26 USC 32(d) - Overall married individual eligibility
+variable eitc_married_eligible:
+  imports:
+    - 26/7703#is_married
+    - 26/1#filing_status
+    - 26/32/d#eitc_separated_spouse_exception
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "EITC Married Individual Eligible"
+  description: "Per 26 USC 32(d), married individual eligible if filing jointly OR meets separated spouse exception"
+  reference: "26 USC 32(d)"
+  syntax: python
+  formula: |
+    # Not married - eligible (d) does not apply
+    if not is_married:
+      return True
+
+    # Married filing jointly - eligible per (d)(1)
+    if filing_status == JOINT:
+      return True
+
+    # Married but meets separated spouse exception per (d)(2)(B)
+    if eitc_separated_spouse_exception:
+      return True
+
+    # Married but not filing jointly and no exception - not eligible
+    return False

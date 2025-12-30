@@ -1,4 +1,4 @@
-#
+# 26 USC 34 - Certain Uses of Gasoline and Special Fuels
 # Reference: https://www.law.cornell.edu/uscode/text/26/34
 
 text: """
@@ -12,13 +12,70 @@ imposed by this subtitle for the taxable year an amount equal to the
 sum of the amounts payable to the taxpayer under sections 6420, 6421,
 and 6427 (determined without regard to section 6421(i)) with respect
 to gasoline and special fuels used during such year.
+
+(b) Exception - Amounts payable under sections 6421 and 6427 if
+(1) a claim for payment has been filed under such section, and
+(2) the amount qualifies for payment under section 6421(i) or 6427(k)
+shall not be taken into account.
 """
 
-input fuel_tax_credit:
+# Input: Credit for gasoline used on farms (26 USC 6420)
+# Refund of excise taxes for fuel used on a farm for farming purposes.
+# Per 6420(g), for taxable entities this is claimed as a credit under section 34
+# rather than a direct refund.
+input s6420_gasoline_used_on_farms_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Gasoline Used on Farms Credit (26 USC 6420)"
+  description: "Amount payable under 26 USC 6420 for gasoline used on farms for farming purposes"
+  reference: "26 USC 6420"
+  default: 0
+
+# Input: Credit for gasoline used for certain nonhighway purposes (26 USC 6421)
+# Refund of excise taxes for gasoline used in nonhighway business use,
+# local transit systems, and school buses.
+# Per 6421(i), for taxable entities this is claimed as a credit under section 34.
+# Note: Section 34 specifies "determined without regard to section 6421(i)"
+# meaning we use the full amount before any limitations that would redirect
+# to direct payment.
+input s6421_gasoline_nonhighway_purposes_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Gasoline Used for Nonhighway Purposes Credit (26 USC 6421)"
+  description: "Amount payable under 26 USC 6421 for gasoline used for nonhighway business purposes"
+  reference: "26 USC 6421"
+  default: 0
+
+# Input: Credit for fuels not used for taxable purposes (26 USC 6427)
+# Refund of excise taxes for diesel fuel, kerosene, and other fuels
+# used for farming, off-highway business, local transit, school buses,
+# aircraft museums, and other nontaxable purposes.
+# Per 6427(k), for taxable entities this is claimed as a credit under section 34.
+input s6427_fuels_not_used_for_taxable_purposes_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Fuels Not Used for Taxable Purposes Credit (26 USC 6427)"
+  description: "Amount payable under 26 USC 6427 for fuels not used for taxable purposes"
+  reference: "26 USC 6427"
+  default: 0
+
+# Output: Total fuel tax credit under 26 USC 34(a)
+variable fuel_tax_credit:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Fuel Tax Credit"
-  description: "Credit for federal excise taxes on fuels used for nontaxable purposes per 26 USC 34"
-  default: 0
+  description: "Credit for federal excise taxes on fuels used for nontaxable purposes per 26 USC 34(a)"
+  reference: "26 USC 34(a)"
+
+  formula:
+    # Per 34(a), the credit equals the sum of amounts payable under
+    # sections 6420, 6421, and 6427
+    return s6420_gasoline_used_on_farms_credit + s6421_gasoline_nonhighway_purposes_credit + s6427_fuels_not_used_for_taxable_purposes_credit

@@ -1,0 +1,103 @@
+# 26 USC 32 - Earned Income Tax Credit (EITC)
+# Metadata and coverage documentation
+
+title: "Earned Income Tax Credit"
+section: "26 USC 32"
+short_title: "EITC"
+
+sources:
+  statute:
+    - title: "26 U.S. Code 32 - Earned income"
+      href: "https://www.law.cornell.edu/uscode/text/26/32"
+  irs_guidance:
+    - title: "Rev. Proc. 2023-34 (2024 inflation adjustments)"
+      href: "https://www.irs.gov/irb/2023-48_IRB#REV-PROC-2023-34"
+    - title: "Publication 596 - Earned Income Credit"
+      href: "https://www.irs.gov/pub/irs-pdf/p596.pdf"
+    - title: "IRS EITC Tables"
+      href: "https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit/earned-income-and-earned-income-tax-credit-eitc-tables"
+
+coverage:
+  subsections:
+    a:
+      title: "Allowance of credit"
+      status: "implemented"
+      files:
+        - "a/1.rac"      # Main credit formula
+        - "a/2/A.rac"    # Initial credit amount (phase-in)
+        - "a/2/B.rac"    # Credit reduction amount (phase-out)
+    b:
+      title: "Percentages and amounts"
+      status: "implemented"
+      files:
+        - "b/1.rac"      # Credit and phaseout percentages by child count
+        - "b/2/A.rac"    # Earned income and phaseout amounts by child count
+        - "b/2/B.rac"    # Joint return adjustment
+      parameters: "parameters.yaml"
+    c:
+      title: "Definitions and special rules"
+      status: "implemented"
+      files:
+        - "c/1/A/i.rac"  # Eligible individual definition
+        - "c/1/A/ii.rac" # Eligible individual (joint return)
+        - "c/1/B.rac"    # Principal place of abode
+        - "c/1/C.rac"    # Age requirements
+        - "c/1/D.rac"    # Dependent status
+        - "c/1/E/i.rac"  # Taxpayer identification number
+        - "c/1/E/ii.rac" # TIN (additional rules)
+        - "c/2/A.rac"    # Earned income definition
+        - "c/3/A.rac"    # Number of qualifying children
+        - "c/3/B.rac"    # Married child filing joint
+        - "c/3/C.rac"    # Place of abode requirement
+        - "c/3/D/i.rac"  # Valid TIN requirement
+    d:
+      title: "Married individuals"
+      status: "implemented"
+      files:
+        - "d.rac"        # Married filing separately rules
+    i:
+      title: "Denial of credit for individuals having excessive investment income"
+      status: "implemented"
+      files:
+        - "i/1.rac"      # Investment income limit
+        - "i/2/C.rac"    # Net rent/royalty income
+        - "i/2/E.rac"    # Net passive income
+
+  not_implemented:
+    - "32(e) - Taxable year must be full taxable year"
+    - "32(f) - Amount of credit to be determined under tables"
+    - "32(g) - Coordination with advance payments of credit"
+    - "32(h) - Recapture of excess advance payments"
+    - "32(j) - Inflation adjustments (handled via parameter indexing)"
+    - "32(k) - Restrictions on taxpayers who improperly claimed credit in prior year"
+    - "32(l) - Coordination with certain means-tested programs"
+    - "32(m) - Identification numbers"
+    - "32(n) - Special rules for individuals without qualifying children (ARPA 2021)"
+
+child_count_structure:
+  description: |
+    EITC parameters vary by the number of qualifying children. The child count
+    is capped at 3 for parameter lookup purposes (3+ children use the same
+    rates as 3 children).
+  keys:
+    0: "No qualifying children"
+    1: "One qualifying child"
+    2: "Two qualifying children"
+    3: "Three or more qualifying children"
+  affected_parameters:
+    - credit_percentage
+    - phaseout_percentage
+    - earned_income_amount
+    - phaseout_amount
+    - maximum_credit
+    - agi_limit_single
+    - agi_limit_joint
+
+tax_years_covered:
+  - 2024
+  - 2023
+  - 2022
+  - 2021
+  - 2020
+
+last_updated: "2024-12-29"
