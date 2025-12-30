@@ -1,6 +1,6 @@
 # https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title26-section1411
 
-text: |
+text: """
   26 USC 1411 - Imposition of tax
 
   (a) In general
@@ -16,10 +16,10 @@ text: |
   (b) Threshold amount
     For purposes of this chapter, the term "threshold amount" means-
       (1) in the case of a taxpayer making a joint return under section 6013 or
-          a surviving spouse (as defined in section 2(a)), $250,000,
+          a surviving spouse (as defined in section 2(a)), 250,000,
       (2) in the case of a married taxpayer (as defined in section 7703) filing
-          a separate return, $125,000, and
-      (3) in any other case, $200,000.
+          a separate return, 125,000, and
+      (3) in any other case, 200,000.
 
   (c) Net investment income
     For purposes of this chapter-
@@ -45,6 +45,7 @@ text: |
           gross income) or exclusions disallowed under section 911(d)(6) with
           respect to the amounts described in paragraph (1).
 
+"""
 # 26 USC 1411(a)(1) - NIIT rate
 parameter niit_rate:
   description: "Net Investment Income Tax rate per 26 USC 1411(a)(1)"
@@ -120,9 +121,9 @@ variable niit_standalone:
     # Section 1411(d): Modified AGI = AGI + foreign earned income exclusion
     magi = adjusted_gross_income + foreign_earned_income_exclusion
     # Section 1411(b): Determine threshold based on filing status
-    # (1) Joint return or surviving spouse: $250,000
-    # (2) Married filing separately: $125,000 (half of joint)
-    # (3) Any other case (single, HOH): $200,000
+    # (1) Joint return or surviving spouse: 250,000
+    # (2) Married filing separately: 125,000 (half of joint)
+    # (3) Any other case (single, HOH): 200,000
     if filing_status == JOINT:
         threshold = niit_threshold_joint
     elif filing_status == SURVIVING_SPOUSE:
@@ -150,7 +151,7 @@ variable niit_standalone:
         adjusted_gross_income: 175_000
         foreign_earned_income_exclusion: 0
         net_investment_income: 40_000
-      # MAGI $175k < threshold $200k, no excess MAGI
+      # MAGI 175k < threshold 200k, no excess MAGI
       expect: 0
 
     # ========================================
@@ -163,9 +164,9 @@ variable niit_standalone:
         adjusted_gross_income: 350_000
         foreign_earned_income_exclusion: 0
         net_investment_income: 60_000
-      # MAGI excess: $350k - $200k = $150k
-      # NII: $60k (limiting factor since $60k < $150k)
-      # Tax: $60,000 * 0.038 = $2,280
+      # MAGI excess: 350k - 200k = 150k
+      # NII: 60k (limiting factor since 60k < 150k)
+      # Tax: 60,000 * 0.038 = 2,280
       expect: 2_280
 
     - name: "Joint filers above threshold - excess MAGI is limiting factor"
@@ -175,25 +176,25 @@ variable niit_standalone:
         adjusted_gross_income: 290_000
         foreign_earned_income_exclusion: 0
         net_investment_income: 100_000
-      # MAGI excess: $290k - $250k = $40k (limiting factor since $40k < $100k)
-      # NII: $100k
-      # Tax: $40,000 * 0.038 = $1,520
+      # MAGI excess: 290k - 250k = 40k (limiting factor since 40k < 100k)
+      # NII: 100k
+      # Tax: 40,000 * 0.038 = 1,520
       expect: 1_520
 
     # ========================================
     # Filing status with lower threshold
     # ========================================
-    - name: "Married filing separately - lower $125k threshold"
+    - name: "Married filing separately - lower 125k threshold"
       period: 2024
       inputs:
         filing_status: SEPARATE
         adjusted_gross_income: 200_000
         foreign_earned_income_exclusion: 0
         net_investment_income: 55_000
-      # MFS uses $125k threshold (half of joint)
-      # MAGI excess: $200k - $125k = $75k
-      # NII: $55k (limiting factor)
-      # Tax: $55,000 * 0.038 = $2,090
+      # MFS uses 125k threshold (half of joint)
+      # MAGI excess: 200k - 125k = 75k
+      # NII: 55k (limiting factor)
+      # Tax: 55,000 * 0.038 = 2,090
       expect: 2_090
 
     # ========================================
@@ -206,10 +207,10 @@ variable niit_standalone:
         adjusted_gross_income: 160_000
         foreign_earned_income_exclusion: 80_000
         net_investment_income: 25_000
-      # MAGI: $160k AGI + $80k FEIE = $240k
-      # MAGI excess: $240k - $200k = $40k
-      # NII: $25k (limiting factor)
-      # Tax: $25,000 * 0.038 = $950
+      # MAGI: 160k AGI + 80k FEIE = 240k
+      # MAGI excess: 240k - 200k = 40k
+      # NII: 25k (limiting factor)
+      # Tax: 25,000 * 0.038 = 950
       expect: 950
 
     # ========================================
@@ -222,6 +223,6 @@ variable niit_standalone:
         adjusted_gross_income: 250_000
         foreign_earned_income_exclusion: 0
         net_investment_income: 75_000
-      # MAGI $250k = threshold $250k, excess = $0
+      # MAGI 250k = threshold 250k, excess = 0
       # No tax regardless of NII amount
       expect: 0

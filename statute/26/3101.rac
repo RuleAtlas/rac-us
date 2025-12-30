@@ -1,6 +1,6 @@
 # https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title26-section3101
 
-text: |
+text: """
   26 USC 3101 - Rate of tax
 
   (a) Old-age, survivors, and disability insurance
@@ -22,13 +22,14 @@ text: |
     or trust) a tax equal to 0.9 percent of wages which are received with respect
     to employment (as defined in section 3121(b)) during any taxable year beginning
     after December 31, 2012, and which are in excess of—
-      (A) in the case of a joint return, $250,000,
+      (A) in the case of a joint return, 250,000,
       (B) in the case of a married taxpayer (as defined in section 7703) filing
           a separate return, 1/2 of the dollar amount determined under subparagraph (A), and
-      (C) in any other case, $200,000.
+      (C) in any other case, 200,000.
 
   Note: The contribution and benefit base (Social Security wage base) is determined
   under 42 USC 430 and adjusted annually for inflation.
+"""
 
 # =============================================================================
 # OASDI (Social Security) Tax Parameters
@@ -135,21 +136,21 @@ variable oasdi_tax:
       period: 2024
       inputs:
         wages: 100_000
-      # $100,000 * 6.2% = $6,200
+      # 100,000 * 6.2% = 6,200
       expect: 6_200
 
     - name: "Wages at wage base (2024)"
       period: 2024
       inputs:
         wages: 168_600
-      # $168,600 * 6.2% = $10,453.20
+      # 168,600 * 6.2% = 10,453.20
       expect: 10_453.20
 
     - name: "Wages exceed wage base - capped (2024)"
       period: 2024
       inputs:
         wages: 300_000
-      # Capped at $168,600 * 6.2% = $10,453.20
+      # Capped at 168,600 * 6.2% = 10,453.20
       expect: 10_453.20
 
     - name: "Zero wages"
@@ -162,7 +163,7 @@ variable oasdi_tax:
       period: 2025
       inputs:
         wages: 200_000
-      # Capped at $176,100 * 6.2% = $10,918.20
+      # Capped at 176,100 * 6.2% = 10,918.20
       expect: 10_918.20
 
 variable medicare_tax:
@@ -182,14 +183,14 @@ variable medicare_tax:
       period: 2024
       inputs:
         wages: 100_000
-      # $100,000 * 1.45% = $1,450
+      # 100,000 * 1.45% = 1,450
       expect: 1_450
 
     - name: "High wages - no cap"
       period: 2024
       inputs:
         wages: 500_000
-      # $500,000 * 1.45% = $7,250 (no wage base cap)
+      # 500,000 * 1.45% = 7,250 (no wage base cap)
       expect: 7_250
 
     - name: "Zero wages"
@@ -224,7 +225,7 @@ variable additional_medicare_tax:
       inputs:
         wages: 150_000
         filing_status: SINGLE
-      # $150k < $200k threshold, no additional tax
+      # 150k < 200k threshold, no additional tax
       expect: 0
 
     - name: "Single filer above threshold"
@@ -232,7 +233,7 @@ variable additional_medicare_tax:
       inputs:
         wages: 250_000
         filing_status: SINGLE
-      # ($250k - $200k) * 0.9% = $50k * 0.009 = $450
+      # (250k - 200k) * 0.9% = 50k * 0.009 = 450
       expect: 450
 
     - name: "Joint filers above threshold"
@@ -240,7 +241,7 @@ variable additional_medicare_tax:
       inputs:
         wages: 350_000
         filing_status: JOINT
-      # ($350k - $250k) * 0.9% = $100k * 0.009 = $900
+      # (350k - 250k) * 0.9% = 100k * 0.009 = 900
       expect: 900
 
     - name: "MFS lower threshold"
@@ -248,7 +249,7 @@ variable additional_medicare_tax:
       inputs:
         wages: 200_000
         filing_status: SEPARATE
-      # ($200k - $125k) * 0.9% = $75k * 0.009 = $675
+      # (200k - 125k) * 0.9% = 75k * 0.009 = 675
       expect: 675
 
     - name: "Single exactly at threshold"
@@ -275,10 +276,10 @@ variable total_fica_employee_tax:
       inputs:
         wages: 60_000
         filing_status: SINGLE
-      # OASDI: $60k * 6.2% = $3,720
-      # Medicare: $60k * 1.45% = $870
-      # Additional Medicare: $0
-      # Total: $4,590
+      # OASDI: 60k * 6.2% = 3,720
+      # Medicare: 60k * 1.45% = 870
+      # Additional Medicare: 0
+      # Total: 4,590
       expect: 4_590
 
     - name: "High earner single (2024)"
@@ -286,10 +287,10 @@ variable total_fica_employee_tax:
       inputs:
         wages: 300_000
         filing_status: SINGLE
-      # OASDI: $168,600 * 6.2% = $10,453.20
-      # Medicare: $300k * 1.45% = $4,350
-      # Additional Medicare: ($300k - $200k) * 0.9% = $900
-      # Total: $15,703.20
+      # OASDI: 168,600 * 6.2% = 10,453.20
+      # Medicare: 300k * 1.45% = 4,350
+      # Additional Medicare: (300k - 200k) * 0.9% = 900
+      # Total: 15,703.20
       expect: 15_703.20
 
     - name: "Maximum Social Security earner (2024)"
@@ -297,8 +298,8 @@ variable total_fica_employee_tax:
       inputs:
         wages: 168_600
         filing_status: SINGLE
-      # OASDI: $168,600 * 6.2% = $10,453.20
-      # Medicare: $168,600 * 1.45% = $2,444.70
-      # Additional Medicare: $0 (below $200k)
-      # Total: $12,897.90
+      # OASDI: 168,600 * 6.2% = 10,453.20
+      # Medicare: 168,600 * 1.45% = 2,444.70
+      # Additional Medicare: 0 (below 200k)
+      # Total: 12,897.90
       expect: 12_897.90
