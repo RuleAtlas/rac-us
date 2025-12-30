@@ -1,0 +1,155 @@
+# 26 USC 1(h)(1)(F) - 28 Percent Rate on Remaining Gain
+#
+# This subparagraph applies a 28% rate to taxable income in excess of amounts
+# taxed under prior subparagraphs (A) through (E). This captures the remaining
+# 28-percent rate gain (collectibles gain and section 1202 gain).
+
+text: """
+(F) 28 percent of the amount of taxable income in excess of the sum of the amounts
+on which tax is determined under the preceding subparagraphs of this paragraph.
+"""
+
+# === IMPORTS ===
+
+# === INPUTS ===
+# Inherited from parent context: taxable_income, subparagraph amounts
+
+# === PARAMETERS ===
+
+parameter twentyeight_rate:
+  description: "Rate for 28-percent rate gain (collectibles and section 1202 gain)"
+  unit: /1
+  values:
+    2018-01-01: 0.28
+
+# === VARIABLES ===
+
+variable subparagraph_f_amount:
+  imports:
+    - 26/63/a#taxable_income
+    - 26/1/h/1#subparagraph_a_amount
+    - 26/1/h/1#subparagraph_b_amount
+    - 26/1/h/1#subparagraph_c_amount
+    - 26/1/h/1#subparagraph_d_amount
+    - 26/1/h/1/e#subparagraph_e_amount
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Subparagraph (F) Amount"
+  description: "Amount of taxable income taxed at 28% per 26 USC 1(h)(1)(F)"
+  formula: |
+    # (h)(1)(F): 28% of taxable income in excess of the sum of amounts on which
+    # tax is determined under subparagraphs (A) through (E)
+
+    # Sum of all amounts under prior subparagraphs
+    sum_a_through_e = (
+        subparagraph_a_amount +
+        subparagraph_b_amount +
+        subparagraph_c_amount +
+        subparagraph_d_amount +
+        subparagraph_e_amount
+    )
+
+    # Excess of taxable income over that sum
+    return max(0, taxable_income - sum_a_through_e)
+  default: 0
+  tests:
+    - name: "28% gain when taxable income exceeds A-E sum"
+      period: 2024
+      inputs:
+        taxable_income: 150000
+        subparagraph_a_amount: 50000
+        subparagraph_b_amount: 10000
+        subparagraph_c_amount: 40000
+        subparagraph_d_amount: 30000
+        subparagraph_e_amount: 10000
+      # Sum: 50000 + 10000 + 40000 + 30000 + 10000 = 140000
+      # Excess: 150000 - 140000 = 10000
+      expect: 10000
+    - name: "No 28% gain - all income covered by A-E"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        subparagraph_a_amount: 50000
+        subparagraph_b_amount: 20000
+        subparagraph_c_amount: 30000
+        subparagraph_d_amount: 0
+        subparagraph_e_amount: 0
+      # Sum: 50000 + 20000 + 30000 + 0 + 0 = 100000
+      # Excess: 100000 - 100000 = 0
+      expect: 0
+    - name: "Large 28% rate gain"
+      period: 2024
+      inputs:
+        taxable_income: 200000
+        subparagraph_a_amount: 100000
+        subparagraph_b_amount: 0
+        subparagraph_c_amount: 20000
+        subparagraph_d_amount: 30000
+        subparagraph_e_amount: 15000
+      # Sum: 100000 + 0 + 20000 + 30000 + 15000 = 165000
+      # Excess: 200000 - 165000 = 35000
+      expect: 35000
+    - name: "Zero case - no taxable income"
+      period: 2024
+      inputs:
+        taxable_income: 0
+        subparagraph_a_amount: 0
+        subparagraph_b_amount: 0
+        subparagraph_c_amount: 0
+        subparagraph_d_amount: 0
+        subparagraph_e_amount: 0
+      expect: 0
+
+variable subparagraph_f_tax:
+  imports:
+    - 26/63/a#taxable_income
+    - 26/1/h/1#subparagraph_a_amount
+    - 26/1/h/1#subparagraph_b_amount
+    - 26/1/h/1#subparagraph_c_amount
+    - 26/1/h/1#subparagraph_d_amount
+    - 26/1/h/1/e#subparagraph_e_amount
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tax Under Subparagraph (F)"
+  description: "Tax on 28-percent rate gain at 28% per 26 USC 1(h)(1)(F)"
+  formula: |
+    # Compute f_amount inline
+    sum_a_through_e = (
+        subparagraph_a_amount +
+        subparagraph_b_amount +
+        subparagraph_c_amount +
+        subparagraph_d_amount +
+        subparagraph_e_amount
+    )
+    f_amount = max(0, taxable_income - sum_a_through_e)
+
+    # Apply 28% rate
+    return f_amount * twentyeight_rate
+  default: 0
+  tests:
+    - name: "28% tax on collectibles/1202 gain"
+      period: 2024
+      inputs:
+        taxable_income: 150000
+        subparagraph_a_amount: 50000
+        subparagraph_b_amount: 10000
+        subparagraph_c_amount: 40000
+        subparagraph_d_amount: 30000
+        subparagraph_e_amount: 10000
+      # f_amount = 10000
+      # Tax: 10000 * 0.28 = 2800
+      expect: 2800
+    - name: "No 28% tax - all covered by A-E"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        subparagraph_a_amount: 50000
+        subparagraph_b_amount: 20000
+        subparagraph_c_amount: 30000
+        subparagraph_d_amount: 0
+        subparagraph_e_amount: 0
+      expect: 0

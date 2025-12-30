@@ -1,0 +1,170 @@
+# 26 USC 1(h)(1)(E) - 25 Percent Rate on Unrecaptured Section 1250 Gain
+#
+# This subparagraph applies a 25% rate to unrecaptured section 1250 gain
+# (depreciation recapture on real property).
+
+text: """
+(E) 25 percent of the excess (if any) of--
+  (i) the unrecaptured section 1250 gain (or, if less, the net capital gain
+      (determined without regard to paragraph (11))), over
+  (ii) the excess (if any) of--
+    (I) the sum of the amount on which tax is determined under subparagraph (A)
+        plus the net capital gain, over
+    (II) taxable income.
+"""
+
+# === IMPORTS ===
+
+# === INPUTS ===
+
+input unrecaptured_section_1250_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Unrecaptured Section 1250 Gain"
+  description: "Depreciation recapture on real property held more than 1 year per 26 USC 1(h)(6)"
+  default: 0
+
+input net_capital_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Net Capital Gain"
+  description: "Net capital gain per 26 USC 1222(11)"
+  default: 0
+
+# === PARAMETERS ===
+
+parameter unrecaptured_1250_rate:
+  description: "Rate for unrecaptured section 1250 gain"
+  unit: /1
+  values:
+    2018-01-01: 0.25
+
+# === VARIABLES ===
+
+variable subparagraph_e_amount:
+  imports:
+    - 26/63/a#taxable_income
+    - 26/1/h/1#subparagraph_a_amount
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Subparagraph (E) Amount"
+  description: "Amount of unrecaptured section 1250 gain taxed at 25% per 26 USC 1(h)(1)(E)"
+  formula: |
+    # (h)(1)(E): 25% of the excess (if any) of:
+    #   (i) unrecaptured 1250 gain (or if less, NCG without regard to (11)), OVER
+    #   (ii) the excess (if any) of:
+    #        (I) sum of (A) amount plus NCG, OVER
+    #        (II) taxable income
+
+    # Amount (i): lesser of unrecaptured 1250 gain or NCG (ignoring qualified dividends)
+    # Per paragraph (11), qualified dividends are treated as NCG, so "without regard to (11)"
+    # means we use the pre-dividend NCG. For simplicity, we use net_capital_gain input.
+    amount_i = min(unrecaptured_section_1250_gain, net_capital_gain)
+
+    # Amount (ii): excess of (A + NCG) over taxable income
+    # This is the "excess" that has already been accounted for in prior subparagraphs
+    sum_a_plus_ncg = subparagraph_a_amount + net_capital_gain
+    amount_ii = max(0, sum_a_plus_ncg - taxable_income)
+
+    # The (E) amount is the excess of (i) over (ii), floored at 0
+    return max(0, amount_i - amount_ii)
+  default: 0
+  tests:
+    - name: "Basic unrecaptured 1250 gain"
+      period: 2024
+      inputs:
+        unrecaptured_section_1250_gain: 20000
+        net_capital_gain: 50000
+        taxable_income: 100000
+        subparagraph_a_amount: 50000
+      # (i) = min(20000, 50000) = 20000
+      # (ii) = max(0, 50000 + 50000 - 100000) = max(0, 0) = 0
+      # Result: 20000 - 0 = 20000
+      expect: 20000
+    - name: "1250 gain limited by NCG"
+      period: 2024
+      inputs:
+        unrecaptured_section_1250_gain: 30000
+        net_capital_gain: 15000
+        taxable_income: 100000
+        subparagraph_a_amount: 85000
+      # (i) = min(30000, 15000) = 15000
+      # (ii) = max(0, 85000 + 15000 - 100000) = max(0, 0) = 0
+      # Result: 15000 - 0 = 15000
+      expect: 15000
+    - name: "Excess reduces 1250 gain amount"
+      period: 2024
+      inputs:
+        unrecaptured_section_1250_gain: 20000
+        net_capital_gain: 50000
+        taxable_income: 80000
+        subparagraph_a_amount: 50000
+      # (i) = min(20000, 50000) = 20000
+      # (ii) = max(0, 50000 + 50000 - 80000) = max(0, 20000) = 20000
+      # Result: 20000 - 20000 = 0
+      expect: 0
+    - name: "No unrecaptured 1250 gain"
+      period: 2024
+      inputs:
+        unrecaptured_section_1250_gain: 0
+        net_capital_gain: 50000
+        taxable_income: 100000
+        subparagraph_a_amount: 50000
+      expect: 0
+    - name: "Partial reduction by excess"
+      period: 2024
+      inputs:
+        unrecaptured_section_1250_gain: 25000
+        net_capital_gain: 40000
+        taxable_income: 80000
+        subparagraph_a_amount: 50000
+      # (i) = min(25000, 40000) = 25000
+      # (ii) = max(0, 50000 + 40000 - 80000) = max(0, 10000) = 10000
+      # Result: 25000 - 10000 = 15000
+      expect: 15000
+
+variable subparagraph_e_tax:
+  imports:
+    - 26/63/a#taxable_income
+    - 26/1/h/1#subparagraph_a_amount
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tax Under Subparagraph (E)"
+  description: "Tax on unrecaptured section 1250 gain at 25% per 26 USC 1(h)(1)(E)"
+  formula: |
+    # Compute e_amount inline
+    amount_i = min(unrecaptured_section_1250_gain, net_capital_gain)
+    sum_a_plus_ncg = subparagraph_a_amount + net_capital_gain
+    amount_ii = max(0, sum_a_plus_ncg - taxable_income)
+    e_amount = max(0, amount_i - amount_ii)
+
+    # Apply 25% rate
+    return e_amount * unrecaptured_1250_rate
+  default: 0
+  tests:
+    - name: "25% tax on 1250 gain"
+      period: 2024
+      inputs:
+        unrecaptured_section_1250_gain: 20000
+        net_capital_gain: 50000
+        taxable_income: 100000
+        subparagraph_a_amount: 50000
+      # e_amount = 20000
+      # Tax: 20000 * 0.25 = 5000
+      expect: 5000
+    - name: "No 1250 gain - no tax"
+      period: 2024
+      inputs:
+        unrecaptured_section_1250_gain: 0
+        net_capital_gain: 50000
+        taxable_income: 100000
+        subparagraph_a_amount: 50000
+      expect: 0
