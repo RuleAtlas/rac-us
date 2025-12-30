@@ -1,118 +1,119 @@
 # https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title26-section32
 
-text: |
-  26 USC 32 - Earned income
+text: """
+26 USC 32 - Earned income
 
-  (a) Allowance of credit
-    (1) In general
-    In the case of an eligible individual, there shall be allowed as a credit against
-    the tax imposed by this subtitle for the taxable year an amount equal to the
-    credit percentage of so much of the taxpayer's earned income for the taxable
-    year as does not exceed the earned income amount.
+(a) Allowance of credit
+  (1) In general
+  In the case of an eligible individual, there shall be allowed as a credit against
+  the tax imposed by this subtitle for the taxable year an amount equal to the
+  credit percentage of so much of the taxpayer earned income for the taxable
+  year as does not exceed the earned income amount.
 
-    (2) Limitation
-    The amount of the credit allowable to a taxpayer under paragraph (1) for any
-    taxable year shall not exceed the excess (if any) of—
-      (A) the credit percentage of the earned income amount, over
-      (B) the phaseout percentage of so much of the adjusted gross income (or, if
-          greater, the earned income) of the taxpayer for the taxable year as
-          exceeds the phaseout amount.
+  (2) Limitation
+  The amount of the credit allowable to a taxpayer under paragraph (1) for any
+  taxable year shall not exceed the excess (if any) of
+    (A) the credit percentage of the earned income amount, over
+    (B) the phaseout percentage of so much of the adjusted gross income (or, if
+        greater, the earned income) of the taxpayer for the taxable year as
+        exceeds the phaseout amount.
 
-  (b) Percentages and amounts
-    (1) Percentages
-    The credit percentage and the phaseout percentage shall be determined as follows:
-      In the case of an eligible individual with:    Credit %    Phaseout %
-      1 qualifying child                               34          15.98
-      2 qualifying children                            40          21.06
-      3 or more qualifying children                    45          21.06
-      No qualifying children                           7.65         7.65
+(b) Percentages and amounts
+  (1) Percentages
+  The credit percentage and the phaseout percentage shall be determined as follows:
+    In the case of an eligible individual with:    Credit %    Phaseout %
+    1 qualifying child                               34          15.98
+    2 qualifying children                            40          21.06
+    3 or more qualifying children                    45          21.06
+    No qualifying children                           7.65         7.65
 
-    (2) Amounts
-      (A) In general
-      Subject to subparagraph (B), the earned income amount and the phaseout
-      amount shall be determined as follows:
-        In the case of an eligible individual with:  Earned income  Phaseout
-        1 qualifying child                             6,330       11,610
-        2 or more qualifying children                  8,890       11,610
-        No qualifying children                         4,220        5,280
-      [Note: Amounts shown are base amounts; actual amounts adjusted for inflation per (j)]
+  (2) Amounts
+    (A) In general
+    Subject to subparagraph (B), the earned income amount and the phaseout
+    amount shall be determined as follows:
+      In the case of an eligible individual with:  Earned income  Phaseout
+      1 qualifying child                             6,330       11,610
+      2 or more qualifying children                  8,890       11,610
+      No qualifying children                         4,220        5,280
+    [Note: Amounts shown are base amounts; actual amounts adjusted for inflation per (j)]
 
-      (B) Joint returns
-      In the case of a joint return filed by an eligible individual and such
-      individual's spouse, the phaseout amount determined under subparagraph (A)
-      shall be increased by 5,000. [Note: Amount adjusted for inflation per (j)]
+    (B) Joint returns
+    In the case of a joint return filed by an eligible individual and such
+    individuals spouse, the phaseout amount determined under subparagraph (A)
+    shall be increased by 5,000. [Note: Amount adjusted for inflation per (j)]
 
-  (c) Definitions and special rules
-    For purposes of this section—
+(c) Definitions and special rules
+  For purposes of this section
 
-    (1) Eligible individual
-      (A) In general
-      The term "eligible individual" means—
-        (i) any individual who has a qualifying child for the taxable year, or
-        (ii) any other individual who does not have a qualifying child for the
-             taxable year, if—
-             (I) such individual's principal place of abode is in the United States
-                 for more than one-half of such taxable year,
-             (II) such individual (or, if the individual is married, either the
-                  individual or the individual's spouse) has attained age 25 but
-                  not attained age 65 before the close of the taxable year, and
-             (III) such individual is not a dependent for whom a deduction is
-                   allowable under section 151 to another taxpayer for any taxable
-                   year beginning in the same calendar year as such taxable year.
+  (1) Eligible individual
+    (A) In general
+    The term eligible individual means
+      (i) any individual who has a qualifying child for the taxable year, or
+      (ii) any other individual who does not have a qualifying child for the
+           taxable year, if
+           (I) such individuals principal place of abode is in the United States
+               for more than one-half of such taxable year,
+           (II) such individual (or, if the individual is married, either the
+                individual or the individuals spouse) has attained age 25 but
+                not attained age 65 before the close of the taxable year, and
+           (III) such individual is not a dependent for whom a deduction is
+                 allowable under section 151 to another taxpayer for any taxable
+                 year beginning in the same calendar year as such taxable year.
 
-    (2) Earned income
-      (A) The term "earned income" means—
-        (i) wages, salaries, tips, and other employee compensation, but only if
-            such amounts are includible in gross income for the taxable year, plus
-        (ii) the amount of the taxpayer's net earnings from self-employment for
-             the taxable year (within the meaning of section 1402(a)), but such
-             net earnings shall be determined with regard to the deduction allowed
-             to the taxpayer by section 164(f).
+  (2) Earned income
+    (A) The term earned income means
+      (i) wages, salaries, tips, and other employee compensation, but only if
+          such amounts are includible in gross income for the taxable year, plus
+      (ii) the amount of the taxpayers net earnings from self-employment for
+           the taxable year (within the meaning of section 1402(a)), but such
+           net earnings shall be determined with regard to the deduction allowed
+           to the taxpayer by section 164(f).
 
-    (3) Qualifying child
-      (A) In general
-      The term "qualifying child" means a qualifying child of the taxpayer (as
-      defined in section 152(c), determined without regard to paragraph (1)(D)
-      thereof and section 152(e)).
+  (3) Qualifying child
+    (A) In general
+    The term qualifying child means a qualifying child of the taxpayer (as
+    defined in section 152(c), determined without regard to paragraph (1)(D)
+    thereof and section 152(e)).
 
-  (d) Married individuals
-    In the case of an individual who is married (within the meaning of section 7703),
-    this section shall apply only if a joint return is filed for the taxable year
-    under section 6013.
+(d) Married individuals
+  In the case of an individual who is married (within the meaning of section 7703),
+  this section shall apply only if a joint return is filed for the taxable year
+  under section 6013.
 
-  (i) Denial of credit for individuals having excessive investment income
-    (1) In general
-    No credit shall be allowed under subsection (a) for the taxable year if the
-    aggregate amount of disqualified income of the taxpayer for the taxable year
-    exceeds 10,000. [Note: Amount adjusted for inflation per (j)]
+(i) Denial of credit for individuals having excessive investment income
+  (1) In general
+  No credit shall be allowed under subsection (a) for the taxable year if the
+  aggregate amount of disqualified income of the taxpayer for the taxable year
+  exceeds 10,000. [Note: Amount adjusted for inflation per (j)]
 
-    (2) Disqualified income
-    For purposes of paragraph (1), the term "disqualified income" means—
-      (A) interest or dividends to the extent includible in gross income,
-      (B) interest received or accrued during the taxable year which is exempt
-          from tax imposed by this chapter,
-      (C) the excess (if any) of—
-          (i) gross income from rents or royalties not derived in the ordinary
-              course of a trade or business, over
-          (ii) the sum of the deductions allowable with respect to such income,
-      (D) the capital gain net income (as defined in section 1222) of the taxpayer
-          for such taxable year, and
-      (E) the excess (if any) of—
-          (i) the aggregate income from all passive activities for the taxable
-              year (determined without regard to any amount included in earned
-              income under subsection (c)(2) or described in a preceding
-              subparagraph), over
-          (ii) the aggregate losses from all passive activities for the taxable
-               year (as so determined).
+  (2) Disqualified income
+  For purposes of paragraph (1), the term disqualified income means
+    (A) interest or dividends to the extent includible in gross income,
+    (B) interest received or accrued during the taxable year which is exempt
+        from tax imposed by this chapter,
+    (C) the excess (if any) of
+        (i) gross income from rents or royalties not derived in the ordinary
+            course of a trade or business, over
+        (ii) the sum of the deductions allowable with respect to such income,
+    (D) the capital gain net income (as defined in section 1222) of the taxpayer
+        for such taxable year, and
+    (E) the excess (if any) of
+        (i) the aggregate income from all passive activities for the taxable
+            year (determined without regard to any amount included in earned
+            income under subsection (c)(2) or described in a preceding
+            subparagraph), over
+        (ii) the aggregate losses from all passive activities for the taxable
+             year (as so determined).
 
-  (j) Inflation adjustments
-    (1) In general
-    In the case of any taxable year beginning after 2015, each of the dollar amounts
-    in subsections (b)(2) and (i)(1) shall be increased by an amount equal to—
-      (A) such dollar amount, multiplied by
-      (B) the cost-of-living adjustment determined under section 1(f)(3) for the
-          calendar year in which the taxable year begins, determined by substituting
-          "calendar year 2015" for "calendar year 2016" in subparagraph (A)(ii) thereof.
+(j) Inflation adjustments
+  (1) In general
+  In the case of any taxable year beginning after 2015, each of the dollar amounts
+  in subsections (b)(2) and (i)(1) shall be increased by an amount equal to
+    (A) such dollar amount, multiplied by
+    (B) the cost-of-living adjustment determined under section 1(f)(3) for the
+        calendar year in which the taxable year begins, determined by substituting
+        calendar year 2015 for calendar year 2016 in subparagraph (A)(ii) thereof.
+"""
 
 # Parameters for EITC credit rates and caps
 parameter credit_rate_0:
@@ -235,7 +236,7 @@ parameter joint_adjustment:
     2023: 6_570
     2024: 6_920
 
-variable eitc_standalone:
+variable eitc:
   imports:
     - 26/32/c/3/A#num_qualifying_children
     - 26/32/c/2/A#earned_income
@@ -776,3 +777,71 @@ variable eitc_validation:
         filing_status: SINGLE
         is_eligible_individual: false
       expect: 0
+
+# Standalone EITC variable for validation (no imports required)
+# Uses parameters passed by executor
+variable eitc_standalone:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Earned Income Tax Credit (Standalone)"
+  description: "Standalone EITC calculation for validation"
+  syntax: python
+  formula: |
+    # Cap children at 3 for credit calculation per 32(b)(1)
+    n_children = min(num_qualifying_children, 3)
+
+    # Get credit rate based on number of children - 32(b)(1)
+    if n_children == 0:
+        credit_rate = credit_rate_0
+    elif n_children == 1:
+        credit_rate = credit_rate_1
+    elif n_children == 2:
+        credit_rate = credit_rate_2
+    else:
+        credit_rate = credit_rate_3
+
+    # Get earned income cap based on number of children - 32(b)(2)(A)
+    if n_children == 0:
+        earned_income_cap = earned_income_cap_0
+    elif n_children == 1:
+        earned_income_cap = earned_income_cap_1
+    else:
+        earned_income_cap = earned_income_cap_2
+
+    # Phase-in: credit_rate * min(earned_income, cap) per 32(a)(1)
+    phase_in_amount = credit_rate * min(earned_income, earned_income_cap)
+
+    # Use greater of AGI or earned income for phaseout - 32(a)(2)(B)
+    income = max(adjusted_gross_income, earned_income)
+
+    # Get phaseout rate based on number of children - 32(b)(1)
+    if n_children == 0:
+        phaseout_rate = phaseout_rate_0
+    elif n_children == 1:
+        phaseout_rate = phaseout_rate_1
+    else:
+        phaseout_rate = phaseout_rate_2
+
+    # Get phaseout threshold (single/HoH base) - 32(b)(2)(A)
+    if n_children == 0:
+        phaseout_threshold = phaseout_start_0
+    else:
+        phaseout_threshold = phaseout_start_1
+
+    # Joint filers get higher threshold per 32(b)(2)(B)
+    if filing_status == "JOINT":
+        adjusted_threshold = phaseout_threshold + joint_adjustment
+    else:
+        adjusted_threshold = phaseout_threshold
+
+    # Reduction = rate * (income - threshold), but not below zero - 32(a)(2)
+    phase_out_amount = max(0, phaseout_rate * (income - adjusted_threshold))
+
+    # Final credit = phase-in minus phase-out, but not below zero
+    # Assume eligible (investment income check done separately)
+    if is_eligible_individual:
+        return max(0, phase_in_amount - phase_out_amount)
+    return 0
+  default: 0
