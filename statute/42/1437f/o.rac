@@ -1,0 +1,881 @@
+text: """
+42 USC 1437f(o) - Voucher program
+
+(o) Voucher program.--
+(4) Tenant-based assistance.--Assistance under this subsection
+shall be tenant-based assistance.
+
+42 USC 1437n establishes income targeting:
+- 75% of tenant-based assistance must serve extremely low income (30% AMI)
+- Families must be very low income (50% AMI) for initial eligibility
+- 80% AMI threshold for continued occupancy
+
+42 USC 1436a establishes citizenship/immigration requirements.
+24 CFR 5.612 establishes student eligibility restrictions.
+"""
+
+# =============================================================================
+# PARAMETERS - Thresholds and constants from regulations
+# =============================================================================
+
+parameter max_table_size:
+  description: "Maximum household size with specific income limit in tables"
+  unit: persons
+  reference: "HUD Income Limits methodology"
+  values:
+    1937-01-01: 8
+
+parameter student_age_threshold:
+  description: "Age threshold for student eligibility restrictions"
+  unit: years
+  reference: "24 CFR 5.612(b)(1)"
+  values:
+    2005-11-30: 24
+
+parameter asset_limit:
+  description: "Maximum net family assets for eligibility"
+  unit: USD
+  reference: "42 USC 1437n(b)(4)(A)"
+  values:
+    2023-01-01: 100_000
+    # Indexed annually per statute
+
+parameter asset_self_certification_limit:
+  description: "Maximum assets for self-certification without verification"
+  unit: USD
+  reference: "42 USC 1437n(b)(4)(B)"
+  values:
+    2023-01-01: 50_000
+
+# =============================================================================
+# INPUT DECLARATIONS - Household characteristics for eligibility
+# =============================================================================
+
+input household_size:
+  entity: Household
+  period: Year
+  dtype: Integer
+  unit: /1
+  label: "Household size"
+  description: "Number of persons in the household"
+  default: 1
+
+input hcv_annual_income:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "HCV Annual Income"
+  description: "Total annual gross income per 24 CFR 5.609"
+  default: 0
+
+# Citizenship/Immigration Status Inputs
+input has_eligible_citizen_or_immigrant:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "Has Eligible Citizen or Immigrant"
+  description: "Whether at least one household member has eligible immigration status per 42 USC 1436a"
+  default: false
+
+input count_eligible_members:
+  entity: Household
+  period: Year
+  dtype: Integer
+  unit: /1
+  label: "Count of Eligible Members"
+  description: "Number of household members with eligible citizenship/immigration status"
+  default: 0
+
+input is_mixed_status_household:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "Mixed Status Household"
+  description: "Whether household contains both eligible and ineligible members"
+  default: false
+
+# Student Status Inputs (24 CFR 5.612)
+input is_enrolled_higher_education:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Enrolled in Higher Education"
+  description: "Whether person is enrolled at an institution of higher education"
+  default: false
+
+input person_age:
+  entity: Person
+  period: Year
+  dtype: Integer
+  unit: years
+  label: "Person Age"
+  description: "Age of the person in years"
+  default: 0
+
+input is_veteran:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Veteran"
+  description: "Whether person is a veteran of the U.S. Armed Forces"
+  default: false
+
+input is_married:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Married"
+  description: "Whether person is married"
+  default: false
+
+input has_dependent_child:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Has Dependent Child"
+  description: "Whether person has a dependent child"
+  default: false
+
+input is_disabled:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Disabled"
+  description: "Whether person has a disability as defined in 42 USC 1437a(b)(3)"
+  default: false
+
+input was_receiving_assistance_nov_2005:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Was Receiving Assistance Nov 2005"
+  description: "Whether disabled person was receiving HCV assistance on November 30, 2005"
+  default: false
+
+input parents_income_eligible:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Parents Income Eligible"
+  description: "Whether parents are independently income eligible for HCV"
+  default: false
+
+# Asset Inputs (42 USC 1437n)
+input net_family_assets:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Net Family Assets"
+  description: "Total net family assets including cash, investments, real property equity"
+  default: 0
+
+input owns_suitable_housing:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "Owns Suitable Housing"
+  description: "Whether household owns suitable residential property"
+  default: false
+
+input is_domestic_violence_victim:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "Is Domestic Violence Victim"
+  description: "Whether leaving property due to domestic violence"
+  default: false
+
+# =============================================================================
+# INCOME LIMITS - 30%, 50%, 80% of Area Median Income
+# =============================================================================
+
+variable hcv_extremely_low_income_limit:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "HCV Extremely Low Income Limit"
+  description: "30% of Area Median Income limit for targeting requirement per 42 USC 1437n(b)(1)"
+  reference: "42 USC 1437n(b)(1)"
+  syntax: python
+  formula: |
+    # Income limit varies by household size
+    # For sizes > max_table_size, add per-person amount
+    limits = parameter(gov.hud.hcv.income_limits.extremely_low_income)
+    additional = parameter(gov.hud.hcv.income_limits.extremely_low_income.additional_per_person)
+    if household_size <= max_table_size:
+        return limits[household_size]
+    else:
+        base = limits[max_table_size]
+        extra_members = household_size - max_table_size
+        return base + (additional * extra_members)
+  default: 0
+  tests:
+    - name: "Single person 30% AMI"
+      period: 2024
+      inputs:
+        household_size: 1
+      expect: 21390
+    - name: "Two person 30% AMI"
+      period: 2024
+      inputs:
+        household_size: 2
+      expect: 24450
+    - name: "Four person 30% AMI"
+      period: 2024
+      inputs:
+        household_size: 4
+      expect: 30510
+    - name: "Family of 8 30% AMI"
+      period: 2024
+      inputs:
+        household_size: 8
+      expect: 39120
+
+variable hcv_very_low_income_limit:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "HCV Very Low Income Limit"
+  description: "50% of Area Median Income limit for HCV eligibility per 42 USC 1437a(b)(2)"
+  reference: "42 USC 1437a(b)(2)"
+  syntax: python
+  formula: |
+    # Income limit varies by household size
+    # For sizes > max_table_size, add per-person amount
+    limits = parameter(gov.hud.hcv.income_limits.very_low_income)
+    additional = parameter(gov.hud.hcv.income_limits.very_low_income.additional_per_person)
+    if household_size <= max_table_size:
+        return limits[household_size]
+    else:
+        base = limits[max_table_size]
+        extra_members = household_size - max_table_size
+        return base + (additional * extra_members)
+  default: 0
+  tests:
+    - name: "Single person 50% AMI"
+      period: 2024
+      inputs:
+        household_size: 1
+      expect: 35650
+    - name: "Two person 50% AMI"
+      period: 2024
+      inputs:
+        household_size: 2
+      expect: 40750
+    - name: "Four person 50% AMI"
+      period: 2024
+      inputs:
+        household_size: 4
+      expect: 50850
+    - name: "Family of 8 50% AMI"
+      period: 2024
+      inputs:
+        household_size: 8
+      expect: 65200
+
+variable hcv_low_income_limit:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "HCV Low Income Limit"
+  description: "80% of Area Median Income limit for continued occupancy per 42 USC 1437a(b)(2)"
+  reference: "42 USC 1437a(b)(2)"
+  syntax: python
+  formula: |
+    # Income limit varies by household size
+    # For sizes > max_table_size, add per-person amount
+    limits = parameter(gov.hud.hcv.income_limits.low_income)
+    additional = parameter(gov.hud.hcv.income_limits.low_income.additional_per_person)
+    if household_size <= max_table_size:
+        return limits[household_size]
+    else:
+        base = limits[max_table_size]
+        extra_members = household_size - max_table_size
+        return base + (additional * extra_members)
+  default: 0
+  tests:
+    - name: "Single person 80% AMI"
+      period: 2024
+      inputs:
+        household_size: 1
+      expect: 57000
+    - name: "Two person 80% AMI"
+      period: 2024
+      inputs:
+        household_size: 2
+      expect: 65150
+    - name: "Four person 80% AMI"
+      period: 2024
+      inputs:
+        household_size: 4
+      expect: 81300
+    - name: "Family of 8 80% AMI"
+      period: 2024
+      inputs:
+        household_size: 8
+      expect: 104250
+
+# =============================================================================
+# INCOME ELIGIBILITY
+# =============================================================================
+
+variable hcv_income_eligible:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "HCV Income Eligible"
+  description: "Whether household meets 50% AMI income eligibility for initial HCV admission"
+  reference: "42 USC 1437f(o)(4)"
+  formula: return hcv_annual_income <= hcv_very_low_income_limit
+  default: false
+  tests:
+    - name: "Single person eligible - under limit"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 30000
+      expect: true
+    - name: "Single person at limit - eligible"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 35650
+      expect: true
+    - name: "Single person over limit - ineligible"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 40000
+      expect: false
+    - name: "Family of 4 eligible"
+      period: 2024
+      inputs:
+        household_size: 4
+        hcv_annual_income: 45000
+      expect: true
+    - name: "Family of 4 ineligible"
+      period: 2024
+      inputs:
+        household_size: 4
+        hcv_annual_income: 60000
+      expect: false
+    - name: "Zero income - eligible"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 0
+      expect: true
+
+variable hcv_extremely_low_income:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "HCV Extremely Low Income"
+  description: "Whether household is at or below 30% AMI for targeting purposes"
+  reference: "42 USC 1437n(b)(1)"
+  formula: return hcv_annual_income <= hcv_extremely_low_income_limit
+  default: false
+  tests:
+    - name: "Single person extremely low income"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 20000
+      expect: true
+    - name: "Single person at extremely low limit"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 21390
+      expect: true
+    - name: "Single person over extremely low limit but under very low"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 30000
+      expect: false
+    - name: "Family of 4 extremely low income"
+      period: 2024
+      inputs:
+        household_size: 4
+        hcv_annual_income: 25000
+      expect: true
+
+# =============================================================================
+# FAMILY COMPOSITION ELIGIBILITY
+# =============================================================================
+
+variable hcv_family_eligible:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "HCV Family Composition Eligible"
+  description: "Whether household constitutes a family under HCV rules per 42 USC 1437a(b)(3)"
+  reference: "42 USC 1437a(b)(3)"
+  syntax: python
+  formula: |
+    # A family includes:
+    # (1) Two or more persons who intend to share residency and whose
+    #     income and resources are available to meet the family's needs
+    # (2) Single person who is:
+    #     - Elderly (62+)
+    #     - Disabled
+    #     - Displaced
+    #     - Single person determined eligible by PHA
+    # (3) Remaining member of tenant family
+    #
+    # For modeling, we assume any household of size >= 1 constitutes
+    # a family as PHAs have broad discretion in family definitions
+    if household_size >= 1:
+        return True
+    return False
+  default: false
+  tests:
+    - name: "Single person household eligible"
+      period: 2024
+      inputs:
+        household_size: 1
+      expect: true
+    - name: "Two person household eligible"
+      period: 2024
+      inputs:
+        household_size: 2
+      expect: true
+    - name: "Large family eligible"
+      period: 2024
+      inputs:
+        household_size: 6
+      expect: true
+
+# =============================================================================
+# CITIZENSHIP/IMMIGRATION ELIGIBILITY - 42 USC 1436a
+# =============================================================================
+
+variable hcv_citizenship_eligible:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "HCV Citizenship/Immigration Eligible"
+  description: "Whether at least one household member has eligible immigration status per 42 USC 1436a"
+  reference: "42 USC 1436a"
+  syntax: python
+  formula: |
+    # At least one family member must be:
+    # - U.S. citizen
+    # - National
+    # - Eligible immigrant categories per 42 USC 1436a(a):
+    #   (1) Lawful permanent resident
+    #   (2) Alien continuously residing since before June 30, 1948
+    #   (3) Refugee or asylee
+    #   (4) Alien admitted for emergency/public interest reasons
+    #   (5) Alien with deportation withheld
+    #   (6) Alien granted amnesty/legalization
+    #   (7) Citizens of Marshall Islands, Micronesia, Palau under Compact
+    #
+    # Mixed-status families receive prorated assistance per 1436a(b)
+    if has_eligible_citizen_or_immigrant:
+        return True
+    return False
+  default: false
+  tests:
+    - name: "Household with US citizen"
+      period: 2024
+      inputs:
+        has_eligible_citizen_or_immigrant: true
+      expect: true
+    - name: "Household without eligible members"
+      period: 2024
+      inputs:
+        has_eligible_citizen_or_immigrant: false
+      expect: false
+    - name: "Mixed status household with one eligible member"
+      period: 2024
+      inputs:
+        has_eligible_citizen_or_immigrant: true
+        is_mixed_status_household: true
+      expect: true
+
+variable hcv_proration_factor:
+  entity: Household
+  period: Year
+  dtype: Rate
+  unit: /1
+  label: "HCV Proration Factor"
+  description: "Factor to prorate assistance for mixed-status households per 42 USC 1436a(b)"
+  reference: "42 USC 1436a(b)"
+  syntax: python
+  formula: |
+    # For mixed-status families, assistance is prorated based on
+    # the number of eligible members divided by total members
+    if not is_mixed_status_household:
+        return 1.0
+    if household_size == 0:
+        return 0.0
+    return count_eligible_members / household_size
+  default: 1.0
+  tests:
+    - name: "Non-mixed household - full assistance"
+      period: 2024
+      inputs:
+        is_mixed_status_household: false
+        household_size: 4
+        count_eligible_members: 4
+      expect: 1.0
+    - name: "Mixed household - 3 of 4 eligible"
+      period: 2024
+      inputs:
+        is_mixed_status_household: true
+        household_size: 4
+        count_eligible_members: 3
+      expect: 0.75
+    - name: "Mixed household - 2 of 4 eligible"
+      period: 2024
+      inputs:
+        is_mixed_status_household: true
+        household_size: 4
+        count_eligible_members: 2
+      expect: 0.5
+    - name: "Mixed household - 1 of 2 eligible"
+      period: 2024
+      inputs:
+        is_mixed_status_household: true
+        household_size: 2
+        count_eligible_members: 1
+      expect: 0.5
+
+# =============================================================================
+# STUDENT ELIGIBILITY - 24 CFR 5.612
+# =============================================================================
+
+variable hcv_student_restriction_applies:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "HCV Student Restriction Applies"
+  description: "Whether person is subject to student restrictions per 24 CFR 5.612"
+  reference: "24 CFR 5.612(b)"
+  syntax: python
+  formula: |
+    # Student restrictions apply if ALL of the following are true:
+    # (1) Enrolled in higher education
+    # (2) Under 24 years old
+    # (3) Not a veteran
+    # (4) Unmarried
+    # (5) No dependent child
+    # (6) Not disabled (or was not receiving assistance as of Nov 30, 2005)
+    #
+    # If ANY exception applies, restrictions do NOT apply
+    if not is_enrolled_higher_education:
+        return False
+    if person_age >= student_age_threshold:
+        return False  # Age 24+ exemption
+    if is_veteran:
+        return False  # Veteran exemption
+    if is_married:
+        return False  # Married exemption
+    if has_dependent_child:
+        return False  # Dependent child exemption
+    if is_disabled:
+        if was_receiving_assistance_nov_2005:
+            return False  # Disabled + grandfathered exemption
+        # Disabled students added after Nov 2005 may still be restricted
+        return False  # Current interpretation: disabled = exempt
+    if parents_income_eligible:
+        return False  # Parents eligible exemption
+    # All conditions met - restrictions apply
+    return True
+  default: false
+  tests:
+    - name: "Not a student - no restriction"
+      period: 2024
+      inputs:
+        is_enrolled_higher_education: false
+        person_age: 20
+      expect: false
+    - name: "Student age 24+ - no restriction"
+      period: 2024
+      inputs:
+        is_enrolled_higher_education: true
+        person_age: 25
+        is_veteran: false
+        is_married: false
+        has_dependent_child: false
+        is_disabled: false
+        parents_income_eligible: false
+      expect: false
+    - name: "Student veteran - no restriction"
+      period: 2024
+      inputs:
+        is_enrolled_higher_education: true
+        person_age: 22
+        is_veteran: true
+        is_married: false
+        has_dependent_child: false
+        is_disabled: false
+        parents_income_eligible: false
+      expect: false
+    - name: "Married student - no restriction"
+      period: 2024
+      inputs:
+        is_enrolled_higher_education: true
+        person_age: 21
+        is_veteran: false
+        is_married: true
+        has_dependent_child: false
+        is_disabled: false
+        parents_income_eligible: false
+      expect: false
+    - name: "Student parent - no restriction"
+      period: 2024
+      inputs:
+        is_enrolled_higher_education: true
+        person_age: 22
+        is_veteran: false
+        is_married: false
+        has_dependent_child: true
+        is_disabled: false
+        parents_income_eligible: false
+      expect: false
+    - name: "Disabled student - no restriction"
+      period: 2024
+      inputs:
+        is_enrolled_higher_education: true
+        person_age: 21
+        is_veteran: false
+        is_married: false
+        has_dependent_child: false
+        is_disabled: true
+        parents_income_eligible: false
+      expect: false
+    - name: "Student with eligible parents - no restriction"
+      period: 2024
+      inputs:
+        is_enrolled_higher_education: true
+        person_age: 20
+        is_veteran: false
+        is_married: false
+        has_dependent_child: false
+        is_disabled: false
+        parents_income_eligible: true
+      expect: false
+    - name: "Traditional student no exceptions - restriction applies"
+      period: 2024
+      inputs:
+        is_enrolled_higher_education: true
+        person_age: 20
+        is_veteran: false
+        is_married: false
+        has_dependent_child: false
+        is_disabled: false
+        parents_income_eligible: false
+      expect: true
+    - name: "Young student with no exemptions - restriction applies"
+      period: 2024
+      inputs:
+        is_enrolled_higher_education: true
+        person_age: 19
+        is_veteran: false
+        is_married: false
+        has_dependent_child: false
+        is_disabled: false
+        parents_income_eligible: false
+      expect: true
+
+variable hcv_student_eligible:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "HCV Student Eligible"
+  description: "Whether person is eligible under student provisions"
+  reference: "24 CFR 5.612"
+  formula: return not hcv_student_restriction_applies
+  default: true
+  tests:
+    - name: "Non-student eligible"
+      period: 2024
+      inputs:
+        hcv_student_restriction_applies: false
+      expect: true
+    - name: "Restricted student ineligible"
+      period: 2024
+      inputs:
+        hcv_student_restriction_applies: true
+      expect: false
+
+# =============================================================================
+# ASSET ELIGIBILITY - 42 USC 1437n(b)(4)
+# =============================================================================
+
+variable hcv_asset_eligible:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "HCV Asset Eligible"
+  description: "Whether household meets asset limits per 42 USC 1437n(b)(4)"
+  reference: "42 USC 1437n(b)(4)"
+  syntax: python
+  formula: |
+    # Ineligible if:
+    # (1) Net family assets exceed $100,000 (indexed), OR
+    # (2) Family owns suitable residential property
+    #     Exception: domestic violence victims leaving their residence
+    #
+    if net_family_assets > asset_limit:
+        return False
+    if owns_suitable_housing:
+        if is_domestic_violence_victim:
+            return True  # Exception for DV victims
+        return False
+    return True
+  default: true
+  tests:
+    - name: "No assets - eligible"
+      period: 2024
+      inputs:
+        net_family_assets: 0
+        owns_suitable_housing: false
+      expect: true
+    - name: "Assets under limit - eligible"
+      period: 2024
+      inputs:
+        net_family_assets: 50_000
+        owns_suitable_housing: false
+      expect: true
+    - name: "Assets at limit - eligible"
+      period: 2024
+      inputs:
+        net_family_assets: 100_000
+        owns_suitable_housing: false
+      expect: true
+    - name: "Assets over limit - ineligible"
+      period: 2024
+      inputs:
+        net_family_assets: 150_000
+        owns_suitable_housing: false
+      expect: false
+    - name: "Owns suitable housing - ineligible"
+      period: 2024
+      inputs:
+        net_family_assets: 10_000
+        owns_suitable_housing: true
+        is_domestic_violence_victim: false
+      expect: false
+    - name: "DV victim owns housing - eligible exception"
+      period: 2024
+      inputs:
+        net_family_assets: 10_000
+        owns_suitable_housing: true
+        is_domestic_violence_victim: true
+      expect: true
+
+# =============================================================================
+# OVERALL ELIGIBILITY - Combines all requirements
+# =============================================================================
+
+variable hcv_eligible:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "HCV Eligible"
+  description: "Whether household meets all HCV eligibility requirements"
+  reference: "42 USC 1437f(o)"
+  syntax: python
+  formula: |
+    # Must meet ALL eligibility requirements:
+    # (1) Income eligibility - at or below 50% AMI
+    # (2) Family composition - constitutes a family
+    # (3) Citizenship/immigration status - at least one eligible member
+    # (4) Asset limits - not over asset limit or own suitable housing
+    # Note: Student restrictions are per-person, evaluated separately
+    if hcv_income_eligible and hcv_family_eligible and hcv_citizenship_eligible and hcv_asset_eligible:
+        return True
+    return False
+  default: false
+  tests:
+    - name: "All requirements met - eligible"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 30000
+        has_eligible_citizen_or_immigrant: true
+        net_family_assets: 5000
+        owns_suitable_housing: false
+      expect: true
+    - name: "Family of 4, very low income - eligible"
+      period: 2024
+      inputs:
+        household_size: 4
+        hcv_annual_income: 45000
+        has_eligible_citizen_or_immigrant: true
+        net_family_assets: 20000
+        owns_suitable_housing: false
+      expect: true
+    - name: "Income over limit - ineligible"
+      period: 2024
+      inputs:
+        household_size: 2
+        hcv_annual_income: 80000
+        has_eligible_citizen_or_immigrant: true
+        net_family_assets: 0
+        owns_suitable_housing: false
+      expect: false
+    - name: "No eligible citizens/immigrants - ineligible"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 25000
+        has_eligible_citizen_or_immigrant: false
+        net_family_assets: 0
+        owns_suitable_housing: false
+      expect: false
+    - name: "Assets over limit - ineligible"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 20000
+        has_eligible_citizen_or_immigrant: true
+        net_family_assets: 200000
+        owns_suitable_housing: false
+      expect: false
+    - name: "Owns suitable housing - ineligible"
+      period: 2024
+      inputs:
+        household_size: 2
+        hcv_annual_income: 30000
+        has_eligible_citizen_or_immigrant: true
+        net_family_assets: 10_000
+        owns_suitable_housing: true
+        is_domestic_violence_victim: false
+      expect: false
+    - name: "Zero income with eligible status - eligible"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 0
+        has_eligible_citizen_or_immigrant: true
+        net_family_assets: 0
+        owns_suitable_housing: false
+      expect: true
+    - name: "Extremely low income - eligible and qualifies for targeting"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 20000
+        has_eligible_citizen_or_immigrant: true
+        net_family_assets: 0
+        owns_suitable_housing: false
+      expect: true
+    - name: "Multiple requirements not met"
+      period: 2024
+      inputs:
+        household_size: 1
+        hcv_annual_income: 100_000
+        has_eligible_citizen_or_immigrant: false
+        net_family_assets: 200000
+        owns_suitable_housing: true
+      expect: false
