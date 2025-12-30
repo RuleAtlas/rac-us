@@ -1,0 +1,785 @@
+# 26 USC 1(h)(1) - Maximum Capital Gains Rate: In General
+#
+# This is the main computational rule for preferential taxation of net capital gain.
+# The tax shall not exceed the SUM of amounts computed under subparagraphs (A) through (F).
+
+text: """
+(h) Maximum capital gains rate.--
+(1) In general.--If a taxpayer has a net capital gain for any taxable year, the tax
+imposed by this section for such taxable year shall not exceed the sum of--
+(A) a tax computed at the rates and in the same manner as if this subsection had not
+been enacted on the greater of--
+  (i) taxable income reduced by the net capital gain; or
+  (ii) the lesser of--
+    (I) the amount of taxable income which would (without regard to this paragraph)
+        be taxed at a rate below 25 percent, or
+    (II) taxable income reduced by the adjusted net capital gain,
+plus
+(B) 0 percent of so much of the adjusted net capital gain (or, if less, taxable income)
+as does not exceed the excess (if any) of--
+  (i) the amount of taxable income which would (without regard to this paragraph) be
+      taxed at a rate below 25 percent, over
+  (ii) the taxable income reduced by the adjusted net capital gain,
+plus
+(C) 15 percent of the lesser of--
+  (i) so much of the adjusted net capital gain (or, if less, taxable income) as exceeds
+      the amount on which a tax is determined under subparagraph (B), or
+  (ii) the excess of--
+    (I) the amount of taxable income which would (without regard to this paragraph)
+        be taxed at a rate below 39.6 percent, over
+    (II) the sum of the amounts on which a tax is determined under subparagraphs (A) and (B),
+plus
+(D) 20 percent of the adjusted net capital gain (or, if less, taxable income) in excess
+of the amount on which tax is determined under subparagraphs (B) and (C),
+plus
+(E) 25 percent of the excess (if any) of--
+  (i) the unrecaptured section 1250 gain (or, if less, the net capital gain (determined
+      without regard to paragraph (11))), over
+  (ii) the excess (if any) of--
+    (I) the sum of the amount on which tax is determined under subparagraph (A) plus
+        the net capital gain, over
+    (II) taxable income,
+plus
+(F) 28 percent of the amount of taxable income in excess of the sum of the amounts on
+which tax is determined under the preceding subparagraphs of this paragraph.
+"""
+
+# === IMPORTS ===
+# Note: This file implements the full (h)(1) calculation
+
+# === INPUTS ===
+# net_capital_gain is defined in h.rac via input long_term_capital_gains
+
+input net_capital_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Net Capital Gain"
+  description: "Net capital gain for purposes of 26 USC 1(h)(1) - imported from h.rac or provided directly"
+  default: 0
+
+# === VARIABLES ===
+
+variable amount_taxed_below_25_percent:
+  imports:
+    - 26/1#filing_status
+    - 26/1/h/parameters#zero_rate_threshold
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Amount Taxed Below 25 Percent"
+  description: "The amount of taxable income that would be taxed at rates below 25% (10% and 12% brackets) per 26 USC 1(h)(1)(B)(i)"
+  formula: |
+    # This equals the top of the 12% bracket for the filing status
+    # The statutory language refers to "taxed at a rate below 25 percent"
+    # Under TCJA, this means the 10% and 12% brackets
+    return zero_rate_threshold[filing_status]
+  default: 0
+  tests:
+    - name: "Single filer 2024"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+      expect: 47025
+    - name: "Joint filer 2024"
+      period: 2024
+      inputs:
+        filing_status: JOINT
+      expect: 94050
+    - name: "MFS 2024"
+      period: 2024
+      inputs:
+        filing_status: SEPARATE
+      expect: 47025
+    - name: "HOH 2024"
+      period: 2024
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+      expect: 63000
+
+variable amount_taxed_below_39_6_percent:
+  imports:
+    - 26/1#filing_status
+    - 26/1/h/parameters#fifteen_rate_threshold
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Amount Taxed Below 39.6 Percent"
+  description: "The amount of taxable income that would be taxed at rates below 39.6% per 26 USC 1(h)(1)(C)(ii)(I)"
+  formula: |
+    # Under TCJA, the top rate is 37%, so this threshold is separately defined
+    # Rather than tied to the 39.6% bracket (which no longer exists)
+    return fifteen_rate_threshold[filing_status]
+  default: 0
+  tests:
+    - name: "Single filer 2024"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+      expect: 518900
+    - name: "Joint filer 2024"
+      period: 2024
+      inputs:
+        filing_status: JOINT
+      expect: 583750
+
+variable ordinary_income_base:
+  imports:
+    - 26/63/a#taxable_income
+    - 26/1/h/3#adjusted_net_capital_gain
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Ordinary Income Base"
+  description: "Taxable income reduced by adjusted net capital gain per 26 USC 1(h)(1)(A)(ii)(II)"
+  formula: |
+    # (h)(1)(A)(ii)(II): taxable income reduced by adjusted net capital gain
+    return max(0, taxable_income - adjusted_net_capital_gain)
+  default: 0
+  tests:
+    - name: "Basic calculation"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        adjusted_net_capital_gain: 30000
+      expect: 70000
+    - name: "ANCG exceeds taxable income"
+      period: 2024
+      inputs:
+        taxable_income: 20000
+        adjusted_net_capital_gain: 50000
+      expect: 0
+
+variable taxable_income_reduced_by_ncg:
+  imports:
+    - 26/63/a#taxable_income
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Taxable Income Reduced by Net Capital Gain"
+  description: "Taxable income reduced by net capital gain per 26 USC 1(h)(1)(A)(i)"
+  formula: |
+    # (h)(1)(A)(i): taxable income reduced by the net capital gain
+    return max(0, taxable_income - net_capital_gain)
+  default: 0
+  tests:
+    - name: "Basic calculation"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        net_capital_gain: 30000
+      expect: 70000
+    - name: "NCG exceeds taxable income"
+      period: 2024
+      inputs:
+        taxable_income: 20000
+        net_capital_gain: 50000
+      expect: 0
+
+variable subparagraph_a_amount:
+  imports:
+    - 26/63/a#taxable_income
+    - 26/1/h/3#adjusted_net_capital_gain
+    - 26/1#filing_status
+    - 26/1/h/parameters#zero_rate_threshold
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Subparagraph (A) Amount"
+  description: "The GREATER OF amount from 26 USC 1(h)(1)(A) on which ordinary rates apply"
+  formula: |
+    # (h)(1)(A): Tax computed at regular rates on the GREATER OF:
+    # (i) taxable income reduced by net capital gain, OR
+    # (ii) the LESSER OF:
+    #      (I) amount taxed below 25%, OR
+    #      (II) taxable income reduced by adjusted net capital gain
+
+    # Compute (i): taxable income - NCG
+    amount_i = max(0, taxable_income - net_capital_gain)
+
+    # Compute (ii): lesser of (I) and (II)
+    amount_ii_I = zero_rate_threshold[filing_status]  # Amount taxed below 25%
+    amount_ii_II = max(0, taxable_income - adjusted_net_capital_gain)
+    amount_ii = min(amount_ii_I, amount_ii_II)
+
+    # Return the GREATER of (i) and (ii)
+    return max(amount_i, amount_ii)
+  default: 0
+  tests:
+    - name: "Low income - NCG reduction applies"
+      period: 2024
+      inputs:
+        taxable_income: 50000
+        net_capital_gain: 10000
+        adjusted_net_capital_gain: 15000
+        filing_status: SINGLE
+      # (i) = 50000 - 10000 = 40000
+      # (ii)(I) = 47025
+      # (ii)(II) = 50000 - 15000 = 35000
+      # (ii) = min(47025, 35000) = 35000
+      # greater of 40000 and 35000 = 40000
+      expect: 40000
+    - name: "High income - below 25% threshold applies"
+      period: 2024
+      inputs:
+        taxable_income: 200000
+        net_capital_gain: 50000
+        adjusted_net_capital_gain: 60000
+        filing_status: SINGLE
+      # (i) = 200000 - 50000 = 150000
+      # (ii)(I) = 47025
+      # (ii)(II) = 200000 - 60000 = 140000
+      # (ii) = min(47025, 140000) = 47025
+      # greater of 150000 and 47025 = 150000
+      expect: 150000
+
+variable subparagraph_b_amount:
+  imports:
+    - 26/63/a#taxable_income
+    - 26/1/h/3#adjusted_net_capital_gain
+    - 26/1#filing_status
+    - 26/1/h/parameters#zero_rate_threshold
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Subparagraph (B) Amount"
+  description: "Amount of adjusted net capital gain taxed at 0% per 26 USC 1(h)(1)(B)"
+  formula: |
+    # (h)(1)(B): 0% of so much of ANCG (or if less, taxable income) as does not exceed
+    # the excess (if any) of:
+    #   (i) amount taxed below 25%, OVER
+    #   (ii) taxable income reduced by ANCG
+
+    # The "excess" is how much room remains in the 0% bracket after ordinary income
+    ordinary_income = max(0, taxable_income - adjusted_net_capital_gain)
+    room_in_zero_bracket = max(0, zero_rate_threshold[filing_status] - ordinary_income)
+
+    # Amount at 0% is the lesser of: ANCG, taxable income, or room in bracket
+    ancg_or_less = min(adjusted_net_capital_gain, taxable_income)
+    return min(ancg_or_less, room_in_zero_bracket)
+  default: 0
+  tests:
+    - name: "All ANCG fits in 0% bracket"
+      period: 2024
+      inputs:
+        taxable_income: 40000
+        adjusted_net_capital_gain: 10000
+        filing_status: SINGLE
+      # ordinary = 40000 - 10000 = 30000
+      # room = 47025 - 30000 = 17025
+      # ANCG = 10000
+      # At 0%: min(10000, 17025) = 10000
+      expect: 10000
+    - name: "Partial ANCG at 0%"
+      period: 2024
+      inputs:
+        taxable_income: 60000
+        adjusted_net_capital_gain: 20000
+        filing_status: SINGLE
+      # ordinary = 60000 - 20000 = 40000
+      # room = 47025 - 40000 = 7025
+      # At 0%: min(20000, 7025) = 7025
+      expect: 7025
+    - name: "No room at 0% - high ordinary income"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        adjusted_net_capital_gain: 10000
+        filing_status: SINGLE
+      # ordinary = 100000 - 10000 = 90000
+      # room = 47025 - 90000 = 0 (capped at 0)
+      # At 0%: 0
+      expect: 0
+
+variable subparagraph_c_amount:
+  imports:
+    - 26/63/a#taxable_income
+    - 26/1/h/3#adjusted_net_capital_gain
+    - 26/1#filing_status
+    - 26/1/h/parameters#zero_rate_threshold
+    - 26/1/h/parameters#fifteen_rate_threshold
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Subparagraph (C) Amount"
+  description: "Amount of adjusted net capital gain taxed at 15% per 26 USC 1(h)(1)(C)"
+  formula: |
+    # (h)(1)(C): 15% of the LESSER OF:
+    #   (i) ANCG (or if less, taxable income) EXCEEDING the (B) amount, OR
+    #   (ii) the EXCESS of:
+    #        (I) amount taxed below 39.6%, OVER
+    #        (II) sum of (A) and (B) amounts
+
+    # First compute subparagraph_a_amount inline
+    amount_i = max(0, taxable_income - net_capital_gain)
+    amount_ii_I = zero_rate_threshold[filing_status]
+    amount_ii_II = max(0, taxable_income - adjusted_net_capital_gain)
+    amount_ii = min(amount_ii_I, amount_ii_II)
+    a_amount = max(amount_i, amount_ii)
+
+    # Compute subparagraph_b_amount inline
+    ordinary_income = max(0, taxable_income - adjusted_net_capital_gain)
+    room_in_zero_bracket = max(0, zero_rate_threshold[filing_status] - ordinary_income)
+    ancg_or_less = min(adjusted_net_capital_gain, taxable_income)
+    b_amount = min(ancg_or_less, room_in_zero_bracket)
+
+    # Amount (i): ANCG remaining after 0% bracket
+    remaining_ancg = max(0, ancg_or_less - b_amount)
+
+    # Amount (ii): Room in 15% bracket
+    room_under_39_6 = max(0, fifteen_rate_threshold[filing_status] - a_amount - b_amount)
+
+    # At 15%: lesser of remaining ANCG or room in 15% bracket
+    return min(remaining_ancg, room_under_39_6)
+  default: 0
+  tests:
+    - name: "All remaining ANCG at 15%"
+      period: 2024
+      inputs:
+        taxable_income: 60000
+        adjusted_net_capital_gain: 20000
+        net_capital_gain: 20000
+        filing_status: SINGLE
+      # From (B) test: 7025 at 0%
+      # Remaining ANCG: 20000 - 7025 = 12975
+      # Room at 15%: 518900 - 40000 - 7025 = 471875
+      # At 15%: min(12975, 471875) = 12975
+      expect: 12975
+    - name: "High income - partial at 15%"
+      period: 2024
+      inputs:
+        taxable_income: 600000
+        adjusted_net_capital_gain: 100000
+        net_capital_gain: 100000
+        filing_status: SINGLE
+      # ordinary = 500000
+      # (B): room = 47025 - 500000 = 0, so 0 at 0%
+      # Remaining: 100000
+      # (A): max(500000, min(47025, 500000)) = 500000
+      # Room at 15%: 518900 - 500000 - 0 = 18900
+      # At 15%: min(100000, 18900) = 18900
+      expect: 18900
+
+variable subparagraph_d_amount:
+  imports:
+    - 26/63/a#taxable_income
+    - 26/1/h/3#adjusted_net_capital_gain
+    - 26/1#filing_status
+    - 26/1/h/parameters#zero_rate_threshold
+    - 26/1/h/parameters#fifteen_rate_threshold
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Subparagraph (D) Amount"
+  description: "Amount of adjusted net capital gain taxed at 20% per 26 USC 1(h)(1)(D)"
+  formula: |
+    # (h)(1)(D): 20% of ANCG (or if less, taxable income) in EXCESS of
+    # amounts on which tax is determined under (B) and (C)
+
+    # Compute b_amount inline
+    ordinary_income = max(0, taxable_income - adjusted_net_capital_gain)
+    room_in_zero_bracket = max(0, zero_rate_threshold[filing_status] - ordinary_income)
+    ancg_or_less = min(adjusted_net_capital_gain, taxable_income)
+    b_amount = min(ancg_or_less, room_in_zero_bracket)
+
+    # Compute a_amount inline
+    amount_i = max(0, taxable_income - net_capital_gain)
+    amount_ii_I = zero_rate_threshold[filing_status]
+    amount_ii_II = max(0, taxable_income - adjusted_net_capital_gain)
+    amount_ii = min(amount_ii_I, amount_ii_II)
+    a_amount = max(amount_i, amount_ii)
+
+    # Compute c_amount inline
+    remaining_ancg = max(0, ancg_or_less - b_amount)
+    room_under_39_6 = max(0, fifteen_rate_threshold[filing_status] - a_amount - b_amount)
+    c_amount = min(remaining_ancg, room_under_39_6)
+
+    return max(0, ancg_or_less - b_amount - c_amount)
+  default: 0
+  tests:
+    - name: "No 20% bracket for moderate income"
+      period: 2024
+      inputs:
+        taxable_income: 60000
+        adjusted_net_capital_gain: 20000
+        net_capital_gain: 20000
+        filing_status: SINGLE
+      # All ANCG covered by (B) and (C)
+      expect: 0
+    - name: "High income - remainder at 20%"
+      period: 2024
+      inputs:
+        taxable_income: 600000
+        adjusted_net_capital_gain: 100000
+        net_capital_gain: 100000
+        filing_status: SINGLE
+      # (B): 0, (C): 18900
+      # At 20%: 100000 - 0 - 18900 = 81100
+      expect: 81100
+
+variable subparagraph_a_tax:
+  imports:
+    - 26/1#brackets
+    - 26/1#filing_status
+    - 26/63/a#taxable_income
+    - 26/1/h/3#adjusted_net_capital_gain
+    - 26/1/h/parameters#zero_rate_threshold
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tax Under Subparagraph (A)"
+  description: "Tax on ordinary income at regular rates per 26 USC 1(h)(1)(A)"
+  formula: |
+    # Compute a_amount inline
+    amount_i = max(0, taxable_income - net_capital_gain)
+    amount_ii_I = zero_rate_threshold[filing_status]
+    amount_ii_II = max(0, taxable_income - adjusted_net_capital_gain)
+    amount_ii = min(amount_ii_I, amount_ii_II)
+    a_amount = max(amount_i, amount_ii)
+
+    # Tax computed at regular rates on the (A) amount
+    # marginal_agg(amount, brackets, threshold_by, rate_by) - positional args
+    return marginal_agg(a_amount, brackets, filing_status)
+  default: 0
+  tests:
+    - name: "Tax on ordinary income base"
+      period: 2024
+      inputs:
+        taxable_income: 50000
+        net_capital_gain: 10000
+        adjusted_net_capital_gain: 10000
+        filing_status: SINGLE
+      # a_amount = max(40000, min(47025, 40000)) = 40000
+      # Tax: 11600 at 10% + 28400 at 12% = 1160 + 3408 = 4568
+      expect: 4568
+
+variable subparagraph_b_tax:
+  imports:
+    - 26/1/h/parameters#zero_rate
+    - 26/63/a#taxable_income
+    - 26/1/h/3#adjusted_net_capital_gain
+    - 26/1#filing_status
+    - 26/1/h/parameters#zero_rate_threshold
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tax Under Subparagraph (B)"
+  description: "Tax on ANCG at 0% rate per 26 USC 1(h)(1)(B)"
+  formula: |
+    # Compute b_amount inline
+    ordinary_income = max(0, taxable_income - adjusted_net_capital_gain)
+    room_in_zero_bracket = max(0, zero_rate_threshold[filing_status] - ordinary_income)
+    ancg_or_less = min(adjusted_net_capital_gain, taxable_income)
+    b_amount = min(ancg_or_less, room_in_zero_bracket)
+
+    # 0% rate on the (B) amount
+    return b_amount * zero_rate
+  default: 0
+  tests:
+    - name: "Always zero (0% rate)"
+      period: 2024
+      inputs:
+        taxable_income: 60000
+        adjusted_net_capital_gain: 20000
+        filing_status: SINGLE
+      expect: 0
+
+variable subparagraph_c_tax:
+  imports:
+    - 26/1/h/parameters#fifteen_rate
+    - 26/63/a#taxable_income
+    - 26/1/h/3#adjusted_net_capital_gain
+    - 26/1#filing_status
+    - 26/1/h/parameters#zero_rate_threshold
+    - 26/1/h/parameters#fifteen_rate_threshold
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tax Under Subparagraph (C)"
+  description: "Tax on ANCG at 15% rate per 26 USC 1(h)(1)(C)"
+  formula: |
+    # Compute a_amount inline
+    amount_i = max(0, taxable_income - net_capital_gain)
+    amount_ii_I = zero_rate_threshold[filing_status]
+    amount_ii_II = max(0, taxable_income - adjusted_net_capital_gain)
+    amount_ii = min(amount_ii_I, amount_ii_II)
+    a_amount = max(amount_i, amount_ii)
+
+    # Compute b_amount inline
+    ordinary_income = max(0, taxable_income - adjusted_net_capital_gain)
+    room_in_zero_bracket = max(0, zero_rate_threshold[filing_status] - ordinary_income)
+    ancg_or_less = min(adjusted_net_capital_gain, taxable_income)
+    b_amount = min(ancg_or_less, room_in_zero_bracket)
+
+    # Compute c_amount inline
+    remaining_ancg = max(0, ancg_or_less - b_amount)
+    room_under_39_6 = max(0, fifteen_rate_threshold[filing_status] - a_amount - b_amount)
+    c_amount = min(remaining_ancg, room_under_39_6)
+
+    # 15% rate on the (C) amount
+    return c_amount * fifteen_rate
+  default: 0
+  tests:
+    - name: "15% on remaining ANCG"
+      period: 2024
+      inputs:
+        taxable_income: 60000
+        adjusted_net_capital_gain: 20000
+        net_capital_gain: 20000
+        filing_status: SINGLE
+      # c_amount = 12975
+      # Tax: 12975 * 0.15 = 1946.25
+      expect: 1946.25
+
+variable subparagraph_d_tax:
+  imports:
+    - 26/1/h/parameters#twenty_rate
+    - 26/63/a#taxable_income
+    - 26/1/h/3#adjusted_net_capital_gain
+    - 26/1#filing_status
+    - 26/1/h/parameters#zero_rate_threshold
+    - 26/1/h/parameters#fifteen_rate_threshold
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tax Under Subparagraph (D)"
+  description: "Tax on ANCG at 20% rate per 26 USC 1(h)(1)(D)"
+  formula: |
+    # Compute b_amount inline
+    ordinary_income = max(0, taxable_income - adjusted_net_capital_gain)
+    room_in_zero_bracket = max(0, zero_rate_threshold[filing_status] - ordinary_income)
+    ancg_or_less = min(adjusted_net_capital_gain, taxable_income)
+    b_amount = min(ancg_or_less, room_in_zero_bracket)
+
+    # Compute a_amount inline
+    amount_i = max(0, taxable_income - net_capital_gain)
+    amount_ii_I = zero_rate_threshold[filing_status]
+    amount_ii_II = max(0, taxable_income - adjusted_net_capital_gain)
+    amount_ii = min(amount_ii_I, amount_ii_II)
+    a_amount = max(amount_i, amount_ii)
+
+    # Compute c_amount inline
+    remaining_ancg = max(0, ancg_or_less - b_amount)
+    room_under_39_6 = max(0, fifteen_rate_threshold[filing_status] - a_amount - b_amount)
+    c_amount = min(remaining_ancg, room_under_39_6)
+
+    # d_amount
+    d_amount = max(0, ancg_or_less - b_amount - c_amount)
+
+    # 20% rate on the (D) amount
+    return d_amount * twenty_rate
+  default: 0
+  tests:
+    - name: "20% on remainder"
+      period: 2024
+      inputs:
+        taxable_income: 600000
+        adjusted_net_capital_gain: 100000
+        net_capital_gain: 100000
+        filing_status: SINGLE
+      # d_amount = 81100
+      # Tax: 81100 * 0.20 = 16220
+      expect: 16220
+
+input unrecaptured_section_1250_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Unrecaptured Section 1250 Gain"
+  description: "Depreciation recapture on real property held more than 1 year per 26 USC 1(h)(6)"
+  default: 0
+
+input twentyeight_percent_rate_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "28-Percent Rate Gain"
+  description: "Collectibles gain + section 1202 gain minus offsets per 26 USC 1(h)(4)"
+  default: 0
+
+variable capital_gains_tax_under_1h1:
+  imports:
+    - 26/63/a#taxable_income
+    - 26/1/h/3#adjusted_net_capital_gain
+    - 26/1#filing_status
+    - 26/1#brackets
+    - 26/1/h/parameters#zero_rate
+    - 26/1/h/parameters#fifteen_rate
+    - 26/1/h/parameters#twenty_rate
+    - 26/1/h/parameters#unrecaptured_1250_rate
+    - 26/1/h/parameters#twentyeight_rate
+    - 26/1/h/parameters#zero_rate_threshold
+    - 26/1/h/parameters#fifteen_rate_threshold
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Capital Gains Tax Under Section 1(h)(1)"
+  description: "Total tax computed under 26 USC 1(h)(1) including ordinary income and preferential rates on ANCG, 25% on unrecaptured 1250, and 28% on collectibles/1202"
+  formula: |
+    # Compute all amounts inline to avoid circular reference issues
+    # Full (h)(1) computation: SUM of taxes under (A) through (F)
+
+    # === Subparagraph (A): Ordinary income base ===
+    amount_i = max(0, taxable_income - net_capital_gain)
+    amount_ii_I = zero_rate_threshold[filing_status]
+    amount_ii_II = max(0, taxable_income - adjusted_net_capital_gain)
+    amount_ii = min(amount_ii_I, amount_ii_II)
+    a_amount = max(amount_i, amount_ii)
+
+    # === Subparagraph (B): 0% rate on ANCG ===
+    ordinary_income = max(0, taxable_income - adjusted_net_capital_gain)
+    room_in_zero_bracket = max(0, zero_rate_threshold[filing_status] - ordinary_income)
+    ancg_or_less = min(adjusted_net_capital_gain, taxable_income)
+    b_amount = min(ancg_or_less, room_in_zero_bracket)
+
+    # === Subparagraph (C): 15% rate on ANCG ===
+    remaining_ancg = max(0, ancg_or_less - b_amount)
+    room_under_39_6 = max(0, fifteen_rate_threshold[filing_status] - a_amount - b_amount)
+    c_amount = min(remaining_ancg, room_under_39_6)
+
+    # === Subparagraph (D): 20% rate on ANCG ===
+    d_amount = max(0, ancg_or_less - b_amount - c_amount)
+
+    # === Subparagraph (E): 25% rate on unrecaptured 1250 gain ===
+    # (i) lesser of unrecaptured 1250 gain or NCG (without regard to para 11)
+    e_amount_i = min(unrecaptured_section_1250_gain, net_capital_gain)
+    # (ii) excess of (A + NCG) over taxable income
+    sum_a_plus_ncg = a_amount + net_capital_gain
+    e_amount_ii = max(0, sum_a_plus_ncg - taxable_income)
+    e_amount = max(0, e_amount_i - e_amount_ii)
+
+    # === Subparagraph (F): 28% rate on remaining 28% rate gain ===
+    # Taxable income in excess of sum of amounts under (A) through (E)
+    sum_a_through_e = a_amount + b_amount + c_amount + d_amount + e_amount
+    f_amount = max(0, taxable_income - sum_a_through_e)
+    # But (F) amount cannot exceed actual 28% rate gain available
+    f_amount = min(f_amount, twentyeight_percent_rate_gain)
+
+    # Compute taxes (marginal_agg uses positional args: amount, brackets, threshold_by)
+    a_tax = marginal_agg(a_amount, brackets, filing_status)
+    b_tax = b_amount * zero_rate
+    c_tax = c_amount * fifteen_rate
+    d_tax = d_amount * twenty_rate
+    e_tax = e_amount * unrecaptured_1250_rate
+    f_tax = f_amount * twentyeight_rate
+
+    # (h)(1): The tax shall not exceed the SUM of amounts under (A) through (F)
+    return a_tax + b_tax + c_tax + d_tax + e_tax + f_tax
+  default: 0
+  tests:
+    - name: "Low income - all ANCG at 0%"
+      period: 2024
+      inputs:
+        taxable_income: 40000
+        adjusted_net_capital_gain: 10000
+        net_capital_gain: 10000
+        filing_status: SINGLE
+        unrecaptured_section_1250_gain: 0
+        twentyeight_percent_rate_gain: 0
+      # a_amount = max(30000, min(47025, 30000)) = 30000
+      # a_tax: 11600 at 10% + 18400 at 12% = 1160 + 2208 = 3368
+      # b_amount: room = 47025 - 30000 = 17025, ANCG = 10000, so 10000 at 0%
+      # b_tax: 0
+      # e_amount: 0 (no 1250 gain)
+      # f_amount: 0 (no 28% rate gain)
+      # Total: 3368
+      expect: 3368
+    - name: "Mid income - ANCG spans 0% and 15%"
+      period: 2024
+      inputs:
+        taxable_income: 60000
+        adjusted_net_capital_gain: 20000
+        net_capital_gain: 20000
+        filing_status: SINGLE
+        unrecaptured_section_1250_gain: 0
+        twentyeight_percent_rate_gain: 0
+      # a_amount = max(40000, min(47025, 40000)) = 40000
+      # a_tax: 11600 at 10% + 28400 at 12% = 1160 + 3408 = 4568
+      # b_amount: room = 47025 - 40000 = 7025, ANCG = 20000, so 7025 at 0%
+      # b_tax: 0
+      # c_amount: 20000 - 7025 = 12975
+      # c_tax: 12975 * 0.15 = 1946.25
+      # Total: 4568 + 0 + 1946.25 = 6514.25
+      expect: 6514.25
+    - name: "High income - ANCG at 15% and 20%"
+      period: 2024
+      inputs:
+        taxable_income: 600000
+        adjusted_net_capital_gain: 100000
+        net_capital_gain: 100000
+        filing_status: SINGLE
+        unrecaptured_section_1250_gain: 0
+        twentyeight_percent_rate_gain: 0
+      # a_amount = max(500000, min(47025, 500000)) = 500000
+      # b_amount: room = 47025 - 500000 = 0
+      # c_amount: room at 15% = 518900 - 500000 - 0 = 18900
+      # d_amount: 100000 - 0 - 18900 = 81100
+      # a_tax: complex, approx 147689.50 for 500k single
+      # c_tax: 18900 * 0.15 = 2835
+      # d_tax: 81100 * 0.20 = 16220
+      # Total: 147689.50 + 0 + 2835 + 16220 = 166744.50
+      expect: 166744.50
+    - name: "With unrecaptured 1250 gain"
+      period: 2024
+      inputs:
+        taxable_income: 120000
+        adjusted_net_capital_gain: 50000
+        net_capital_gain: 70000
+        filing_status: SINGLE
+        unrecaptured_section_1250_gain: 20000
+        twentyeight_percent_rate_gain: 0
+      # ordinary = 120000 - 50000 = 70000
+      # a_amount = max(120000-70000, min(47025, 70000)) = max(50000, 47025) = 50000
+      # b_amount: room = 47025 - 70000 = 0, so 0 at 0%
+      # c_amount: remaining = 50000, room = 518900 - 50000 - 0 = 468900, so 50000 at 15%
+      # d_amount: 0
+      # e_amount: (i) = min(20000, 70000) = 20000
+      #           (ii) = max(0, 50000 + 70000 - 120000) = 0
+      #           = 20000
+      # e_tax: 20000 * 0.25 = 5000
+      # a_tax: 11600*.10 + 35600*.12 + 2800*.22 = 1160 + 4272 + 616 = 6048
+      # c_tax: 50000 * 0.15 = 7500
+      # Total: 6048 + 0 + 7500 + 0 + 5000 = 18548
+      expect: 18548
+    - name: "With 28% rate gain (collectibles)"
+      period: 2024
+      inputs:
+        taxable_income: 150000
+        adjusted_net_capital_gain: 50000
+        net_capital_gain: 80000
+        filing_status: SINGLE
+        unrecaptured_section_1250_gain: 10000
+        twentyeight_percent_rate_gain: 20000
+      # ordinary = 150000 - 50000 = 100000
+      # a_amount = max(150000-80000, min(47025, 100000)) = max(70000, 47025) = 70000
+      # b_amount: room = 47025 - 100000 = 0
+      # c_amount: remaining = 50000, room = 518900 - 70000 - 0 = 448900, so 50000 at 15%
+      # d_amount: 0
+      # e_amount: (i) = min(10000, 80000) = 10000
+      #           (ii) = max(0, 70000 + 80000 - 150000) = 0
+      #           = 10000
+      # sum_a_through_e = 70000 + 0 + 50000 + 0 + 10000 = 130000
+      # f_amount: min(150000 - 130000, 20000) = min(20000, 20000) = 20000
+      # a_tax: 70000 ordinary (complex calc)
+      # c_tax: 50000 * 0.15 = 7500
+      # e_tax: 10000 * 0.25 = 2500
+      # f_tax: 20000 * 0.28 = 5600
+      # a_tax breakdown: 11600*.10 + 35600*.12 + 22950*.22 = 1160 + 4272 + 5049 = 10481
+      # Total: 10481 + 0 + 7500 + 0 + 2500 + 5600 = 26081
+      expect: 26081

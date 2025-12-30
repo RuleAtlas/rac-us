@@ -1,0 +1,184 @@
+# 26 USC 1(h) - Maximum Capital Gains Rate Parameters
+#
+# This file contains all rate thresholds for preferential capital gains taxation.
+#
+# Sources:
+# - 26 USC 1(h): https://www.law.cornell.edu/uscode/text/26/1
+# - Rev. Proc. 2023-34, Section 3.01 (2024 amounts)
+# - Rev. Proc. 2022-38, Section 3.01 (2023 amounts)
+
+text: """
+Section 1(h) parameters for preferential capital gains rates.
+These thresholds determine which capital gains rate applies based on taxable income.
+"""
+
+# =============================================================================
+# SECTION 1(h)(1)(B) - ZERO PERCENT RATE THRESHOLD
+# =============================================================================
+# The 0% rate applies to adjusted net capital gain up to the amount of
+# taxable income that would be taxed at a rate below 25 percent.
+# Per Rev. Proc., this equals the top of the 12% bracket.
+
+parameter zero_rate_threshold:
+  description: "Maximum taxable income for 0% capital gains rate (equals 12% ordinary bracket ceiling)"
+  unit: USD
+  reference: "26 USC 1(h)(1)(B), Rev. Proc. 2023-34 Section 3.01"
+  values:
+    SINGLE:
+      2024-01-01: 47025
+      2023-01-01: 44625
+      2022-01-01: 41675
+      2021-01-01: 40400
+      2020-01-01: 40000
+      2019-01-01: 39375
+      2018-01-01: 38600
+    JOINT:
+      2024-01-01: 94050
+      2023-01-01: 89250
+      2022-01-01: 83350
+      2021-01-01: 80800
+      2020-01-01: 80000
+      2019-01-01: 78750
+      2018-01-01: 77200
+    SEPARATE:
+      2024-01-01: 47025
+      2023-01-01: 44625
+      2022-01-01: 41675
+      2021-01-01: 40400
+      2020-01-01: 40000
+      2019-01-01: 39375
+      2018-01-01: 38600
+    HEAD_OF_HOUSEHOLD:
+      2024-01-01: 63000
+      2023-01-01: 59750
+      2022-01-01: 55800
+      2021-01-01: 54100
+      2020-01-01: 53600
+      2019-01-01: 52750
+      2018-01-01: 51700
+    WIDOW:
+      2024-01-01: 94050
+      2023-01-01: 89250
+      2022-01-01: 83350
+      2021-01-01: 80800
+      2020-01-01: 80000
+      2019-01-01: 78750
+      2018-01-01: 77200
+
+# =============================================================================
+# SECTION 1(h)(1)(C) - FIFTEEN PERCENT RATE THRESHOLD
+# =============================================================================
+# The 15% rate applies to adjusted net capital gain exceeding the zero rate
+# amount but not exceeding the amount taxed at rates below 39.6%.
+
+parameter fifteen_rate_threshold:
+  description: "Maximum taxable income for 15% capital gains rate"
+  unit: USD
+  reference: "26 USC 1(h)(1)(C), Rev. Proc. 2023-34 Section 3.01"
+  values:
+    SINGLE:
+      2024-01-01: 518900
+      2023-01-01: 492300
+      2022-01-01: 459750
+      2021-01-01: 445850
+      2020-01-01: 441450
+      2019-01-01: 434550
+      2018-01-01: 425800
+    JOINT:
+      2024-01-01: 583750
+      2023-01-01: 553850
+      2022-01-01: 517200
+      2021-01-01: 501600
+      2020-01-01: 496600
+      2019-01-01: 488850
+      2018-01-01: 479000
+    SEPARATE:
+      2024-01-01: 291850
+      2023-01-01: 276900
+      2022-01-01: 258600
+      2021-01-01: 250800
+      2020-01-01: 248300
+      2019-01-01: 244425
+      2018-01-01: 239500
+    HEAD_OF_HOUSEHOLD:
+      2024-01-01: 551350
+      2023-01-01: 523050
+      2022-01-01: 488500
+      2021-01-01: 473750
+      2020-01-01: 469050
+      2019-01-01: 461700
+      2018-01-01: 452400
+    WIDOW:
+      2024-01-01: 583750
+      2023-01-01: 553850
+      2022-01-01: 517200
+      2021-01-01: 501600
+      2020-01-01: 496600
+      2019-01-01: 488850
+      2018-01-01: 479000
+
+# =============================================================================
+# CAPITAL GAINS RATES
+# =============================================================================
+# Statutory rates - these are NOT inflation-adjusted.
+
+parameter zero_rate:
+  description: "Preferential rate for adjusted net capital gain in lowest bracket"
+  unit: /1
+  reference: "26 USC 1(h)(1)(B)"
+  values:
+    2018-01-01: 0.00
+
+parameter fifteen_rate:
+  description: "Preferential rate for adjusted net capital gain in middle bracket"
+  unit: /1
+  reference: "26 USC 1(h)(1)(C)"
+  values:
+    2018-01-01: 0.15
+
+parameter twenty_rate:
+  description: "Preferential rate for adjusted net capital gain in highest bracket"
+  unit: /1
+  reference: "26 USC 1(h)(1)(D)"
+  values:
+    2018-01-01: 0.20
+
+# =============================================================================
+# SECTION 1(h)(1)(E) - UNRECAPTURED SECTION 1250 GAIN RATE
+# =============================================================================
+
+parameter unrecaptured_1250_rate:
+  description: "Rate for unrecaptured section 1250 gain (depreciation recapture on real property)"
+  unit: /1
+  reference: "26 USC 1(h)(1)(E), P.L. 105-34 Section 311(a)"
+  values:
+    1997-05-07: 0.25
+
+# =============================================================================
+# SECTION 1(h)(1)(F) - 28-PERCENT RATE GAIN
+# =============================================================================
+
+parameter twentyeight_rate:
+  description: "Rate for 28-percent rate gain (collectibles and section 1202 gain)"
+  unit: /1
+  reference: "26 USC 1(h)(1)(F), P.L. 105-34"
+  values:
+    1997-05-07: 0.28
+
+# =============================================================================
+# SECTION 1(h)(11)(D)(i) - QUALIFIED DIVIDEND HOLDING PERIOD
+# =============================================================================
+
+parameter qualified_dividend_holding_days:
+  description: "Minimum days stock must be held for dividend to be qualified"
+  unit: days
+  reference: "26 USC 1(h)(11)(B)(iii)"
+  values:
+    2003-01-01: 60
+
+parameter qualified_dividend_holding_window:
+  description: "Window period around ex-dividend date for measuring holding period"
+  unit: days
+  reference: "26 USC 1(h)(11)(B)(iii)"
+  values:
+    2003-01-01: 121
