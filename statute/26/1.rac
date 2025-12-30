@@ -103,17 +103,22 @@ parameter brackets:
 variable income_tax_before_credits:
   imports:
     - 26/63/a#taxable_income
+    - 26/1/h#adjusted_net_capital_gain
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Income Tax Before Credits"
-  description: "Federal income tax on ordinary income before credits per 26 USC Section 1"
+  description: "Federal income tax on ordinary income before credits per 26 USC Section 1(h)(1)(A)"
   syntax: python
   formula: |
-    if taxable_income <= 0:
+    # Per Section 1(h)(1)(A): Tax on ordinary income at regular rates.
+    # Ordinary income = taxable income - adjusted net capital gain (LTCG + qualified dividends)
+    # Capital gains are taxed separately at preferential rates per Section 1(h).
+    ordinary_income = max(0, taxable_income - adjusted_net_capital_gain)
+    if ordinary_income <= 0:
         return 0
-    return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
+    return marginal_agg(ordinary_income, brackets, threshold_by=filing_status)
   default: 0
   tests:
     - name: "Single filer, zero taxable income"
@@ -306,19 +311,61 @@ variable income_tax_before_credits:
       # $500,000 at 37%: $185,000.00
       # Total: $335,689.50
       expect: 335689.50
+    # Section 1(h) integration tests - capital gains taxed separately
+    - name: "With capital gains - ordinary income portion only"
+      period: 2018-01
+      inputs:
+        taxable_income: 100_000
+        long_term_capital_gains: 30_000
+        qualified_dividends: 0
+        filing_status: SINGLE
+      # Ordinary income = $100k - $30k = $70k
+      # Tax only on $70k of ordinary income:
+      # $9,525 at 10%: $952.50
+      # $29,175 at 12%: $3,501.00
+      # $31,300 at 22%: $6,886.00
+      # Total: $11,339.50
+      expect: 11339.50
+    - name: "With qualified dividends - reduces ordinary income portion"
+      period: 2018-01
+      inputs:
+        taxable_income: 80_000
+        long_term_capital_gains: 0
+        qualified_dividends: 20_000
+        filing_status: SINGLE
+      # Ordinary income = $80k - $20k = $60k
+      # Tax on $60k:
+      # $9,525 at 10%: $952.50
+      # $29,175 at 12%: $3,501.00
+      # $21,300 at 22%: $4,686.00
+      # Total: $9,139.50
+      expect: 9139.50
+    - name: "ANCG exceeds taxable income - zero ordinary tax"
+      period: 2018-01
+      inputs:
+        taxable_income: 50_000
+        long_term_capital_gains: 60_000
+        qualified_dividends: 0
+        filing_status: SINGLE
+      # Ordinary income = max(0, $50k - $60k) = $0
+      # All income is capital gains, taxed at preferential rates separately
+      expect: 0
 
 variable income_tax_before_credits_vectorized:
   imports:
     - 26/63/a#taxable_income
+    - 26/1/h#adjusted_net_capital_gain
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Income Tax Before Credits (Vectorized)"
-  description: "Vectorized implementation for microsimulation"
+  description: "Vectorized implementation for microsimulation per 26 USC Section 1(h)(1)(A)"
   syntax: python
   formula: |
-    return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
+    # Ordinary income = taxable income - adjusted net capital gain
+    ordinary_income = max(0, taxable_income - adjusted_net_capital_gain)
+    return marginal_agg(ordinary_income, brackets, threshold_by=filing_status)
   default: 0
   tests:
     - name: "Single filer, $50k spanning multiple brackets (2024)"
