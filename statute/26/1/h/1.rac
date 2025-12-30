@@ -44,6 +44,138 @@ plus
 which tax is determined under the preceding subparagraphs of this paragraph.
 """
 
+# === PARAMETERS ===
+# Thresholds determined by Rev. Proc. (inflation-adjusted annually)
+
+parameter zero_rate_threshold:
+  description: "Maximum taxable income for 0% capital gains rate (equals 12% ordinary bracket ceiling)"
+  unit: USD
+  reference: "26 USC 1(h)(1)(B), Rev. Proc. 2023-34 Section 3.01"
+  values:
+    SINGLE:
+      2024-01-01: 47025
+      2023-01-01: 44625
+      2022-01-01: 41675
+      2021-01-01: 40400
+      2020-01-01: 40000
+      2019-01-01: 39375
+      2018-01-01: 38600
+    JOINT:
+      2024-01-01: 94050
+      2023-01-01: 89250
+      2022-01-01: 83350
+      2021-01-01: 80800
+      2020-01-01: 80000
+      2019-01-01: 78750
+      2018-01-01: 77200
+    SEPARATE:
+      2024-01-01: 47025
+      2023-01-01: 44625
+      2022-01-01: 41675
+      2021-01-01: 40400
+      2020-01-01: 40000
+      2019-01-01: 39375
+      2018-01-01: 38600
+    HEAD_OF_HOUSEHOLD:
+      2024-01-01: 63000
+      2023-01-01: 59750
+      2022-01-01: 55800
+      2021-01-01: 54100
+      2020-01-01: 53600
+      2019-01-01: 52750
+      2018-01-01: 51700
+    WIDOW:
+      2024-01-01: 94050
+      2023-01-01: 89250
+      2022-01-01: 83350
+      2021-01-01: 80800
+      2020-01-01: 80000
+      2019-01-01: 78750
+      2018-01-01: 77200
+
+parameter fifteen_rate_threshold:
+  description: "Maximum taxable income for 15% capital gains rate"
+  unit: USD
+  reference: "26 USC 1(h)(1)(C), Rev. Proc. 2023-34 Section 3.01"
+  values:
+    SINGLE:
+      2024-01-01: 518900
+      2023-01-01: 492300
+      2022-01-01: 459750
+      2021-01-01: 445850
+      2020-01-01: 441450
+      2019-01-01: 434550
+      2018-01-01: 425800
+    JOINT:
+      2024-01-01: 583750
+      2023-01-01: 553850
+      2022-01-01: 517200
+      2021-01-01: 501600
+      2020-01-01: 496600
+      2019-01-01: 488850
+      2018-01-01: 479000
+    SEPARATE:
+      2024-01-01: 291850
+      2023-01-01: 276900
+      2022-01-01: 258600
+      2021-01-01: 250800
+      2020-01-01: 248300
+      2019-01-01: 244425
+      2018-01-01: 239500
+    HEAD_OF_HOUSEHOLD:
+      2024-01-01: 551350
+      2023-01-01: 523050
+      2022-01-01: 488500
+      2021-01-01: 473750
+      2020-01-01: 469050
+      2019-01-01: 461700
+      2018-01-01: 452400
+    WIDOW:
+      2024-01-01: 583750
+      2023-01-01: 553850
+      2022-01-01: 517200
+      2021-01-01: 501600
+      2020-01-01: 496600
+      2019-01-01: 488850
+      2018-01-01: 479000
+
+# Capital gains rates (statutory, not inflation-adjusted)
+
+parameter zero_rate:
+  description: "Preferential rate for adjusted net capital gain in lowest bracket"
+  unit: /1
+  reference: "26 USC 1(h)(1)(B)"
+  values:
+    2018-01-01: 0.00
+
+parameter fifteen_rate:
+  description: "Preferential rate for adjusted net capital gain in middle bracket"
+  unit: /1
+  reference: "26 USC 1(h)(1)(C)"
+  values:
+    2018-01-01: 0.15
+
+parameter twenty_rate:
+  description: "Preferential rate for adjusted net capital gain in highest bracket"
+  unit: /1
+  reference: "26 USC 1(h)(1)(D)"
+  values:
+    2018-01-01: 0.20
+
+parameter unrecaptured_1250_rate:
+  description: "Rate for unrecaptured section 1250 gain (depreciation recapture on real property)"
+  unit: /1
+  reference: "26 USC 1(h)(1)(E), P.L. 105-34 Section 311(a)"
+  values:
+    1997-05-07: 0.25
+
+parameter twentyeight_rate:
+  description: "Rate for 28-percent rate gain (collectibles and section 1202 gain)"
+  unit: /1
+  reference: "26 USC 1(h)(1)(F), P.L. 105-34"
+  values:
+    1997-05-07: 0.28
+
 # === IMPORTS ===
 # Note: This file implements the full (h)(1) calculation
 
@@ -64,7 +196,6 @@ input net_capital_gain:
 variable amount_taxed_below_25_percent:
   imports:
     - 26/1#filing_status
-    - 26/1/h/parameters#zero_rate_threshold
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -102,7 +233,6 @@ variable amount_taxed_below_25_percent:
 variable amount_taxed_below_39_6_percent:
   imports:
     - 26/1#filing_status
-    - 26/1/h/parameters#fifteen_rate_threshold
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -186,7 +316,6 @@ variable subparagraph_a_amount:
     - 26/63/a#taxable_income
     - 26/1/h/3#adjusted_net_capital_gain
     - 26/1#filing_status
-    - 26/1/h/parameters#zero_rate_threshold
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -244,7 +373,6 @@ variable subparagraph_b_amount:
     - 26/63/a#taxable_income
     - 26/1/h/3#adjusted_net_capital_gain
     - 26/1#filing_status
-    - 26/1/h/parameters#zero_rate_threshold
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -303,8 +431,6 @@ variable subparagraph_c_amount:
     - 26/63/a#taxable_income
     - 26/1/h/3#adjusted_net_capital_gain
     - 26/1#filing_status
-    - 26/1/h/parameters#zero_rate_threshold
-    - 26/1/h/parameters#fifteen_rate_threshold
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -373,8 +499,6 @@ variable subparagraph_d_amount:
     - 26/63/a#taxable_income
     - 26/1/h/3#adjusted_net_capital_gain
     - 26/1#filing_status
-    - 26/1/h/parameters#zero_rate_threshold
-    - 26/1/h/parameters#fifteen_rate_threshold
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -432,7 +556,6 @@ variable subparagraph_a_tax:
     - 26/1#filing_status
     - 26/63/a#taxable_income
     - 26/1/h/3#adjusted_net_capital_gain
-    - 26/1/h/parameters#zero_rate_threshold
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -465,11 +588,9 @@ variable subparagraph_a_tax:
 
 variable subparagraph_b_tax:
   imports:
-    - 26/1/h/parameters#zero_rate
     - 26/63/a#taxable_income
     - 26/1/h/3#adjusted_net_capital_gain
     - 26/1#filing_status
-    - 26/1/h/parameters#zero_rate_threshold
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -497,12 +618,9 @@ variable subparagraph_b_tax:
 
 variable subparagraph_c_tax:
   imports:
-    - 26/1/h/parameters#fifteen_rate
     - 26/63/a#taxable_income
     - 26/1/h/3#adjusted_net_capital_gain
     - 26/1#filing_status
-    - 26/1/h/parameters#zero_rate_threshold
-    - 26/1/h/parameters#fifteen_rate_threshold
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -545,12 +663,9 @@ variable subparagraph_c_tax:
 
 variable subparagraph_d_tax:
   imports:
-    - 26/1/h/parameters#twenty_rate
     - 26/63/a#taxable_income
     - 26/1/h/3#adjusted_net_capital_gain
     - 26/1#filing_status
-    - 26/1/h/parameters#zero_rate_threshold
-    - 26/1/h/parameters#fifteen_rate_threshold
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -618,13 +733,6 @@ variable capital_gains_tax_under_1h1:
     - 26/1/h/3#adjusted_net_capital_gain
     - 26/1#filing_status
     - 26/1#brackets
-    - 26/1/h/parameters#zero_rate
-    - 26/1/h/parameters#fifteen_rate
-    - 26/1/h/parameters#twenty_rate
-    - 26/1/h/parameters#unrecaptured_1250_rate
-    - 26/1/h/parameters#twentyeight_rate
-    - 26/1/h/parameters#zero_rate_threshold
-    - 26/1/h/parameters#fifteen_rate_threshold
   entity: TaxUnit
   period: Year
   dtype: Money
