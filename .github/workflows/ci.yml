@@ -19,10 +19,10 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Checkout cosilico-engine
+      - name: Checkout rac
         uses: actions/checkout@v4
         with:
-          repository: CosilicoAI/cosilico-engine
+          repository: CosilicoAI/rac
           path: engine
           token: ${{ secrets.GITHUB_TOKEN }}
 
