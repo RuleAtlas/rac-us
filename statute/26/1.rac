@@ -1,100 +1,917 @@
-# 26 USC § 1 - Filing Status
+# 26 USC Section 1 - Tax Imposed
 #
-variable filing_status:
+# THE core income tax section defining ordinary income tax rates.
+# Establishes progressive rate structure for different filing statuses.
+# Brackets indexed annually per 1(f) using chained CPI-U.
+# TCJA rates (10%, 12%, 22%, 24%, 32%, 35%, 37%) effective 2018-2025.
+
+text: """
+(a) Married individuals filing joint returns and surviving spouses.--
+There is hereby imposed on the taxable income of every married individual
+(as defined in section 7703) who makes a single return jointly with his
+spouse under section 6013, and every surviving spouse (as defined in
+section 2(a)), a tax determined in accordance with the following table...
+
+(b) Heads of households.--There is hereby imposed on the taxable income
+of every head of a household (as defined in section 2(b)) a tax determined
+in accordance with the following table...
+
+(c) Unmarried individuals (other than surviving spouses and heads of households).--
+There is hereby imposed on the taxable income of every individual (other than
+a surviving spouse as defined in section 2(a) or the head of a household as
+defined in section 2(b)) who is not a married individual (as defined in
+section 7703) a tax determined in accordance with the following table...
+
+(d) Married individuals filing separate returns.--There is hereby imposed
+on the taxable income of every married individual (as defined in section 7703)
+who does not make a single return jointly with his spouse under section 6013,
+a tax determined in accordance with the following table...
+
+(j) Modifications for taxable years 2018 through 2025.--
+(1) In general.--In the case of a taxable year beginning after December 31, 2017,
+and before January 1, 2026--
+(A) subsection (i) shall not apply, and
+(B) this section (other than subsection (i)) shall be applied as provided
+in paragraphs (2) through (6).
+(2) Rate tables.--
+(A) Married individuals filing joint returns and surviving spouses.--
+The following table shall be applied in lieu of the table contained in
+subsection (a): [10%, 12%, 22%, 24%, 32%, 35%, 37%]
+...
+"""
+
+# === INPUTS ===
+
+input filing_status:
   entity: TaxUnit
   period: Year
   dtype: Enum(FilingStatus)
   label: "Filing Status"
   description: "Tax filing status determining applicable rate schedule"
 
-# 26 USC Section 1 - Tax Imposed (Ordinary Income Tax)
-#
+# === PARAMETERS ===
+# Federal income tax rates - TCJA 26 USC 1(j)(2)
+# 7-bracket structure: 10%, 12%, 22%, 24%, 32%, 35%, 37%
 
-text: """
-There is hereby imposed on the taxable income of every individual...
-a tax determined in accordance with the following table
-"""
+parameter rate_bracket_1:
+  description: "First marginal tax rate (10% bracket)"
+  unit: rate
+  values:
+    2018-01-01: 0.10
 
-# Federal income tax brackets (base statutory values from TCJA 2017)
-# Thresholds indexed annually per IRC 1(f); base 2018 values here
-# Current indexed values in IRS Rev. Proc. guidance files
-parameter brackets:
-  description: "Federal income tax brackets"
+parameter rate_bracket_2:
+  description: "Second marginal tax rate (12% bracket)"
+  unit: rate
+  values:
+    2018-01-01: 0.12
+
+parameter rate_bracket_3:
+  description: "Third marginal tax rate (22% bracket)"
+  unit: rate
+  values:
+    2018-01-01: 0.22
+
+parameter rate_bracket_4:
+  description: "Fourth marginal tax rate (24% bracket)"
+  unit: rate
+  values:
+    2018-01-01: 0.24
+
+parameter rate_bracket_5:
+  description: "Fifth marginal tax rate (32% bracket)"
+  unit: rate
+  values:
+    2018-01-01: 0.32
+
+parameter rate_bracket_6:
+  description: "Sixth marginal tax rate (35% bracket)"
+  unit: rate
+  values:
+    2018-01-01: 0.35
+
+parameter rate_bracket_7:
+  description: "Seventh marginal tax rate (37% bracket)"
+  unit: rate
+  values:
+    2018-01-01: 0.37
+
+# === BRACKET THRESHOLDS - SINGLE FILERS ===
+# 26 USC 1(c), indexed per 1(f)
+
+parameter threshold_single_1:
+  description: "Single filer: end of 10% bracket"
+  unit: USD
   indexed_by: statute/26/1/f
   values:
-    # TCJA base thresholds (2018)
-    thresholds:
-      single: [0, 9525, 38700, 82500, 157500, 200000, 500000]
-      married_filing_jointly: [0, 19050, 77400, 165000, 315000, 400000, 600000]
-      married_filing_separately: [0, 9525, 38700, 82500, 157500, 200000, 300000]
-      head_of_household: [0, 13600, 51800, 82500, 157500, 200000, 500000]
-      qualifying_widow: [0, 19050, 77400, 165000, 315000, 400000, 600000]
-    # Rates are statutory (TCJA)
-    rates: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+    2018-01-01: 9_525
+    2019-01-01: 9_700
+    2020-01-01: 9_875
+    2021-01-01: 9_950
+    2022-01-01: 10_275
+    2023-01-01: 11_000
+    2024-01-01: 11_600
 
-variable income_tax:
-  imports:
-    - 26/63/c/taxable_income#taxable_income
-    - 26/1#filing_status
+parameter threshold_single_2:
+  description: "Single filer: end of 12% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 38_700
+    2019-01-01: 39_475
+    2020-01-01: 40_125
+    2021-01-01: 40_525
+    2022-01-01: 41_775
+    2023-01-01: 44_725
+    2024-01-01: 47_150
+
+parameter threshold_single_3:
+  description: "Single filer: end of 22% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 82_500
+    2019-01-01: 84_200
+    2020-01-01: 85_525
+    2021-01-01: 86_375
+    2022-01-01: 89_075
+    2023-01-01: 95_375
+    2024-01-01: 100_525
+
+parameter threshold_single_4:
+  description: "Single filer: end of 24% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 157_500
+    2019-01-01: 160_725
+    2020-01-01: 163_300
+    2021-01-01: 164_925
+    2022-01-01: 170_050
+    2023-01-01: 182_100
+    2024-01-01: 191_950
+
+parameter threshold_single_5:
+  description: "Single filer: end of 32% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 200_000
+    2019-01-01: 204_100
+    2020-01-01: 207_350
+    2021-01-01: 209_425
+    2022-01-01: 215_950
+    2023-01-01: 231_250
+    2024-01-01: 243_725
+
+parameter threshold_single_6:
+  description: "Single filer: end of 35% bracket (start of 37%)"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 500_000
+    2019-01-01: 510_300
+    2020-01-01: 518_400
+    2021-01-01: 523_600
+    2022-01-01: 539_900
+    2023-01-01: 578_125
+    2024-01-01: 609_350
+
+# === BRACKET THRESHOLDS - MARRIED FILING JOINTLY ===
+# 26 USC 1(a), indexed per 1(f)
+
+parameter threshold_joint_1:
+  description: "MFJ: end of 10% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 19_050
+    2019-01-01: 19_400
+    2020-01-01: 19_750
+    2021-01-01: 19_900
+    2022-01-01: 20_550
+    2023-01-01: 22_000
+    2024-01-01: 23_200
+
+parameter threshold_joint_2:
+  description: "MFJ: end of 12% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 77_400
+    2019-01-01: 78_950
+    2020-01-01: 80_250
+    2021-01-01: 81_050
+    2022-01-01: 83_550
+    2023-01-01: 89_450
+    2024-01-01: 94_300
+
+parameter threshold_joint_3:
+  description: "MFJ: end of 22% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 165_000
+    2019-01-01: 168_400
+    2020-01-01: 171_050
+    2021-01-01: 172_750
+    2022-01-01: 178_150
+    2023-01-01: 190_750
+    2024-01-01: 201_050
+
+parameter threshold_joint_4:
+  description: "MFJ: end of 24% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 315_000
+    2019-01-01: 321_450
+    2020-01-01: 326_600
+    2021-01-01: 329_850
+    2022-01-01: 340_100
+    2023-01-01: 364_200
+    2024-01-01: 383_900
+
+parameter threshold_joint_5:
+  description: "MFJ: end of 32% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 400_000
+    2019-01-01: 408_200
+    2020-01-01: 414_700
+    2021-01-01: 418_850
+    2022-01-01: 431_900
+    2023-01-01: 462_500
+    2024-01-01: 487_450
+
+parameter threshold_joint_6:
+  description: "MFJ: end of 35% bracket (start of 37%)"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 600_000
+    2019-01-01: 612_350
+    2020-01-01: 622_050
+    2021-01-01: 628_300
+    2022-01-01: 647_850
+    2023-01-01: 693_750
+    2024-01-01: 731_200
+
+# === BRACKET THRESHOLDS - MARRIED FILING SEPARATELY ===
+# 26 USC 1(d), indexed per 1(f) - generally half of MFJ
+
+parameter threshold_separate_1:
+  description: "MFS: end of 10% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 9_525
+    2019-01-01: 9_700
+    2020-01-01: 9_875
+    2021-01-01: 9_950
+    2022-01-01: 10_275
+    2023-01-01: 11_000
+    2024-01-01: 11_600
+
+parameter threshold_separate_2:
+  description: "MFS: end of 12% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 38_700
+    2019-01-01: 39_475
+    2020-01-01: 40_125
+    2021-01-01: 40_525
+    2022-01-01: 41_775
+    2023-01-01: 44_725
+    2024-01-01: 47_150
+
+parameter threshold_separate_3:
+  description: "MFS: end of 22% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 82_500
+    2019-01-01: 84_200
+    2020-01-01: 85_525
+    2021-01-01: 86_375
+    2022-01-01: 89_075
+    2023-01-01: 95_375
+    2024-01-01: 100_525
+
+parameter threshold_separate_4:
+  description: "MFS: end of 24% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 157_500
+    2019-01-01: 160_725
+    2020-01-01: 163_300
+    2021-01-01: 164_925
+    2022-01-01: 170_050
+    2023-01-01: 182_100
+    2024-01-01: 191_950
+
+parameter threshold_separate_5:
+  description: "MFS: end of 32% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 200_000
+    2019-01-01: 204_100
+    2020-01-01: 207_350
+    2021-01-01: 209_425
+    2022-01-01: 215_950
+    2023-01-01: 231_250
+    2024-01-01: 243_725
+
+parameter threshold_separate_6:
+  description: "MFS: end of 35% bracket (start of 37%)"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 300_000
+    2019-01-01: 306_175
+    2020-01-01: 311_025
+    2021-01-01: 314_150
+    2022-01-01: 323_925
+    2023-01-01: 346_875
+    2024-01-01: 365_600
+
+# === BRACKET THRESHOLDS - HEAD OF HOUSEHOLD ===
+# 26 USC 1(b), indexed per 1(f)
+
+parameter threshold_hoh_1:
+  description: "HOH: end of 10% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 13_600
+    2019-01-01: 13_850
+    2020-01-01: 14_100
+    2021-01-01: 14_200
+    2022-01-01: 14_650
+    2023-01-01: 15_700
+    2024-01-01: 16_550
+
+parameter threshold_hoh_2:
+  description: "HOH: end of 12% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 51_800
+    2019-01-01: 52_850
+    2020-01-01: 53_700
+    2021-01-01: 54_200
+    2022-01-01: 55_900
+    2023-01-01: 59_850
+    2024-01-01: 63_100
+
+parameter threshold_hoh_3:
+  description: "HOH: end of 22% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 82_500
+    2019-01-01: 84_200
+    2020-01-01: 85_500
+    2021-01-01: 86_350
+    2022-01-01: 89_050
+    2023-01-01: 95_350
+    2024-01-01: 100_500
+
+parameter threshold_hoh_4:
+  description: "HOH: end of 24% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 157_500
+    2019-01-01: 160_700
+    2020-01-01: 163_300
+    2021-01-01: 164_900
+    2022-01-01: 170_050
+    2023-01-01: 182_100
+    2024-01-01: 191_950
+
+parameter threshold_hoh_5:
+  description: "HOH: end of 32% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 200_000
+    2019-01-01: 204_100
+    2020-01-01: 207_350
+    2021-01-01: 209_400
+    2022-01-01: 215_950
+    2023-01-01: 231_250
+    2024-01-01: 243_700
+
+parameter threshold_hoh_6:
+  description: "HOH: end of 35% bracket (start of 37%)"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 500_000
+    2019-01-01: 510_300
+    2020-01-01: 518_400
+    2021-01-01: 523_600
+    2022-01-01: 539_900
+    2023-01-01: 578_100
+    2024-01-01: 609_350
+
+# === VARIABLES ===
 
 variable income_tax_before_credits:
+  imports:
+    - 26/63/a#taxable_income
+    - 26/1/h#adjusted_net_capital_gain
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Income Tax Before Credits"
   description: "Federal income tax on ordinary income before credits per 26 USC Section 1"
+  default: 0
   syntax: python
   formula: |
-    if taxable_income <= 0:
+    # Per Section 1(h)(1)(A): Tax on ordinary income at regular rates.
+    # Ordinary income = taxable income - adjusted net capital gain
+    ordinary_income = max(0, taxable_income - adjusted_net_capital_gain)
+    if ordinary_income <= 0:
         return 0
-    return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
-  default: 0
 
-variable income_tax_before_credits_vectorized:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "Income Tax Before Credits (Vectorized)"
-  description: "Vectorized implementation for microsimulation"
-  syntax: python
-  formula: |
-    return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
-  default: 0
+    # Select bracket thresholds based on filing status
+    if filing_status == SINGLE:
+        t1 = threshold_single_1
+        t2 = threshold_single_2
+        t3 = threshold_single_3
+        t4 = threshold_single_4
+        t5 = threshold_single_5
+        t6 = threshold_single_6
+    elif filing_status == JOINT or filing_status == QUALIFYING_WIDOW:
+        t1 = threshold_joint_1
+        t2 = threshold_joint_2
+        t3 = threshold_joint_3
+        t4 = threshold_joint_4
+        t5 = threshold_joint_5
+        t6 = threshold_joint_6
+    elif filing_status == SEPARATE:
+        t1 = threshold_separate_1
+        t2 = threshold_separate_2
+        t3 = threshold_separate_3
+        t4 = threshold_separate_4
+        t5 = threshold_separate_5
+        t6 = threshold_separate_6
+    else:
+        t1 = threshold_hoh_1
+        t2 = threshold_hoh_2
+        t3 = threshold_hoh_3
+        t4 = threshold_hoh_4
+        t5 = threshold_hoh_5
+        t6 = threshold_hoh_6
+
+    # Compute progressive tax using marginal brackets
+    tax = 0
+
+    # 10% bracket: $0 to t1
+    bracket_income = min(ordinary_income, t1)
+    tax = tax + bracket_income * rate_bracket_1
+
+    # 12% bracket: t1 to t2
+    if ordinary_income > t1:
+        bracket_income = min(ordinary_income, t2) - t1
+        tax = tax + bracket_income * rate_bracket_2
+
+    # 22% bracket: t2 to t3
+    if ordinary_income > t2:
+        bracket_income = min(ordinary_income, t3) - t2
+        tax = tax + bracket_income * rate_bracket_3
+
+    # 24% bracket: t3 to t4
+    if ordinary_income > t3:
+        bracket_income = min(ordinary_income, t4) - t3
+        tax = tax + bracket_income * rate_bracket_4
+
+    # 32% bracket: t4 to t5
+    if ordinary_income > t4:
+        bracket_income = min(ordinary_income, t5) - t4
+        tax = tax + bracket_income * rate_bracket_5
+
+    # 35% bracket: t5 to t6
+    if ordinary_income > t5:
+        bracket_income = min(ordinary_income, t6) - t5
+        tax = tax + bracket_income * rate_bracket_6
+
+    # 37% bracket: above t6
+    if ordinary_income > t6:
+        bracket_income = ordinary_income - t6
+        tax = tax + bracket_income * rate_bracket_7
+
+    return tax
+  tests:
+    # =========================================================================
+    # SINGLE FILER TESTS - 26 USC 1(c)
+    # =========================================================================
+    - name: "Single filer, zero taxable income"
+      period: 2024
+      inputs:
+        taxable_income: 0
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      expect: 0
+
+    - name: "Single filer, $10k in 10% bracket (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 10_000
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      # All $10k at 10%: $10,000 * 0.10 = $1,000
+      expect: 1_000
+
+    - name: "Single filer, $30k spanning 10% and 12% brackets (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 30_000
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      # $11,600 at 10%: $1,160.00
+      # $18,400 at 12%: $2,208.00
+      # Total: $3,368.00
+      expect: 3_368
+
+    - name: "Single filer, $50k spanning 10%, 12%, 22% brackets (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 50_000
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      # $11,600 at 10%: $1,160.00
+      # $35,550 at 12%: $4,266.00
+      # $2,850 at 22%: $627.00
+      # Total: $6,053.00
+      expect: 6_053
+
+    - name: "Single filer, $100k income (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 100_000
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      # $11,600 at 10%: $1,160.00
+      # $35,550 at 12%: $4,266.00
+      # $52,850 at 22%: $11,627.00
+      # Total: $17,053.00
+      expect: 17_053
+
+    - name: "Single filer, high income $600k (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 600_000
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      # 10%: $11,600 -> $1,160
+      # 12%: $35,550 -> $4,266
+      # 22%: $53,375 -> $11,742.50
+      # 24%: $91,425 -> $21,942
+      # 32%: $51,775 -> $16,568
+      # 35%: $356,275 -> $124,696.25
+      # Total: $180,374.75
+      expect: 180_374.75
+
+    - name: "Single filer, $1M income in top bracket (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 1_000_000
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      # 10%: $11,600 -> $1,160
+      # 12%: $35,550 -> $4,266
+      # 22%: $53,375 -> $11,742.50
+      # 24%: $91,425 -> $21,942
+      # 32%: $51,775 -> $16,568
+      # 35%: $365,625 -> $127,968.75
+      # 37%: $390,650 -> $144,540.50
+      # Total: $328,187.75
+      expect: 328_187.75
+
+    # =========================================================================
+    # MARRIED FILING JOINTLY TESTS - 26 USC 1(a)
+    # =========================================================================
+    - name: "MFJ, zero taxable income"
+      period: 2024
+      inputs:
+        taxable_income: 0
+        filing_status: JOINT
+        adjusted_net_capital_gain: 0
+      expect: 0
+
+    - name: "MFJ, $20k in 10% bracket (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 20_000
+        filing_status: JOINT
+        adjusted_net_capital_gain: 0
+      # All $20k at 10%: $20,000 * 0.10 = $2,000
+      expect: 2_000
+
+    - name: "MFJ, $50k spanning 10% and 12% (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 50_000
+        filing_status: JOINT
+        adjusted_net_capital_gain: 0
+      # $23,200 at 10%: $2,320
+      # $26,800 at 12%: $3,216
+      # Total: $5,536
+      expect: 5_536
+
+    - name: "MFJ, $100k income (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 100_000
+        filing_status: JOINT
+        adjusted_net_capital_gain: 0
+      # $23,200 at 10%: $2,320
+      # $71,100 at 12%: $8,532
+      # $5,700 at 22%: $1,254
+      # Total: $12,106
+      expect: 12_106
+
+    - name: "MFJ, $200k income (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 200_000
+        filing_status: JOINT
+        adjusted_net_capital_gain: 0
+      # $23,200 at 10%: $2,320
+      # $71,100 at 12%: $8,532
+      # $105,700 at 22%: $23,254
+      # Total: $34,106
+      expect: 34_106
+
+    - name: "MFJ, high income $500k (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 500_000
+        filing_status: JOINT
+        adjusted_net_capital_gain: 0
+      # $23,200 at 10%: $2,320
+      # $71,100 at 12%: $8,532
+      # $106,750 at 22%: $23,485
+      # $182,850 at 24%: $43,884
+      # $103,550 at 32%: $33,136
+      # $12,550 at 35%: $4,392.50
+      # Total: $115,749.50
+      expect: 115_749.50
+
+    # =========================================================================
+    # HEAD OF HOUSEHOLD TESTS - 26 USC 1(b)
+    # =========================================================================
+    - name: "HOH, $15k in 10% bracket (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 15_000
+        filing_status: HEAD_OF_HOUSEHOLD
+        adjusted_net_capital_gain: 0
+      # All $15k at 10%: $15,000 * 0.10 = $1,500
+      expect: 1_500
+
+    - name: "HOH, $25k spanning 10% and 12% (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 25_000
+        filing_status: HEAD_OF_HOUSEHOLD
+        adjusted_net_capital_gain: 0
+      # $16,550 at 10%: $1,655
+      # $8,450 at 12%: $1,014
+      # Total: $2,669
+      expect: 2_669
+
+    - name: "HOH, $60k spanning multiple brackets (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 60_000
+        filing_status: HEAD_OF_HOUSEHOLD
+        adjusted_net_capital_gain: 0
+      # $16,550 at 10%: $1,655
+      # $43,450 at 12%: $5,214
+      # Total: $6,869
+      expect: 6_869
+
+    # =========================================================================
+    # MARRIED FILING SEPARATELY TESTS - 26 USC 1(d)
+    # =========================================================================
+    - name: "MFS, $25k spanning 10% and 12% (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 25_000
+        filing_status: SEPARATE
+        adjusted_net_capital_gain: 0
+      # $11,600 at 10%: $1,160
+      # $13,400 at 12%: $1,608
+      # Total: $2,768
+      expect: 2_768
+
+    - name: "MFS, $250k income (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 250_000
+        filing_status: SEPARATE
+        adjusted_net_capital_gain: 0
+      # $11,600 at 10%: $1,160
+      # $35,550 at 12%: $4,266
+      # $53,375 at 22%: $11,742.50
+      # $91,425 at 24%: $21,942
+      # $51,775 at 32%: $16,568
+      # $6,275 at 35%: $2,196.25
+      # Total: $57,874.75
+      expect: 57_874.75
+
+    # =========================================================================
+    # QUALIFYING WIDOW(ER) TESTS - 26 USC 1(a)
+    # =========================================================================
+    - name: "Qualifying widow, $80k (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 80_000
+        filing_status: QUALIFYING_WIDOW
+        adjusted_net_capital_gain: 0
+      # Same brackets as MFJ
+      # $23,200 at 10%: $2,320
+      # $56,800 at 12%: $6,816
+      # Total: $9,136
+      expect: 9_136
+
+    # =========================================================================
+    # EDGE CASES
+    # =========================================================================
+    - name: "Negative taxable income (loss)"
+      period: 2024
+      inputs:
+        taxable_income: -5_000
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      expect: 0
+
+    - name: "$1 taxable income"
+      period: 2024
+      inputs:
+        taxable_income: 1
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      # $1 at 10%: $0.10
+      expect: 0.10
+
+    - name: "Exactly at bracket boundary - single $11,600 (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 11_600
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      # Exactly at 10% bracket ceiling: $11,600 * 0.10 = $1,160
+      expect: 1_160
+
+    - name: "Just over bracket boundary - single $11,601 (2024)"
+      period: 2024
+      inputs:
+        taxable_income: 11_601
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      # $11,600 at 10%: $1,160
+      # $1 at 12%: $0.12
+      # Total: $1,160.12
+      expect: 1_160.12
+
+    # =========================================================================
+    # CAPITAL GAINS INTERACTION - 26 USC 1(h)
+    # =========================================================================
+    - name: "With capital gains - ordinary income only"
+      period: 2024
+      inputs:
+        taxable_income: 100_000
+        adjusted_net_capital_gain: 30_000
+        filing_status: SINGLE
+      # Ordinary income = $100k - $30k = $70k
+      # $11,600 at 10%: $1,160
+      # $35,550 at 12%: $4,266
+      # $22,850 at 22%: $5,027
+      # Total: $10,453
+      expect: 10_453
+
+    - name: "ANCG exceeds taxable income - zero ordinary tax"
+      period: 2024
+      inputs:
+        taxable_income: 50_000
+        adjusted_net_capital_gain: 60_000
+        filing_status: SINGLE
+      expect: 0
+
+    # =========================================================================
+    # MULTI-YEAR TESTS - Verify bracket indexing
+    # =========================================================================
+    - name: "Single $50k (2023 brackets)"
+      period: 2023
+      inputs:
+        taxable_income: 50_000
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      # 2023: $0-$11,000 at 10%, $11,000-$44,725 at 12%, $44,725+ at 22%
+      # $11,000 at 10%: $1,100
+      # $33,725 at 12%: $4,047
+      # $5,275 at 22%: $1,160.50
+      # Total: $6,307.50
+      expect: 6_307.50
+
+    - name: "Single $50k (2022 brackets)"
+      period: 2022
+      inputs:
+        taxable_income: 50_000
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      # 2022: $0-$10,275 at 10%, $10,275-$41,775 at 12%, $41,775+ at 22%
+      # $10,275 at 10%: $1,027.50
+      # $31,500 at 12%: $3,780
+      # $8,225 at 22%: $1,809.50
+      # Total: $6,617
+      expect: 6_617
+
+    - name: "Single $50k (2018 TCJA first year)"
+      period: 2018
+      inputs:
+        taxable_income: 50_000
+        filing_status: SINGLE
+        adjusted_net_capital_gain: 0
+      # 2018: $0-$9,525 at 10%, $9,525-$38,700 at 12%, $38,700+ at 22%
+      # $9,525 at 10%: $952.50
+      # $29,175 at 12%: $3,501
+      # $11,300 at 22%: $2,486
+      # Total: $6,939.50
+      expect: 6_939.50
 
 variable total_federal_income_tax:
   imports:
     - 26/1#income_tax_before_credits
     - 26/1/h#capital_gains_tax
-    - 26/55/a/amt#alternative_minimum_tax
-    - 26/1411/net_investment_income_tax#net_investment_income_tax
-    - 26/1401/self_employment_tax#self_employment_tax
+    - 26/55/a#alternative_minimum_tax
+    - 26/1411/a#niit
+    - 26/1401/a#self_employment_social_security_tax
+    - 26/1401/b/1#self_employment_medicare_tax
     - 26/3101/b/2#additional_medicare_tax
-    - 26/26#total_nonrefundable_credits
-    - 26/6401/total_refundable_credits#total_refundable_credits
   entity: TaxUnit
   period: Year
   dtype: Money
-  unit: "USD"
+  unit: USD
   label: "Total Federal Income Tax"
-  description: "Final federal income tax liability (negative = refund) per 26 USC Section 1"
+  description: "Total federal income tax liability combining ordinary income, capital gains, AMT, NIIT, and employment taxes per 26 USC Section 1"
+  default: 0
   syntax: python
   formula: |
-    # Regular income tax (on ordinary income)
-    regular_tax = income_tax_before_credits
-    # Capital gains are taxed at preferential rates under Section 1(h)
-    # For taxpayers with capital gains, the actual tax is computed
-    # as the lesser of regular tax or the Section 1(h) calculation
-    # For simplicity, we use the capital gains tax as an add-on here
-    cap_gains_tax = capital_gains_tax
-    # AMT is only the excess over regular tax per Section 55(a)
-    amt = alternative_minimum_tax
-    # NIIT applies in addition to all other taxes
-    niit = net_investment_income_tax
-    # Self-employment tax - aggregate from Person level
-    se_tax = sum(Person.self_employment_tax)
-    # Additional Medicare Tax
-    add_medicare = additional_medicare_tax
-    return regular_tax + cap_gains_tax + amt + niit + se_tax + add_medicare
-  default: 0
+    # Sum all federal income tax components
+    # Note: SE taxes are pre-aggregated from Person level in the microsim
+    return (
+        income_tax_before_credits
+        + capital_gains_tax
+        + alternative_minimum_tax
+        + niit
+        + self_employment_social_security_tax
+        + self_employment_medicare_tax
+        + additional_medicare_tax
+    )
+  tests:
+    - name: "Ordinary income only"
+      period: 2024
+      inputs:
+        income_tax_before_credits: 5_000
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 0
+      expect: 5_000
+
+    - name: "Zero tax liability"
+      period: 2024
+      inputs:
+        income_tax_before_credits: 0
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 0
+      expect: 0
+
+    - name: "All components combined"
+      period: 2024
+      inputs:
+        income_tax_before_credits: 15_000
+        capital_gains_tax: 2_000
+        alternative_minimum_tax: 500
+        niit: 400
+        self_employment_social_security_tax: 2_000
+        self_employment_medicare_tax: 1_000
+        additional_medicare_tax: 200
+      # Total: $15,000 + $2,000 + $500 + $400 + $2,000 + $1,000 + $200 = $21,100
+      expect: 21_100

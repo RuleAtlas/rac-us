@@ -1,0 +1,237 @@
+# 26 USC Section 31 - Tax Withheld on Wages
+# Reference: https://www.law.cornell.edu/uscode/text/26/31
+
+text: """
+26 USC Section 31 - Tax withheld on wages
+
+(a) Wage withholding for income tax purposes
+  (1) In general
+  The amount withheld as tax under chapter 24 shall be allowed to the
+  recipient of the income as a credit against the tax imposed by this
+  subtitle.
+
+  (2) Year of credit
+  The amount so withheld during any calendar year shall be allowed as a
+  credit for the taxable year beginning in such calendar year. If more
+  than one taxable year begins in a calendar year, such amount shall be
+  allowed as a credit for the last taxable year so beginning.
+
+(b) Credit for special refunds of social security tax
+  (1) In general
+  The Secretary may prescribe regulations providing for the crediting
+  against the tax imposed by this subtitle of the amount determined by
+  the taxpayer or the Secretary to be allowable under section 6413(c)
+  as a special refund of tax imposed on wages. The amount so credited
+  shall be treated as an amount withheld at source as tax under section 3402.
+
+  (2) Year of credit
+  Any amount to which paragraph (1) applies shall be allowed as a credit
+  for the taxable year beginning in the calendar year during which the
+  wages were received. If more than one taxable year begins in the calendar
+  year, such amount shall be allowed as a credit for the last taxable year
+  so beginning.
+
+(c) Special rule for backup withholding
+  Any credit allowed by subsection (a) for any amount withheld under
+  section 3406 shall be allowed for the taxable year of the recipient
+  of the income in which the income is includible.
+"""
+
+# =============================================================================
+# INPUTS - External withholding amounts from W-2, 1099, etc.
+# =============================================================================
+
+input federal_income_tax_withheld:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Federal Income Tax Withheld"
+  description: "Amount of federal income tax withheld from wages per chapter 24 (reported on W-2 Box 2)"
+  default: 0
+
+input backup_withholding:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Backup Withholding"
+  description: "Amount withheld under section 3406 for backup withholding (reported on 1099 forms)"
+  default: 0
+
+input social_security_tax_overpayment:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Excess Social Security Tax Withheld"
+  description: "Special refund of social security tax under section 6413(c) when wages from multiple employers exceed wage base"
+  default: 0
+
+# =============================================================================
+# Section 31(a)(1) - Credit for wage withholding
+# =============================================================================
+
+variable wage_withholding_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Credit for Tax Withheld on Wages"
+  description: "Credit against tax for amounts withheld under chapter 24 per 26 USC 31(a)(1)"
+  formula: |
+    # The amount withheld as tax under chapter 24 shall be allowed as a credit
+    return federal_income_tax_withheld
+  default: 0
+  tests:
+    - name: "No withholding results in zero credit"
+      period: 2024
+      inputs:
+        federal_income_tax_withheld: 0
+      expect: 0
+    - name: "Basic wage withholding credit"
+      period: 2024
+      inputs:
+        federal_income_tax_withheld: 5_000
+      expect: 5_000
+    - name: "Large withholding amount"
+      period: 2024
+      inputs:
+        federal_income_tax_withheld: 50_000
+      expect: 50_000
+    - name: "Small withholding amount"
+      period: 2024
+      inputs:
+        federal_income_tax_withheld: 150
+      expect: 150
+
+# =============================================================================
+# Section 31(b)(1) - Credit for special refunds of social security tax
+# =============================================================================
+
+variable social_security_overpayment_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Credit for Excess Social Security Tax"
+  description: "Credit for special refund of social security tax per 26 USC 31(b)(1) and 6413(c)"
+  formula: |
+    # The amount determined to be allowable under section 6413(c) as a
+    # special refund of tax imposed on wages is credited against tax.
+    # This applies when a taxpayer has multiple employers and total
+    # wages exceed the social security wage base.
+    return social_security_tax_overpayment
+  default: 0
+  tests:
+    - name: "No excess social security tax"
+      period: 2024
+      inputs:
+        social_security_tax_overpayment: 0
+      expect: 0
+    - name: "Excess social security from multiple employers"
+      period: 2024
+      inputs:
+        social_security_tax_overpayment: 2_500
+      expect: 2_500
+    - name: "Large excess social security overpayment"
+      period: 2024
+      inputs:
+        social_security_tax_overpayment: 10_000
+      expect: 10_000
+
+# =============================================================================
+# Section 31(c) - Credit for backup withholding
+# =============================================================================
+
+variable backup_withholding_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Credit for Backup Withholding"
+  description: "Credit for amounts withheld under section 3406 per 26 USC 31(c)"
+  formula: |
+    # Any credit allowed by subsection (a) for any amount withheld under
+    # section 3406 shall be allowed for the taxable year of the recipient
+    # of the income in which the income is includible.
+    return backup_withholding
+  default: 0
+  tests:
+    - name: "No backup withholding"
+      period: 2024
+      inputs:
+        backup_withholding: 0
+      expect: 0
+    - name: "Backup withholding from interest income"
+      period: 2024
+      inputs:
+        backup_withholding: 500
+      expect: 500
+    - name: "Backup withholding from multiple sources"
+      period: 2024
+      inputs:
+        backup_withholding: 1_200
+      expect: 1_200
+
+# =============================================================================
+# Total Section 31 Credit - All withholding credits combined
+# =============================================================================
+
+variable total_withholding_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Total Tax Withheld Credit"
+  description: "Total credit for all amounts withheld per 26 USC 31 (wages, SS overpayment, backup)"
+  formula: |
+    # Sum of all withholding credits under section 31:
+    # (a) wage withholding under chapter 24
+    # (b) special refund of social security tax
+    # (c) backup withholding under section 3406
+    return federal_income_tax_withheld + social_security_tax_overpayment + backup_withholding
+  default: 0
+  tests:
+    - name: "No withholding of any type"
+      period: 2024
+      inputs:
+        federal_income_tax_withheld: 0
+        social_security_tax_overpayment: 0
+        backup_withholding: 0
+      expect: 0
+    - name: "Only wage withholding"
+      period: 2024
+      inputs:
+        federal_income_tax_withheld: 8_000
+        social_security_tax_overpayment: 0
+        backup_withholding: 0
+      expect: 8_000
+    - name: "Wage withholding plus backup withholding"
+      period: 2024
+      inputs:
+        federal_income_tax_withheld: 10_000
+        social_security_tax_overpayment: 0
+        backup_withholding: 300
+      expect: 10_300
+    - name: "All three types of withholding"
+      period: 2024
+      inputs:
+        federal_income_tax_withheld: 15_000
+        social_security_tax_overpayment: 1_500
+        backup_withholding: 200
+      expect: 16_700
+    - name: "Only excess social security tax"
+      period: 2024
+      inputs:
+        federal_income_tax_withheld: 0
+        social_security_tax_overpayment: 3_000
+        backup_withholding: 0
+      expect: 3_000
+    - name: "Typical high earner with multiple employers"
+      period: 2024
+      inputs:
+        federal_income_tax_withheld: 45_000
+        social_security_tax_overpayment: 5_000
+        backup_withholding: 0
+      expect: 50_000
