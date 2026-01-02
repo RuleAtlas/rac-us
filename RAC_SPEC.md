@@ -2,6 +2,66 @@
 
 Self-contained statute encoding format for tax and benefit rules.
 
+## Core Principle
+
+**A .rac file encodes ONLY what appears in its source text - no more, no less.**
+
+What IS encoded must be faithful to the text. What ISN'T encoded should be explicitly marked with a status.
+
+This means:
+- Values in the statute text → parameters in the .rac
+- Values from IRS guidance, indexing, etc. → separate data layer (not in .rac)
+- The `indexed_by:` field is a pointer, not a command to include indexed values
+
+## File Status
+
+Every .rac file has an implicit or explicit status:
+
+```yaml
+status: encoded | partial | draft | consolidated | deferred | boilerplate | entity_not_supported | obsolete
+
+notes: "optional context"
+```
+
+| Status | Meaning | Has formula? |
+|--------|---------|--------------|
+| `encoded` | Fully implemented | Yes |
+| `partial` | Some provisions in text encoded, others pending | Yes (incomplete) |
+| `draft` | Work in progress | Partial |
+| `consolidated` | Captured in parent/sibling file | No |
+| `deferred` | Too complex, return later | No |
+| `boilerplate` | Definitions, cross-refs, no computational content | No |
+| `entity_not_supported` | Needs entity type not yet modeled (corps, trusts) | No |
+| `obsolete` | Historical provision no longer in effect | No |
+
+**Default**: Files without explicit `status:` are assumed `encoded`.
+
+Examples:
+
+```yaml
+# 26 USC 1(g) - Kiddie Tax
+status: deferred
+notes: "Parent-child income linkage needed"
+text: """..."""
+```
+
+```yaml
+# 26 USC 1(a)(1) - MFJ definition clause
+status: consolidated
+notes: "Rate table in 26/1/a.rac"
+text: """..."""
+```
+
+```yaml
+# 26 USC 32(b)(1) - Credit percentage
+status: partial
+notes: "Credit percentage done; investment income disqualification pending"
+text: """..."""
+parameter credit_percentage: ...
+variable eitc_credit_pct: ...
+# investment_income_test not yet encoded
+```
+
 ## File Structure
 
 ```yaml
