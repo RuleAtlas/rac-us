@@ -1,0 +1,245 @@
+# 26 USC 21 - Expenses for household and dependent care services necessary for gainful employment
+# https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title26-section21
+
+text: """
+SEC. 21. EXPENSES FOR HOUSEHOLD AND DEPENDENT CARE SERVICES NECESSARY FOR GAINFUL EMPLOYMENT.
+
+(a) ALLOWANCE OF CREDIT.
+(1) IN GENERAL. -- In the case of an individual who maintains a household which
+includes as a member one or more qualifying individuals (as defined in
+subsection (b)(1)), there shall be allowed as a credit against the tax
+imposed by this chapter for the taxable year an amount equal to the
+applicable percentage of the employment-related expenses (as defined in
+subsection (b)(2)) paid by such individual during the taxable year.
+
+(2) APPLICABLE PERCENTAGE DEFINED. -- For purposes of paragraph (1), the term
+"applicable percentage" means 35 percent reduced (but not below 20 percent)
+by 1 percentage point for each $2,000 (or fraction thereof) by which the
+taxpayer's adjusted gross income for the taxable year exceeds $15,000.
+
+(b) DEFINITIONS OF QUALIFYING INDIVIDUAL AND EMPLOYMENT-RELATED EXPENSES.
+(1) QUALIFYING INDIVIDUAL. -- The term "qualifying individual" means --
+(A) a dependent of the taxpayer (as defined in section 152(a)(1)) who has not
+    attained age 13,
+(B) a dependent of the taxpayer (as defined in section 152(a)(1)) who is physically
+    or mentally incapable of caring for himself or herself and who has the same
+    principal place of abode as the taxpayer for more than one-half of such
+    taxable year, or
+(C) the spouse of the taxpayer, if the spouse is physically or mentally incapable
+    of caring for himself or herself and who has the same principal place of abode
+    as the taxpayer for more than one-half of such taxable year.
+
+(c) DOLLAR LIMIT ON AMOUNT CREDITABLE. -- The amount of the employment-related
+expenses incurred during any taxable year which may be taken into account
+under subsection (a) shall not exceed --
+(1) $3,000 if there is 1 qualifying individual with respect to the taxpayer
+    for such taxable year, or
+(2) $6,000 if there are 2 or more qualifying individuals with respect to
+    the taxpayer for such taxable year.
+
+(d) EARNED INCOME LIMITATION.
+(1) IN GENERAL. -- Except as otherwise provided in this subsection, the
+amount of the employment-related expenses incurred during any taxable year
+which may be taken into account under subsection (a) shall not exceed --
+(A) in the case of an individual who is not married at the close of such year,
+    such individual's earned income for such year, or
+(B) in the case of an individual who is married at the close of such year,
+    the lesser of such individual's earned income or the earned income
+    of his spouse for such year.
+
+(2) SPECIAL RULE FOR SPOUSE WHO IS A STUDENT OR INCAPABLE OF CARING FOR HIMSELF. --
+In the case of a spouse who is a full-time student at an educational institution
+or who is physically or mentally incapable of caring for himself, such spouse shall
+be deemed for each month during which such spouse is a full-time student or is so
+incapable to be gainfully employed and to have earned income of not less than --
+(A) $250 if there is 1 qualifying individual, or
+(B) $500 if there are 2 or more qualifying individuals.
+
+(e) SPECIAL RULES.
+[See 26/21/e.rac for eligibility requirements including joint filing, marital status, etc.]
+
+(f) REGULATIONS. -- The Secretary shall prescribe such regulations as may be necessary.
+[Administrative - skip encoding]
+
+(g)-(h) [2021 ARPA temporary rules - expired, skip encoding]
+"""
+
+# =============================================================================
+# Main Credit Calculation - 26 USC 21(a)
+# =============================================================================
+# The child and dependent care credit equals:
+# applicable_percentage * min(employment_expenses, expense_limit, earned_income_limit)
+#
+# Components from subsections:
+# - applicable_percentage: from 26/21/b (35% down to 20% based on AGI)
+# - expense_limit: from 26/21/c ($3,000 for 1, $6,000 for 2+)
+# - earned_income_limit: from 26/21/d (lesser of taxpayer's/spouse's earned income)
+# - num_qualifying_individuals: from 26/21/e (count of qualifying dependents)
+
+input cdcc_expenses_paid:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "CDCC Expenses Paid"
+  description: "Employment-related child/dependent care expenses paid during the year per 26 USC 21(b)(2)"
+  default: 0
+
+variable child_and_dependent_care_credit:
+  imports:
+    - 26/21/b#applicable_percentage
+    - 26/21/c#expense_limit
+    - 26/21/d#earned_income_limit
+    - 26/21/e#num_qualifying_individuals
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Child and Dependent Care Credit"
+  description: "Credit for employment-related expenses for care of qualifying individuals per 26 USC 21(a)"
+  formula: |
+    # 26 USC 21(a): No credit if no qualifying individuals
+    if num_qualifying_individuals == 0:
+      return 0
+
+    # Qualified expenses = actual expenses capped by both:
+    # (c) dollar limit based on number of qualifying individuals
+    # (d) earned income limitation
+    qualified_expenses = min(cdcc_expenses_paid, expense_limit, earned_income_limit)
+
+    # 26 USC 21(a)(1): Credit = applicable percentage * qualified expenses
+    return applicable_percentage * qualified_expenses
+  tests:
+    # ==========================================================================
+    # Basic functionality tests
+    # ==========================================================================
+    - name: "No qualifying individuals returns zero credit"
+      period: 2024
+      inputs:
+        num_qualifying_individuals: 0
+        cdcc_expenses_paid: 5_000
+        applicable_percentage: 0.35
+        expense_limit: 3_000
+        earned_income_limit: 50_000
+      expect: 0
+
+    - name: "One child - low AGI gets maximum 35% rate"
+      period: 2024
+      inputs:
+        num_qualifying_individuals: 1
+        cdcc_expenses_paid: 3_000
+        applicable_percentage: 0.35
+        expense_limit: 3_000
+        earned_income_limit: 15_000
+      # At 35% rate: 3,000 * 0.35 = 1,050
+      expect: 1_050
+
+    - name: "One child - AGI above threshold reduces percentage"
+      period: 2024
+      inputs:
+        num_qualifying_individuals: 1
+        cdcc_expenses_paid: 3_000
+        applicable_percentage: 0.30
+        expense_limit: 3_000
+        earned_income_limit: 25_000
+      # At 30% rate: 3,000 * 0.30 = 900
+      expect: 900
+
+    # ==========================================================================
+    # Dollar limit tests - 26 USC 21(c)
+    # ==========================================================================
+    - name: "Two children - high AGI hits 20% floor rate"
+      period: 2024
+      inputs:
+        num_qualifying_individuals: 2
+        cdcc_expenses_paid: 8_000
+        applicable_percentage: 0.20
+        expense_limit: 6_000
+        earned_income_limit: 60_000
+      # Expenses capped at $6,000 (two children), 20% rate: 6,000 * 0.20 = 1,200
+      expect: 1_200
+
+    - name: "Expenses capped at one-child statutory limit"
+      period: 2024
+      inputs:
+        num_qualifying_individuals: 1
+        cdcc_expenses_paid: 5_000
+        applicable_percentage: 0.22
+        expense_limit: 3_000
+        earned_income_limit: 40_000
+      # Expenses capped at $3,000: 3,000 * 0.22 = 660
+      expect: 660
+
+    - name: "Expenses capped at two-child statutory limit"
+      period: 2024
+      inputs:
+        num_qualifying_individuals: 2
+        cdcc_expenses_paid: 10_000
+        applicable_percentage: 0.25
+        expense_limit: 6_000
+        earned_income_limit: 50_000
+      # Expenses capped at $6,000: 6,000 * 0.25 = 1,500
+      expect: 1_500
+
+    # ==========================================================================
+    # Earned income limit tests - 26 USC 21(d)
+    # ==========================================================================
+    - name: "Earned income limit constrains expenses"
+      period: 2024
+      inputs:
+        num_qualifying_individuals: 1
+        cdcc_expenses_paid: 5_000
+        applicable_percentage: 0.35
+        expense_limit: 3_000
+        earned_income_limit: 2_000
+      # Earned income ($2,000) is less than expense limit ($3,000)
+      # Qualified expenses = 2,000, credit = 2,000 * 0.35 = 700
+      expect: 700
+
+    - name: "Zero earned income produces zero credit"
+      period: 2024
+      inputs:
+        num_qualifying_individuals: 1
+        cdcc_expenses_paid: 3_000
+        applicable_percentage: 0.35
+        expense_limit: 3_000
+        earned_income_limit: 0
+      # No earned income = no qualified expenses
+      expect: 0
+
+    # ==========================================================================
+    # Edge cases
+    # ==========================================================================
+    - name: "Three or more qualifying individuals same as two"
+      period: 2024
+      inputs:
+        num_qualifying_individuals: 3
+        cdcc_expenses_paid: 12_000
+        applicable_percentage: 0.33
+        expense_limit: 6_000
+        earned_income_limit: 80_000
+      # Three children still uses $6,000 limit: 6,000 * 0.33 = 1,980
+      expect: 1_980
+
+    - name: "All limits interact - expenses are binding constraint"
+      period: 2024
+      inputs:
+        num_qualifying_individuals: 2
+        cdcc_expenses_paid: 2_000
+        applicable_percentage: 0.28
+        expense_limit: 6_000
+        earned_income_limit: 40_000
+      # Actual expenses ($2,000) < dollar limit < earned income
+      # Credit = 2,000 * 0.28 = 560
+      expect: 560
+
+    - name: "Maximum credit - two children at lowest AGI tier"
+      period: 2024
+      inputs:
+        num_qualifying_individuals: 2
+        cdcc_expenses_paid: 10_000
+        applicable_percentage: 0.35
+        expense_limit: 6_000
+        earned_income_limit: 100_000
+      # Maximum credit = 6,000 * 0.35 = 2,100
+      expect: 2_100

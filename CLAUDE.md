@@ -23,12 +23,16 @@ cosilico-us/
 └── scripts/              # Validation and conversion tools
 ```
 
-## Filepath = Citation
+## Filepath = Citation (NEVER duplicate)
 
 ```
 statute/26/32/c/2/A.rac  →  26 USC § 32(c)(2)(A)
 statute/7/2017/a.rac     →  7 USC § 2017(a)
 ```
+
+**⚠️ The filepath IS the citation. NEVER store citation separately.**
+- ❌ `citation: "26 USC 1"` + `file: "statute/26/1.rac"` — REDUNDANT
+- ✓ `file: "statute/26/1.rac"` — filepath encodes the citation
 
 ## .rac Format v2
 

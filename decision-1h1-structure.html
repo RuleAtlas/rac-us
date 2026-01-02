@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>26 USC 1(h)(1) Structure Decision</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --void: #08080c;
+      --void-light: #0f0f14;
+      --void-lighter: #16161d;
+      --cyan: #00d4ff;
+      --cyan-dim: rgba(0, 212, 255, 0.15);
+      --cyan-glow: rgba(0, 212, 255, 0.4);
+      --green: #00ff88;
+      --amber: #ffaa00;
+      --red: #ff4466;
+      --text: #e8e8ed;
+      --text-dim: #8888a0;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-serif: 'Crimson Pro', Georgia, serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--void);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* Grid background */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 20%, black 40%, transparent 100%);
+    }
+
+    .grid-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 50%);
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .citation {
+      font-size: 0.75rem;
+      color: var(--cyan);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--text) 0%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    /* Section styling */
+    section {
+      margin-bottom: 4rem;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      color: var(--cyan);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      padding-left: 1rem;
+      border-left: 2px solid var(--cyan);
+    }
+
+    /* Statute cards */
+    .statute-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+    }
+
+    .statute-card {
+      background: var(--void-light);
+      border: 1px solid var(--void-lighter);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.3s ease;
+    }
+
+    .statute-card:hover {
+      border-color: var(--cyan-dim);
+    }
+
+    .statute-header {
+      padding: 1.25rem 1.5rem;
+      background: var(--void-lighter);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .statute-tag {
+      background: var(--cyan);
+      color: var(--void);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.25rem 0.5rem;
+      border-radius: 3px;
+    }
+
+    .statute-tag.rate-25 {
+      background: var(--amber);
+    }
+
+    .statute-tag.rate-28 {
+      background: var(--red);
+    }
+
+    .statute-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .statute-body {
+      padding: 1.5rem;
+    }
+
+    .statute-text {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--text);
+    }
+
+    .statute-text .clause {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    .statute-text .emphasis {
+      color: var(--amber);
+      font-style: italic;
+    }
+
+    /* File structure visualization */
+    .file-tree {
+      background: var(--void-light);
+      border: 1px solid var(--void-lighter);
+      border-radius: 8px;
+      padding: 2rem;
+      font-size: 0.85rem;
+    }
+
+    .tree-line {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0;
+    }
+
+    .tree-indent {
+      color: var(--text-dim);
+      user-select: none;
+    }
+
+    .tree-file {
+      color: var(--text);
+    }
+
+    .tree-file.parent {
+      color: var(--cyan);
+    }
+
+    .tree-file.orphan {
+      color: var(--amber);
+    }
+
+    .tree-status {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      margin-left: auto;
+    }
+
+    .tree-status.inline {
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--green);
+    }
+
+    .tree-status.orphan {
+      background: rgba(255, 170, 0, 0.15);
+      color: var(--amber);
+    }
+
+    .tree-status.new {
+      background: rgba(0, 212, 255, 0.15);
+      color: var(--cyan);
+    }
+
+    /* Options comparison */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .option-card {
+      background: var(--void-light);
+      border: 2px solid var(--void-lighter);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .option-card:hover {
+      border-color: var(--cyan);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 60px var(--cyan-dim);
+    }
+
+    .option-card.selected {
+      border-color: var(--cyan);
+      box-shadow: 0 0 30px var(--cyan-dim);
+    }
+
+    .option-header {
+      padding: 1.5rem;
+      background: var(--void-lighter);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .option-label {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .option-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .option-body {
+      padding: 1.5rem;
+    }
+
+    .option-desc {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+    }
+
+    .pros-cons {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .pros h4, .cons h4 {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .pros h4 {
+      color: var(--green);
+    }
+
+    .cons h4 {
+      color: var(--red);
+    }
+
+    .pros ul, .cons ul {
+      list-style: none;
+      font-size: 0.8rem;
+    }
+
+    .pros li, .cons li {
+      padding: 0.4rem 0;
+      padding-left: 1.25rem;
+      position: relative;
+      color: var(--text-dim);
+    }
+
+    .pros li::before {
+      content: '+';
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .cons li::before {
+      content: '-';
+      position: absolute;
+      left: 0;
+      color: var(--red);
+      font-weight: 600;
+    }
+
+    /* Code preview */
+    .code-preview {
+      background: var(--void);
+      border: 1px solid var(--void-lighter);
+      border-radius: 6px;
+      margin-top: 1.5rem;
+      overflow: hidden;
+    }
+
+    .code-header {
+      padding: 0.5rem 1rem;
+      background: var(--void-lighter);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .code-body {
+      padding: 1rem;
+      font-size: 0.75rem;
+      overflow-x: auto;
+    }
+
+    .code-body code {
+      color: var(--text-dim);
+    }
+
+    .code-body .keyword {
+      color: var(--cyan);
+    }
+
+    .code-body .string {
+      color: var(--green);
+    }
+
+    .code-body .comment {
+      color: #555;
+      font-style: italic;
+    }
+
+    .code-body .deleted {
+      color: var(--red);
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    .code-body .added {
+      color: var(--green);
+    }
+
+    /* Recommendation banner */
+    .recommendation {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 255, 136, 0.05) 100%);
+      border: 1px solid var(--cyan-dim);
+      border-radius: 8px;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .rec-icon {
+      font-size: 2rem;
+    }
+
+    .rec-content h3 {
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+      color: var(--cyan);
+    }
+
+    .rec-content p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* Beads issues */
+    .beads-list {
+      background: var(--void-light);
+      border: 1px solid var(--void-lighter);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .bead-item {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--void-lighter);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.8rem;
+    }
+
+    .bead-item:last-child {
+      border-bottom: none;
+    }
+
+    .bead-id {
+      font-size: 0.7rem;
+      color: var(--cyan);
+      font-weight: 500;
+      min-width: 100px;
+    }
+
+    .bead-priority {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+
+    .bead-priority.p2 {
+      background: rgba(255, 170, 0, 0.15);
+      color: var(--amber);
+    }
+
+    .bead-priority.p3 {
+      background: rgba(136, 136, 160, 0.15);
+      color: var(--text-dim);
+    }
+
+    .bead-title {
+      color: var(--text);
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <div class="container">
+    <header>
+      <div class="citation">Internal Revenue Code</div>
+      <h1>26 USC 1(h)(1) Structure Decision</h1>
+      <p class="subtitle">Capital Gains Tax Rate Provisions - File Architecture</p>
+    </header>
+
+    <!-- Raw Statute Text -->
+    <section>
+      <div class="section-label">Raw Statute Text</div>
+      <div class="statute-grid">
+        <div class="statute-card">
+          <div class="statute-header">
+            <span class="statute-tag rate-25">25%</span>
+            <span class="statute-title">Subparagraph (E) - Unrecaptured Section 1250 Gain</span>
+          </div>
+          <div class="statute-body">
+            <p class="statute-text">
+              <span class="clause">(E)</span> <span class="emphasis">25 percent</span> of the excess (if any) of&mdash;
+              <br><br>
+              <span class="clause">(i)</span> the unrecaptured section 1250 gain (or, if less, the net capital gain (determined without regard to paragraph (11))), over
+              <br><br>
+              <span class="clause">(ii)</span> the excess (if any) of&mdash;
+              <br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="clause">(I)</span> the sum of the amount on which tax is determined under subparagraph (A) plus the net capital gain, over
+              <br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="clause">(II)</span> taxable income
+            </p>
+          </div>
+        </div>
+
+        <div class="statute-card">
+          <div class="statute-header">
+            <span class="statute-tag rate-28">28%</span>
+            <span class="statute-title">Subparagraph (F) - Collectibles & 1202 Gain</span>
+          </div>
+          <div class="statute-body">
+            <p class="statute-text">
+              <span class="clause">(F)</span> <span class="emphasis">28 percent</span> of the amount of taxable income in excess of the sum of the amounts on which tax is determined under the preceding subparagraphs of this paragraph.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Current File Structure -->
+    <section>
+      <div class="section-label">Current File Structure</div>
+      <div class="file-tree">
+        <div class="tree-line">
+          <span class="tree-indent"></span>
+          <span class="tree-file">statute/26/1/h/</span>
+        </div>
+        <div class="tree-line">
+          <span class="tree-indent">├──</span>
+          <span class="tree-file parent">1.rac</span>
+          <span class="tree-status inline">894 lines, complete implementation</span>
+        </div>
+        <div class="tree-line">
+          <span class="tree-indent">└── 1/</span>
+        </div>
+        <div class="tree-line">
+          <span class="tree-indent">&nbsp;&nbsp;&nbsp;&nbsp;├──</span>
+          <span class="tree-file orphan">E.rac</span>
+          <span class="tree-status new">NEW</span>
+          <span class="tree-status orphan">orphaned</span>
+        </div>
+        <div class="tree-line">
+          <span class="tree-indent">&nbsp;&nbsp;&nbsp;&nbsp;└──</span>
+          <span class="tree-file orphan">F.rac</span>
+          <span class="tree-status new">NEW</span>
+          <span class="tree-status orphan">orphaned</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- What's in 1.rac -->
+    <section>
+      <div class="section-label">What's in h/1.rac (894 lines)</div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+        <!-- Parameters -->
+        <div class="statute-card">
+          <div class="statute-header">
+            <span class="statute-tag">PARAMETERS</span>
+            <span class="statute-title">Lines 50-177</span>
+          </div>
+          <div class="statute-body">
+            <div class="code-preview" style="margin: 0;">
+              <div class="code-body">
+<code><span class="comment"># Thresholds (inflation-adjusted)</span>
+<span class="keyword">parameter</span> zero_rate_threshold:     <span class="comment"># 0% bracket ceiling</span>
+<span class="keyword">parameter</span> fifteen_rate_threshold:  <span class="comment"># 15% bracket ceiling</span>
+
+<span class="comment"># Rates (statutory)</span>
+<span class="keyword">parameter</span> zero_rate:      <span class="string">0.00</span>  <span class="comment"># (B)</span>
+<span class="keyword">parameter</span> fifteen_rate:   <span class="string">0.15</span>  <span class="comment"># (C)</span>
+<span class="keyword">parameter</span> twenty_rate:    <span class="string">0.20</span>  <span class="comment"># (D)</span>
+<span class="keyword">parameter</span> unrecaptured_1250_rate: <span class="string">0.25</span>  <span class="comment"># (E) ← defined HERE</span>
+<span class="keyword">parameter</span> twentyeight_rate: <span class="string">0.28</span>  <span class="comment"># (F) ← defined HERE</span></code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variables -->
+        <div class="statute-card">
+          <div class="statute-header">
+            <span class="statute-tag">VARIABLES</span>
+            <span class="statute-title">Lines 196-894</span>
+          </div>
+          <div class="statute-body">
+            <div class="code-preview" style="margin: 0;">
+              <div class="code-body">
+<code><span class="keyword">variable</span> subparagraph_a_amount   <span class="comment"># ordinary income base</span>
+<span class="keyword">variable</span> subparagraph_b_amount   <span class="comment"># 0% bracket</span>
+<span class="keyword">variable</span> subparagraph_c_amount   <span class="comment"># 15% bracket</span>
+<span class="keyword">variable</span> subparagraph_d_amount   <span class="comment"># 20% bracket</span>
+<span class="keyword">variable</span> subparagraph_a_tax ... subparagraph_d_tax
+
+<span class="comment"># Main formula (lines 730-893)</span>
+<span class="keyword">variable</span> capital_gains_tax_under_1h1:
+  <span class="keyword">formula:</span> |
+    <span class="comment"># ... computes (A) through (D) ...</span>
+
+    <span class="comment"># === (E): 25% rate ===</span>
+    e_amount = max(0, e_amount_i - e_amount_ii)
+    e_tax = e_amount * unrecaptured_1250_rate
+
+    <span class="comment"># === (F): 28% rate ===</span>
+    f_amount = min(excess, twentyeight_percent_rate_gain)
+    f_tax = f_amount * twentyeight_rate</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="recommendation" style="background: linear-gradient(135deg, rgba(255, 170, 0, 0.1) 0%, rgba(255, 68, 102, 0.05) 100%); border-color: rgba(255, 170, 0, 0.3);">
+        <div class="rec-icon" style="color: var(--amber);">&#9888;</div>
+        <div class="rec-content">
+          <h3 style="color: var(--amber);">Key Insight: Rates are already in 1.rac</h3>
+          <p>
+            The 25% and 28% rates are defined as parameters in <code>1.rac</code> (lines 165-177), not in subparagraph files.
+            The new <code>E.rac</code> and <code>F.rac</code> <strong>duplicate</strong> these rate definitions.
+            Paragraph (h)(1) reads as one integrated computation: "the tax... shall not exceed the sum of (A) plus (B) plus... (F)".
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- The Problem -->
+    <section>
+      <div class="section-label">The Problem: 1.rac Violates "Filepath = Citation"</div>
+
+      <div class="recommendation" style="background: linear-gradient(135deg, rgba(255, 68, 102, 0.15) 0%, rgba(255, 68, 102, 0.05) 100%); border-color: rgba(255, 68, 102, 0.4);">
+        <div class="rec-icon" style="color: var(--red);">&#10060;</div>
+        <div class="rec-content">
+          <h3 style="color: var(--red);">1.rac has content that belongs in child files</h3>
+          <p>
+            The RAC spec is clear: <strong>"Each file encodes the DEEPEST subsection that defines it."</strong>
+            The statute says "(E) <em>25 percent</em>..." - so the 25% rate belongs in E.rac, not 1.rac.
+            The statute says "(F) <em>28 percent</em>..." - so the 28% rate belongs in F.rac, not 1.rac.
+          </p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+        <!-- What's Wrong -->
+        <div class="statute-card" style="border-color: rgba(255, 68, 102, 0.3);">
+          <div class="statute-header" style="background: rgba(255, 68, 102, 0.1);">
+            <span class="statute-tag" style="background: var(--red);">WRONG</span>
+            <span class="statute-title">Current 1.rac (894 lines)</span>
+          </div>
+          <div class="statute-body">
+            <div class="code-preview" style="margin: 0;">
+              <div class="code-body">
+<code><span class="comment"># These parameters belong in CHILD files:</span>
+<span class="deleted">parameter unrecaptured_1250_rate: 0.25</span>  <span class="comment"># → E.rac</span>
+<span class="deleted">parameter twentyeight_rate: 0.28</span>  <span class="comment"># → F.rac</span>
+<span class="deleted">parameter zero_rate: 0.00</span>  <span class="comment"># → B.rac</span>
+<span class="deleted">parameter fifteen_rate: 0.15</span>  <span class="comment"># → C.rac</span>
+<span class="deleted">parameter twenty_rate: 0.20</span>  <span class="comment"># → D.rac</span>
+
+<span class="comment"># These variables belong in CHILD files:</span>
+<span class="deleted">variable subparagraph_a_amount</span>  <span class="comment"># → A.rac</span>
+<span class="deleted">variable subparagraph_b_amount</span>  <span class="comment"># → B.rac</span>
+<span class="deleted">variable subparagraph_c_amount</span>  <span class="comment"># → C.rac</span>
+<span class="deleted">variable subparagraph_d_amount</span>  <span class="comment"># → D.rac</span>
+
+<span class="comment"># Inline (E)/(F) computation:</span>
+<span class="deleted">e_amount = max(0, ...)</span>  <span class="comment"># → E.rac</span>
+<span class="deleted">f_amount = min(...)</span>  <span class="comment"># → F.rac</span></code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- What's Right -->
+        <div class="statute-card" style="border-color: rgba(0, 255, 136, 0.3);">
+          <div class="statute-header" style="background: rgba(0, 255, 136, 0.1);">
+            <span class="statute-tag" style="background: var(--green);">CORRECT</span>
+            <span class="statute-title">Target 1.rac (~50 lines)</span>
+          </div>
+          <div class="statute-body">
+            <div class="code-preview" style="margin: 0;">
+              <div class="code-body">
+<code><span class="comment"># 1.rac ONLY does what paragraph (1) says:</span>
+<span class="comment"># "the tax... shall not exceed the SUM of"</span>
+
+<span class="keyword">variable</span> capital_gains_tax_under_1h1:
+  <span class="keyword">imports:</span>
+    <span class="added">- 26/1/h/1/A#subparagraph_a_tax</span>
+    <span class="added">- 26/1/h/1/B#subparagraph_b_tax</span>
+    <span class="added">- 26/1/h/1/C#subparagraph_c_tax</span>
+    <span class="added">- 26/1/h/1/D#subparagraph_d_tax</span>
+    <span class="added">- 26/1/h/1/E#subparagraph_e_tax</span>
+    <span class="added">- 26/1/h/1/F#subparagraph_f_tax</span>
+  <span class="keyword">formula:</span> |
+    <span class="comment"># Just the sum - that's all (1) says</span>
+    <span class="added">return sum([a_tax, b_tax, c_tax,</span>
+    <span class="added">            d_tax, e_tax, f_tax])</span></code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Required Work -->
+    <section>
+      <div class="section-label">Required Work</div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+        <div class="statute-card">
+          <div class="statute-header">
+            <span class="statute-tag" style="background: var(--green);">DONE</span>
+            <span class="statute-title">E.rac, F.rac</span>
+          </div>
+          <div class="statute-body" style="font-size: 0.8rem; color: var(--text-dim);">
+            Already created with correct parameters and formulas. Just need to integrate.
+          </div>
+        </div>
+
+        <div class="statute-card">
+          <div class="statute-header">
+            <span class="statute-tag" style="background: var(--amber);">TODO</span>
+            <span class="statute-title">A.rac, B.rac, C.rac, D.rac</span>
+          </div>
+          <div class="statute-body" style="font-size: 0.8rem; color: var(--text-dim);">
+            Extract from 1.rac. Each gets its rate parameter + amount/tax variables.
+          </div>
+        </div>
+
+        <div class="statute-card">
+          <div class="statute-header">
+            <span class="statute-tag" style="background: var(--amber);">TODO</span>
+            <span class="statute-title">Refactor 1.rac</span>
+          </div>
+          <div class="statute-body" style="font-size: 0.8rem; color: var(--text-dim);">
+            Remove inline code. Import from A-F.rac. Keep only the sum formula.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Beads -->
+    <section>
+      <div class="section-label">Related Beads Issues</div>
+      <div class="beads-list">
+        <div class="bead-item">
+          <span class="bead-id">CosilicoAI-1cg</span>
+          <span class="bead-priority p2">P2</span>
+          <span class="bead-title">26/1/h/1/E.rac is orphaned - not imported by parent h/1.rac</span>
+        </div>
+        <div class="bead-item">
+          <span class="bead-id">CosilicoAI-z30</span>
+          <span class="bead-priority p2">P2</span>
+          <span class="bead-title">Determine file hierarchy: F.rac appears orphaned from parent h/1.rac</span>
+        </div>
+        <div class="bead-item">
+          <span class="bead-id">CosilicoAI-a7z</span>
+          <span class="bead-priority p2">P2</span>
+          <span class="bead-title">Resolve duplicate twentyeight_rate parameter in 26/1/h/1/F.rac and h/1.rac</span>
+        </div>
+        <div class="bead-item">
+          <span class="bead-id">CosilicoAI-b6o</span>
+          <span class="bead-priority p3">P3</span>
+          <span class="bead-title">Duplicate unrecaptured_1250_rate parameter in E.rac and h/1.rac</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Clear Direction -->
+    <section>
+      <div class="recommendation">
+        <div class="rec-icon">&#10003;</div>
+        <div class="rec-content">
+          <h3>Clear Direction: Refactor to match RAC spec</h3>
+          <p>
+            Create A.rac, B.rac, C.rac, D.rac (E.rac and F.rac already exist).
+            Each subparagraph file owns its rate parameter and computes its tax.
+            Refactor 1.rac to import and sum. No other option is valid.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Simple click handler for options
+    document.querySelectorAll('.option-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+      });
+    });
+  </script>
+</body>
+</html>
