@@ -114,6 +114,112 @@ formula: |
   return 0
 ```
 
+## ⚠️ Pattern Library (MUST USE)
+
+When you see these statutory patterns, use the corresponding RAC construct.
+**Do NOT implement these manually - use the built-in functions.**
+
+### Progressive Tax Brackets → `marginal_agg()`
+
+When statute has a rate table like:
+```
+If taxable income is:          The tax is:
+Not over $X                    A% of taxable income
+Over $X but not over $Y        $Z, plus B% of excess over $X
+```
+
+**MUST use:**
+```yaml
+parameter brackets:
+  values:
+    2018-01-01:
+      thresholds: [0, 19050, 77400, 165000, 315000, 400000, 600000]
+      rates: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+
+variable income_tax:
+  formula: |
+    return marginal_agg(taxable_income, brackets)
+```
+
+**NEVER write manual bracket loops:**
+```yaml
+# ❌ WRONG - 80 lines of manual computation
+formula: |
+  if taxable_income <= threshold_1:
+    return taxable_income * rate_1
+  elif taxable_income <= threshold_2:
+    return threshold_1 * rate_1 + (taxable_income - threshold_1) * rate_2
+  # ... 6 more brackets
+```
+
+### Filing Status Variations → Threshold by Category
+
+When brackets differ by filing status (single, joint, HoH, MFS):
+
+```yaml
+parameter brackets:
+  values:
+    2018-01-01:
+      thresholds:
+        single: [0, 9525, 38700, 82500, 157500, 200000, 500000]
+        joint: [0, 19050, 77400, 165000, 315000, 400000, 600000]
+        hoh: [0, 13600, 51800, 82500, 157500, 200000, 500000]
+        mfs: [0, 9525, 38700, 82500, 157500, 200000, 300000]
+      rates: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+
+variable income_tax:
+  imports: [26/1#filing_status]
+  formula: |
+    return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
+```
+
+### Step Function Lookup → `cut()`
+
+When statute says "if X is at least Y, the amount is Z":
+
+```yaml
+parameter benefit_schedule:
+  values:
+    2024-01-01:
+      thresholds: [0, 100, 130]
+      amounts:
+        1: [291, 200, 0]  # household size 1
+        2: [535, 391, 0]  # household size 2
+
+variable snap_max_benefit:
+  formula: |
+    return cut(net_income_pct, benefit_schedule, amount_by=household_size)
+```
+
+### Phase-Out (AGI-based) → Linear Reduction
+
+```yaml
+parameter phase_out:
+  values:
+    2024-01-01:
+      start: 200000
+      end: 240000
+      rate: 0.05  # 5% reduction per $1000 over start
+
+variable credit_after_phaseout:
+  formula: |
+    reduction = max(0, (agi - phase_out.start) * phase_out.rate)
+    return max(0, base_credit - reduction)
+```
+
+### Pattern Recognition Checklist
+
+Before encoding, identify which pattern applies:
+
+| Statutory Language | Pattern | RAC Construct |
+|-------------------|---------|---------------|
+| "rate table", "if income is..." | Progressive brackets | `marginal_agg()` |
+| "by filing status" | Category variation | `threshold_by=` |
+| "maximum benefit of $X" | Step function | `cut()` |
+| "reduced by $Y for each $Z" | Phase-out | Linear formula |
+| "shall not exceed" | Cap/limit | `min()` |
+| "the greater of" | Floor | `max()`|
+
 ## Test Syntax
 
 ```yaml
