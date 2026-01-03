@@ -1,5 +1,0 @@
-# 26 USC §32(c)(3)(D)(i) - TIN requirement for qualifying child
-variable child_has_valid_tin:
-  entity: Person
-  period: Year
-  dtype: Boolean

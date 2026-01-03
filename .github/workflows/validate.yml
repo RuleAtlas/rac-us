@@ -22,6 +22,9 @@ jobs:
       - name: Validate .rac schema
         run: python3 scripts/validate_schema.py
 
+      - name: Validate imports resolve
+        run: python3 scripts/validate_imports.py
+
       - name: Checkout cosilico-validators
         uses: actions/checkout@v4
         with:

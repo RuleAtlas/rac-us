@@ -1,5 +1,0 @@
-# 26 USC §32(b)(2)(B) - Joint Return Adjustment
-variable joint_return_adjustment:
-  entity: TaxUnit
-  period: Year
-  dtype: Money

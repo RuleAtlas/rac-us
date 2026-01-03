@@ -1,5 +1,0 @@
-# 26 USC §32(c)(3)(C) - Place of abode requirement
-variable child_meets_place_of_abode:
-  entity: Person
-  period: Year
-  dtype: Boolean
