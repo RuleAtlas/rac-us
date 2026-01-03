@@ -225,6 +225,24 @@ formula: |
   return 0
 ```
 
+## Validation Rules
+
+These rules are enforced by CI (automated pytest checks):
+
+| Rule | Description |
+|------|-------------|
+| No magic numbers | Only -1, 0, 1, 2, 3 allowed in formulas |
+| Param values in text | Every parameter value must appear in the `text:` field |
+| Imports resolve | All `imports:` paths must reference existing files/variables |
+| Large number separators | Numbers ≥1000 must use `_` separator (e.g., `10_000`) |
+
+**Param values in text** catches:
+- Hallucinated values (LLM made it up)
+- Copy-paste from other statutes
+- Rev Proc values when encoding statute-only
+
+Allowed exceptions: 0 and 1 (common defaults), percentage conversions (0.075 ↔ "7.5%")
+
 ## ⚠️ Pattern Library (MUST USE)
 
 When you see these statutory patterns, use the corresponding RAC construct.
