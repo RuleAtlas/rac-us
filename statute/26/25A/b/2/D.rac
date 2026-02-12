@@ -1,27 +1,17 @@
 # 26 USC 25A(b)(2)(D) - Denial of credit for felony drug conviction
 
-"""
-(D) Denial of credit to students with felony drug convictions
-A student shall not be treated as an eligible student for purposes of this
-section if the student has been convicted of a Federal or State felony
-offense consisting of the possession or distribution of a controlled
-substance before the end of the taxable year with respect to which this
-section is being applied.
-"""
+# (D) Denial of credit to students with felony drug convictions
+# A student shall not be treated as an eligible student for purposes of this
+# section if the student has been convicted of a Federal or State felony
+# offense consisting of the possession or distribution of a controlled
+# substance before the end of the taxable year with respect to which this
+# section is being applied.
 
-has_felony_drug_conviction:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Has Felony Drug Conviction"
-  description: "Whether the student has been convicted of a Federal or State felony offense for possession or distribution of a controlled substance per 26 USC 25A(b)(2)(D)"
-  default: false
+variable has_felony_drug_conviction:
+    entity: person
+    from 2024-01-01: 0
 
-eligible_student_drug_conviction_disqualified:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Disqualified by Felony Drug Conviction"
-  description: "Whether student is disqualified from eligible student status due to felony drug conviction per 26 USC 25A(b)(2)(D)"
-  from 2013-01-01:
-    return has_felony_drug_conviction
+
+variable eligible_student_drug_conviction_disqualified:
+    entity: person
+    from 2013-01-01: has_felony_drug_conviction

@@ -1,12 +1,10 @@
 # 26 USC 25A(b)(2)(B) - Credit allowed for year only if individual is at least half-time student
 
-"""
-(B) Credit allowed for year only if individual is at least 1/2 time student for portion of year
+# (B) Credit allowed for year only if individual is at least 1/2 time student for portion of year
 
-The American Opportunity Tax Credit under subsection (a)(1) shall not be allowed for a taxable
-year with respect to the qualified tuition and related expenses of an individual unless such
-individual is an eligible student for at least one academic period which begins during such year.
-"""
+# The American Opportunity Tax Credit under subsection (a)(1) shall not be allowed for a taxable
+# year with respect to the qualified tuition and related expenses of an individual unless such
+# individual is an eligible student for at least one academic period which begins during such year.
 
 # This subsection establishes a half-time student requirement for the American Opportunity Tax Credit.
 # An "eligible student" is defined in 25A(b)(3) as someone who:
@@ -16,25 +14,15 @@ individual is an eligible student for at least one academic period which begins 
 # academic period beginning in the taxable year.
 
 # Minimum number of academic periods required for AOTC eligibility
-min_academic_periods_for_aotc:
-  description: "Minimum academic periods as eligible student required for AOTC per 26 USC 25A(b)(2)(B)"
-  from 1997-08-05: 1
+variable min_academic_periods_for_aotc:
+    from 1997-08-05: 1
 
-eligible_student_academic_periods:
-  entity: Person
-  period: Year
-  dtype: Integer
-  label: "Academic Periods as Eligible Student"
-  description: "Number of academic periods beginning during the year for which the individual is an eligible student per 26 USC 25A(b)(3)"
-  default: 0
 
-aotc_half_time_requirement_met:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "AOTC Half-Time Requirement Met"
-  description: "Whether individual meets half-time student requirement for AOTC per 26 USC 25A(b)(2)(B)"
-  from 1997-08-05:
-    # Credit allowed only if individual is an eligible student (at least half-time)
-    # for at least one academic period beginning during the taxable year
-    return eligible_student_academic_periods >= min_academic_periods_for_aotc
+variable eligible_student_academic_periods:
+    entity: person
+    from 2024-01-01: 0
+
+
+variable aotc_half_time_requirement_met:
+    entity: person
+    from 1997-08-05: eligible_student_academic_periods >= min_academic_periods_for_aotc

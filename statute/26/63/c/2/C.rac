@@ -1,49 +1,34 @@
 # 26 USC 63(c)(2)(C) - Basic standard deduction - other cases
 
-"""
-(C) $3,000 in any other case.
+# (C) $3,000 in any other case.
 
-Note: Per 26 USC 63(c)(7)(A)(ii), for taxable years beginning after December 31, 2017,
-paragraph (2) shall be applied by substituting "$15,750" for "$3,000" in subparagraph (C).
+# Note: Per 26 USC 63(c)(7)(A)(ii), for taxable years beginning after December 31, 2017,
+# paragraph (2) shall be applied by substituting "$15,750" for "$3,000" in subparagraph (C).
 
-Per 26 USC 63(c)(7)(B)(ii), for taxable years beginning after 2025, the $15,750 amount
-shall be increased by inflation adjustment.
-"""
+# Per 26 USC 63(c)(7)(B)(ii), for taxable years beginning after 2025, the $15,750 amount
+# shall be increased by inflation adjustment.
 
 # Base standard deduction for single filers and MFS
 # This is the reference amount that (A) doubles for joint/surviving spouse
 
-basic_std_ded_other_pre_tcja:
-  description: "Basic standard deduction for single/other filers before TCJA per 26 USC 63(c)(2)(C)"
-  indexed_by: cpi_adjustment
-  from 1988-01-01: 3000
+variable basic_std_ded_other_pre_tcja:
+    from 1988-01-01: 3000
 
-basic_std_ded_other_tcja:
-  description: "Basic standard deduction for single/other filers under TCJA per 26 USC 63(c)(7)(A)(ii)"
-  indexed_by: cpi_adjustment
-  from 2018-01-01: 12000
-  from 2026-01-01: 15750
 
-tcja_effective_year:
-  description: "Year TCJA standard deduction provisions took effect"
-  from 1988-01-01: 2018
+variable basic_std_ded_other_tcja:
+    from 2018-01-01: 12000
+    from 2026-01-01: 15750
 
-basic_std_ded_other:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "Basic Standard Deduction - Other Cases"
-  description: "Basic standard deduction for unmarried individuals (other than HoH or surviving spouse) per 26 USC 63(c)(2)(C)"
-  from 1988-01-01:
-    # TCJA provisions apply for taxable years beginning after 2017
-    if tax_year >= tcja_effective_year:
-      return basic_std_ded_other_tcja
-    return basic_std_ded_other_pre_tcja
 
-tax_year:
-  entity: TaxUnit
-  period: Year
-  dtype: Integer
-  label: "Tax Year"
-  description: "The taxable year"
+variable tcja_effective_year:
+    from 1988-01-01: 2018
+
+
+variable basic_std_ded_other:
+    entity: taxunit
+    from 1988-01-01: basic_std_ded_other_pre_tcja
+
+
+variable tax_year:
+    entity: taxunit
+    from 2024-01-01: 0

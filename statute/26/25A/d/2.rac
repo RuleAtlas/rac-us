@@ -1,57 +1,33 @@
 # 26 USC 25A(d)(2) - Modified adjusted gross income
 
-"""
-(2) Modified adjusted gross income
-The term "modified adjusted gross income" means the adjusted gross income of the
-taxpayer for the taxable year increased by any amount excluded from gross income
-under section 911, 931, or 933.
-"""
+# (2) Modified adjusted gross income
+# The term "modified adjusted gross income" means the adjusted gross income of the
+# taxpayer for the taxable year increased by any amount excluded from gross income
+# under section 911, 931, or 933.
 
 # No parameters needed - this subsection defines a term, not values.
 # The amounts excluded under sections 911/931/933 are inputs from those sections.
 
-adjusted_gross_income:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Adjusted Gross Income"
-  description: "AGI per 26 USC 62(a)"
-  default: 0
+variable adjusted_gross_income:
+    entity: taxunit
+    from 2024-01-01: 0
 
-section_911_exclusion:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Section 911 Exclusion"
-  description: "Foreign earned income exclusion per 26 USC 911"
-  default: 0
 
-section_931_exclusion:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Section 931 Exclusion"
-  description: "Income from sources within Guam, American Samoa, or CNMI per 26 USC 931"
-  default: 0
+variable section_911_exclusion:
+    entity: taxunit
+    from 2024-01-01: 0
 
-section_933_exclusion:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Section 933 Exclusion"
-  description: "Income from sources within Puerto Rico per 26 USC 933"
-  default: 0
 
-magi_for_25A:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Modified AGI for Education Credits"
-  description: "Modified adjusted gross income for purposes of 26 USC 25A per subsection (d)(2)"
-  from 2013-01-01:
-    return adjusted_gross_income + section_911_exclusion + section_931_exclusion + section_933_exclusion
+variable section_931_exclusion:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable section_933_exclusion:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable magi_for_25A:
+    entity: taxunit
+    from 2013-01-01: adjusted_gross_income + section_911_exclusion + section_931_exclusion + section_933_exclusion

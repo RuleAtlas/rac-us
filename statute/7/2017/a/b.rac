@@ -1,16 +1,14 @@
 # 7 USC 2017(a) - Value of allotment: Benefits not deemed income or resources
 
-status: boilerplate
+# status: boilerplate
 
-"""
-(b) Benefits not deemed income or resources for certain purposes
-The value of benefits that may be provided under this chapter shall not be
-considered income or resources for any purpose under any Federal, State, or
-local laws, including, but not limited to, laws relating to taxation, welfare,
-and public assistance programs, and no participating State or political
-subdivision thereof shall decrease any assistance otherwise provided an
-individual or individuals because of the receipt of benefits under this chapter.
-"""
+# (b) Benefits not deemed income or resources for certain purposes
+# The value of benefits that may be provided under this chapter shall not be
+# considered income or resources for any purpose under any Federal, State, or
+# local laws, including, but not limited to, laws relating to taxation, welfare,
+# and public assistance programs, and no participating State or political
+# subdivision thereof shall decrease any assistance otherwise provided an
+# individual or individuals because of the receipt of benefits under this chapter.
 
 # This subsection is a legal exclusion rule: SNAP benefits must not be counted
 # as income or resources under any Federal, State, or local law. It contains
@@ -18,12 +16,6 @@ individual or individuals because of the receipt of benefits under this chapter.
 # legal protection. Encoded as a Boolean variable that is always true for any
 # individual receiving SNAP benefits.
 
-snap_benefits_excluded_from_income:
-  entity: Person
-  period: Month
-  dtype: Boolean
-  label: "SNAP Benefits Excluded from Income"
-  description: "Whether SNAP benefits are excluded from income and resources per 7 USC 2017(a)(b)"
-  default: true
-  from 2013-01-01:
-    return true
+variable snap_benefits_excluded_from_income:
+    entity: person
+    from 2013-01-01: true

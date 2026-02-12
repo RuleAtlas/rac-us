@@ -1,17 +1,15 @@
-"""
-(e) Allotments for households residing in centers
-(1) In general
-In the case of an individual who resides in a center for the purpose of a drug
-or alcoholic treatment program described in section 2012(m)(5) of this title,
-a State agency may provide an allotment for the individual to—
-(A) the center as an authorized representative of the individual for a period
-that is less than 1 month; and
-(B) the individual, if the individual leaves the center.
-(2) Direct payment
-A State agency may require an individual referred to in paragraph (1) to
-designate the center in which the individual resides as the authorized
-representative of the individual for the purpose of receiving an allotment.
-"""
+# (e) Allotments for households residing in centers
+# (1) In general
+# In the case of an individual who resides in a center for the purpose of a drug
+# or alcoholic treatment program described in section 2012(m)(5) of this title,
+# a State agency may provide an allotment for the individual to—
+# (A) the center as an authorized representative of the individual for a period
+# that is less than 1 month; and
+# (B) the individual, if the individual leaves the center.
+# (2) Direct payment
+# A State agency may require an individual referred to in paragraph (1) to
+# designate the center in which the individual resides as the authorized
+# representative of the individual for the purpose of receiving an allotment.
 
 # This subsection governs allotment routing for individuals in drug/alcoholic
 # treatment centers per 7 USC 2012(m)(5). It is procedural: State agencies MAY
@@ -21,50 +19,24 @@ representative of the individual for the purpose of receiving an allotment.
 #   - Individual receives allotment if they leave the center
 # No rates, dollar amounts, or formulas beyond boolean routing logic.
 
-resides_in_treatment_center:
-  entity: Person
-  period: Month
-  dtype: Boolean
-  label: "Resides in Treatment Center"
-  description: "Whether individual resides in a center for drug or alcoholic treatment per 7 USC 2012(m)(5)"
-  default: false
+variable resides_in_treatment_center:
+    entity: person
+    from 2024-01-01: 0
 
-has_left_treatment_center:
-  entity: Person
-  period: Month
-  dtype: Boolean
-  label: "Has Left Treatment Center"
-  description: "Whether individual has left the treatment center"
-  default: false
+
+variable has_left_treatment_center:
+    entity: person
+    from 2024-01-01: 0
+
 
 # (e)(1)(A): center receives allotment as authorized representative
 # for a period that is less than 1 month
-allotment_payable_to_center:
-  entity: Person
-  period: Month
-  dtype: Boolean
-  label: "Allotment Payable to Treatment Center"
-  description: "Whether the allotment is provided to the treatment center as authorized representative per 7 USC 2017(a)(e)(1)(A)"
-  from 2013-01-01:
-    # Center receives allotment only if individual resides there
-    # and has not left; statute limits this to periods < 1 month
-    # (period constraint enforced by State agency administration)
-    if resides_in_treatment_center and not has_left_treatment_center:
-      return true
-    return false
+variable allotment_payable_to_center:
+    entity: person
+    from 2013-01-01: false
+
 
 # (e)(1)(B): individual receives allotment if they leave the center
-allotment_payable_to_individual:
-  entity: Person
-  period: Month
-  dtype: Boolean
-  label: "Allotment Payable to Individual"
-  description: "Whether the allotment is provided directly to the individual per 7 USC 2017(a)(e)(1)(B)"
-  from 2013-01-01:
-    # Individual receives allotment if they have left the center
-    if resides_in_treatment_center and has_left_treatment_center:
-      return true
-    # Also payable to individual if not in treatment center at all
-    if not resides_in_treatment_center:
-      return true
-    return false
+variable allotment_payable_to_individual:
+    entity: person
+    from 2013-01-01: false

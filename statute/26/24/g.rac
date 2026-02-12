@@ -1,114 +1,72 @@
 # 26 USC 24(g) - Restrictions on taxpayers who improperly claimed credit in prior year
 
-"""
-(g) Restrictions on taxpayers who improperly claimed credit in prior year
-(1) Taxpayers making prior fraudulent or reckless claims
-(A) In general
-No credit shall be allowed under this section for any taxable year in the
-disallowance period.
-(B) Disallowance period
-For purposes of subparagraph (A), the disallowance period is—
-(i) the period of 10 taxable years after the most recent taxable year for which
-there was a final determination that the taxpayer's claim of credit under this
-section was due to fraud, and
-(ii) the period of 2 taxable years after the most recent taxable year for which
-there was a final determination that the taxpayer's claim of credit under this
-section was due to reckless or intentional disregard of rules and regulations
-(but not due to fraud).
+# (g) Restrictions on taxpayers who improperly claimed credit in prior year
+# (1) Taxpayers making prior fraudulent or reckless claims
+# (A) In general
+# No credit shall be allowed under this section for any taxable year in the
+# disallowance period.
+# (B) Disallowance period
+# For purposes of subparagraph (A), the disallowance period is—
+# (i) the period of 10 taxable years after the most recent taxable year for which
+# there was a final determination that the taxpayer's claim of credit under this
+# section was due to fraud, and
+# (ii) the period of 2 taxable years after the most recent taxable year for which
+# there was a final determination that the taxpayer's claim of credit under this
+# section was due to reckless or intentional disregard of rules and regulations
+# (but not due to fraud).
 
-(2) Taxpayers making improper prior claims
-In the case of a taxpayer who is denied credit under this section for any taxable
-year as a result of the deficiency procedures under subchapter B of chapter 63,
-no credit shall be allowed under this section for any subsequent taxable year
-unless the taxpayer provides such information as the Secretary may require to
-demonstrate eligibility for such credit.
-"""
+# (2) Taxpayers making improper prior claims
+# In the case of a taxpayer who is denied credit under this section for any taxable
+# year as a result of the deficiency procedures under subchapter B of chapter 63,
+# no credit shall be allowed under this section for any subsequent taxable year
+# unless the taxpayer provides such information as the Secretary may require to
+# demonstrate eligibility for such credit.
 
 # Disallowance period for fraud
-ctc_fraud_disallowance_years:
-  description: "Disallowance period for fraudulent CTC claims per 26 USC 24(g)(1)(B)(i)"
-  unit: years
-  from 2016-01-01: 10
+variable ctc_fraud_disallowance_years:
+    from 2016-01-01: 10
+
 
 # Disallowance period for reckless/intentional disregard
-ctc_reckless_disallowance_years:
-  description: "Disallowance period for reckless CTC claims per 26 USC 24(g)(1)(B)(ii)"
-  unit: years
-  from 2016-01-01: 2
+variable ctc_reckless_disallowance_years:
+    from 2016-01-01: 2
 
-ctc_fraud_determination_year:
-  entity: TaxUnit
-  period: Year
-  dtype: Integer
-  label: "CTC Fraud Determination Year"
-  description: "Year of final determination of fraudulent CTC claim (0 if none)"
 
-ctc_reckless_determination_year:
-  entity: TaxUnit
-  period: Year
-  dtype: Integer
-  label: "CTC Reckless Determination Year"
-  description: "Year of final determination of reckless CTC claim (0 if none)"
+variable ctc_fraud_determination_year:
+    entity: taxunit
+    from 2024-01-01: 0
 
-ctc_deficiency_requires_documentation:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "CTC Documentation Required"
-  description: "Whether taxpayer must provide documentation due to prior denial per 26 USC 24(g)(2)"
 
-ctc_documentation_provided:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "CTC Documentation Provided"
-  description: "Whether required documentation has been provided"
+variable ctc_reckless_determination_year:
+    entity: taxunit
+    from 2024-01-01: 0
 
-current_tax_year:
-  entity: TaxUnit
-  period: Year
-  dtype: Integer
-  label: "Current Tax Year"
-  description: "The current taxable year"
 
-ctc_in_fraud_disallowance_period:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "In CTC Fraud Disallowance Period"
-  description: "Whether taxpayer is in disallowance period due to fraud per 26 USC 24(g)(1)(B)(i)"
-  from 2016-01-01:
-    if ctc_fraud_determination_year == 0:
-      return False
-    years_since_fraud = current_tax_year - ctc_fraud_determination_year
-    return years_since_fraud <= ctc_fraud_disallowance_years
+variable ctc_deficiency_requires_documentation:
+    entity: taxunit
+    from 2024-01-01: 0
 
-ctc_in_reckless_disallowance_period:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "In CTC Reckless Disallowance Period"
-  description: "Whether taxpayer is in disallowance period due to reckless claim per 26 USC 24(g)(1)(B)(ii)"
-  from 2016-01-01:
-    if ctc_reckless_determination_year == 0:
-      return False
-    years_since_reckless = current_tax_year - ctc_reckless_determination_year
-    return years_since_reckless <= ctc_reckless_disallowance_years
 
-ctc_disallowed_prior_claim:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "CTC Disallowed Due to Prior Claim"
-  description: "Whether CTC is disallowed due to prior improper claim per 26 USC 24(g)"
-  from 2016-01-01:
-    # Fraud disallowance
-    if ctc_in_fraud_disallowance_period:
-      return True
-    # Reckless disallowance
-    if ctc_in_reckless_disallowance_period:
-      return True
-    # Documentation requirement not met
-    if ctc_deficiency_requires_documentation and not ctc_documentation_provided:
-      return True
-    return False
+variable ctc_documentation_provided:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable current_tax_year:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable ctc_in_fraud_disallowance_period:
+    entity: taxunit
+    from 2016-01-01: (current_tax_year - ctc_fraud_determination_year) <= ctc_fraud_disallowance_years
+
+
+variable ctc_in_reckless_disallowance_period:
+    entity: taxunit
+    from 2016-01-01: (current_tax_year - ctc_reckless_determination_year) <= ctc_reckless_disallowance_years
+
+
+variable ctc_disallowed_prior_claim:
+    entity: taxunit
+    from 2016-01-01: False

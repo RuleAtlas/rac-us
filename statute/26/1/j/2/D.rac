@@ -1,123 +1,78 @@
 # 26 USC 1(j)(2)(D) - Married individuals filing separate returns
 
-"""
-(D) Married individuals filing separate returns
-The following table shall be applied in lieu of the table contained in subsection (d):
+# (D) Married individuals filing separate returns
+# The following table shall be applied in lieu of the table contained in subsection (d):
 
-If taxable income is:                    The tax is:
-Not over $9,525                          10% of taxable income.
-Over $9,525 but not over $38,700         $952.50, plus 12% of the excess over $9,525.
-Over $38,700 but not over $82,500        $4,453.50, plus 22% of the excess over $38,700.
-Over $82,500 but not over $157,500       $14,089.50, plus 24% of the excess over $82,500.
-Over $157,500 but not over $200,000      $32,089.50, plus 32% of the excess over $157,500.
-Over $200,000 but not over $300,000      $45,689.50, plus 35% of the excess over $200,000.
-Over $300,000                            $80,689.50, plus 37% of the excess over $300,000.
-"""
+# If taxable income is:                    The tax is:
+# Not over $9,525                          10% of taxable income.
+# Over $9,525 but not over $38,700         $952.50, plus 12% of the excess over $9,525.
+# Over $38,700 but not over $82,500        $4,453.50, plus 22% of the excess over $38,700.
+# Over $82,500 but not over $157,500       $14,089.50, plus 24% of the excess over $82,500.
+# Over $157,500 but not over $200,000      $32,089.50, plus 32% of the excess over $157,500.
+# Over $200,000 but not over $300,000      $45,689.50, plus 35% of the excess over $200,000.
+# Over $300,000                            $80,689.50, plus 37% of the excess over $300,000.
 
-mfs_bracket_1_threshold:
-  description: "First bracket threshold for MFS per 26 USC 1(j)(2)(D)"
-  indexed_by: cpi_adjustment
-  from 2018-01-01: 0
+variable mfs_bracket_1_threshold:
+    from 2018-01-01: 0
 
-mfs_bracket_2_threshold:
-  description: "Second bracket threshold for MFS per 26 USC 1(j)(2)(D)"
-  indexed_by: cpi_adjustment
-  from 2018-01-01: 9525
 
-mfs_bracket_3_threshold:
-  description: "Third bracket threshold for MFS per 26 USC 1(j)(2)(D)"
-  indexed_by: cpi_adjustment
-  from 2018-01-01: 38700
+variable mfs_bracket_2_threshold:
+    from 2018-01-01: 9525
 
-mfs_bracket_4_threshold:
-  description: "Fourth bracket threshold for MFS per 26 USC 1(j)(2)(D)"
-  indexed_by: cpi_adjustment
-  from 2018-01-01: 82500
 
-mfs_bracket_5_threshold:
-  description: "Fifth bracket threshold for MFS per 26 USC 1(j)(2)(D)"
-  indexed_by: cpi_adjustment
-  from 2018-01-01: 157500
+variable mfs_bracket_3_threshold:
+    from 2018-01-01: 38700
 
-mfs_bracket_6_threshold:
-  description: "Sixth bracket threshold for MFS per 26 USC 1(j)(2)(D)"
-  indexed_by: cpi_adjustment
-  from 2018-01-01: 200000
 
-mfs_bracket_7_threshold:
-  description: "Seventh bracket threshold for MFS per 26 USC 1(j)(2)(D)"
-  indexed_by: cpi_adjustment
-  from 2018-01-01: 300000
+variable mfs_bracket_4_threshold:
+    from 2018-01-01: 82500
 
-rate_1:
-  description: "First marginal rate per 26 USC 1(j)(2)"
-  from 2018-01-01: 0.10
 
-rate_2:
-  description: "Second marginal rate per 26 USC 1(j)(2)"
-  from 2018-01-01: 0.12
+variable mfs_bracket_5_threshold:
+    from 2018-01-01: 157500
 
-rate_3:
-  description: "Third marginal rate per 26 USC 1(j)(2)"
-  from 2018-01-01: 0.22
 
-rate_4:
-  description: "Fourth marginal rate per 26 USC 1(j)(2)"
-  from 2018-01-01: 0.24
+variable mfs_bracket_6_threshold:
+    from 2018-01-01: 200000
 
-rate_5:
-  description: "Fifth marginal rate per 26 USC 1(j)(2)"
-  from 2018-01-01: 0.32
 
-rate_6:
-  description: "Sixth marginal rate per 26 USC 1(j)(2)"
-  from 2018-01-01: 0.35
+variable mfs_bracket_7_threshold:
+    from 2018-01-01: 300000
 
-rate_7:
-  description: "Seventh marginal rate per 26 USC 1(j)(2)"
-  from 2018-01-01: 0.37
 
-taxable_income:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Taxable Income"
-  description: "Taxable income as determined under 26 USC 63"
+variable rate_1:
+    from 2018-01-01: 0.10
 
-mfs_income_tax:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "Income Tax (MFS)"
-  description: "Income tax for married filing separately per 26 USC 1(j)(2)(D)"
-  from 2018-01-01:
-    # Bracket 1: 10% of income up to threshold 2
-    bracket_1_income = min(taxable_income, mfs_bracket_2_threshold)
-    tax_1 = bracket_1_income * rate_1
 
-    # Bracket 2: 12% of income between thresholds 2 and 3
-    bracket_2_income = max(0, min(taxable_income, mfs_bracket_3_threshold) - mfs_bracket_2_threshold)
-    tax_2 = bracket_2_income * rate_2
+variable rate_2:
+    from 2018-01-01: 0.12
 
-    # Bracket 3: 22% of income between thresholds 3 and 4
-    bracket_3_income = max(0, min(taxable_income, mfs_bracket_4_threshold) - mfs_bracket_3_threshold)
-    tax_3 = bracket_3_income * rate_3
 
-    # Bracket 4: 24% of income between thresholds 4 and 5
-    bracket_4_income = max(0, min(taxable_income, mfs_bracket_5_threshold) - mfs_bracket_4_threshold)
-    tax_4 = bracket_4_income * rate_4
+variable rate_3:
+    from 2018-01-01: 0.22
 
-    # Bracket 5: 32% of income between thresholds 5 and 6
-    bracket_5_income = max(0, min(taxable_income, mfs_bracket_6_threshold) - mfs_bracket_5_threshold)
-    tax_5 = bracket_5_income * rate_5
 
-    # Bracket 6: 35% of income between thresholds 6 and 7
-    bracket_6_income = max(0, min(taxable_income, mfs_bracket_7_threshold) - mfs_bracket_6_threshold)
-    tax_6 = bracket_6_income * rate_6
+variable rate_4:
+    from 2018-01-01: 0.24
 
-    # Bracket 7: 37% of income above threshold 7
-    bracket_7_income = max(0, taxable_income - mfs_bracket_7_threshold)
-    tax_7 = bracket_7_income * rate_7
 
-    return tax_1 + tax_2 + tax_3 + tax_4 + tax_5 + tax_6 + tax_7
+variable rate_5:
+    from 2018-01-01: 0.32
+
+
+variable rate_6:
+    from 2018-01-01: 0.35
+
+
+variable rate_7:
+    from 2018-01-01: 0.37
+
+
+variable taxable_income:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable mfs_income_tax:
+    entity: taxunit
+    from 2018-01-01: (bracket_1_income * rate_1) + (bracket_2_income * rate_2) + (bracket_3_income * rate_3) + (bracket_4_income * rate_4) + (bracket_5_income * rate_5) + (bracket_6_income * rate_6) + (bracket_7_income * rate_7)

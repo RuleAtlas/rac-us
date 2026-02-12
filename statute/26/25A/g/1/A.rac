@@ -1,55 +1,33 @@
 # 26 USC 25A(g)(1)(A) - Social security number requirement
 # status: stub - created for import resolution from 26/25A/g/1
 
-"""
-(A) Social security number requirement
-No credit shall be allowed under subsection (a) to an individual unless the
-individual includes on the return of tax for the taxable year—
-(i) such individual's social security number, and
-(ii) in the case of a credit with respect to the qualified tuition and related
-expenses of an individual other than the taxpayer or the taxpayer's spouse, the
-name and social security number of such individual.
-"""
+# (A) Social security number requirement
+# No credit shall be allowed under subsection (a) to an individual unless the
+# individual includes on the return of tax for the taxable year—
+# (i) such individual's social security number, and
+# (ii) in the case of a credit with respect to the qualified tuition and related
+# expenses of an individual other than the taxpayer or the taxpayer's spouse, the
+# name and social security number of such individual.
 
 # This is a Boolean eligibility check: taxpayer must include valid SSN on return
 # For credits claimed on behalf of others (non-spouse students), student's name and SSN also required
 # SSN definition in subparagraph (C) cross-references 26 USC 24(h)(7)
 
-taxpayer_has_valid_ssn:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Taxpayer Has Valid SSN"
-  description: "Whether taxpayer has a valid SSN per 26 USC 25A(g)(1)(A)(i)"
-  default: True
+variable taxpayer_has_valid_ssn:
+    entity: taxunit
+    from 2024-01-01: 0
 
-student_ssn_provided:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Student SSN Provided"
-  description: "Whether student's name and SSN are provided when required per 26 USC 25A(g)(1)(A)(ii)"
-  default: True
 
-claiming_for_non_spouse_dependent:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Claiming for Non-Spouse Dependent"
-  description: "Whether credit is claimed for individual other than taxpayer or taxpayer's spouse"
-  default: False
+variable student_ssn_provided:
+    entity: taxunit
+    from 2024-01-01: 0
 
-ssn_requirement_met:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "SSN Requirement Met"
-  description: "Whether SSN requirements of 26 USC 25A(g)(1)(A) are satisfied"
-  from 2013-01-01:
-    # Per (i): Taxpayer must include their SSN
-    if not taxpayer_has_valid_ssn:
-      return False
-    # Per (ii): If claiming for non-spouse dependent, their name and SSN required
-    if claiming_for_non_spouse_dependent and not student_ssn_provided:
-      return False
-    return True
+
+variable claiming_for_non_spouse_dependent:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable ssn_requirement_met:
+    entity: taxunit
+    from 2013-01-01: True

@@ -1,50 +1,32 @@
 # 26 USC 24(e) - Identification requirements
 
-"""
-(e) Identification requirements
-(1) Qualifying child identification requirement
-No credit shall be allowed under this section to a taxpayer with respect to any
-qualifying child unless the taxpayer includes the name and taxpayer identification
-number of such qualifying child on the return of tax for the taxable year and
-such taxpayer identification number was issued on or before the due date for
-filing such return.
+# (e) Identification requirements
+# (1) Qualifying child identification requirement
+# No credit shall be allowed under this section to a taxpayer with respect to any
+# qualifying child unless the taxpayer includes the name and taxpayer identification
+# number of such qualifying child on the return of tax for the taxable year and
+# such taxpayer identification number was issued on or before the due date for
+# filing such return.
 
-(2) Taxpayer identification requirement
-No credit shall be allowed under this section if the taxpayer identification number
-of the taxpayer was issued after the due date for filing the return for the taxable year.
-"""
+# (2) Taxpayer identification requirement
+# No credit shall be allowed under this section if the taxpayer identification number
+# of the taxpayer was issued after the due date for filing the return for the taxable year.
 
-child_has_valid_tin:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Child Has Valid TIN"
-  description: "Whether child has TIN issued on or before return due date per 26 USC 24(e)(1)"
+variable child_has_valid_tin:
+    entity: person
+    from 2024-01-01: 0
 
-taxpayer_has_valid_tin:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Taxpayer Has Valid TIN"
-  description: "Whether taxpayer TIN was issued on or before return due date per 26 USC 24(e)(2)"
 
-ctc_meets_id_requirements:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "CTC Meets ID Requirements"
-  description: "Whether taxpayer meets identification requirements per 26 USC 24(e)"
-  from 2013-01-01:
-    # Taxpayer must have valid TIN
-    if not taxpayer_has_valid_tin:
-      return False
-    return True
+variable taxpayer_has_valid_tin:
+    entity: taxunit
+    from 2024-01-01: 0
 
-child_meets_ctc_id_requirement:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Child Meets CTC ID Requirement"
-  description: "Whether child meets identification requirement per 26 USC 24(e)(1)"
-  from 2013-01-01:
-    return child_has_valid_tin
+
+variable ctc_meets_id_requirements:
+    entity: taxunit
+    from 2013-01-01: True
+
+
+variable child_meets_ctc_id_requirement:
+    entity: person
+    from 2013-01-01: child_has_valid_tin

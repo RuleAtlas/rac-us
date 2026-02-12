@@ -1,18 +1,16 @@
 # 26 USC 25A(g)(3) - Treatment of expenses paid by dependent
 
-"""
-(3) Treatment of expenses paid by dependent
-If a deduction under section 151 with respect to an individual is allowed to another
-taxpayer for a taxable year beginning in the calendar year in which such individual's
-taxable year begins—
-  (A) no credit shall be allowed under subsection (a) to such individual for such
-      individual's taxable year,
-  (B) qualified tuition and related expenses paid by such individual during such
-      individual's taxable year shall be treated for purposes of this section as
-      paid by such other taxpayer, and
-  (C) a statement described in paragraph (8) and received by such individual shall
-      be treated as received by the taxpayer.
-"""
+# (3) Treatment of expenses paid by dependent
+# If a deduction under section 151 with respect to an individual is allowed to another
+# taxpayer for a taxable year beginning in the calendar year in which such individual's
+# taxable year begins—
+# (A) no credit shall be allowed under subsection (a) to such individual for such
+# individual's taxable year,
+# (B) qualified tuition and related expenses paid by such individual during such
+# individual's taxable year shall be treated for purposes of this section as
+# paid by such other taxpayer, and
+# (C) a statement described in paragraph (8) and received by such individual shall
+# be treated as received by the taxpayer.
 
 # This subsection handles the case where a dependent pays qualified education expenses.
 # If someone else (typically a parent) claims the dependent on their return:
@@ -23,63 +21,31 @@ taxable year begins—
 # Note: Section 151 deductions were suspended by TCJA for 2018-2025, but the dependency
 # relationship still applies for purposes of this section per IRC 152(a).
 
-is_dependent_of_another_taxpayer:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Is Dependent of Another Taxpayer"
-  description: "Whether a deduction under section 151 is allowed to another taxpayer with respect to this individual"
-  default: False
+variable is_dependent_of_another_taxpayer:
+    entity: person
+    from 2024-01-01: 0
 
-qualified_expenses_paid_by_dependent:
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Qualified Expenses Paid by Dependent"
-  description: "Qualified tuition and related expenses paid by the dependent during the taxable year"
-  default: 0
 
-form_1098t_received_by_dependent:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Form 1098-T Received by Dependent"
-  description: "Whether the dependent received a statement described in section 25A(g)(8)"
-  default: False
+variable qualified_expenses_paid_by_dependent:
+    entity: person
+    from 2024-01-01: 0
 
-dependent_disqualified_from_credit:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Dependent Disqualified From Credit"
-  description: "Whether the individual is disqualified from claiming section 25A credit due to being claimed as a dependent per 26 USC 25A(g)(3)(A)"
-  from 2013-01-01:
-    return is_dependent_of_another_taxpayer
 
-expenses_attributed_to_claiming_taxpayer:
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Expenses Attributed to Claiming Taxpayer"
-  description: "Qualified expenses paid by dependent that are treated as paid by the taxpayer claiming the dependent per 26 USC 25A(g)(3)(B)"
-  from 2013-01-01:
-    # Per (B): If individual is claimed as dependent, their expenses are attributed
-    # to the taxpayer claiming them
-    if is_dependent_of_another_taxpayer:
-      return qualified_expenses_paid_by_dependent
-    return 0
+variable form_1098t_received_by_dependent:
+    entity: person
+    from 2024-01-01: 0
 
-form_1098t_attributed_to_claiming_taxpayer:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Form 1098-T Attributed to Claiming Taxpayer"
-  description: "Whether Form 1098-T received by dependent is treated as received by claiming taxpayer per 26 USC 25A(g)(3)(C)"
-  from 2013-01-01:
-    # Per (C): If individual is claimed as dependent, Form 1098-T received by them
-    # is treated as received by the taxpayer claiming them
-    if is_dependent_of_another_taxpayer:
-      return form_1098t_received_by_dependent
-    return False
+
+variable dependent_disqualified_from_credit:
+    entity: person
+    from 2013-01-01: is_dependent_of_another_taxpayer
+
+
+variable expenses_attributed_to_claiming_taxpayer:
+    entity: person
+    from 2013-01-01: 0
+
+
+variable form_1098t_attributed_to_claiming_taxpayer:
+    entity: person
+    from 2013-01-01: False

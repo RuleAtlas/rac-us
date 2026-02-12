@@ -1,48 +1,33 @@
 # 26 USC 63(c)(2)(B) - Basic standard deduction - head of household
 
-"""
-(B) $4,400 in the case of a head of household (as defined in section 2(b)), or
+# (B) $4,400 in the case of a head of household (as defined in section 2(b)), or
 
-Note: Per 26 USC 63(c)(7)(A)(i), for taxable years beginning after December 31, 2017,
-paragraph (2) shall be applied by substituting "$23,625" for "$4,400" in subparagraph (B).
+# Note: Per 26 USC 63(c)(7)(A)(i), for taxable years beginning after December 31, 2017,
+# paragraph (2) shall be applied by substituting "$23,625" for "$4,400" in subparagraph (B).
 
-Per 26 USC 63(c)(7)(B)(ii), for taxable years beginning after 2025, the $23,625 amount
-shall be increased by inflation adjustment.
-"""
+# Per 26 USC 63(c)(7)(B)(ii), for taxable years beginning after 2025, the $23,625 amount
+# shall be increased by inflation adjustment.
 
 # Basic standard deduction for head of household filers
 
-basic_std_ded_hoh_pre_tcja:
-  description: "Basic standard deduction for head of household before TCJA per 26 USC 63(c)(2)(B)"
-  indexed_by: cpi_adjustment
-  from 1988-01-01: 4400
+variable basic_std_ded_hoh_pre_tcja:
+    from 1988-01-01: 4400
 
-basic_std_ded_hoh_tcja:
-  description: "Basic standard deduction for head of household under TCJA per 26 USC 63(c)(7)(A)(i)"
-  indexed_by: cpi_adjustment
-  from 2018-01-01: 18000
-  from 2026-01-01: 23625
 
-tcja_effective_year:
-  description: "Year TCJA standard deduction provisions took effect"
-  from 1988-01-01: 2018
+variable basic_std_ded_hoh_tcja:
+    from 2018-01-01: 18000
+    from 2026-01-01: 23625
 
-basic_std_ded_hoh:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "Basic Standard Deduction - Head of Household"
-  description: "Basic standard deduction for head of household filers per 26 USC 63(c)(2)(B)"
-  from 1988-01-01:
-    # TCJA provisions apply for taxable years beginning after 2017
-    if tax_year >= tcja_effective_year:
-      return basic_std_ded_hoh_tcja
-    return basic_std_ded_hoh_pre_tcja
 
-tax_year:
-  entity: TaxUnit
-  period: Year
-  dtype: Integer
-  label: "Tax Year"
-  description: "The taxable year"
+variable tcja_effective_year:
+    from 1988-01-01: 2018
+
+
+variable basic_std_ded_hoh:
+    entity: taxunit
+    from 1988-01-01: basic_std_ded_hoh_pre_tcja
+
+
+variable tax_year:
+    entity: taxunit
+    from 2024-01-01: 0

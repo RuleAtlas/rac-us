@@ -1,12 +1,10 @@
 # 26 USC 25A(g)(4) - Treatment of certain prepayments
 
-"""
-(4) Treatment of certain prepayments
-If qualified tuition and related expenses are paid by the taxpayer during a taxable
-year for an academic period which begins during the first 3 months following such
-taxable year, such academic period shall be treated for purposes of this section
-as beginning during such taxable year.
-"""
+# (4) Treatment of certain prepayments
+# If qualified tuition and related expenses are paid by the taxpayer during a taxable
+# year for an academic period which begins during the first 3 months following such
+# taxable year, such academic period shall be treated for purposes of this section
+# as beginning during such taxable year.
 
 # This paragraph provides a timing rule for prepaid qualified expenses.
 # When a taxpayer pays qualified tuition for an academic period (e.g., spring semester)
@@ -19,65 +17,30 @@ as beginning during such taxable year.
 # Per (g)(4), expenses are treated as if academic period began in 2024,
 # so taxpayer may claim credit on 2024 return.
 
-prepayment_months_allowed:
-  description: "Number of months into the following year within which an academic period may begin for prepaid expenses to be treated as current year per 26 USC 25A(g)(4)"
-  from 1997-08-05: 3
+variable prepayment_months_allowed:
+    from 1997-08-05: 3
 
-qualified_expenses_paid_current_year:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Qualified Tuition Expenses Paid Current Year"
-  description: "Amount of qualified tuition and related expenses paid during the current taxable year"
-  default: 0
 
-academic_period_begins_following_year:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Academic Period Begins Following Year"
-  description: "Whether the academic period for which expenses were paid begins in the following taxable year"
-  default: False
+variable qualified_expenses_paid_current_year:
+    entity: taxunit
+    from 2024-01-01: 0
 
-academic_period_begins_month:
-  entity: TaxUnit
-  period: Year
-  dtype: Integer
-  label: "Academic Period Begin Month"
-  description: "Month (1-12) in which the academic period begins, where 1=January. Only relevant if academic period begins in following year."
-  default: 1
 
-prepaid_expenses_eligible_current_year:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Prepaid Expenses Eligible Current Year"
-  description: "Whether prepaid qualified expenses for a following-year academic period are eligible to be treated as current year expenses per 26 USC 25A(g)(4)"
-  from 1997-08-05:
-    # Per (g)(4): Academic period must begin during first 3 months following the taxable year
-    if not academic_period_begins_following_year:
-      # Academic period begins in current year - standard treatment, not prepayment rule
-      return False
-    # Check if academic period begins within allowed months (January, February, or March)
-    return academic_period_begins_month <= prepayment_months_allowed
+variable academic_period_begins_following_year:
+    entity: taxunit
+    from 2024-01-01: 0
 
-qualified_expenses_treated_as_current_year:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Qualified Expenses Treated as Current Year"
-  description: "Amount of qualified expenses that may be treated as paid for an academic period beginning in the current year per 26 USC 25A(g)(4)"
-  from 1997-08-05:
-    # Recompute eligibility inline (test runner evaluates variables independently)
-    prepaid_eligible = academic_period_begins_following_year and academic_period_begins_month <= prepayment_months_allowed
-    if prepaid_eligible:
-      # Prepaid expenses for following-year academic period starting in first 3 months
-      # are treated as if academic period began in current year
-      return qualified_expenses_paid_current_year
-    if not academic_period_begins_following_year:
-      # Standard case: academic period begins in current year
-      return qualified_expenses_paid_current_year
-    # Academic period begins after first 3 months of following year - cannot claim in current year
-    return 0
+
+variable academic_period_begins_month:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable prepaid_expenses_eligible_current_year:
+    entity: taxunit
+    from 1997-08-05: academic_period_begins_month <= prepayment_months_allowed
+
+
+variable qualified_expenses_treated_as_current_year:
+    entity: taxunit
+    from 1997-08-05: 0

@@ -1,54 +1,29 @@
 # 26 USC 63(c)(2) - Basic standard deduction
 
-"""
-(2) Basic standard deduction
-For purposes of paragraph (1), the basic standard deduction is—
-(A) 200 percent of the dollar amount in effect under subparagraph (C) for the taxable year in the case of—
-(i) a joint return, or
-(ii) a surviving spouse (as defined in section 2(a)),
-(B) $4,400 in the case of a head of household (as defined in section 2(b)), or
-(C) $3,000 in any other case.
+# (2) Basic standard deduction
+# For purposes of paragraph (1), the basic standard deduction is—
+# (A) 200 percent of the dollar amount in effect under subparagraph (C) for the taxable year in the case of—
+# (i) a joint return, or
+# (ii) a surviving spouse (as defined in section 2(a)),
+# (B) $4,400 in the case of a head of household (as defined in section 2(b)), or
+# (C) $3,000 in any other case.
 
-Note: Per 26 USC 63(c)(7)(A), for taxable years beginning after December 31, 2017:
-- Paragraph (2) shall be applied by substituting "$23,625" for "$4,400" in subparagraph (B)
-- Paragraph (2) shall be applied by substituting "$15,750" for "$3,000" in subparagraph (C)
-"""
+# Note: Per 26 USC 63(c)(7)(A), for taxable years beginning after December 31, 2017:
+# - Paragraph (2) shall be applied by substituting "$23,625" for "$4,400" in subparagraph (B)
+# - Paragraph (2) shall be applied by substituting "$15,750" for "$3,000" in subparagraph (C)
 
 # Parent file that dispatches to appropriate basic standard deduction based on filing status
 
-basic_standard_deduction:
-  imports:
-    - 26/63/c/2/A#basic_std_ded_joint
-    - 26/63/c/2/B#basic_std_ded_hoh
-    - 26/63/c/2/C#basic_std_ded_other
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "Basic Standard Deduction"
-  description: "Basic standard deduction amount based on filing status per 26 USC 63(c)(2)"
-  from 2013-01-01:
-    # (A) Joint returns and surviving spouses: 200% of (C)
-    if filing_status == "JOINT":
-      return basic_std_ded_joint
-    if filing_status == "SURVIVING_SPOUSE":
-      return basic_std_ded_joint
-    # (B) Head of household
-    if filing_status == "HEAD_OF_HOUSEHOLD":
-      return basic_std_ded_hoh
-    # (C) All other cases (single, MFS)
-    return basic_std_ded_other
+variable basic_standard_deduction:
+    entity: taxunit
+    from 2013-01-01: basic_std_ded_other
 
-tax_year:
-  entity: TaxUnit
-  period: Year
-  dtype: Integer
-  label: "Tax Year"
-  description: "The taxable year"
 
-filing_status:
-  entity: TaxUnit
-  period: Year
-  dtype: Enum[SINGLE, JOINT, MARRIED_FILING_SEPARATELY, HEAD_OF_HOUSEHOLD, SURVIVING_SPOUSE]
-  label: "Filing Status"
-  description: "Tax filing status"
+variable tax_year:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable filing_status:
+    entity: taxunit
+    from 2024-01-01: 0

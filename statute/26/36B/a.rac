@@ -1,12 +1,10 @@
 # 26 USC 36B(a) - In general
 
-"""
-(a) In general
-In the case of an applicable taxpayer, there shall be allowed as a credit
-against the tax imposed by this subtitle for any taxable year an amount
-equal to the premium assistance credit amount of the taxpayer for the
-taxable year.
-"""
+# (a) In general
+# In the case of an applicable taxpayer, there shall be allowed as a credit
+# against the tax imposed by this subtitle for any taxable year an amount
+# equal to the premium assistance credit amount of the taxpayer for the
+# taxable year.
 
 # Subsection (a) is a gating provision: it allows the premium tax credit
 # only for "applicable taxpayers" (defined in 36B(c)(1)). The credit amount
@@ -17,30 +15,15 @@ taxable year.
 # Input: Whether the taxpayer is an applicable taxpayer per 36B(c)(1)
 # =============================================================================
 
-is_applicable_taxpayer:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Applicable Taxpayer"
-  description: "Whether the taxpayer is an applicable taxpayer as defined in 26 USC 36B(c)(1)"
-  default: false
+variable is_applicable_taxpayer:
+    entity: taxunit
+    from 2024-01-01: 0
+
 
 # =============================================================================
 # 36B(a) - Premium tax credit
 # =============================================================================
 
-ptc_premium_tax_credit:
-  imports:
-    - 26/36B/b/1#ptc_premium_assistance_credit_amount
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Premium Tax Credit"
-  description: "Refundable credit for coverage under a qualified health plan per 26 USC 36B(a)"
-  from 2013-01-01:
-    # (a): "In the case of an applicable taxpayer, there shall be allowed as a
-    # credit...an amount equal to the premium assistance credit amount"
-    if not is_applicable_taxpayer:
-      return 0
-    return ptc_premium_assistance_credit_amount
+variable ptc_premium_tax_credit:
+    entity: taxunit
+    from 2013-01-01: ptc_premium_assistance_credit_amount

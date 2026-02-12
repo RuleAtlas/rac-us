@@ -1,14 +1,12 @@
 # 26 USC 36B(b)(1) - Premium assistance credit amount — In general
 
-"""
-(b) Premium assistance credit amount
-For purposes of this section—
-(1) In general
-The term "premium assistance credit amount" means, with respect to any
-taxable year, the sum of the premium assistance amounts determined under
-paragraph (2) with respect to all coverage months of the taxpayer occurring
-during the taxable year.
-"""
+# (b) Premium assistance credit amount
+# For purposes of this section—
+# (1) In general
+# The term "premium assistance credit amount" means, with respect to any
+# taxable year, the sum of the premium assistance amounts determined under
+# paragraph (2) with respect to all coverage months of the taxpayer occurring
+# during the taxable year.
 
 # This subsection defines the annual premium assistance credit amount as the
 # sum of monthly premium assistance amounts (determined under paragraph (2))
@@ -20,24 +18,11 @@ during the taxable year.
 # equivalent to summing identical monthly amounts. If monthly amounts vary,
 # this would need a monthly-level computation.
 
-ptc_coverage_months:
-  entity: TaxUnit
-  period: Year
-  dtype: Integer
-  label: "PTC Coverage Months"
-  description: "Number of coverage months of the taxpayer occurring during the taxable year per 26 USC 36B(b)(1)"
-  default: 0
+variable ptc_coverage_months:
+    entity: taxunit
+    from 2024-01-01: 0
 
-ptc_premium_assistance_credit_amount:
-  imports:
-    - 26/36B/b/2#ptc_premium_assistance_amount
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Premium Assistance Credit Amount"
-  description: "Sum of premium assistance amounts for all coverage months per 26 USC 36B(b)(1)"
-  from 2013-01-01:
-    # (b)(1): "the sum of the premium assistance amounts determined under
-    # paragraph (2) with respect to all coverage months"
-    return ptc_premium_assistance_amount * ptc_coverage_months
+
+variable ptc_premium_assistance_credit_amount:
+    entity: taxunit
+    from 2013-01-01: ptc_premium_assistance_amount * ptc_coverage_months

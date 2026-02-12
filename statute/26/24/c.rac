@@ -1,59 +1,36 @@
 # 26 USC 24(c) - Qualifying child
 
-"""
-(c) Qualifying child
-For purposes of this section—
-(1) In general
-The term "qualifying child" means a qualifying child of the taxpayer (as defined
-in section 152(c)) who has not attained age 17.
+# (c) Qualifying child
+# For purposes of this section—
+# (1) In general
+# The term "qualifying child" means a qualifying child of the taxpayer (as defined
+# in section 152(c)) who has not attained age 17.
 
-(2) Exception for certain noncitizens
-The term "qualifying child" shall not include any individual who would not be a
-dependent if subparagraph (A) of section 152(b)(3) were applied without regard to
-all that follows "resident of the United States".
-"""
+# (2) Exception for certain noncitizens
+# The term "qualifying child" shall not include any individual who would not be a
+# dependent if subparagraph (A) of section 152(b)(3) were applied without regard to
+# all that follows "resident of the United States".
 
 # Age threshold for qualifying child
-ctc_qualifying_age:
-  description: "Maximum age for CTC qualifying child per 26 USC 24(c)(1)"
-  unit: years
-  from 1998-01-01: 17
+variable ctc_qualifying_age:
+    from 1998-01-01: 17
 
-child_age:
-  entity: Person
-  period: Year
-  dtype: Integer
-  label: "Child Age"
-  description: "Age of child at end of calendar year"
 
-is_qualifying_child_152c:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Qualifying Child per 152(c)"
-  description: "Whether individual meets qualifying child definition under section 152(c)"
+variable child_age:
+    entity: person
+    from 2024-01-01: 0
 
-is_us_citizen_or_resident:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "US Citizen or Resident"
-  description: "Whether individual is US citizen or resident per 152(b)(3)(A)"
 
-is_ctc_qualifying_child:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "CTC Qualifying Child"
-  description: "Whether individual qualifies as qualifying child for CTC per 26 USC 24(c)"
-  from 1998-01-01:
-    # Must be qualifying child under 152(c)
-    if not is_qualifying_child_152c:
-      return False
-    # Must not have attained age 17
-    if child_age >= ctc_qualifying_age:
-      return False
-    # Must meet citizenship/residency requirement
-    if not is_us_citizen_or_resident:
-      return False
-    return True
+variable is_qualifying_child_152c:
+    entity: person
+    from 2024-01-01: 0
+
+
+variable is_us_citizen_or_resident:
+    entity: person
+    from 2024-01-01: 0
+
+
+variable is_ctc_qualifying_child:
+    entity: person
+    from 1998-01-01: True

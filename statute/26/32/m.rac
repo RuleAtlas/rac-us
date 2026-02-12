@@ -1,42 +1,40 @@
 # 26 USC 32(m) - Identification numbers
 
-"""
-(m) Identification numbers
-(1) Qualifying child identification requirement
-The credit shall not be allowed under this section with respect to any qualifying
-child unless the taxpayer includes the name, age, and TIN of such qualifying child
-on the return of tax for the taxable year and such TIN was issued on or before the
-due date for filing such return.
+# (m) Identification numbers
+# (1) Qualifying child identification requirement
+# The credit shall not be allowed under this section with respect to any qualifying
+# child unless the taxpayer includes the name, age, and TIN of such qualifying child
+# on the return of tax for the taxable year and such TIN was issued on or before the
+# due date for filing such return.
 
-(2) Requirements relating to taxpayers claiming credit for eligible individuals
-without qualifying children
-(A) In general
-The credit shall not be allowed under this section to an eligible individual who has
-no qualifying children for the taxable year unless the taxpayer includes a taxpayer
-identification number (as defined in section 6109(d)) of such individual on the
-return of tax for the taxable year.
-(B) Requirement relating to social security numbers
-The credit shall not be allowed under this section to an eligible individual who has
-no qualifying children for a taxable year unless such individual (or, if the individual
-is married, at least 1 spouse) has a social security number issued before the due date
-for filing the return for the taxable year.
+# (2) Requirements relating to taxpayers claiming credit for eligible individuals
+# without qualifying children
+# (A) In general
+# The credit shall not be allowed under this section to an eligible individual who has
+# no qualifying children for the taxable year unless the taxpayer includes a taxpayer
+# identification number (as defined in section 6109(d)) of such individual on the
+# return of tax for the taxable year.
+# (B) Requirement relating to social security numbers
+# The credit shall not be allowed under this section to an eligible individual who has
+# no qualifying children for a taxable year unless such individual (or, if the individual
+# is married, at least 1 spouse) has a social security number issued before the due date
+# for filing the return for the taxable year.
 
-(3) Social security number
-For purposes of this subsection—
-(A) In general
-The term "social security number" means a social security number issued to an
-individual by the Social Security Administration, but only if the social security
-number is issued—
-(i) to a citizen of the United States or pursuant to subclause (I) (or that portion
-of subclause (III) that relates to subclause (I)) of section 205(c)(2)(B)(i) of the
-Social Security Act, and
-(ii) before the due date for such return.
-(B) Misuse of social security number
-If, on or before the date on which a social security number was issued, the social
-security number holder was disqualified for the earned income credit because of
-misuse of a previous social security number, the social security number shall be
-treated as not meeting the requirements of subparagraph (A).
-"""
+# (3) Social security number
+# For purposes of this subsection—
+# (A) In general
+# The term "social security number" means a social security number issued to an
+# individual by the Social Security Administration, but only if the social security
+# number is issued—
+# (i) to a citizen of the United States or pursuant to subclause (I) (or that portion
+# of subclause (III) that relates to subclause (I)) of section 205(c)(2)(B)(i) of the
+# Social Security Act, and
+# (ii) before the due date for such return.
+# (B) Misuse of social security number
+# If, on or before the date on which a social security number was issued, the social
+# security number holder was disqualified for the earned income credit because of
+# misuse of a previous social security number, the social security number shall be
+# treated as not meeting the requirements of subparagraph (A).
 
 # This subsection establishes three identification requirements for EITC:
 # (1) Qualifying children must have valid TIN included on return
@@ -45,101 +43,48 @@ treated as not meeting the requirements of subparagraph (A).
 
 # Inputs for identification information
 
-qualifying_child_has_valid_tin:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Qualifying Child Has Valid TIN"
-  description: "Whether qualifying child's TIN was issued on or before return due date per 26 USC 32(m)(1)"
-  default: True
+variable qualifying_child_has_valid_tin:
+    entity: person
+    from 2024-01-01: 0
 
-eitc_taxpayer_has_tin:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Taxpayer Has TIN for EITC"
-  description: "Whether taxpayer has a valid TIN per 26 USC 32(m)(2)(A)"
-  default: True
 
-eitc_taxpayer_has_work_authorized_ssn:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Taxpayer Has Work-Authorized SSN"
-  description: "Whether taxpayer (or spouse) has work-authorized SSN issued before due date per 26 USC 32(m)(2)(B) and (3)(A)"
-  default: True
+variable eitc_taxpayer_has_tin:
+    entity: taxunit
+    from 2024-01-01: 0
 
-eitc_ssn_previously_disqualified:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "SSN Previously Disqualified"
-  description: "Whether SSN holder was previously disqualified for EITC due to SSN misuse per 26 USC 32(m)(3)(B)"
-  default: False
 
-has_qualifying_child_for_eitc:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Has Qualifying Child for EITC"
-  description: "Whether taxpayer has a qualifying child for EITC purposes"
-  default: False
+variable eitc_taxpayer_has_work_authorized_ssn:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable eitc_ssn_previously_disqualified:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable has_qualifying_child_for_eitc:
+    entity: taxunit
+    from 2024-01-01: 0
+
 
 # Variables implementing the identification requirements
 
-eitc_ssn_valid_for_work:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "EITC SSN Valid for Work"
-  description: "Whether SSN meets work authorization requirements per 26 USC 32(m)(3)"
-  from 2013-01-01:
-    # Per (3)(A): SSN must be issued to US citizen or work-authorized alien
-    # Per (3)(B): SSN not valid if previously disqualified for misuse
-    if eitc_ssn_previously_disqualified:
-      return False
-    return eitc_taxpayer_has_work_authorized_ssn
+variable eitc_ssn_valid_for_work:
+    entity: taxunit
+    from 2013-01-01: eitc_taxpayer_has_work_authorized_ssn
 
-eitc_child_id_requirement_met:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "EITC Child ID Requirement Met"
-  description: "Whether qualifying child meets identification requirements per 26 USC 32(m)(1)"
-  from 2013-01-01:
-    # Per (1): Child must have TIN issued on or before return due date
-    return qualifying_child_has_valid_tin
 
-eitc_childless_id_requirement_met:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "EITC Childless ID Requirement Met"
-  description: "Whether childless eligible individual meets ID requirements per 26 USC 32(m)(2)"
-  from 2013-01-01:
-    # Per (2)(A): Must have valid TIN
-    if not eitc_taxpayer_has_tin:
-      return False
-    # Per (2)(B): Must have work-authorized SSN issued before due date
-    if not eitc_ssn_valid_for_work:
-      return False
-    return True
+variable eitc_child_id_requirement_met:
+    entity: person
+    from 2013-01-01: qualifying_child_has_valid_tin
 
-eitc_id_requirements_met:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "EITC Identification Requirements Met"
-  description: "Whether all identification requirements of 26 USC 32(m) are satisfied"
-  from 2013-01-01:
-    # For taxpayers with qualifying children: child must meet (m)(1)
-    # For childless taxpayers: taxpayer must meet (m)(2)
-    # Note: Child-level checks are done separately per child
-    # This variable checks taxpayer-level requirements
-    if has_qualifying_child_for_eitc:
-      # Taxpayer with children - child TIN checked at child level
-      # Taxpayer must still meet general ID requirements
-      return eitc_taxpayer_has_tin
-    else:
-      # Childless taxpayer - stricter requirements under (m)(2)
-      return eitc_childless_id_requirement_met
+
+variable eitc_childless_id_requirement_met:
+    entity: taxunit
+    from 2013-01-01: True
+
+
+variable eitc_id_requirements_met:
+    entity: taxunit
+    from 2013-01-01: eitc_childless_id_requirement_met

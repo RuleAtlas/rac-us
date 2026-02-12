@@ -1,34 +1,32 @@
 # 26 USC 36B(c)(3) - Definitions and other rules
 
-"""
-(3) Definitions and other rules
-(A) Qualified health plan
-(i) In general
-The term "qualified health plan" has the meaning given such term by section 1301(a) of
-the Patient Protection and Affordable Care Act, except that such term shall not include
-a qualified health plan which is a catastrophic plan described in section 1302(e) of such
-Act.
+# (3) Definitions and other rules
+# (A) Qualified health plan
+# (i) In general
+# The term "qualified health plan" has the meaning given such term by section 1301(a) of
+# the Patient Protection and Affordable Care Act, except that such term shall not include
+# a qualified health plan which is a catastrophic plan described in section 1302(e) of such
+# Act.
 
-(ii) Pre-enrollment verification process required
-Such term shall not include any plan enrolled in through an Exchange, unless such
-Exchange provides a process for pre-enrollment verification through which any applicant
-may, beginning not later than August 1, verify with the Exchange the applicant's
-household income and eligibility for enrollment in such plan for plan years beginning in
-the subsequent year.
+# (ii) Pre-enrollment verification process required
+# Such term shall not include any plan enrolled in through an Exchange, unless such
+# Exchange provides a process for pre-enrollment verification through which any applicant
+# may, beginning not later than August 1, verify with the Exchange the applicant's
+# household income and eligibility for enrollment in such plan for plan years beginning in
+# the subsequent year.
 
-(iii) Exception in case of certain special enrollment periods
-Such term shall not include any plan enrolled in during a special enrollment period
-provided for by an Exchange—
-(I) on the basis of the relationship of the individual's expected household income to
-such a percentage of the poverty line (or such other amount) as is prescribed by the
-Secretary of Health and Human Services for purposes of such period, and
-(II) not in connection with the occurrence of an event or change in circumstances
-specified by the Secretary of Health and Human Services for such purposes.
+# (iii) Exception in case of certain special enrollment periods
+# Such term shall not include any plan enrolled in during a special enrollment period
+# provided for by an Exchange—
+# (I) on the basis of the relationship of the individual's expected household income to
+# such a percentage of the poverty line (or such other amount) as is prescribed by the
+# Secretary of Health and Human Services for purposes of such period, and
+# (II) not in connection with the occurrence of an event or change in circumstances
+# specified by the Secretary of Health and Human Services for such purposes.
 
-(B) Grandfathered health plan
-The term "grandfathered health plan" has the meaning given such term by section 1251 of
-the Patient Protection and Affordable Care Act.
-"""
+# (B) Grandfathered health plan
+# The term "grandfathered health plan" has the meaning given such term by section 1251 of
+# the Patient Protection and Affordable Care Act.
 
 # Subsection (c)(3) defines terms used throughout section 36B.
 #
@@ -48,81 +46,40 @@ the Patient Protection and Affordable Care Act.
 # Inputs: Plan characteristics
 # =============================================================================
 
-is_ppaca_1301a_qualified_plan:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "PPACA 1301(a) Qualified Plan"
-  description: "Whether the plan meets the definition of qualified health plan under section 1301(a) of the Patient Protection and Affordable Care Act"
-  default: false
+variable is_ppaca_1301a_qualified_plan:
+    entity: taxunit
+    from 2024-01-01: 0
 
-is_catastrophic_plan:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Catastrophic Plan"
-  description: "Whether the plan is a catastrophic plan described in section 1302(e) of the Patient Protection and Affordable Care Act"
-  default: false
 
-exchange_has_pre_enrollment_verification:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Exchange Has Pre-Enrollment Verification"
-  description: "Whether the Exchange provides a pre-enrollment verification process per 26 USC 36B(c)(3)(A)(ii)"
-  default: true
+variable is_catastrophic_plan:
+    entity: taxunit
+    from 2024-01-01: 0
 
-enrolled_through_exchange:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Enrolled Through Exchange"
-  description: "Whether the plan was enrolled in through an Exchange"
-  default: true
 
-enrolled_during_special_enrollment_period:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Enrolled During Special Enrollment Period"
-  description: "Whether the plan was enrolled in during a special enrollment period described in 26 USC 36B(c)(3)(A)(iii)"
-  default: false
+variable exchange_has_pre_enrollment_verification:
+    entity: taxunit
+    from 2024-01-01: 0
 
-special_enrollment_is_income_based:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Special Enrollment Is Income-Based"
-  description: "Whether the special enrollment period is on the basis of income as a percentage of poverty line per 26 USC 36B(c)(3)(A)(iii)(I), and not in connection with a qualifying event per (iii)(II)"
-  default: false
+
+variable enrolled_through_exchange:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable enrolled_during_special_enrollment_period:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable special_enrollment_is_income_based:
+    entity: taxunit
+    from 2024-01-01: 0
+
 
 # =============================================================================
 # Variable: Qualified health plan determination
 # =============================================================================
 
-ptc_is_qualified_health_plan:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Qualified Health Plan for PTC"
-  description: "Whether the plan is a qualified health plan for purposes of the premium tax credit per 26 USC 36B(c)(3)(A)"
-  from 2013-01-01:
-    # (A)(i): Must be a qualified health plan under PPACA 1301(a)
-    if not is_ppaca_1301a_qualified_plan:
-      return false
-
-    # (A)(i): Excludes catastrophic plans under PPACA 1302(e)
-    if is_catastrophic_plan:
-      return false
-
-    # (A)(ii): If enrolled through Exchange, Exchange must have pre-enrollment
-    # verification process (effective for taxable years beginning after 12/31/2027)
-    if enrolled_through_exchange and not exchange_has_pre_enrollment_verification:
-      return false
-
-    # (A)(iii): Excludes plans enrolled in during certain special enrollment
-    # periods that are income-based and not triggered by qualifying events
-    if enrolled_during_special_enrollment_period and special_enrollment_is_income_based:
-      return false
-
-    return true
+variable ptc_is_qualified_health_plan:
+    entity: taxunit
+    from 2013-01-01: true

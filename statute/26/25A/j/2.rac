@@ -1,38 +1,36 @@
 # 26 USC 25A(j)(2) - DOES NOT EXIST IN CURRENT LAW
 
-status: obsolete
+# status: obsolete
 
-"""
-26 USC 25A(j) currently contains ONLY a single paragraph about regulations.
-There is NO (j)(2) in current law.
+# 26 USC 25A(j) currently contains ONLY a single paragraph about regulations.
+# There is NO (j)(2) in current law.
 
-Current text of 26 USC 25A(j):
+# Current text of 26 USC 25A(j):
 
-(j) Regulations
-The Secretary may prescribe such regulations as may be necessary or appropriate
-to carry out this section, including regulations providing for a recapture of
-the credit allowed under this section in cases where there is a refund in a
-subsequent taxable year of any amount which was taken into account in
-determining the amount of such credit.
+# (j) Regulations
+# The Secretary may prescribe such regulations as may be necessary or appropriate
+# to carry out this section, including regulations providing for a recapture of
+# the credit allowed under this section in cases where there is a refund in a
+# subsequent taxable year of any amount which was taken into account in
+# determining the amount of such credit.
 
-Historical note:
-The "Credit allowed against alternative minimum tax" provision was FORMERLY
-located at 26 USC 25A(i)(5), NOT (j)(2). This provision was struck by
-Pub. L. 115-97 (Tax Cuts and Jobs Act of 2017), section 11002(d)(1)(B),
-which redesignated paragraphs (5) and (6) as (4) and (5), and struck out
-former paragraph (5) relating to credit allowed against alternative minimum tax.
+# Historical note:
+# The "Credit allowed against alternative minimum tax" provision was FORMERLY
+# located at 26 USC 25A(i)(5), NOT (j)(2). This provision was struck by
+# Pub. L. 115-97 (Tax Cuts and Jobs Act of 2017), section 11002(d)(1)(B),
+# which redesignated paragraphs (5) and (6) as (4) and (5), and struck out
+# former paragraph (5) relating to credit allowed against alternative minimum tax.
 
-For AMT-related credit provisions, see:
-- 26 USC 26(a)(1) - Credits allowed against regular tax liability
-- 26 USC 26(a)(2) - Credits listed in section 53(d)(1)(B)(iv) allowed against AMT
-- 26 USC 53 - Credit for prior year minimum tax liability
+# For AMT-related credit provisions, see:
+# - 26 USC 26(a)(1) - Credits allowed against regular tax liability
+# - 26 USC 26(a)(2) - Credits listed in section 53(d)(1)(B)(iv) allowed against AMT
+# - 26 USC 53 - Credit for prior year minimum tax liability
 
-The education credits under section 25A are currently listed among the
-nonrefundable personal credits in 26 USC 26(a), which are allowed against
-regular tax liability reduced by foreign tax credit. The specific AMT
-treatment is no longer in section 25A but is handled by the general
-credit limitation rules in section 26.
-"""
+# The education credits under section 25A are currently listed among the
+# nonrefundable personal credits in 26 USC 26(a), which are allowed against
+# regular tax liability reduced by foreign tax credit. The specific AMT
+# treatment is no longer in section 25A but is handled by the general
+# credit limitation rules in section 26.
 
 # This file documents that the requested citation does not exist.
 # No parameters, variables, or formulas - citation is invalid.

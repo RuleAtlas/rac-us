@@ -1,70 +1,43 @@
-"""
-(2) Premium assistance amount
-The premium assistance amount determined under this subsection with respect
-to any coverage month is the amount equal to the lesser of—
-(A) the monthly premiums for such month for 1 or more qualified health plans
-offered in the individual market within a State which cover the taxpayer, the
-taxpayer's spouse, or any dependent (as defined in section 152) of the taxpayer
-and which were enrolled in through an Exchange established by the State under
-1311 of the Patient Protection and Affordable Care Act, or
-(B) the excess (if any) of—
-(i) the adjusted monthly premium for such month for the applicable second
-lowest cost silver plan with respect to the taxpayer, over
-(ii) an amount equal to 1/12 of the product of the applicable percentage and
-the taxpayer's household income for the taxable year.
-"""
+# (2) Premium assistance amount
+# The premium assistance amount determined under this subsection with respect
+# to any coverage month is the amount equal to the lesser of—
+# (A) the monthly premiums for such month for 1 or more qualified health plans
+# offered in the individual market within a State which cover the taxpayer, the
+# taxpayer's spouse, or any dependent (as defined in section 152) of the taxpayer
+# and which were enrolled in through an Exchange established by the State under
+# 1311 of the Patient Protection and Affordable Care Act, or
+# (B) the excess (if any) of—
+# (i) the adjusted monthly premium for such month for the applicable second
+# lowest cost silver plan with respect to the taxpayer, over
+# (ii) an amount equal to 1/12 of the product of the applicable percentage and
+# the taxpayer's household income for the taxable year.
 
 # =============================================================================
 # Parameters
 # =============================================================================
 
-months_per_year:
-  description: "Number of months per year, used to compute monthly share of annual expected contribution per 26 USC 36B(b)(2)(B)(ii)"
-  from 2014-01-01: 12
+variable months_per_year:
+    from 2014-01-01: 12
+
 
 # =============================================================================
 # Inputs
 # =============================================================================
 
-ptc_monthly_premium:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Monthly Exchange Premium"
-  description: "Monthly premiums for qualified health plans enrolled through an Exchange per 26 USC 36B(b)(2)(A)"
-  default: 0
+variable ptc_monthly_premium:
+    entity: taxunit
+    from 2024-01-01: 0
 
-ptc_slcsp_monthly_premium:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "SLCSP Adjusted Monthly Premium"
-  description: "Adjusted monthly premium for the applicable second lowest cost silver plan per 26 USC 36B(b)(2)(B)(i)"
-  default: 0
+
+variable ptc_slcsp_monthly_premium:
+    entity: taxunit
+    from 2024-01-01: 0
+
 
 # =============================================================================
 # Variable: Premium assistance amount (monthly)
 # =============================================================================
 
-ptc_premium_assistance_amount:
-  imports:
-    - 26/36B/b/3#applicable_percentage
-    - 26/36B/b/3#household_income
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Premium Assistance Amount"
-  description: "Monthly premium assistance amount per 26 USC 36B(b)(2), the lesser of (A) enrolled plan premiums or (B) excess of SLCSP premium over expected contribution"
-  from 2014-01-01:
-    # (A): Monthly premiums for qualified health plans enrolled through an Exchange
-    amount_a = ptc_monthly_premium
-
-    # (B)(ii): 1/12 of (applicable percentage * household income)
-    expected_contribution = household_income * applicable_percentage / months_per_year
-
-    # (B): Excess (if any) of (i) SLCSP premium over (ii) expected contribution
-    amount_b = max(0, ptc_slcsp_monthly_premium - expected_contribution)
-
-    # Lesser of (A) or (B)
-    return min(amount_a, amount_b)
+variable ptc_premium_assistance_amount:
+    entity: taxunit
+    from 2014-01-01: min((ptc_monthly_premium), (max(0, ptc_slcsp_monthly_premium - expected_contribution)))

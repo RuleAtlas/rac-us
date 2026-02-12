@@ -1,23 +1,21 @@
 # 26 USC 25A(g)(1) - Identification requirement
 
-"""
-(1) Identification requirement
-(A) Social security number requirement
-No credit shall be allowed under subsection (a) to an individual unless the
-individual includes on the return of tax for the taxable year—
-(i) such individual's social security number, and
-(ii) in the case of a credit with respect to the qualified tuition and related
-expenses of an individual other than the taxpayer or the taxpayer's spouse, the
-name and social security number of such individual.
-(B) Institution
-No American Opportunity Tax Credit shall be allowed under this section unless
-the taxpayer includes the employer identification number of any institution to
-which the taxpayer paid qualified tuition and related expenses taken into account
-under this section on the return of tax for the taxable year.
-(C) Social security number defined
-For purposes of this paragraph, the term "social security number" shall have the
-meaning given such term in section 24(h)(7).
-"""
+# (1) Identification requirement
+# (A) Social security number requirement
+# No credit shall be allowed under subsection (a) to an individual unless the
+# individual includes on the return of tax for the taxable year—
+# (i) such individual's social security number, and
+# (ii) in the case of a credit with respect to the qualified tuition and related
+# expenses of an individual other than the taxpayer or the taxpayer's spouse, the
+# name and social security number of such individual.
+# (B) Institution
+# No American Opportunity Tax Credit shall be allowed under this section unless
+# the taxpayer includes the employer identification number of any institution to
+# which the taxpayer paid qualified tuition and related expenses taken into account
+# under this section on the return of tax for the taxable year.
+# (C) Social security number defined
+# For purposes of this paragraph, the term "social security number" shall have the
+# meaning given such term in section 24(h)(7).
 
 # This paragraph establishes three identification requirements for education credits:
 # (A) SSN requirements - taxpayer must have valid SSN; if claiming for non-spouse dependent,
@@ -29,28 +27,11 @@ meaning given such term in section 24(h)(7).
 # The subsection is split into: g/1/A.rac, g/1/B.rac, g/1/C.rac for detailed encoding.
 # This file provides the aggregate eligibility determination.
 
-claiming_aotc:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Claiming AOTC"
-  description: "Whether taxpayer is claiming American Opportunity Tax Credit per 26 USC 25A(a)(1)"
-  default: False
+variable claiming_aotc:
+    entity: taxunit
+    from 2024-01-01: 0
 
-sec_25A_identification_requirement_met:
-  imports:
-    - 26/25A/g/1/A#ssn_requirement_met
-    - 26/25A/g/1/B#institution_ein_requirement_met
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Section 25A Identification Requirement Met"
-  description: "Whether identification requirements of 26 USC 25A(g)(1) are satisfied for education credit"
-  from 2013-01-01:
-    # Per (A): SSN requirement must be met for any credit under subsection (a)
-    if not ssn_requirement_met:
-      return False
-    # Per (B): Institution EIN required only for AOTC
-    if claiming_aotc and not institution_ein_requirement_met:
-      return False
-    return True
+
+variable sec_25A_identification_requirement_met:
+    entity: taxunit
+    from 2013-01-01: True

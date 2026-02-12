@@ -1,15 +1,13 @@
 # 26 USC 1(j)(2)(F) - References to rate tables
 
-status: boilerplate
+# status: boilerplate
 
-"""
-(F) References to rate tables
-Any reference in this title to a rate of tax under subsection (c) shall be treated as a
-reference to the corresponding rate bracket under subparagraph (C) of this paragraph,
-except that the reference in section 3402(q)(1) to the third lowest rate of tax applicable
-under subsection (c) shall be treated as a reference to the fourth lowest rate of tax
-under subparagraph (C).
-"""
+# (F) References to rate tables
+# Any reference in this title to a rate of tax under subsection (c) shall be treated as a
+# reference to the corresponding rate bracket under subparagraph (C) of this paragraph,
+# except that the reference in section 3402(q)(1) to the third lowest rate of tax applicable
+# under subsection (c) shall be treated as a reference to the fourth lowest rate of tax
+# under subparagraph (C).
 
 # This subparagraph contains cross-reference rules, not computational content.
 # It clarifies how other code sections should interpret references to subsection (c)

@@ -1,14 +1,12 @@
 # 26 USC 36B(d)(1) - Family size
 
-"""
-(d) Terms relating to income and families
-For purposes of this section—
-(1) Family size
-The family size involved with respect to any taxpayer shall be equal to
-the number of individuals for whom the taxpayer is allowed a deduction
-under section 151 (relating to allowance of deduction for personal
-exemptions) for the taxable year.
-"""
+# (d) Terms relating to income and families
+# For purposes of this section—
+# (1) Family size
+# The family size involved with respect to any taxpayer shall be equal to
+# the number of individuals for whom the taxpayer is allowed a deduction
+# under section 151 (relating to allowance of deduction for personal
+# exemptions) for the taxable year.
 
 # Family size is the count of section 151 exemptions. Post-TCJA, section
 # 151(d)(5) reduces the exemption amount to zero but does not eliminate the
@@ -16,19 +14,11 @@ exemptions) for the taxable year.
 # Section 36B(e)(1)(B) separately modifies family size for individuals not
 # lawfully present; that adjustment is encoded in 26/36B/e.
 
-section_151_deduction_count:
-  entity: TaxUnit
-  period: Year
-  dtype: Integer
-  label: "Section 151 deduction count"
-  description: "Number of individuals for whom the taxpayer is allowed a deduction under section 151"
-  default: 1
+variable section_151_deduction_count:
+    entity: taxunit
+    from 2024-01-01: 0
 
-ptc_family_size:
-  entity: TaxUnit
-  period: Year
-  dtype: Integer
-  label: "PTC Family Size"
-  description: "Family size for purposes of 26 USC 36B per subsection (d)(1)"
-  from 2013-01-01:
-    return section_151_deduction_count
+
+variable ptc_family_size:
+    entity: taxunit
+    from 2013-01-01: section_151_deduction_count

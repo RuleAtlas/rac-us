@@ -1,29 +1,27 @@
 # 26 USC 25A(b)(2) - Limitations applicable to Hope Scholarship Credit
 
-"""
-(2) Limitations applicable to Hope Scholarship Credit
+# (2) Limitations applicable to Hope Scholarship Credit
 
-(A) Credit allowed only for 4 taxable years
-An election to have this section apply with respect to any eligible student for purposes
-of the American Opportunity Tax Credit under subsection (a)(1) may not be made for any
-taxable year if such an election (by the taxpayer or any other individual) is in effect
-with respect to such student for any 4 prior taxable years.
+# (A) Credit allowed only for 4 taxable years
+# An election to have this section apply with respect to any eligible student for purposes
+# of the American Opportunity Tax Credit under subsection (a)(1) may not be made for any
+# taxable year if such an election (by the taxpayer or any other individual) is in effect
+# with respect to such student for any 4 prior taxable years.
 
-(B) Credit allowed for year only if individual is at least 1/2 time student for portion of year
-The American Opportunity Tax Credit under subsection (a)(1) shall not be allowed for a taxable
-year with respect to the qualified tuition and related expenses of an individual unless such
-individual is an eligible student for at least one academic period which begins during such year.
+# (B) Credit allowed for year only if individual is at least 1/2 time student for portion of year
+# The American Opportunity Tax Credit under subsection (a)(1) shall not be allowed for a taxable
+# year with respect to the qualified tuition and related expenses of an individual unless such
+# individual is an eligible student for at least one academic period which begins during such year.
 
-(C) Credit allowed only for first 4 years of postsecondary education
-The American Opportunity Tax Credit under subsection (a)(1) shall be allowed only for
-4 taxable years with respect to any eligible student.
+# (C) Credit allowed only for first 4 years of postsecondary education
+# The American Opportunity Tax Credit under subsection (a)(1) shall be allowed only for
+# 4 taxable years with respect to any eligible student.
 
-(D) Denial of credit to students with felony drug convictions
-A student shall not be treated as an eligible student for purposes of this section if
-the student has been convicted of a Federal or State felony offense consisting of the
-possession or distribution of a controlled substance before the end of the taxable year
-with respect to which this section is being applied.
-"""
+# (D) Denial of credit to students with felony drug convictions
+# A student shall not be treated as an eligible student for purposes of this section if
+# the student has been convicted of a Federal or State felony offense consisting of the
+# possession or distribution of a controlled substance before the end of the taxable year
+# with respect to which this section is being applied.
 
 # This paragraph establishes four limitations on the Hope Scholarship Credit (AOTC):
 # (A) Cannot claim if already claimed for 4 prior years (aotc_4_year_limit_met)
@@ -31,28 +29,6 @@ with respect to which this section is being applied.
 # (C) Credit limited to first 4 years of postsecondary education (aotc_first_4_years_eligible)
 # (D) No credit for students with felony drug convictions (eligible_student_drug_conviction_disqualified)
 
-hope_scholarship_limitations_satisfied:
-  imports:
-    - 26/25A/b/2/A#aotc_4_year_limit_met
-    - 26/25A/b/2/B#aotc_half_time_requirement_met
-    - 26/25A/b/2/C#aotc_first_4_years_eligible
-    - 26/25A/b/2/D#eligible_student_drug_conviction_disqualified
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Hope Scholarship Credit Limitations Satisfied"
-  description: "Whether all limitations of 26 USC 25A(b)(2) are satisfied for the Hope Scholarship Credit (AOTC)"
-  from 2013-01-01:
-    # (A) Cannot have already claimed AOTC for 4 prior years
-    if aotc_4_year_limit_met:
-      return False
-    # (B) Must be at least half-time student for at least one academic period
-    if not aotc_half_time_requirement_met:
-      return False
-    # (C) Must be within first 4 years of postsecondary education
-    if not aotc_first_4_years_eligible:
-      return False
-    # (D) Cannot have felony drug conviction
-    if eligible_student_drug_conviction_disqualified:
-      return False
-    return True
+variable hope_scholarship_limitations_satisfied:
+    entity: person
+    from 2013-01-01: True

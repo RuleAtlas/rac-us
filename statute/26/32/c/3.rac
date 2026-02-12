@@ -1,31 +1,29 @@
 # 26 USC 32(c)(3) - Qualifying child
 
-"""
-(3) Qualifying child
-(A) In general
-The term "qualifying child" means a qualifying child of the taxpayer (as defined
-in section 152(c), determined without regard to paragraph (1)(D) thereof and
-section 152(e)).
+# (3) Qualifying child
+# (A) In general
+# The term "qualifying child" means a qualifying child of the taxpayer (as defined
+# in section 152(c), determined without regard to paragraph (1)(D) thereof and
+# section 152(e)).
 
-(B) Married individual
-The term "qualifying child" shall not include an individual who is married as of
-the close of the taxpayer's taxable year unless the taxpayer is entitled to a
-deduction under section 151 for such taxable year with respect to such individual
-(or would be so entitled but for section 152(e)).
+# (B) Married individual
+# The term "qualifying child" shall not include an individual who is married as of
+# the close of the taxpayer's taxable year unless the taxpayer is entitled to a
+# deduction under section 151 for such taxable year with respect to such individual
+# (or would be so entitled but for section 152(e)).
 
-(C) Place of abode
-For purposes of subparagraph (A), the requirements of section 152(c)(1)(B) shall
-be met only if the principal place of abode is in the United States.
+# (C) Place of abode
+# For purposes of subparagraph (A), the requirements of section 152(c)(1)(B) shall
+# be met only if the principal place of abode is in the United States.
 
-(D) Identification requirements
-(i) In general
-A qualifying child shall not be taken into account under subsection (b) unless the
-taxpayer includes the name, age, and TIN of the qualifying child on the return of
-tax for the taxable year.
-(ii) Other methods
-The Secretary may prescribe other methods for providing the information described
-in clause (i).
-"""
+# (D) Identification requirements
+# (i) In general
+# A qualifying child shall not be taken into account under subsection (b) unless the
+# taxpayer includes the name, age, and TIN of the qualifying child on the return of
+# tax for the taxable year.
+# (ii) Other methods
+# The Secretary may prescribe other methods for providing the information described
+# in clause (i).
 
 # This subsection defines "qualifying child" for EITC purposes.
 # It modifies the general 152(c) definition with:
@@ -36,72 +34,33 @@ in clause (i).
 
 # Inputs for qualifying child determination
 
-is_qualifying_child_152c:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Qualifying Child per 152(c)"
-  description: "Whether individual meets qualifying child definition under section 152(c)"
-  default: False
+variable is_qualifying_child_152c:
+    entity: person
+    from 2024-01-01: 0
 
-child_is_married:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Child Is Married"
-  description: "Whether the child is married as of the close of the taxpayer's taxable year"
-  default: False
 
-taxpayer_claims_151_deduction_for_child:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Taxpayer Claims 151 Deduction for Child"
-  description: "Whether taxpayer is entitled to deduction under section 151 for this child"
-  default: False
+variable child_is_married:
+    entity: person
+    from 2024-01-01: 0
 
-child_principal_abode_in_us:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Child Principal Abode in US"
-  description: "Whether child's principal place of abode is in the United States per 32(c)(3)(C)"
-  default: True
 
-child_tin_included_on_return:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Child TIN Included on Return"
-  description: "Whether taxpayer includes name, age, and TIN of qualifying child on return per 32(c)(3)(D)(i)"
-  default: True
+variable taxpayer_claims_151_deduction_for_child:
+    entity: person
+    from 2024-01-01: 0
+
+
+variable child_principal_abode_in_us:
+    entity: person
+    from 2024-01-01: 0
+
+
+variable child_tin_included_on_return:
+    entity: person
+    from 2024-01-01: 0
+
 
 # Variable implementing the qualifying child definition for EITC
 
-is_eitc_qualifying_child:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "EITC Qualifying Child"
-  description: "Whether individual is a qualifying child for EITC per 26 USC 32(c)(3)"
-  from 2013-01-01:
-    # (A) In general: Must be qualifying child under 152(c)
-    # (determined without regard to 152(c)(1)(D) and 152(e))
-    if not is_qualifying_child_152c:
-      return False
-
-    # (B) Married individual: Exclude married child unless taxpayer claims 151 deduction
-    if child_is_married:
-      if not taxpayer_claims_151_deduction_for_child:
-        return False
-
-    # (C) Place of abode: Principal place must be in the United States
-    if not child_principal_abode_in_us:
-      return False
-
-    # (D)(i) Identification requirements: Must include name, age, TIN on return
-    # Note: (D)(ii) is administrative ("Secretary may prescribe other methods")
-    if not child_tin_included_on_return:
-      return False
-
-    return True
+variable is_eitc_qualifying_child:
+    entity: person
+    from 2013-01-01: True

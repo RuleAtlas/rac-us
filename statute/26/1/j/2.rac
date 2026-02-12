@@ -1,58 +1,22 @@
 # 26 USC 1(j)(2) - Rate tables
 
-"""
-(2) Rate tables
-[Subparagraphs (A) through (F) provide tax rate tables for different filing statuses
-that apply in lieu of the tables in subsections (a) through (e) for taxable years
-beginning after December 31, 2017.]
+# (2) Rate tables
+# [Subparagraphs (A) through (F) provide tax rate tables for different filing statuses
+# that apply in lieu of the tables in subsections (a) through (e) for taxable years
+# beginning after December 31, 2017.]
 
-(A) Married individuals filing joint returns and surviving spouses - see 26/1/j/2/A.rac
-(B) Heads of households - see 26/1/j/2/B.rac
-(C) Unmarried individuals other than surviving spouses and heads of households - see 26/1/j/2/C.rac
-(D) Married individuals filing separate returns - see 26/1/j/2/D.rac
-(E) Estates and trusts - see 26/1/j/2/E.rac
-(F) References to rate tables - see 26/1/j/2/F.rac
-"""
+# (A) Married individuals filing joint returns and surviving spouses - see 26/1/j/2/A.rac
+# (B) Heads of households - see 26/1/j/2/B.rac
+# (C) Unmarried individuals other than surviving spouses and heads of households - see 26/1/j/2/C.rac
+# (D) Married individuals filing separate returns - see 26/1/j/2/D.rac
+# (E) Estates and trusts - see 26/1/j/2/E.rac
+# (F) References to rate tables - see 26/1/j/2/F.rac
 
-enum FilingStatus:
-  values:
-    - SINGLE
-    - JOINT
-    - SEPARATE
-    - HEAD_OF_HOUSEHOLD
-    - SURVIVING_SPOUSE
+variable filing_status:
+    entity: taxunit
+    from 2024-01-01: 0
 
-filing_status:
-  entity: TaxUnit
-  period: Year
-  dtype: Enum[FilingStatus]
-  label: "Filing Status"
-  description: "Tax filing status per 26 USC 1"
 
-tcja_income_tax:
-  imports:
-    - 26/1/j/2/A#joint_income_tax
-    - 26/1/j/2/B#hoh_income_tax
-    - 26/1/j/2/C#single_income_tax
-    - 26/1/j/2/D#mfs_income_tax
-    - 26/1/j/2/E#trust_income_tax
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "TCJA Income Tax"
-  description: "Income tax per 26 USC 1(j)(2) rate tables based on filing status"
-  from 2013-01-01:
-    # Select tax calculation based on filing status
-    if filing_status == "JOINT":
-      return joint_income_tax
-    if filing_status == "SURVIVING_SPOUSE":
-      return joint_income_tax
-    if filing_status == "HEAD_OF_HOUSEHOLD":
-      return hoh_income_tax
-    if filing_status == "SINGLE":
-      return single_income_tax
-    if filing_status == "SEPARATE":
-      return mfs_income_tax
-    # Default to single if status unknown
-    return single_income_tax
+variable tcja_income_tax:
+    entity: taxunit
+    from 2013-01-01: single_income_tax

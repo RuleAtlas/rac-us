@@ -1,221 +1,143 @@
 # 26 USC 32(b) - Percentages and amounts
 
-"""
-(b) Percentages and amounts
-For purposes of subsection (a)—
+# (b) Percentages and amounts
+# For purposes of subsection (a)—
 
-(1) Percentages
-The credit percentage and the phaseout percentage shall be determined as follows:
+# (1) Percentages
+# The credit percentage and the phaseout percentage shall be determined as follows:
 
-In the case of an eligible individual with:   The credit percentage is:  The phaseout percentage is:
-1 qualifying child                            34                         15.98
-2 qualifying children                         40                         21.06
-3 or more qualifying children                 45                         21.06
-No qualifying children                        7.65                       7.65
+# In the case of an eligible individual with:   The credit percentage is:  The phaseout percentage is:
+# 1 qualifying child                            34                         15.98
+# 2 qualifying children                         40                         21.06
+# 3 or more qualifying children                 45                         21.06
+# No qualifying children                        7.65                       7.65
 
-(2) Amounts
-(A) In general
-Subject to subparagraph (B), the earned income amount and the phaseout amount shall be determined as follows:
+# (2) Amounts
+# (A) In general
+# Subject to subparagraph (B), the earned income amount and the phaseout amount shall be determined as follows:
 
-In the case of an eligible individual with:   The earned income amount is:  The phaseout amount is:
-1 qualifying child                            $6,330                        $11,610
-2 or more qualifying children                 $8,890                        $11,610
-No qualifying children                        $4,220                        $5,280
+# In the case of an eligible individual with:   The earned income amount is:  The phaseout amount is:
+# 1 qualifying child                            $6,330                        $11,610
+# 2 or more qualifying children                 $8,890                        $11,610
+# No qualifying children                        $4,220                        $5,280
 
-(B) Joint returns
-In the case of a joint return filed by an eligible individual and such individual's spouse,
-the phaseout amount determined under subparagraph (A) shall be increased by $5,000.
-"""
+# (B) Joint returns
+# In the case of a joint return filed by an eligible individual and such individual's spouse,
+# the phaseout amount determined under subparagraph (A) shall be increased by $5,000.
 
 # =============================================================================
 # 32(b)(1) - Percentages
 # =============================================================================
 
 # Credit percentages per 32(b)(1)
-eitc_credit_percentage_0:
-  description: "Credit percentage for no qualifying children per 26 USC 32(b)(1)"
-  unit: /1
-  from 1996-01-01: 0.0765
+variable eitc_credit_percentage_0:
+    from 1996-01-01: 0.0765
 
-eitc_credit_percentage_1:
-  description: "Credit percentage for 1 qualifying child per 26 USC 32(b)(1)"
-  unit: /1
-  from 1996-01-01: 0.34
 
-eitc_credit_percentage_2:
-  description: "Credit percentage for 2 qualifying children per 26 USC 32(b)(1)"
-  unit: /1
-  from 1996-01-01: 0.40
+variable eitc_credit_percentage_1:
+    from 1996-01-01: 0.34
 
-eitc_credit_percentage_3plus:
-  description: "Credit percentage for 3 or more qualifying children per 26 USC 32(b)(1)"
-  unit: /1
-  from 2009-01-01: 0.45
+
+variable eitc_credit_percentage_2:
+    from 1996-01-01: 0.40
+
+
+variable eitc_credit_percentage_3plus:
+    from 2009-01-01: 0.45
+
 
 # Phaseout percentages per 32(b)(1)
-eitc_phaseout_percentage_0:
-  description: "Phaseout percentage for no qualifying children per 26 USC 32(b)(1)"
-  unit: /1
-  from 1996-01-01: 0.0765
+variable eitc_phaseout_percentage_0:
+    from 1996-01-01: 0.0765
 
-eitc_phaseout_percentage_1:
-  description: "Phaseout percentage for 1 qualifying child per 26 USC 32(b)(1)"
-  unit: /1
-  from 1996-01-01: 0.1598
 
-eitc_phaseout_percentage_2plus:
-  description: "Phaseout percentage for 2 or more qualifying children per 26 USC 32(b)(1)"
-  unit: /1
-  from 1996-01-01: 0.2106
+variable eitc_phaseout_percentage_1:
+    from 1996-01-01: 0.1598
+
+
+variable eitc_phaseout_percentage_2plus:
+    from 1996-01-01: 0.2106
+
 
 # =============================================================================
 # 32(b)(2)(A) - Amounts (base statutory values, subject to 32(j) inflation adjustment)
 # =============================================================================
 
 # Earned income amounts per 32(b)(2)(A)
-eitc_earned_income_amount_0:
-  description: "Earned income amount for no qualifying children per 26 USC 32(b)(2)(A)"
-  unit: USD
-  indexed_by: eitc_cola_adjustment
-  from 1996-01-01: 4220
+variable eitc_earned_income_amount_0:
+    from 1996-01-01: 4220
 
-eitc_earned_income_amount_1:
-  description: "Earned income amount for 1 qualifying child per 26 USC 32(b)(2)(A)"
-  unit: USD
-  indexed_by: eitc_cola_adjustment
-  from 1996-01-01: 6330
 
-eitc_earned_income_amount_2plus:
-  description: "Earned income amount for 2 or more qualifying children per 26 USC 32(b)(2)(A)"
-  unit: USD
-  indexed_by: eitc_cola_adjustment
-  from 1996-01-01: 8890
+variable eitc_earned_income_amount_1:
+    from 1996-01-01: 6330
+
+
+variable eitc_earned_income_amount_2plus:
+    from 1996-01-01: 8890
+
 
 # Phaseout amounts per 32(b)(2)(A)
-eitc_phaseout_amount_0:
-  description: "Phaseout amount for no qualifying children per 26 USC 32(b)(2)(A)"
-  unit: USD
-  indexed_by: eitc_cola_adjustment
-  from 1996-01-01: 5280
+variable eitc_phaseout_amount_0:
+    from 1996-01-01: 5280
 
-eitc_phaseout_amount_1plus:
-  description: "Phaseout amount for 1 or more qualifying children per 26 USC 32(b)(2)(A)"
-  unit: USD
-  indexed_by: eitc_cola_adjustment
-  from 1996-01-01: 11610
+
+variable eitc_phaseout_amount_1plus:
+    from 1996-01-01: 11610
+
 
 # =============================================================================
 # 32(b)(2)(B) - Joint return phaseout increase
 # =============================================================================
 
-eitc_joint_return_phaseout_increase:
-  description: "Phaseout amount increase for joint returns per 26 USC 32(b)(2)(B)"
-  unit: USD
-  indexed_by: eitc_cola_adjustment
-  from 2002-01-01: 5000
+variable eitc_joint_return_phaseout_increase:
+    from 2002-01-01: 5000
+
 
 # =============================================================================
 # Inputs
 # =============================================================================
 
-qualifying_children_count:
-  entity: TaxUnit
-  period: Year
-  dtype: Integer
-  label: "Number of Qualifying Children"
-  description: "Number of qualifying children for EITC purposes"
-  default: 0
+variable qualifying_children_count:
+    entity: taxunit
+    from 2024-01-01: 0
 
-is_joint_return:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Joint Return"
-  description: "Whether filing a joint return per 26 USC 32(b)(2)(B)"
-  default: false
+
+variable is_joint_return:
+    entity: taxunit
+    from 2024-01-01: 0
+
 
 # =============================================================================
 # Variables - Credit percentage per 32(b)(1)
 # =============================================================================
 
-eitc_credit_percentage:
-  entity: TaxUnit
-  period: Year
-  dtype: Rate
-  unit: /1
-  label: "EITC Credit Percentage"
-  description: "Credit percentage based on number of qualifying children per 26 USC 32(b)(1)"
-  from 1996-01-01:
-    # 32(b)(1): Credit percentage depends on number of qualifying children
-    if qualifying_children_count == 0:
-      return eitc_credit_percentage_0
-    if qualifying_children_count == 1:
-      return eitc_credit_percentage_1
-    if qualifying_children_count == 2:
-      return eitc_credit_percentage_2
-    # 3 or more qualifying children
-    return eitc_credit_percentage_3plus
+variable eitc_credit_percentage:
+    entity: taxunit
+    from 1996-01-01: eitc_credit_percentage_3plus
+
 
 # =============================================================================
 # Variables - Phaseout percentage per 32(b)(1)
 # =============================================================================
 
-eitc_phaseout_percentage:
-  entity: TaxUnit
-  period: Year
-  dtype: Rate
-  unit: /1
-  label: "EITC Phaseout Percentage"
-  description: "Phaseout percentage based on number of qualifying children per 26 USC 32(b)(1)"
-  from 1996-01-01:
-    # 32(b)(1): Phaseout percentage depends on number of qualifying children
-    if qualifying_children_count == 0:
-      return eitc_phaseout_percentage_0
-    if qualifying_children_count == 1:
-      return eitc_phaseout_percentage_1
-    # 2 or more qualifying children (same rate for 2, 3+)
-    return eitc_phaseout_percentage_2plus
+variable eitc_phaseout_percentage:
+    entity: taxunit
+    from 1996-01-01: eitc_phaseout_percentage_2plus
+
 
 # =============================================================================
 # Variables - Earned income amount per 32(b)(2)(A)
 # =============================================================================
 
-eitc_earned_income_amount:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "EITC Earned Income Amount"
-  description: "Earned income amount based on number of qualifying children per 26 USC 32(b)(2)(A)"
-  from 1996-01-01:
-    # 32(b)(2)(A): Earned income amount depends on number of qualifying children
-    if qualifying_children_count == 0:
-      return eitc_earned_income_amount_0
-    if qualifying_children_count == 1:
-      return eitc_earned_income_amount_1
-    # 2 or more qualifying children
-    return eitc_earned_income_amount_2plus
+variable eitc_earned_income_amount:
+    entity: taxunit
+    from 1996-01-01: eitc_earned_income_amount_2plus
+
 
 # =============================================================================
 # Variables - Phaseout amount per 32(b)(2)(A) and (B)
 # =============================================================================
 
-eitc_phaseout_amount:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "EITC Phaseout Amount"
-  description: "Phaseout amount based on number of qualifying children per 26 USC 32(b)(2)(A), increased for joint returns per 32(b)(2)(B)"
-  from 1996-01-01:
-    # 32(b)(2)(A): Base phaseout amount depends on number of qualifying children
-    if qualifying_children_count == 0:
-      base_amount = eitc_phaseout_amount_0
-    else:
-      # 1 or more qualifying children share same base phaseout
-      base_amount = eitc_phaseout_amount_1plus
-
-    # 32(b)(2)(B): Joint return increase
-    if is_joint_return:
-      return base_amount + eitc_joint_return_phaseout_increase
-    return base_amount
+variable eitc_phaseout_amount:
+    entity: taxunit
+    from 1996-01-01: eitc_phaseout_amount_1plus

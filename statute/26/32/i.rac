@@ -1,175 +1,107 @@
 # Denial of credit for individuals having excessive investment income
 
-"""
-(i) Denial of credit for individuals having excessive investment income
-(1) In general
-No credit shall be allowed under subsection (a) for the taxable year if the aggregate
-amount of disqualified income of the taxpayer for the taxable year exceeds $10,000.
+# (i) Denial of credit for individuals having excessive investment income
+# (1) In general
+# No credit shall be allowed under subsection (a) for the taxable year if the aggregate
+# amount of disqualified income of the taxpayer for the taxable year exceeds $10,000.
 
-(2) Disqualified income
-For purposes of paragraph (1), the term "disqualified income" means—
-(A) interest or dividends to the extent includible in gross income for the taxable year,
-(B) interest received or accrued during the taxable year which is exempt from tax
-imposed by this chapter,
-(C) the excess (if any) of—
-(i) gross income from rents or royalties not derived in the ordinary course of a
-trade or business, over
-(ii) the sum of—
-(I) the deductions (other than interest) which are clearly and directly allocable
-to such gross income, plus
-(II) interest deductions properly allocable to such gross income,
-(D) the capital gain net income (as defined in section 1222) of the taxpayer for such
-taxable year, and
-(E) the excess (if any) of—
-(i) the aggregate income from all passive activities for the taxable year (determined
-without regard to any amount included in earned income under subsection (c)(2)
-or described in a preceding subparagraph), over
-(ii) the aggregate losses from all passive activities for the taxable year
-(as so determined).
+# (2) Disqualified income
+# For purposes of paragraph (1), the term "disqualified income" means—
+# (A) interest or dividends to the extent includible in gross income for the taxable year,
+# (B) interest received or accrued during the taxable year which is exempt from tax
+# imposed by this chapter,
+# (C) the excess (if any) of—
+# (i) gross income from rents or royalties not derived in the ordinary course of a
+# trade or business, over
+# (ii) the sum of—
+# (I) the deductions (other than interest) which are clearly and directly allocable
+# to such gross income, plus
+# (II) interest deductions properly allocable to such gross income,
+# (D) the capital gain net income (as defined in section 1222) of the taxpayer for such
+# taxable year, and
+# (E) the excess (if any) of—
+# (i) the aggregate income from all passive activities for the taxable year (determined
+# without regard to any amount included in earned income under subsection (c)(2)
+# or described in a preceding subparagraph), over
+# (ii) the aggregate losses from all passive activities for the taxable year
+# (as so determined).
 
-For purposes of subparagraph (E), the term "passive activity" has the meaning given
-such term by section 469.
-"""
+# For purposes of subparagraph (E), the term "passive activity" has the meaning given
+# such term by section 469.
 
 # Base disqualified income threshold per 32(i)(1)
 # Note: This is the statutory base amount. Inflation-adjusted amounts are computed
 # via 32(j) and published in annual IRS Revenue Procedures.
-disqualified_income_limit:
-  description: "Maximum disqualified income before EITC denial per 26 USC 32(i)(1)"
-  unit: USD
-  indexed_by: cpi_adjustment
-  from 2021-01-01: 10_000
+variable disqualified_income_limit:
+    from 2021-01-01: 10_000
+
 
 # Inputs for disqualified income components
 
-taxable_interest_income:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Taxable Interest Income"
-  description: "Interest includible in gross income per 26 USC 32(i)(2)(A)"
-  default: 0
+variable taxable_interest_income:
+    entity: taxunit
+    from 2024-01-01: 0
 
-dividend_income:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Dividend Income"
-  description: "Dividends includible in gross income per 26 USC 32(i)(2)(A)"
-  default: 0
 
-tax_exempt_interest_income:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Tax-Exempt Interest Income"
-  description: "Interest exempt from tax per 26 USC 32(i)(2)(B)"
-  default: 0
+variable dividend_income:
+    entity: taxunit
+    from 2024-01-01: 0
 
-gross_rent_royalty_income:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Gross Rent and Royalty Income"
-  description: "Gross income from rents or royalties not in ordinary course of trade or business per 26 USC 32(i)(2)(C)(i)"
-  default: 0
 
-rent_royalty_deductions_noninterest:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Non-Interest Deductions for Rent/Royalty"
-  description: "Deductions (other than interest) allocable to rent/royalty income per 26 USC 32(i)(2)(C)(ii)(I)"
-  default: 0
+variable tax_exempt_interest_income:
+    entity: taxunit
+    from 2024-01-01: 0
 
-rent_royalty_interest_deductions:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Interest Deductions for Rent/Royalty"
-  description: "Interest deductions allocable to rent/royalty income per 26 USC 32(i)(2)(C)(ii)(II)"
-  default: 0
 
-capital_gain_net_income:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Capital Gain Net Income"
-  description: "Capital gain net income per section 1222 for 26 USC 32(i)(2)(D)"
-  default: 0
+variable gross_rent_royalty_income:
+    entity: taxunit
+    from 2024-01-01: 0
 
-gross_passive_income:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Gross Passive Activity Income"
-  description: "Aggregate income from all passive activities per 26 USC 32(i)(2)(E)(i)"
-  default: 0
 
-passive_activity_losses:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Passive Activity Losses"
-  description: "Aggregate losses from all passive activities per 26 USC 32(i)(2)(E)(ii)"
-  default: 0
+variable rent_royalty_deductions_noninterest:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable rent_royalty_interest_deductions:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable capital_gain_net_income:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable gross_passive_income:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable passive_activity_losses:
+    entity: taxunit
+    from 2024-01-01: 0
+
 
 # Variable: Net rent/royalty income per 32(i)(2)(C)
-net_rent_royalty_income:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Net Rent and Royalty Income"
-  description: "Excess of gross rent/royalty over deductions per 26 USC 32(i)(2)(C)"
-  from 2021-01-01:
-    # 32(i)(2)(C): excess of (i) gross income over (ii) sum of deductions
-    total_deductions = rent_royalty_deductions_noninterest + rent_royalty_interest_deductions
-    excess = gross_rent_royalty_income - total_deductions
-    return max(0, excess)
+variable net_rent_royalty_income:
+    entity: taxunit
+    from 2021-01-01: max(0, (gross_rent_royalty_income - total_deductions))
+
 
 # Variable: Net passive income per 32(i)(2)(E)
-net_passive_income:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Net Passive Activity Income"
-  description: "Excess of passive income over passive losses per 26 USC 32(i)(2)(E)"
-  from 2021-01-01:
-    # 32(i)(2)(E): excess of (i) aggregate income over (ii) aggregate losses
-    excess = gross_passive_income - passive_activity_losses
-    return max(0, excess)
+variable net_passive_income:
+    entity: taxunit
+    from 2021-01-01: max(0, (gross_passive_income - passive_activity_losses))
+
 
 # Variable: Total disqualified income per 32(i)(2)
-disqualified_income:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Disqualified Income"
-  description: "Aggregate disqualified income per 26 USC 32(i)(2)"
-  from 2021-01-01:
-    # 32(i)(2)(A): interest or dividends
-    interest_dividends = taxable_interest_income + dividend_income
-    # 32(i)(2)(B): tax-exempt interest
-    exempt_interest = tax_exempt_interest_income
-    # 32(i)(2)(C): net rent/royalty (computed in separate variable)
-    rent_royalty = net_rent_royalty_income
-    # 32(i)(2)(D): capital gain net income
-    cap_gains = capital_gain_net_income
-    # 32(i)(2)(E): net passive income (computed in separate variable)
-    passive = net_passive_income
-    # Sum all components
-    return interest_dividends + exempt_interest + rent_royalty + cap_gains + passive
+variable disqualified_income:
+    entity: taxunit
+    from 2021-01-01: (taxable_interest_income + dividend_income) + (tax_exempt_interest_income) + (net_rent_royalty_income) + (capital_gain_net_income) + (net_passive_income)
+
 
 # Variable: EITC denied due to excessive investment income per 32(i)(1)
-eitc_denied_excessive_investment_income:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "EITC Denied - Excessive Investment Income"
-  description: "Whether EITC is denied due to disqualified income exceeding limit per 26 USC 32(i)(1)"
-  from 2021-01-01:
-    # 32(i)(1): No credit if disqualified income exceeds limit
-    return disqualified_income > disqualified_income_limit
+variable eitc_denied_excessive_investment_income:
+    entity: taxunit
+    from 2021-01-01: disqualified_income > disqualified_income_limit

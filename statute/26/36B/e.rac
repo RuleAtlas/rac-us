@@ -1,32 +1,30 @@
 # 26 USC 36B(e) - Rules for individuals not lawfully present
 
-"""
-(e) Rules for individuals not lawfully present
-(1) In general
-If 1 or more individuals for whom a taxpayer is allowed a deduction under
-section 151 (relating to allowance of deduction for personal exemptions) for
-the taxable year (including the taxpayer or his spouse) are individuals who
-are not lawfully present—
-(A) the aggregate amount of premiums taken into account under clauses (i)
-and (ii) of subsection (b)(2)(A) shall be reduced by the portion (if any) of
-such premiums which is attributable to such individuals, and
-(B) for purposes of applying this section, the determination of household
-income shall be made by reducing the income otherwise taken into account
-under subsection (b)(4)(A) by any amount of such income that is attributable
-to individuals not lawfully present.
-(2) Lawfully present
-For purposes of this section, an individual shall be treated as lawfully
-present only if the individual is, and is reasonably expected to be for the
-entire period of enrollment for which the premium tax credit under this
-section is being claimed, a citizen or national of the United States or an
-alien lawfully present in the United States.
-(3) Secretarial authority
-The Secretary of Health and Human Services, in consultation with the
-Secretary, shall prescribe rules setting forth the methods by which
-calculations of family size and household income are made for purposes of
-this section in the case of a taxpayer who is an applicable taxpayer and has
-at least 1 individual in the tax household who is not lawfully present.
-"""
+# (e) Rules for individuals not lawfully present
+# (1) In general
+# If 1 or more individuals for whom a taxpayer is allowed a deduction under
+# section 151 (relating to allowance of deduction for personal exemptions) for
+# the taxable year (including the taxpayer or his spouse) are individuals who
+# are not lawfully present—
+# (A) the aggregate amount of premiums taken into account under clauses (i)
+# and (ii) of subsection (b)(2)(A) shall be reduced by the portion (if any) of
+# such premiums which is attributable to such individuals, and
+# (B) for purposes of applying this section, the determination of household
+# income shall be made by reducing the income otherwise taken into account
+# under subsection (b)(4)(A) by any amount of such income that is attributable
+# to individuals not lawfully present.
+# (2) Lawfully present
+# For purposes of this section, an individual shall be treated as lawfully
+# present only if the individual is, and is reasonably expected to be for the
+# entire period of enrollment for which the premium tax credit under this
+# section is being claimed, a citizen or national of the United States or an
+# alien lawfully present in the United States.
+# (3) Secretarial authority
+# The Secretary of Health and Human Services, in consultation with the
+# Secretary, shall prescribe rules setting forth the methods by which
+# calculations of family size and household income are made for purposes of
+# this section in the case of a taxpayer who is an applicable taxpayer and has
+# at least 1 individual in the tax household who is not lawfully present.
 
 # Subsection disposition:
 # (e)(1)(A) - ENCODED: Premium adjustment for non-lawfully-present individuals
@@ -42,75 +40,44 @@ at least 1 individual in the tax household who is not lawfully present.
 # operates at the TaxUnit level by adjusting aggregates. The inputs capture
 # the portions attributable to non-lawfully-present individuals.
 
-premiums_attributable_to_non_lawfully_present:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Premiums attributable to non-lawfully-present individuals"
-  description: "The portion of aggregate premiums under 36B(b)(2)(A) attributable to individuals who are not lawfully present per 36B(e)(1)(A)"
-  default: 0
+variable premiums_attributable_to_non_lawfully_present:
+    entity: taxunit
+    from 2024-01-01: 0
 
-income_attributable_to_non_lawfully_present:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Income attributable to non-lawfully-present individuals"
-  description: "Amount of household income under 36B(b)(4)(A) attributable to individuals who are not lawfully present per 36B(e)(1)(B)"
-  default: 0
 
-aggregate_premiums_before_adjustment:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Aggregate premiums before 36B(e) adjustment"
-  description: "Total premiums taken into account under 36B(b)(2)(A)(i) and (ii) before reduction for non-lawfully-present individuals"
-  default: 0
+variable income_attributable_to_non_lawfully_present:
+    entity: taxunit
+    from 2024-01-01: 0
 
-household_income_before_adjustment:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Household income before 36B(e) adjustment"
-  description: "Household income otherwise taken into account under 36B(b)(4)(A) before reduction for non-lawfully-present individuals"
-  default: 0
 
-is_lawfully_present:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Lawfully present"
-  description: "Whether the individual is, and is reasonably expected to be for the entire enrollment period, a citizen or national of the United States or an alien lawfully present, per 36B(e)(2)"
-  default: true
+variable aggregate_premiums_before_adjustment:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable household_income_before_adjustment:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable is_lawfully_present:
+    entity: person
+    from 2024-01-01: 0
+
 
 # =============================================================================
 # (e)(1)(A) - Adjusted premiums
 # =============================================================================
 
-ptc_adjusted_premiums:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "PTC Adjusted Premiums"
-  description: "Aggregate premiums reduced by the portion attributable to non-lawfully-present individuals per 26 USC 36B(e)(1)(A)"
-  from 2013-01-01:
-    # (e)(1)(A): "the aggregate amount of premiums...shall be reduced by the
-    # portion (if any) of such premiums which is attributable to such individuals"
-    return max(0, aggregate_premiums_before_adjustment - premiums_attributable_to_non_lawfully_present)
+variable ptc_adjusted_premiums:
+    entity: taxunit
+    from 2013-01-01: max(0, aggregate_premiums_before_adjustment - premiums_attributable_to_non_lawfully_present)
+
 
 # =============================================================================
 # (e)(1)(B) - Adjusted household income
 # =============================================================================
 
-ptc_adjusted_household_income:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "PTC Adjusted Household Income"
-  description: "Household income reduced by income attributable to non-lawfully-present individuals per 26 USC 36B(e)(1)(B)"
-  from 2013-01-01:
-    # (e)(1)(B): "the determination of household income shall be made by reducing
-    # the income otherwise taken into account under subsection (b)(4)(A) by any
-    # amount of such income that is attributable to individuals not lawfully present"
-    return max(0, household_income_before_adjustment - income_attributable_to_non_lawfully_present)
+variable ptc_adjusted_household_income:
+    entity: taxunit
+    from 2013-01-01: max(0, household_income_before_adjustment - income_attributable_to_non_lawfully_present)

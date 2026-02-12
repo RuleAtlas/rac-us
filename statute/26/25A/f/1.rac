@@ -1,28 +1,26 @@
 # Qualified tuition and related expenses
 
-"""
-(1) Qualified tuition and related expenses
-(A) In general
-The term "qualified tuition and related expenses" means tuition and fees required
-for the enrollment or attendance of-
-(i) the taxpayer,
-(ii) the taxpayer's spouse, or
-(iii) any dependent of the taxpayer with respect to whom the taxpayer is allowed
-a deduction under section 151,
-at an eligible educational institution for courses of instruction of such individual
-at such institution.
-(B) Exception for education involving sports, etc.
-Such term does not include expenses with respect to any course or other education
-involving sports, games, or hobbies, unless such course or other education is part
-of the individual's degree program.
-(C) Exception for nonacademic fees
-Such term does not include student activity fees, athletic fees, insurance expenses,
-or other expenses unrelated to an individual's academic course of instruction.
-(D) Required course materials taken into account for American Opportunity Tax Credit
-For purposes of determining the American Opportunity Tax Credit, subparagraph (A)
-shall be applied by substituting "tuition, fees, and course materials" for
-"tuition and fees".
-"""
+# (1) Qualified tuition and related expenses
+# (A) In general
+# The term "qualified tuition and related expenses" means tuition and fees required
+# for the enrollment or attendance of-
+# (i) the taxpayer,
+# (ii) the taxpayer's spouse, or
+# (iii) any dependent of the taxpayer with respect to whom the taxpayer is allowed
+# a deduction under section 151,
+# at an eligible educational institution for courses of instruction of such individual
+# at such institution.
+# (B) Exception for education involving sports, etc.
+# Such term does not include expenses with respect to any course or other education
+# involving sports, games, or hobbies, unless such course or other education is part
+# of the individual's degree program.
+# (C) Exception for nonacademic fees
+# Such term does not include student activity fees, athletic fees, insurance expenses,
+# or other expenses unrelated to an individual's academic course of instruction.
+# (D) Required course materials taken into account for American Opportunity Tax Credit
+# For purposes of determining the American Opportunity Tax Credit, subparagraph (A)
+# shall be applied by substituting "tuition, fees, and course materials" for
+# "tuition and fees".
 
 # This subsection defines "qualified tuition and related expenses" for purposes of
 # 26 USC 25A education credits (AOTC and LLC).
@@ -42,132 +40,68 @@ shall be applied by substituting "tuition, fees, and course materials" for
 # - Various exclusions per (B) and (C)
 
 # Input: Raw tuition paid to eligible educational institution
-tuition_paid:
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Tuition Paid"
-  description: "Tuition required for enrollment or attendance at an eligible educational institution per 26 USC 25A(f)(1)(A)"
-  default: 0
+variable tuition_paid:
+    entity: person
+    from 2024-01-01: 0
+
 
 # Input: Academic fees paid (enrollment/attendance related)
-academic_fees_paid:
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Academic Fees Paid"
-  description: "Fees required for enrollment or attendance at an eligible educational institution per 26 USC 25A(f)(1)(A)"
-  default: 0
+variable academic_fees_paid:
+    entity: person
+    from 2024-01-01: 0
+
 
 # Input: Course materials paid (books, supplies, equipment for AOTC)
-course_materials_paid:
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Course Materials Paid"
-  description: "Course materials (books, supplies, equipment) paid per 26 USC 25A(f)(1)(D) - included for AOTC only"
-  default: 0
+variable course_materials_paid:
+    entity: person
+    from 2024-01-01: 0
+
 
 # Input: Sports/games/hobbies expenses (excluded per (B) unless part of degree)
-sports_games_hobbies_expenses:
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Sports/Games/Hobbies Expenses"
-  description: "Expenses for courses involving sports, games, or hobbies per 26 USC 25A(f)(1)(B)"
-  default: 0
+variable sports_games_hobbies_expenses:
+    entity: person
+    from 2024-01-01: 0
+
 
 # Input: Whether sports/games/hobbies course is part of degree program
-sports_course_part_of_degree:
-  entity: Person
-  period: Year
-  dtype: Boolean
-  label: "Sports Course Part of Degree Program"
-  description: "Whether the sports/games/hobbies course is part of the individual's degree program per 26 USC 25A(f)(1)(B)"
-  default: False
+variable sports_course_part_of_degree:
+    entity: person
+    from 2024-01-01: 0
+
 
 # Input: Student activity fees (excluded per (C))
-student_activity_fees:
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Student Activity Fees"
-  description: "Student activity fees which are excluded per 26 USC 25A(f)(1)(C)"
-  default: 0
+variable student_activity_fees:
+    entity: person
+    from 2024-01-01: 0
+
 
 # Input: Athletic fees (excluded per (C))
-athletic_fees:
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Athletic Fees"
-  description: "Athletic fees which are excluded per 26 USC 25A(f)(1)(C)"
-  default: 0
+variable athletic_fees:
+    entity: person
+    from 2024-01-01: 0
+
 
 # Input: Insurance expenses (excluded per (C))
-education_insurance_expenses:
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Education Insurance Expenses"
-  description: "Insurance expenses which are excluded per 26 USC 25A(f)(1)(C)"
-  default: 0
+variable education_insurance_expenses:
+    entity: person
+    from 2024-01-01: 0
+
 
 # Input: Other nonacademic expenses (excluded per (C))
-other_nonacademic_expenses:
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Other Nonacademic Expenses"
-  description: "Other expenses unrelated to academic course of instruction per 26 USC 25A(f)(1)(C)"
-  default: 0
+variable other_nonacademic_expenses:
+    entity: person
+    from 2024-01-01: 0
+
 
 # Variable: Qualified tuition and related expenses for LLC
 # Per (A)-(C): tuition + academic fees, excluding sports/hobbies (unless degree), excluding nonacademic fees
-qualified_tuition_and_related_expenses_llc:
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Qualified Tuition and Related Expenses (LLC)"
-  description: "Qualified tuition and related expenses for Lifetime Learning Credit per 26 USC 25A(f)(1)(A)-(C)"
-  from 2013-01-01:
-    # Base: tuition and academic fees per (A)
-    base_expenses = tuition_paid + academic_fees_paid
-    # Nonacademic fees excluded per (C)
-    nonacademic_exclusion = student_activity_fees + athletic_fees + education_insurance_expenses + other_nonacademic_expenses
-    # Sports/games/hobbies exception per (B): excluded UNLESS part of degree program
-    if sports_course_part_of_degree:
-      # Part of degree program - sports expenses included
-      return max(0, base_expenses - nonacademic_exclusion)
-    # Not part of degree program - sports expenses excluded
-    return max(0, base_expenses - sports_games_hobbies_expenses - nonacademic_exclusion)
+variable qualified_tuition_and_related_expenses_llc:
+    entity: person
+    from 2013-01-01: max(0, (tuition_paid + academic_fees_paid) - sports_games_hobbies_expenses - (student_activity_fees + athletic_fees + education_insurance_expenses + other_nonacademic_expenses))
+
 
 # Variable: Qualified tuition and related expenses for AOTC
 # Per (D): Same as LLC but also includes course materials
-qualified_tuition_and_related_expenses_aotc:
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Qualified Tuition and Related Expenses (AOTC)"
-  description: "Qualified tuition and related expenses for American Opportunity Tax Credit per 26 USC 25A(f)(1)(A)-(D)"
-  from 2013-01-01:
-    # Per (D): For AOTC, include course materials in addition to tuition and fees
-    base_expenses = tuition_paid + academic_fees_paid + course_materials_paid
-    # Nonacademic fees excluded per (C)
-    nonacademic_exclusion = student_activity_fees + athletic_fees + education_insurance_expenses + other_nonacademic_expenses
-    # Sports/games/hobbies exception per (B): excluded UNLESS part of degree program
-    if sports_course_part_of_degree:
-      # Part of degree program - sports expenses included
-      return max(0, base_expenses - nonacademic_exclusion)
-    # Not part of degree program - sports expenses excluded
-    return max(0, base_expenses - sports_games_hobbies_expenses - nonacademic_exclusion)
+variable qualified_tuition_and_related_expenses_aotc:
+    entity: person
+    from 2013-01-01: max(0, (tuition_paid + academic_fees_paid + course_materials_paid) - sports_games_hobbies_expenses - (student_activity_fees + athletic_fees + education_insurance_expenses + other_nonacademic_expenses))

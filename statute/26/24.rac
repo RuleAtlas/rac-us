@@ -1,80 +1,26 @@
 # 26 USC 24 - Child tax credit
 
-"""
-26 USC § 24 - Child tax credit
+# 26 USC § 24 - Child tax credit
 
-(a) Allowance of credit - $1,000 (or modified amount) per qualifying child
-(b) Limitations - Income phaseout at threshold amounts
-(c) Qualifying child - Definition: qualifying child under 152(c) who has not attained age 17
-(d) Portion of credit refundable - Additional child tax credit (ACTC)
-(e) Identification requirements - TIN requirements for child and taxpayer
-(f) Taxable year must be full taxable year - Except for death
-(g) Restrictions on taxpayers who improperly claimed credit in prior year
-(h) Special rules for taxable years beginning after 2017 (TCJA provisions)
-(i) Inflation adjustments
-(j) Reconciliation of credit and advance credit
-(k) Application of credit in possessions
-"""
+# (a) Allowance of credit - $1,000 (or modified amount) per qualifying child
+# (b) Limitations - Income phaseout at threshold amounts
+# (c) Qualifying child - Definition: qualifying child under 152(c) who has not attained age 17
+# (d) Portion of credit refundable - Additional child tax credit (ACTC)
+# (e) Identification requirements - TIN requirements for child and taxpayer
+# (f) Taxable year must be full taxable year - Except for death
+# (g) Restrictions on taxpayers who improperly claimed credit in prior year
+# (h) Special rules for taxable years beginning after 2017 (TCJA provisions)
+# (i) Inflation adjustments
+# (j) Reconciliation of credit and advance credit
+# (k) Application of credit in possessions
 
 # Parent file importing key variables from subsections
 
-child_tax_credit:
-  imports:
-    - 26/24/a#ctc_maximum
-    - 26/24/b#ctc_after_phaseout
-    - 26/24/d#actc_amount
-    - 26/24/e#ctc_meets_id_requirements
-    - 26/24/f#ctc_meets_full_year_requirement
-    - 26/24/g#ctc_disallowed_prior_claim
-    - 26/24/h#odc_amount
-    - 26/24/h#ctc_ssn_requirement_met
-    - 26/24/j#ctc_after_advance_reconciliation
-    - 26/24/k#ctc_disallowed_possession_coordination
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Child Tax Credit"
-  description: "Total child tax credit per 26 USC 24"
-  from 2013-01-01:
-    # Check all disqualifying conditions
-    if not ctc_meets_id_requirements:
-      return 0
-    if not ctc_meets_full_year_requirement:
-      return 0
-    if ctc_disallowed_prior_claim:
-      return 0
-    if not ctc_ssn_requirement_met:
-      return 0
-    if ctc_disallowed_possession_coordination:
-      return 0
-    # Return credit after advance reconciliation plus other dependent credit
-    return ctc_after_advance_reconciliation + odc_amount
+variable child_tax_credit:
+    entity: taxunit
+    from 2013-01-01: ctc_after_advance_reconciliation + odc_amount
 
-refundable_ctc:
-  imports:
-    - 26/24/d#actc_amount
-    - 26/24/e#ctc_meets_id_requirements
-    - 26/24/f#ctc_meets_full_year_requirement
-    - 26/24/g#ctc_disallowed_prior_claim
-    - 26/24/h#ctc_ssn_requirement_met
-    - 26/24/k#ctc_disallowed_possession_coordination
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "Refundable Child Tax Credit (ACTC)"
-  description: "Refundable portion of CTC per 26 USC 24(d)"
-  from 2013-01-01:
-    # Check all disqualifying conditions
-    if not ctc_meets_id_requirements:
-      return 0
-    if not ctc_meets_full_year_requirement:
-      return 0
-    if ctc_disallowed_prior_claim:
-      return 0
-    if not ctc_ssn_requirement_met:
-      return 0
-    if ctc_disallowed_possession_coordination:
-      return 0
-    return actc_amount
+
+variable refundable_ctc:
+    entity: taxunit
+    from 2013-01-01: actc_amount

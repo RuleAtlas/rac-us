@@ -1,12 +1,10 @@
 # 26 USC 25A(f)(2) - Eligible educational institution
 
-"""
-(2) Eligible educational institution
-The term "eligible educational institution" means an institution—
-(A) which is described in section 481 of the Higher Education Act of 1965 (20 U.S.C. 1088),
-as in effect on the date of the enactment of this section, and
-(B) which is eligible to participate in a program under title IV of such Act.
-"""
+# (2) Eligible educational institution
+# The term "eligible educational institution" means an institution—
+# (A) which is described in section 481 of the Higher Education Act of 1965 (20 U.S.C. 1088),
+# as in effect on the date of the enactment of this section, and
+# (B) which is eligible to participate in a program under title IV of such Act.
 
 # This subsection defines "eligible educational institution" for purposes of 26 USC 25A
 # education credits (AOTC and LLC).
@@ -20,30 +18,16 @@ as in effect on the date of the enactment of this section, and
 # characteristics of the institution. The determination is binary - the institution
 # either meets the HEA definition and Title IV eligibility or it does not.
 
-institution_described_in_hea_481:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Institution Described in HEA Section 481"
-  description: "Whether the educational institution is described in section 481 of the Higher Education Act of 1965 (20 U.S.C. 1088) per 26 USC 25A(f)(2)(A)"
-  default: False
+variable institution_described_in_hea_481:
+    entity: taxunit
+    from 2024-01-01: 0
 
-institution_title_iv_eligible:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Institution Title IV Eligible"
-  description: "Whether the educational institution is eligible to participate in a program under title IV of the Higher Education Act per 26 USC 25A(f)(2)(B)"
-  default: False
 
-is_eligible_educational_institution:
-  entity: TaxUnit
-  period: Year
-  dtype: Boolean
-  label: "Is Eligible Educational Institution"
-  description: "Whether the institution meets the definition of eligible educational institution per 26 USC 25A(f)(2)"
-  from 2013-01-01:
-    # Per 25A(f)(2): Both (A) and (B) must be satisfied
-    # (A) Institution described in HEA section 481 (20 USC 1088)
-    # (B) Institution eligible for Title IV federal student aid programs
-    return institution_described_in_hea_481 and institution_title_iv_eligible
+variable institution_title_iv_eligible:
+    entity: taxunit
+    from 2024-01-01: 0
+
+
+variable is_eligible_educational_institution:
+    entity: taxunit
+    from 2013-01-01: institution_described_in_hea_481 and institution_title_iv_eligible

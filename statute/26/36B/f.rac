@@ -1,39 +1,37 @@
-"""
-(f) Reconciliation of credit and advance credit
-(1) In general
-The amount of the credit allowed under this section for any taxable year
-shall be reduced (but not below zero) by the amount of any advance payment
-of such credit under section 1412 of the Patient Protection and Affordable
-Care Act.
+# (f) Reconciliation of credit and advance credit
+# (1) In general
+# The amount of the credit allowed under this section for any taxable year
+# shall be reduced (but not below zero) by the amount of any advance payment
+# of such credit under section 1412 of the Patient Protection and Affordable
+# Care Act.
 
-(2) Excess advance payments
-If the advance payments to a taxpayer under section 1412 of the Patient
-Protection and Affordable Care Act for a taxable year exceed the credit
-allowed by this section (determined without regard to paragraph (1)), the
-tax imposed by this chapter for the taxable year shall be increased by the
-amount of such excess.
+# (2) Excess advance payments
+# If the advance payments to a taxpayer under section 1412 of the Patient
+# Protection and Affordable Care Act for a taxable year exceed the credit
+# allowed by this section (determined without regard to paragraph (1)), the
+# tax imposed by this chapter for the taxable year shall be increased by the
+# amount of such excess.
 
-(3) Information requirement
-Each Exchange (or any person carrying out 1 or more responsibilities of an
-Exchange under section 1311(f)(3) or 1321(c) of the Patient Protection and
-Affordable Care Act) shall provide the following information to the Secretary
-and to the taxpayer with respect to any health plan provided through the
-Exchange:
-(A) The level of coverage described in section 1302(d) of the Patient
-Protection and Affordable Care Act and the period such coverage was in
-effect.
-(B) The total premium for the coverage without regard to the credit under
-this section or cost-sharing reductions under section 1402 of such Act.
-(C) The aggregate amount of any advance payment of such credit or reductions
-under section 1412 of such Act.
-(D) The name, address, and TIN of the primary insured and the name and TIN
-of each other individual obtaining coverage under the policy.
-(E) Any information provided to the Exchange, including any change of
-circumstances, necessary to determine eligibility for, and the amount of,
-such credit.
-(F) Information necessary to determine whether a taxpayer has received excess
-advance payments.
-"""
+# (3) Information requirement
+# Each Exchange (or any person carrying out 1 or more responsibilities of an
+# Exchange under section 1311(f)(3) or 1321(c) of the Patient Protection and
+# Affordable Care Act) shall provide the following information to the Secretary
+# and to the taxpayer with respect to any health plan provided through the
+# Exchange:
+# (A) The level of coverage described in section 1302(d) of the Patient
+# Protection and Affordable Care Act and the period such coverage was in
+# effect.
+# (B) The total premium for the coverage without regard to the credit under
+# this section or cost-sharing reductions under section 1402 of such Act.
+# (C) The aggregate amount of any advance payment of such credit or reductions
+# under section 1412 of such Act.
+# (D) The name, address, and TIN of the primary insured and the name and TIN
+# of each other individual obtaining coverage under the policy.
+# (E) Any information provided to the Exchange, including any change of
+# circumstances, necessary to determine eligibility for, and the amount of,
+# such credit.
+# (F) Information necessary to determine whether a taxpayer has received excess
+# advance payments.
 
 # Paragraph (3) is an administrative information-reporting requirement directed
 # at Exchanges. It contains no computational content — no amounts, rates, or
@@ -44,51 +42,24 @@ advance payments.
 # Input: Advance payments received under ACA section 1412
 # =============================================================================
 
-ptc_advance_payments:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "PTC Advance Payments"
-  description: "Advance payments of premium tax credit received under section 1412 of the Patient Protection and Affordable Care Act"
-  default: 0
+variable ptc_advance_payments:
+    entity: taxunit
+    from 2024-01-01: 0
+
 
 # =============================================================================
 # (f)(1) - Credit after reduction for advance payments
 # =============================================================================
 
-ptc_after_advance_reconciliation:
-  imports:
-    - 26/36B/a#ptc_premium_tax_credit
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "PTC After Advance Reconciliation"
-  description: "Premium tax credit reduced by advance payments per 26 USC 36B(f)(1)"
-  from 2013-01-01:
-    # (f)(1): "The amount of the credit allowed under this section for any
-    # taxable year shall be reduced (but not below zero) by the amount of any
-    # advance payment of such credit under section 1412"
-    return max(0, ptc_premium_tax_credit - ptc_advance_payments)
+variable ptc_after_advance_reconciliation:
+    entity: taxunit
+    from 2013-01-01: max(0, ptc_premium_tax_credit - ptc_advance_payments)
+
 
 # =============================================================================
 # (f)(2) - Tax increase for excess advance payments
 # =============================================================================
 
-ptc_excess_advance_repayment:
-  imports:
-    - 26/36B/a#ptc_premium_tax_credit
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "PTC Excess Advance Repayment"
-  description: "Tax increase due to excess advance PTC payments per 26 USC 36B(f)(2)"
-  from 2013-01-01:
-    # (f)(2): "If the advance payments...exceed the credit allowed by this
-    # section (determined without regard to paragraph (1)), the tax imposed
-    # by this chapter...shall be increased by the amount of such excess."
-    #
-    # "determined without regard to paragraph (1)" means we compare advance
-    # payments to the full credit amount before the (f)(1) reduction.
-    return max(0, ptc_advance_payments - ptc_premium_tax_credit)
+variable ptc_excess_advance_repayment:
+    entity: taxunit
+    from 2013-01-01: max(0, ptc_advance_payments - ptc_premium_tax_credit)

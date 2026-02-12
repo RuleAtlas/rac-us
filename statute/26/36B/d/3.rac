@@ -1,17 +1,15 @@
 # 26 USC 36B(d)(3) - Poverty line
 
-"""
-(3) Poverty line
-(A) In general
-The term "poverty line" has the meaning given that term in section
-2110(c)(5) of the Social Security Act (42 U.S.C. 1397jj(c)(5)).
-(B) Poverty line used
-In the case of any qualified health plan offered through an Exchange
-for coverage during a taxable year beginning in a calendar year, the
-poverty line used shall be the most recently published poverty line as
-of the 1st day of the regular enrollment period for coverage during
-such calendar year.
-"""
+# (3) Poverty line
+# (A) In general
+# The term "poverty line" has the meaning given that term in section
+# 2110(c)(5) of the Social Security Act (42 U.S.C. 1397jj(c)(5)).
+# (B) Poverty line used
+# In the case of any qualified health plan offered through an Exchange
+# for coverage during a taxable year beginning in a calendar year, the
+# poverty line used shall be the most recently published poverty line as
+# of the 1st day of the regular enrollment period for coverage during
+# such calendar year.
 
 # The poverty line is an external data input published by HHS. Per (A), it
 # uses the Social Security Act definition (42 USC 1397jj(c)(5)), which
@@ -22,10 +20,6 @@ such calendar year.
 # The poverty line varies by family size. This input represents the poverty
 # line for a family of the applicable size as determined by 36B(d)(1).
 
-poverty_line:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  label: "Poverty Line"
-  description: "Federal poverty line for the applicable family size, per 42 USC 1397jj(c)(5), as of the 1st day of the regular enrollment period per 26 USC 36B(d)(3)(B)"
-  default: 0
+variable poverty_line:
+    entity: taxunit
+    from 2024-01-01: 0
