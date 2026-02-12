@@ -1,0 +1,75 @@
+ptc_is_qualified_health_plan:
+  - name: "Standard QHP through Exchange"
+    period: 2024-01
+    inputs:
+      is_ppaca_1301a_qualified_plan: true
+      is_catastrophic_plan: false
+      enrolled_through_exchange: true
+      exchange_has_pre_enrollment_verification: true
+      enrolled_during_special_enrollment_period: false
+      special_enrollment_is_income_based: false
+    expect: true
+  - name: "Catastrophic plan excluded"
+    period: 2024-01
+    inputs:
+      is_ppaca_1301a_qualified_plan: true
+      is_catastrophic_plan: true
+      enrolled_through_exchange: true
+      exchange_has_pre_enrollment_verification: true
+      enrolled_during_special_enrollment_period: false
+      special_enrollment_is_income_based: false
+    expect: false
+  - name: "Not a PPACA 1301a plan"
+    period: 2024-01
+    inputs:
+      is_ppaca_1301a_qualified_plan: false
+      is_catastrophic_plan: false
+      enrolled_through_exchange: true
+      exchange_has_pre_enrollment_verification: true
+      enrolled_during_special_enrollment_period: false
+      special_enrollment_is_income_based: false
+    expect: false
+  - name: "Exchange lacks pre-enrollment verification"
+    period: 2028-01
+    inputs:
+      is_ppaca_1301a_qualified_plan: true
+      is_catastrophic_plan: false
+      enrolled_through_exchange: true
+      exchange_has_pre_enrollment_verification: false
+      enrolled_during_special_enrollment_period: false
+      special_enrollment_is_income_based: false
+    expect: false
+  - name: "Not enrolled through Exchange - verification not required"
+    period: 2024-01
+    inputs:
+      is_ppaca_1301a_qualified_plan: true
+      is_catastrophic_plan: false
+      enrolled_through_exchange: false
+      exchange_has_pre_enrollment_verification: false
+      enrolled_during_special_enrollment_period: false
+      special_enrollment_is_income_based: false
+    expect: true
+  - name: "Income-based special enrollment period excluded"
+    period: 2024-01
+    inputs:
+      is_ppaca_1301a_qualified_plan: true
+      is_catastrophic_plan: false
+      enrolled_through_exchange: true
+      exchange_has_pre_enrollment_verification: true
+      enrolled_during_special_enrollment_period: true
+      special_enrollment_is_income_based: true
+    expect: false
+  - name: "Event-based special enrollment period allowed"
+    period: 2024-01
+    inputs:
+      is_ppaca_1301a_qualified_plan: true
+      is_catastrophic_plan: false
+      enrolled_through_exchange: true
+      exchange_has_pre_enrollment_verification: true
+      enrolled_during_special_enrollment_period: true
+      special_enrollment_is_income_based: false
+    expect: true
+  - name: "All defaults - not qualified"
+    period: 2024-01
+    inputs: {}
+    expect: false

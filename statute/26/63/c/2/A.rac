@@ -1,6 +1,6 @@
 # 26 USC 63(c)(2)(A) - Basic standard deduction - joint returns and surviving spouses
 
-text: """
+"""
 (A) 200 percent of the dollar amount in effect under subparagraph (C) for the taxable year in the case of—
 (i) a joint return, or
 (ii) a surviving spouse (as defined in section 2(a)),
@@ -9,12 +9,11 @@ text: """
 # Basic standard deduction for joint filers and surviving spouses
 # Defined as 200% of the subparagraph (C) amount
 
-parameter joint_multiplier:
+joint_multiplier:
   description: "Multiplier applied to (C) amount for joint returns per 26 USC 63(c)(2)(A)"
-  values:
-    1988-01-01: 2
+  from 1988-01-01: 2
 
-variable basic_std_ded_joint:
+basic_std_ded_joint:
   imports:
     - 26/63/c/2/C#basic_std_ded_other
   entity: TaxUnit
@@ -23,30 +22,11 @@ variable basic_std_ded_joint:
   unit: "USD"
   label: "Basic Standard Deduction - Joint/Surviving Spouse"
   description: "Basic standard deduction for joint filers and surviving spouses per 26 USC 63(c)(2)(A)"
-  formula: |
+  from 1988-01-01:
     # 200 percent of the subparagraph (C) amount
     return basic_std_ded_other * joint_multiplier
-  tests:
-    - name: "Pre-TCJA joint filers"
-      period: 2017-01
-      inputs:
-        tax_year: 2017
-        basic_std_ded_other: 3000
-      expect: 6000
-    - name: "TCJA joint filers 2018"
-      period: 2018-01
-      inputs:
-        tax_year: 2018
-        basic_std_ded_other: 12000
-      expect: 24000
-    - name: "Post-2025 joint filers"
-      period: 2026-01
-      inputs:
-        tax_year: 2026
-        basic_std_ded_other: 15750
-      expect: 31500
 
-input tax_year:
+tax_year:
   entity: TaxUnit
   period: Year
   dtype: Integer

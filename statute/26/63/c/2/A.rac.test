@@ -1,0 +1,19 @@
+basic_std_ded_joint:
+  - name: "Pre-TCJA joint filers"
+    period: 2017-01
+    inputs:
+      tax_year: 2017
+      basic_std_ded_other: 3000
+    expect: 6000
+  - name: "TCJA joint filers 2018"
+    period: 2018-01
+    inputs:
+      tax_year: 2018
+      basic_std_ded_other: 12000
+    expect: 24000
+  - name: "Post-2025 joint filers"
+    period: 2026-01
+    inputs:
+      tax_year: 2026
+      basic_std_ded_other: 15750
+    expect: 31500

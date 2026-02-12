@@ -1,0 +1,81 @@
+prepaid_expenses_eligible_current_year:
+  - name: "Academic period in current year - not a prepayment"
+    period: 2024-01
+    inputs:
+      academic_period_begins_following_year: False
+      academic_period_begins_month: 9
+    expect: False
+  - name: "Academic period begins January of following year - eligible"
+    period: 2024-01
+    inputs:
+      academic_period_begins_following_year: True
+      academic_period_begins_month: 1
+    expect: True
+  - name: "Academic period begins February of following year - eligible"
+    period: 2024-01
+    inputs:
+      academic_period_begins_following_year: True
+      academic_period_begins_month: 2
+    expect: True
+  - name: "Academic period begins March of following year - eligible"
+    period: 2024-01
+    inputs:
+      academic_period_begins_following_year: True
+      academic_period_begins_month: 3
+    expect: True
+  - name: "Academic period begins April of following year - not eligible"
+    period: 2024-01
+    inputs:
+      academic_period_begins_following_year: True
+      academic_period_begins_month: 4
+    expect: False
+  - name: "Academic period begins September of following year - not eligible"
+    period: 2024-01
+    inputs:
+      academic_period_begins_following_year: True
+      academic_period_begins_month: 9
+    expect: False
+
+qualified_expenses_treated_as_current_year:
+  - name: "Current year academic period - full amount eligible"
+    period: 2024-01
+    inputs:
+      qualified_expenses_paid_current_year: 4000
+      academic_period_begins_following_year: False
+      academic_period_begins_month: 8
+    expect: 4000
+  - name: "Prepaid for January start - full amount eligible under (g)(4)"
+    period: 2024-01
+    inputs:
+      qualified_expenses_paid_current_year: 5000
+      academic_period_begins_following_year: True
+      academic_period_begins_month: 1
+    expect: 5000
+  - name: "Prepaid for March start - full amount eligible under (g)(4)"
+    period: 2024-01
+    inputs:
+      qualified_expenses_paid_current_year: 3500
+      academic_period_begins_following_year: True
+      academic_period_begins_month: 3
+    expect: 3500
+  - name: "Prepaid for April start - not eligible, zero for current year"
+    period: 2024-01
+    inputs:
+      qualified_expenses_paid_current_year: 4000
+      academic_period_begins_following_year: True
+      academic_period_begins_month: 4
+    expect: 0
+  - name: "Prepaid for fall semester following year - not eligible"
+    period: 2024-01
+    inputs:
+      qualified_expenses_paid_current_year: 6000
+      academic_period_begins_following_year: True
+      academic_period_begins_month: 9
+    expect: 0
+  - name: "Zero expenses paid - zero result"
+    period: 2024-01
+    inputs:
+      qualified_expenses_paid_current_year: 0
+      academic_period_begins_following_year: True
+      academic_period_begins_month: 1
+    expect: 0

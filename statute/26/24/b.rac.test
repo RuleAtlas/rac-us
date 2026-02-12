@@ -1,0 +1,66 @@
+ctc_threshold:
+  - name: "Joint filers 2024"
+    period: 2024-01
+    inputs:
+      filing_status: "JOINT"
+    expect: 400000
+  - name: "Single filers 2024"
+    period: 2024-01
+    inputs:
+      filing_status: "SINGLE"
+    expect: 200000
+  - name: "MFS 2024"
+    period: 2024-01
+    inputs:
+      filing_status: "SEPARATE"
+    expect: 200000
+
+ctc_phaseout_amount:
+  - name: "Below threshold - Joint"
+    period: 2024-01
+    inputs:
+      modified_agi: 200000
+      filing_status: "JOINT"
+      ctc_maximum: 4000
+    expect: 0
+  - name: "At threshold - Joint"
+    period: 2024-01
+    inputs:
+      modified_agi: 400000
+      filing_status: "JOINT"
+      ctc_maximum: 4000
+    expect: 0
+  - name: "$20,000 over threshold - Joint"
+    period: 2024-01
+    inputs:
+      modified_agi: 420000
+      filing_status: "JOINT"
+      ctc_maximum: 4000
+    expect: 1000
+  - name: "Fully phased out - Joint"
+    period: 2024-01
+    inputs:
+      modified_agi: 500000
+      filing_status: "JOINT"
+      ctc_maximum: 4000
+    expect: 4000
+
+ctc_after_phaseout:
+  - name: "No phaseout"
+    period: 2024-01
+    inputs:
+      ctc_maximum: 4000
+      ctc_phaseout_amount: 0
+    expect: 4000
+  - name: "Partial phaseout"
+    period: 2024-01
+    inputs:
+      ctc_maximum: 4000
+      ctc_phaseout_amount: 1000
+    expect: 3000
+  - name: "Full phaseout"
+    period: 2024-01
+    inputs:
+      ctc_maximum: 4000
+      ctc_phaseout_amount: 5000
+    expect: 0

@@ -1,6 +1,6 @@
 # 26 USC 63(c)(2)(C) - Basic standard deduction - other cases
 
-text: """
+"""
 (C) $3,000 in any other case.
 
 Note: Per 26 USC 63(c)(7)(A)(ii), for taxable years beginning after December 31, 2017,
@@ -13,54 +13,35 @@ shall be increased by inflation adjustment.
 # Base standard deduction for single filers and MFS
 # This is the reference amount that (A) doubles for joint/surviving spouse
 
-parameter basic_std_ded_other_pre_tcja:
+basic_std_ded_other_pre_tcja:
   description: "Basic standard deduction for single/other filers before TCJA per 26 USC 63(c)(2)(C)"
   indexed_by: cpi_adjustment
-  values:
-    1988-01-01: 3000
+  from 1988-01-01: 3000
 
-parameter basic_std_ded_other_tcja:
+basic_std_ded_other_tcja:
   description: "Basic standard deduction for single/other filers under TCJA per 26 USC 63(c)(7)(A)(ii)"
   indexed_by: cpi_adjustment
-  values:
-    2018-01-01: 12000
-    2026-01-01: 15750
+  from 2018-01-01: 12000
+  from 2026-01-01: 15750
 
-parameter tcja_effective_year:
+tcja_effective_year:
   description: "Year TCJA standard deduction provisions took effect"
-  values:
-    1988-01-01: 2018
+  from 1988-01-01: 2018
 
-variable basic_std_ded_other:
+basic_std_ded_other:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
   label: "Basic Standard Deduction - Other Cases"
   description: "Basic standard deduction for unmarried individuals (other than HoH or surviving spouse) per 26 USC 63(c)(2)(C)"
-  formula: |
+  from 1988-01-01:
     # TCJA provisions apply for taxable years beginning after 2017
     if tax_year >= tcja_effective_year:
       return basic_std_ded_other_tcja
     return basic_std_ded_other_pre_tcja
-  tests:
-    - name: "Pre-TCJA single filer"
-      period: 2017-01
-      inputs:
-        tax_year: 2017
-      expect: 3000
-    - name: "TCJA single filer 2018"
-      period: 2018-01
-      inputs:
-        tax_year: 2018
-      expect: 12000
-    - name: "Post-2025 single filer"
-      period: 2026-01
-      inputs:
-        tax_year: 2026
-      expect: 15750
 
-input tax_year:
+tax_year:
   entity: TaxUnit
   period: Year
   dtype: Integer

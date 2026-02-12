@@ -1,0 +1,256 @@
+eitc_credit_before_limitation:
+  - name: "Earned income below earned income amount"
+    period: 2024-01
+    inputs:
+      eitc_earned_income: 5000
+      eitc_earned_income_amount: 6330
+      eitc_credit_percentage: 0.34
+    expect: 1700
+  - name: "Earned income at earned income amount"
+    period: 2024-01
+    inputs:
+      eitc_earned_income: 6330
+      eitc_earned_income_amount: 6330
+      eitc_credit_percentage: 0.34
+    expect: 2152.20
+  - name: "Earned income exceeds earned income amount"
+    period: 2024-01
+    inputs:
+      eitc_earned_income: 10000
+      eitc_earned_income_amount: 6330
+      eitc_credit_percentage: 0.34
+    expect: 2152.20
+  - name: "Zero earned income"
+    period: 2024-01
+    inputs:
+      eitc_earned_income: 0
+      eitc_earned_income_amount: 6330
+      eitc_credit_percentage: 0.34
+    expect: 0
+  - name: "Childless - low income"
+    period: 2024-01
+    inputs:
+      eitc_earned_income: 3000
+      eitc_earned_income_amount: 4220
+      eitc_credit_percentage: 0.0765
+    expect: 229.50
+
+eitc_maximum_credit:
+  - name: "1 qualifying child"
+    period: 2024-01
+    inputs:
+      eitc_credit_percentage: 0.34
+      eitc_earned_income_amount: 6330
+    expect: 2152.20
+  - name: "2 qualifying children"
+    period: 2024-01
+    inputs:
+      eitc_credit_percentage: 0.40
+      eitc_earned_income_amount: 8890
+    expect: 3556
+  - name: "3 or more qualifying children"
+    period: 2024-01
+    inputs:
+      eitc_credit_percentage: 0.45
+      eitc_earned_income_amount: 8890
+    expect: 4000.50
+  - name: "No qualifying children"
+    period: 2024-01
+    inputs:
+      eitc_credit_percentage: 0.0765
+      eitc_earned_income_amount: 4220
+    expect: 322.83
+
+eitc_phaseout_base:
+  - name: "AGI greater than earned income"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 30000
+      eitc_earned_income: 25000
+    expect: 30000
+  - name: "Earned income greater than AGI"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 20000
+      eitc_earned_income: 25000
+    expect: 25000
+  - name: "Equal amounts"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 25000
+      eitc_earned_income: 25000
+    expect: 25000
+  - name: "Zero values"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 0
+      eitc_earned_income: 0
+    expect: 0
+
+eitc_phaseout_reduction:
+  - name: "Income below phaseout threshold"
+    period: 2024-01
+    inputs:
+      eitc_phaseout_base: 10000
+      eitc_phaseout_amount: 11610
+      eitc_phaseout_percentage: 0.1598
+    expect: 0
+  - name: "Income at phaseout threshold"
+    period: 2024-01
+    inputs:
+      eitc_phaseout_base: 11610
+      eitc_phaseout_amount: 11610
+      eitc_phaseout_percentage: 0.1598
+    expect: 0
+  - name: "Income above phaseout threshold - 1 child"
+    period: 2024-01
+    inputs:
+      eitc_phaseout_base: 20000
+      eitc_phaseout_amount: 11610
+      eitc_phaseout_percentage: 0.1598
+    expect: 1340.72
+  - name: "Income above phaseout threshold - childless"
+    period: 2024-01
+    inputs:
+      eitc_phaseout_base: 10000
+      eitc_phaseout_amount: 5280
+      eitc_phaseout_percentage: 0.0765
+    expect: 361.08
+
+eitc_credit_after_limitation:
+  - name: "No phaseout - full credit"
+    period: 2024-01
+    inputs:
+      eitc_maximum_credit: 2152.20
+      eitc_phaseout_reduction: 0
+    expect: 2152.20
+  - name: "Partial phaseout"
+    period: 2024-01
+    inputs:
+      eitc_maximum_credit: 2152.20
+      eitc_phaseout_reduction: 800
+    expect: 1352.20
+  - name: "Full phaseout - credit eliminated"
+    period: 2024-01
+    inputs:
+      eitc_maximum_credit: 2152.20
+      eitc_phaseout_reduction: 3000
+    expect: 0
+  - name: "Phaseout equals maximum - zero credit"
+    period: 2024-01
+    inputs:
+      eitc_maximum_credit: 2152.20
+      eitc_phaseout_reduction: 2152.20
+    expect: 0
+
+earned_income_credit:
+  - name: "Eligible - phase-in region (earned income below earned income amount)"
+    period: 2024-01
+    inputs:
+      is_eitc_eligible_individual: true
+      eitc_eligible_under_32d: true
+      eitc_denied_excessive_investment_income: false
+      eitc_disallowed_improper_claim: false
+      eitc_id_requirements_met: true
+      eitc_credit_before_limitation: 1700
+      eitc_credit_after_limitation: 2152.20
+    expect: 1700
+  - name: "Eligible - plateau region (at maximum credit)"
+    period: 2024-01
+    inputs:
+      is_eitc_eligible_individual: true
+      eitc_eligible_under_32d: true
+      eitc_denied_excessive_investment_income: false
+      eitc_disallowed_improper_claim: false
+      eitc_id_requirements_met: true
+      eitc_credit_before_limitation: 2152.20
+      eitc_credit_after_limitation: 2152.20
+    expect: 2152.20
+  - name: "Eligible - phaseout region"
+    period: 2024-01
+    inputs:
+      is_eitc_eligible_individual: true
+      eitc_eligible_under_32d: true
+      eitc_denied_excessive_investment_income: false
+      eitc_disallowed_improper_claim: false
+      eitc_id_requirements_met: true
+      eitc_credit_before_limitation: 2152.20
+      eitc_credit_after_limitation: 1200
+    expect: 1200
+  - name: "Ineligible - not eligible individual"
+    period: 2024-01
+    inputs:
+      is_eitc_eligible_individual: false
+      eitc_eligible_under_32d: true
+      eitc_denied_excessive_investment_income: false
+      eitc_disallowed_improper_claim: false
+      eitc_id_requirements_met: true
+      eitc_credit_before_limitation: 2152.20
+      eitc_credit_after_limitation: 2152.20
+    expect: 0
+  - name: "Ineligible - married filing separately"
+    period: 2024-01
+    inputs:
+      is_eitc_eligible_individual: true
+      eitc_eligible_under_32d: false
+      eitc_denied_excessive_investment_income: false
+      eitc_disallowed_improper_claim: false
+      eitc_id_requirements_met: true
+      eitc_credit_before_limitation: 2152.20
+      eitc_credit_after_limitation: 2152.20
+    expect: 0
+  - name: "Ineligible - excessive investment income"
+    period: 2024-01
+    inputs:
+      is_eitc_eligible_individual: true
+      eitc_eligible_under_32d: true
+      eitc_denied_excessive_investment_income: true
+      eitc_disallowed_improper_claim: false
+      eitc_id_requirements_met: true
+      eitc_credit_before_limitation: 2152.20
+      eitc_credit_after_limitation: 2152.20
+    expect: 0
+  - name: "Ineligible - improper prior claim"
+    period: 2024-01
+    inputs:
+      is_eitc_eligible_individual: true
+      eitc_eligible_under_32d: true
+      eitc_denied_excessive_investment_income: false
+      eitc_disallowed_improper_claim: true
+      eitc_id_requirements_met: true
+      eitc_credit_before_limitation: 2152.20
+      eitc_credit_after_limitation: 2152.20
+    expect: 0
+  - name: "Ineligible - ID requirements not met"
+    period: 2024-01
+    inputs:
+      is_eitc_eligible_individual: true
+      eitc_eligible_under_32d: true
+      eitc_denied_excessive_investment_income: false
+      eitc_disallowed_improper_claim: false
+      eitc_id_requirements_met: false
+      eitc_credit_before_limitation: 2152.20
+      eitc_credit_after_limitation: 2152.20
+    expect: 0
+  - name: "Zero earned income - zero credit"
+    period: 2024-01
+    inputs:
+      is_eitc_eligible_individual: true
+      eitc_eligible_under_32d: true
+      eitc_denied_excessive_investment_income: false
+      eitc_disallowed_improper_claim: false
+      eitc_id_requirements_met: true
+      eitc_credit_before_limitation: 0
+      eitc_credit_after_limitation: 2152.20
+    expect: 0
+  - name: "Fully phased out - zero credit"
+    period: 2024-01
+    inputs:
+      is_eitc_eligible_individual: true
+      eitc_eligible_under_32d: true
+      eitc_denied_excessive_investment_income: false
+      eitc_disallowed_improper_claim: false
+      eitc_id_requirements_met: true
+      eitc_credit_before_limitation: 2152.20
+      eitc_credit_after_limitation: 0
+    expect: 0

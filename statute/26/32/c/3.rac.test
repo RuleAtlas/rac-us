@@ -1,0 +1,60 @@
+is_eitc_qualifying_child:
+  - name: "Basic qualifying child"
+    period: 2024-01
+    inputs:
+      is_qualifying_child_152c: true
+      child_is_married: false
+      child_principal_abode_in_us: true
+      child_tin_included_on_return: true
+    expect: true
+  - name: "Not qualifying child under 152(c)"
+    period: 2024-01
+    inputs:
+      is_qualifying_child_152c: false
+      child_is_married: false
+      child_principal_abode_in_us: true
+      child_tin_included_on_return: true
+    expect: false
+  - name: "Married child - taxpayer claims 151 deduction"
+    period: 2024-01
+    inputs:
+      is_qualifying_child_152c: true
+      child_is_married: true
+      taxpayer_claims_151_deduction_for_child: true
+      child_principal_abode_in_us: true
+      child_tin_included_on_return: true
+    expect: true
+  - name: "Married child - taxpayer does not claim 151 deduction"
+    period: 2024-01
+    inputs:
+      is_qualifying_child_152c: true
+      child_is_married: true
+      taxpayer_claims_151_deduction_for_child: false
+      child_principal_abode_in_us: true
+      child_tin_included_on_return: true
+    expect: false
+  - name: "Principal abode not in US"
+    period: 2024-01
+    inputs:
+      is_qualifying_child_152c: true
+      child_is_married: false
+      child_principal_abode_in_us: false
+      child_tin_included_on_return: true
+    expect: false
+  - name: "Missing TIN on return"
+    period: 2024-01
+    inputs:
+      is_qualifying_child_152c: true
+      child_is_married: false
+      child_principal_abode_in_us: true
+      child_tin_included_on_return: false
+    expect: false
+  - name: "Zero case - all requirements fail"
+    period: 2024-01
+    inputs:
+      is_qualifying_child_152c: false
+      child_is_married: true
+      taxpayer_claims_151_deduction_for_child: false
+      child_principal_abode_in_us: false
+      child_tin_included_on_return: false
+    expect: false

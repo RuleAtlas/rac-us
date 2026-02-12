@@ -1,0 +1,4 @@
+snap_benefits_excluded_from_income:
+  - name: "SNAP benefits always excluded from income"
+    period: 2024-10
+    expect: true

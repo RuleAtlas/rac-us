@@ -1,6 +1,6 @@
 # 26 USC 63(c)(2)(B) - Basic standard deduction - head of household
 
-text: """
+"""
 (B) $4,400 in the case of a head of household (as defined in section 2(b)), or
 
 Note: Per 26 USC 63(c)(7)(A)(i), for taxable years beginning after December 31, 2017,
@@ -12,54 +12,35 @@ shall be increased by inflation adjustment.
 
 # Basic standard deduction for head of household filers
 
-parameter basic_std_ded_hoh_pre_tcja:
+basic_std_ded_hoh_pre_tcja:
   description: "Basic standard deduction for head of household before TCJA per 26 USC 63(c)(2)(B)"
   indexed_by: cpi_adjustment
-  values:
-    1988-01-01: 4400
+  from 1988-01-01: 4400
 
-parameter basic_std_ded_hoh_tcja:
+basic_std_ded_hoh_tcja:
   description: "Basic standard deduction for head of household under TCJA per 26 USC 63(c)(7)(A)(i)"
   indexed_by: cpi_adjustment
-  values:
-    2018-01-01: 18000
-    2026-01-01: 23625
+  from 2018-01-01: 18000
+  from 2026-01-01: 23625
 
-parameter tcja_effective_year:
+tcja_effective_year:
   description: "Year TCJA standard deduction provisions took effect"
-  values:
-    1988-01-01: 2018
+  from 1988-01-01: 2018
 
-variable basic_std_ded_hoh:
+basic_std_ded_hoh:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
   label: "Basic Standard Deduction - Head of Household"
   description: "Basic standard deduction for head of household filers per 26 USC 63(c)(2)(B)"
-  formula: |
+  from 1988-01-01:
     # TCJA provisions apply for taxable years beginning after 2017
     if tax_year >= tcja_effective_year:
       return basic_std_ded_hoh_tcja
     return basic_std_ded_hoh_pre_tcja
-  tests:
-    - name: "Pre-TCJA head of household"
-      period: 2017-01
-      inputs:
-        tax_year: 2017
-      expect: 4400
-    - name: "TCJA head of household 2018"
-      period: 2018-01
-      inputs:
-        tax_year: 2018
-      expect: 18000
-    - name: "Post-2025 head of household"
-      period: 2026-01
-      inputs:
-        tax_year: 2026
-      expect: 23625
 
-input tax_year:
+tax_year:
   entity: TaxUnit
   period: Year
   dtype: Integer

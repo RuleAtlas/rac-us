@@ -1,6 +1,6 @@
 # Denial of credit for individuals having excessive investment income
 
-text: """
+"""
 (i) Denial of credit for individuals having excessive investment income
 (1) In general
 No credit shall be allowed under subsection (a) for the taxable year if the aggregate
@@ -34,16 +34,15 @@ such term by section 469.
 # Base disqualified income threshold per 32(i)(1)
 # Note: This is the statutory base amount. Inflation-adjusted amounts are computed
 # via 32(j) and published in annual IRS Revenue Procedures.
-parameter disqualified_income_limit:
+disqualified_income_limit:
   description: "Maximum disqualified income before EITC denial per 26 USC 32(i)(1)"
   unit: USD
   indexed_by: cpi_adjustment
-  values:
-    2021-01-01: 10_000
+  from 2021-01-01: 10_000
 
 # Inputs for disqualified income components
 
-input taxable_interest_income:
+taxable_interest_income:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -51,7 +50,7 @@ input taxable_interest_income:
   description: "Interest includible in gross income per 26 USC 32(i)(2)(A)"
   default: 0
 
-input dividend_income:
+dividend_income:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -59,7 +58,7 @@ input dividend_income:
   description: "Dividends includible in gross income per 26 USC 32(i)(2)(A)"
   default: 0
 
-input tax_exempt_interest_income:
+tax_exempt_interest_income:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -67,7 +66,7 @@ input tax_exempt_interest_income:
   description: "Interest exempt from tax per 26 USC 32(i)(2)(B)"
   default: 0
 
-input gross_rent_royalty_income:
+gross_rent_royalty_income:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -75,7 +74,7 @@ input gross_rent_royalty_income:
   description: "Gross income from rents or royalties not in ordinary course of trade or business per 26 USC 32(i)(2)(C)(i)"
   default: 0
 
-input rent_royalty_deductions_noninterest:
+rent_royalty_deductions_noninterest:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -83,7 +82,7 @@ input rent_royalty_deductions_noninterest:
   description: "Deductions (other than interest) allocable to rent/royalty income per 26 USC 32(i)(2)(C)(ii)(I)"
   default: 0
 
-input rent_royalty_interest_deductions:
+rent_royalty_interest_deductions:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -91,7 +90,7 @@ input rent_royalty_interest_deductions:
   description: "Interest deductions allocable to rent/royalty income per 26 USC 32(i)(2)(C)(ii)(II)"
   default: 0
 
-input capital_gain_net_income:
+capital_gain_net_income:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -99,7 +98,7 @@ input capital_gain_net_income:
   description: "Capital gain net income per section 1222 for 26 USC 32(i)(2)(D)"
   default: 0
 
-input gross_passive_income:
+gross_passive_income:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -107,7 +106,7 @@ input gross_passive_income:
   description: "Aggregate income from all passive activities per 26 USC 32(i)(2)(E)(i)"
   default: 0
 
-input passive_activity_losses:
+passive_activity_losses:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -116,82 +115,41 @@ input passive_activity_losses:
   default: 0
 
 # Variable: Net rent/royalty income per 32(i)(2)(C)
-variable net_rent_royalty_income:
+net_rent_royalty_income:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Net Rent and Royalty Income"
   description: "Excess of gross rent/royalty over deductions per 26 USC 32(i)(2)(C)"
-  formula: |
+  from 2021-01-01:
     # 32(i)(2)(C): excess of (i) gross income over (ii) sum of deductions
     total_deductions = rent_royalty_deductions_noninterest + rent_royalty_interest_deductions
     excess = gross_rent_royalty_income - total_deductions
     return max(0, excess)
-  tests:
-    - name: "No rent/royalty income"
-      period: 2024-01
-      inputs:
-        gross_rent_royalty_income: 0
-        rent_royalty_deductions_noninterest: 0
-        rent_royalty_interest_deductions: 0
-      expect: 0
-    - name: "Positive net rent income"
-      period: 2024-01
-      inputs:
-        gross_rent_royalty_income: 15_000
-        rent_royalty_deductions_noninterest: 5_000
-        rent_royalty_interest_deductions: 2_000
-      expect: 8_000
-    - name: "Deductions exceed gross - floor at zero"
-      period: 2024-01
-      inputs:
-        gross_rent_royalty_income: 5_000
-        rent_royalty_deductions_noninterest: 4_000
-        rent_royalty_interest_deductions: 3_000
-      expect: 0
 
 # Variable: Net passive income per 32(i)(2)(E)
-variable net_passive_income:
+net_passive_income:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Net Passive Activity Income"
   description: "Excess of passive income over passive losses per 26 USC 32(i)(2)(E)"
-  formula: |
+  from 2021-01-01:
     # 32(i)(2)(E): excess of (i) aggregate income over (ii) aggregate losses
     excess = gross_passive_income - passive_activity_losses
     return max(0, excess)
-  tests:
-    - name: "No passive activity"
-      period: 2024-01
-      inputs:
-        gross_passive_income: 0
-        passive_activity_losses: 0
-      expect: 0
-    - name: "Net passive income"
-      period: 2024-01
-      inputs:
-        gross_passive_income: 10_000
-        passive_activity_losses: 3_000
-      expect: 7_000
-    - name: "Losses exceed income - floor at zero"
-      period: 2024-01
-      inputs:
-        gross_passive_income: 2_000
-        passive_activity_losses: 5_000
-      expect: 0
 
 # Variable: Total disqualified income per 32(i)(2)
-variable disqualified_income:
+disqualified_income:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Disqualified Income"
   description: "Aggregate disqualified income per 26 USC 32(i)(2)"
-  formula: |
+  from 2021-01-01:
     # 32(i)(2)(A): interest or dividends
     interest_dividends = taxable_interest_income + dividend_income
     # 32(i)(2)(B): tax-exempt interest
@@ -204,70 +162,14 @@ variable disqualified_income:
     passive = net_passive_income
     # Sum all components
     return interest_dividends + exempt_interest + rent_royalty + cap_gains + passive
-  tests:
-    - name: "No disqualified income"
-      period: 2024-01
-      inputs:
-        taxable_interest_income: 0
-        dividend_income: 0
-        tax_exempt_interest_income: 0
-        net_rent_royalty_income: 0
-        capital_gain_net_income: 0
-        net_passive_income: 0
-      expect: 0
-    - name: "Interest and dividends only"
-      period: 2024-01
-      inputs:
-        taxable_interest_income: 500
-        dividend_income: 1_500
-        tax_exempt_interest_income: 0
-        net_rent_royalty_income: 0
-        capital_gain_net_income: 0
-        net_passive_income: 0
-      expect: 2_000
-    - name: "All components"
-      period: 2024-01
-      inputs:
-        taxable_interest_income: 1_000
-        dividend_income: 2_000
-        tax_exempt_interest_income: 500
-        net_rent_royalty_income: 3_000
-        capital_gain_net_income: 2_500
-        net_passive_income: 1_000
-      expect: 10_000
 
 # Variable: EITC denied due to excessive investment income per 32(i)(1)
-variable eitc_denied_excessive_investment_income:
+eitc_denied_excessive_investment_income:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "EITC Denied - Excessive Investment Income"
   description: "Whether EITC is denied due to disqualified income exceeding limit per 26 USC 32(i)(1)"
-  formula: |
+  from 2021-01-01:
     # 32(i)(1): No credit if disqualified income exceeds limit
     return disqualified_income > disqualified_income_limit
-  tests:
-    - name: "Below limit - not denied"
-      period: 2024-01
-      inputs:
-        disqualified_income: 5_000
-        disqualified_income_limit: 11_600
-      expect: false
-    - name: "At limit - not denied"
-      period: 2024-01
-      inputs:
-        disqualified_income: 11_600
-        disqualified_income_limit: 11_600
-      expect: false
-    - name: "Above limit - denied"
-      period: 2024-01
-      inputs:
-        disqualified_income: 12_000
-        disqualified_income_limit: 11_600
-      expect: true
-    - name: "No investment income - not denied"
-      period: 2024-01
-      inputs:
-        disqualified_income: 0
-        disqualified_income_limit: 11_600
-      expect: false

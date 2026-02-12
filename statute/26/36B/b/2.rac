@@ -1,4 +1,4 @@
-text: """
+"""
 (2) Premium assistance amount
 The premium assistance amount determined under this subsection with respect
 to any coverage month is the amount equal to the lesser of—
@@ -18,16 +18,15 @@ the taxpayer's household income for the taxable year.
 # Parameters
 # =============================================================================
 
-parameter months_per_year:
+months_per_year:
   description: "Number of months per year, used to compute monthly share of annual expected contribution per 26 USC 36B(b)(2)(B)(ii)"
-  values:
-    2014-01-01: 12
+  from 2014-01-01: 12
 
 # =============================================================================
 # Inputs
 # =============================================================================
 
-input ptc_monthly_premium:
+ptc_monthly_premium:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -35,7 +34,7 @@ input ptc_monthly_premium:
   description: "Monthly premiums for qualified health plans enrolled through an Exchange per 26 USC 36B(b)(2)(A)"
   default: 0
 
-input ptc_slcsp_monthly_premium:
+ptc_slcsp_monthly_premium:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -47,7 +46,7 @@ input ptc_slcsp_monthly_premium:
 # Variable: Premium assistance amount (monthly)
 # =============================================================================
 
-variable ptc_premium_assistance_amount:
+ptc_premium_assistance_amount:
   imports:
     - 26/36B/b/3#applicable_percentage
     - 26/36B/b/3#household_income
@@ -57,7 +56,7 @@ variable ptc_premium_assistance_amount:
   unit: USD
   label: "Premium Assistance Amount"
   description: "Monthly premium assistance amount per 26 USC 36B(b)(2), the lesser of (A) enrolled plan premiums or (B) excess of SLCSP premium over expected contribution"
-  formula: |
+  from 2014-01-01:
     # (A): Monthly premiums for qualified health plans enrolled through an Exchange
     amount_a = ptc_monthly_premium
 
@@ -69,76 +68,3 @@ variable ptc_premium_assistance_amount:
 
     # Lesser of (A) or (B)
     return min(amount_a, amount_b)
-  tests:
-    - name: "Basic case - B is lesser (subsidy capped by benchmark)"
-      period: 2024-01
-      inputs:
-        ptc_monthly_premium: 800
-        ptc_slcsp_monthly_premium: 600
-        applicable_percentage: 0.085
-        household_income: 40000
-        months_per_year: 12
-      expect: 316.67
-    - name: "A is lesser (enrolled premium less than benchmark excess)"
-      period: 2024-01
-      inputs:
-        ptc_monthly_premium: 200
-        ptc_slcsp_monthly_premium: 600
-        applicable_percentage: 0.02
-        household_income: 20000
-        months_per_year: 12
-      expect: 200
-    - name: "Expected contribution exceeds SLCSP - no subsidy from (B)"
-      period: 2024-01
-      inputs:
-        ptc_monthly_premium: 500
-        ptc_slcsp_monthly_premium: 300
-        applicable_percentage: 0.095
-        household_income: 80000
-        months_per_year: 12
-      expect: 0
-    - name: "Zero enrolled premium - no assistance"
-      period: 2024-01
-      inputs:
-        ptc_monthly_premium: 0
-        ptc_slcsp_monthly_premium: 600
-        applicable_percentage: 0.06
-        household_income: 50000
-        months_per_year: 12
-      expect: 0
-    - name: "Zero SLCSP premium - B is zero"
-      period: 2024-01
-      inputs:
-        ptc_monthly_premium: 500
-        ptc_slcsp_monthly_premium: 0
-        applicable_percentage: 0.06
-        household_income: 50000
-        months_per_year: 12
-      expect: 0
-    - name: "Zero household income - full SLCSP as B"
-      period: 2024-01
-      inputs:
-        ptc_monthly_premium: 500
-        ptc_slcsp_monthly_premium: 600
-        applicable_percentage: 0.0
-        household_income: 0
-        months_per_year: 12
-      expect: 500
-    - name: "Very low income IRA period - 0% applicable percentage"
-      period: 2024-01
-      inputs:
-        ptc_monthly_premium: 400
-        ptc_slcsp_monthly_premium: 500
-        applicable_percentage: 0.0
-        household_income: 15000
-        months_per_year: 12
-      expect: 400
-    - name: "Equal premiums - subsidy equals excess of SLCSP over contribution"
-      period: 2024-01
-      inputs:
-        ptc_monthly_premium: 600
-        ptc_slcsp_monthly_premium: 600
-        applicable_percentage: 0.04
-        household_income: 36000
-        months_per_year: 12
-      expect: 480

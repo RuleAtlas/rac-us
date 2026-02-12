@@ -1,6 +1,6 @@
 # 26 USC 25A(b)(2)(A) - Credit allowed only for 4 taxable years
 
-text: """
+"""
 (A) Credit allowed only for 4 taxable years
 An election to have this section apply with respect to any eligible student for purposes
 of the American Opportunity Tax Credit under subsection (a)(1) may not be made for any
@@ -8,12 +8,11 @@ taxable year if such an election (by the taxpayer or any other individual) is in
 with respect to such student for any 4 prior taxable years.
 """
 
-parameter max_aotc_years:
+max_aotc_years:
   description: "Maximum number of prior years AOTC can be claimed for a student per 26 USC 25A(b)(2)(A)"
-  values:
-    1997-08-05: 4
+  from 1997-08-05: 4
 
-input prior_aotc_years_claimed:
+prior_aotc_years_claimed:
   entity: Person
   period: Year
   dtype: Integer
@@ -21,32 +20,11 @@ input prior_aotc_years_claimed:
   description: "Number of prior taxable years for which AOTC election was in effect for this student"
   default: 0
 
-variable aotc_4_year_limit_met:
+aotc_4_year_limit_met:
   entity: Person
   period: Year
   dtype: Boolean
   label: "AOTC 4-Year Limit Met"
   description: "Whether student has used AOTC for 4 prior years, disqualifying further claims per 26 USC 25A(b)(2)(A)"
-  formula: |
+  from 1997-08-05:
     return prior_aotc_years_claimed >= max_aotc_years
-  tests:
-    - name: "No prior years - eligible"
-      period: 2024-01
-      inputs:
-        prior_aotc_years_claimed: 0
-      expect: False
-    - name: "Three prior years - still eligible"
-      period: 2024-01
-      inputs:
-        prior_aotc_years_claimed: 3
-      expect: False
-    - name: "Four prior years - limit met"
-      period: 2024-01
-      inputs:
-        prior_aotc_years_claimed: 4
-      expect: True
-    - name: "More than four prior years - limit met"
-      period: 2024-01
-      inputs:
-        prior_aotc_years_claimed: 5
-      expect: True

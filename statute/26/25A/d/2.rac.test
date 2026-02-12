@@ -1,0 +1,41 @@
+magi_for_25A:
+  - name: "No exclusions - MAGI equals AGI"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 50000
+      section_911_exclusion: 0
+      section_931_exclusion: 0
+      section_933_exclusion: 0
+    expect: 50000
+  - name: "Foreign earned income exclusion only"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 50000
+      section_911_exclusion: 120000
+      section_931_exclusion: 0
+      section_933_exclusion: 0
+    expect: 170000
+  - name: "All three exclusions"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 80000
+      section_911_exclusion: 50000
+      section_931_exclusion: 10000
+      section_933_exclusion: 5000
+    expect: 145000
+  - name: "Zero AGI with exclusions"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 0
+      section_911_exclusion: 100000
+      section_931_exclusion: 0
+      section_933_exclusion: 0
+    expect: 100000
+  - name: "Puerto Rico income exclusion only"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 75000
+      section_911_exclusion: 0
+      section_931_exclusion: 0
+      section_933_exclusion: 25000
+    expect: 100000

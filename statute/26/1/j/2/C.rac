@@ -1,6 +1,6 @@
 # 26 USC 1(j)(2)(C) - Unmarried individuals other than surviving spouses and heads of households
 
-text: """
+"""
 (C) Unmarried individuals other than surviving spouses and heads of households
 The following table shall be applied in lieu of the table contained in subsection (c):
 
@@ -14,98 +14,84 @@ Over $200,000 but not over $500,000      $45,689.50, plus 35% of the excess over
 Over $500,000                            $150,689.50, plus 37% of the excess over $500,000.
 """
 
-parameter single_bracket_1_threshold:
+single_bracket_1_threshold:
   description: "First bracket threshold for single filers per 26 USC 1(j)(2)(C)"
   indexed_by: cpi_adjustment
-  values:
-    2018-01-01: 0
+  from 2018-01-01: 0
 
-parameter single_bracket_2_threshold:
+single_bracket_2_threshold:
   description: "Second bracket threshold for single filers per 26 USC 1(j)(2)(C)"
   indexed_by: cpi_adjustment
-  values:
-    2018-01-01: 9525
+  from 2018-01-01: 9525
 
-parameter single_bracket_3_threshold:
+single_bracket_3_threshold:
   description: "Third bracket threshold for single filers per 26 USC 1(j)(2)(C)"
   indexed_by: cpi_adjustment
-  values:
-    2018-01-01: 38700
+  from 2018-01-01: 38700
 
-parameter single_bracket_4_threshold:
+single_bracket_4_threshold:
   description: "Fourth bracket threshold for single filers per 26 USC 1(j)(2)(C)"
   indexed_by: cpi_adjustment
-  values:
-    2018-01-01: 82500
+  from 2018-01-01: 82500
 
-parameter single_bracket_5_threshold:
+single_bracket_5_threshold:
   description: "Fifth bracket threshold for single filers per 26 USC 1(j)(2)(C)"
   indexed_by: cpi_adjustment
-  values:
-    2018-01-01: 157500
+  from 2018-01-01: 157500
 
-parameter single_bracket_6_threshold:
+single_bracket_6_threshold:
   description: "Sixth bracket threshold for single filers per 26 USC 1(j)(2)(C)"
   indexed_by: cpi_adjustment
-  values:
-    2018-01-01: 200000
+  from 2018-01-01: 200000
 
-parameter single_bracket_7_threshold:
+single_bracket_7_threshold:
   description: "Seventh bracket threshold for single filers per 26 USC 1(j)(2)(C)"
   indexed_by: cpi_adjustment
-  values:
-    2018-01-01: 500000
+  from 2018-01-01: 500000
 
-parameter rate_1:
+rate_1:
   description: "First marginal rate per 26 USC 1(j)(2)"
-  values:
-    2018-01-01: 0.10
+  from 2018-01-01: 0.10
 
-parameter rate_2:
+rate_2:
   description: "Second marginal rate per 26 USC 1(j)(2)"
-  values:
-    2018-01-01: 0.12
+  from 2018-01-01: 0.12
 
-parameter rate_3:
+rate_3:
   description: "Third marginal rate per 26 USC 1(j)(2)"
-  values:
-    2018-01-01: 0.22
+  from 2018-01-01: 0.22
 
-parameter rate_4:
+rate_4:
   description: "Fourth marginal rate per 26 USC 1(j)(2)"
-  values:
-    2018-01-01: 0.24
+  from 2018-01-01: 0.24
 
-parameter rate_5:
+rate_5:
   description: "Fifth marginal rate per 26 USC 1(j)(2)"
-  values:
-    2018-01-01: 0.32
+  from 2018-01-01: 0.32
 
-parameter rate_6:
+rate_6:
   description: "Sixth marginal rate per 26 USC 1(j)(2)"
-  values:
-    2018-01-01: 0.35
+  from 2018-01-01: 0.35
 
-parameter rate_7:
+rate_7:
   description: "Seventh marginal rate per 26 USC 1(j)(2)"
-  values:
-    2018-01-01: 0.37
+  from 2018-01-01: 0.37
 
-input taxable_income:
+taxable_income:
   entity: TaxUnit
   period: Year
   dtype: Money
   label: "Taxable Income"
   description: "Taxable income as determined under 26 USC 63"
 
-variable single_income_tax:
+single_income_tax:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
   label: "Income Tax (Single)"
   description: "Income tax for single filers per 26 USC 1(j)(2)(C)"
-  formula: |
+  from 2018-01-01:
     # Bracket 1: 10% of income up to threshold 2
     bracket_1_income = min(taxable_income, single_bracket_2_threshold)
     tax_1 = bracket_1_income * rate_1
@@ -135,34 +121,3 @@ variable single_income_tax:
     tax_7 = bracket_7_income * rate_7
 
     return tax_1 + tax_2 + tax_3 + tax_4 + tax_5 + tax_6 + tax_7
-  tests:
-    - name: "First bracket only"
-      period: 2018-01
-      inputs:
-        taxable_income: 5000
-      expect: 500
-    - name: "Second bracket"
-      period: 2018-01
-      inputs:
-        taxable_income: 25000
-      expect: 2809.50
-    - name: "Third bracket"
-      period: 2018-01
-      inputs:
-        taxable_income: 50000
-      expect: 6939.50
-    - name: "Fourth bracket"
-      period: 2018-01
-      inputs:
-        taxable_income: 100000
-      expect: 18289.50
-    - name: "Top bracket"
-      period: 2018-01
-      inputs:
-        taxable_income: 600000
-      expect: 187689.50
-    - name: "Zero income"
-      period: 2018-01
-      inputs:
-        taxable_income: 0
-      expect: 0

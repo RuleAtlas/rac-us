@@ -1,6 +1,6 @@
 # 26 USC 32(c)(3) - Qualifying child
 
-text: """
+"""
 (3) Qualifying child
 (A) In general
 The term "qualifying child" means a qualifying child of the taxpayer (as defined
@@ -36,7 +36,7 @@ in clause (i).
 
 # Inputs for qualifying child determination
 
-input is_qualifying_child_152c:
+is_qualifying_child_152c:
   entity: Person
   period: Year
   dtype: Boolean
@@ -44,7 +44,7 @@ input is_qualifying_child_152c:
   description: "Whether individual meets qualifying child definition under section 152(c)"
   default: False
 
-input child_is_married:
+child_is_married:
   entity: Person
   period: Year
   dtype: Boolean
@@ -52,7 +52,7 @@ input child_is_married:
   description: "Whether the child is married as of the close of the taxpayer's taxable year"
   default: False
 
-input taxpayer_claims_151_deduction_for_child:
+taxpayer_claims_151_deduction_for_child:
   entity: Person
   period: Year
   dtype: Boolean
@@ -60,7 +60,7 @@ input taxpayer_claims_151_deduction_for_child:
   description: "Whether taxpayer is entitled to deduction under section 151 for this child"
   default: False
 
-input child_principal_abode_in_us:
+child_principal_abode_in_us:
   entity: Person
   period: Year
   dtype: Boolean
@@ -68,7 +68,7 @@ input child_principal_abode_in_us:
   description: "Whether child's principal place of abode is in the United States per 32(c)(3)(C)"
   default: True
 
-input child_tin_included_on_return:
+child_tin_included_on_return:
   entity: Person
   period: Year
   dtype: Boolean
@@ -78,13 +78,13 @@ input child_tin_included_on_return:
 
 # Variable implementing the qualifying child definition for EITC
 
-variable is_eitc_qualifying_child:
+is_eitc_qualifying_child:
   entity: Person
   period: Year
   dtype: Boolean
   label: "EITC Qualifying Child"
   description: "Whether individual is a qualifying child for EITC per 26 USC 32(c)(3)"
-  formula: |
+  from 2013-01-01:
     # (A) In general: Must be qualifying child under 152(c)
     # (determined without regard to 152(c)(1)(D) and 152(e))
     if not is_qualifying_child_152c:
@@ -105,63 +105,3 @@ variable is_eitc_qualifying_child:
       return False
 
     return True
-  tests:
-    - name: "Basic qualifying child"
-      period: 2024-01
-      inputs:
-        is_qualifying_child_152c: true
-        child_is_married: false
-        child_principal_abode_in_us: true
-        child_tin_included_on_return: true
-      expect: true
-    - name: "Not qualifying child under 152(c)"
-      period: 2024-01
-      inputs:
-        is_qualifying_child_152c: false
-        child_is_married: false
-        child_principal_abode_in_us: true
-        child_tin_included_on_return: true
-      expect: false
-    - name: "Married child - taxpayer claims 151 deduction"
-      period: 2024-01
-      inputs:
-        is_qualifying_child_152c: true
-        child_is_married: true
-        taxpayer_claims_151_deduction_for_child: true
-        child_principal_abode_in_us: true
-        child_tin_included_on_return: true
-      expect: true
-    - name: "Married child - taxpayer does not claim 151 deduction"
-      period: 2024-01
-      inputs:
-        is_qualifying_child_152c: true
-        child_is_married: true
-        taxpayer_claims_151_deduction_for_child: false
-        child_principal_abode_in_us: true
-        child_tin_included_on_return: true
-      expect: false
-    - name: "Principal abode not in US"
-      period: 2024-01
-      inputs:
-        is_qualifying_child_152c: true
-        child_is_married: false
-        child_principal_abode_in_us: false
-        child_tin_included_on_return: true
-      expect: false
-    - name: "Missing TIN on return"
-      period: 2024-01
-      inputs:
-        is_qualifying_child_152c: true
-        child_is_married: false
-        child_principal_abode_in_us: true
-        child_tin_included_on_return: false
-      expect: false
-    - name: "Zero case - all requirements fail"
-      period: 2024-01
-      inputs:
-        is_qualifying_child_152c: false
-        child_is_married: true
-        taxpayer_claims_151_deduction_for_child: false
-        child_principal_abode_in_us: false
-        child_tin_included_on_return: false
-      expect: false

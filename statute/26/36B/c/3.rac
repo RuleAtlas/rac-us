@@ -1,6 +1,6 @@
 # 26 USC 36B(c)(3) - Definitions and other rules
 
-text: """
+"""
 (3) Definitions and other rules
 (A) Qualified health plan
 (i) In general
@@ -48,7 +48,7 @@ the Patient Protection and Affordable Care Act.
 # Inputs: Plan characteristics
 # =============================================================================
 
-input is_ppaca_1301a_qualified_plan:
+is_ppaca_1301a_qualified_plan:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -56,7 +56,7 @@ input is_ppaca_1301a_qualified_plan:
   description: "Whether the plan meets the definition of qualified health plan under section 1301(a) of the Patient Protection and Affordable Care Act"
   default: false
 
-input is_catastrophic_plan:
+is_catastrophic_plan:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -64,7 +64,7 @@ input is_catastrophic_plan:
   description: "Whether the plan is a catastrophic plan described in section 1302(e) of the Patient Protection and Affordable Care Act"
   default: false
 
-input exchange_has_pre_enrollment_verification:
+exchange_has_pre_enrollment_verification:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -72,7 +72,7 @@ input exchange_has_pre_enrollment_verification:
   description: "Whether the Exchange provides a pre-enrollment verification process per 26 USC 36B(c)(3)(A)(ii)"
   default: true
 
-input enrolled_through_exchange:
+enrolled_through_exchange:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -80,7 +80,7 @@ input enrolled_through_exchange:
   description: "Whether the plan was enrolled in through an Exchange"
   default: true
 
-input enrolled_during_special_enrollment_period:
+enrolled_during_special_enrollment_period:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -88,7 +88,7 @@ input enrolled_during_special_enrollment_period:
   description: "Whether the plan was enrolled in during a special enrollment period described in 26 USC 36B(c)(3)(A)(iii)"
   default: false
 
-input special_enrollment_is_income_based:
+special_enrollment_is_income_based:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -100,13 +100,13 @@ input special_enrollment_is_income_based:
 # Variable: Qualified health plan determination
 # =============================================================================
 
-variable ptc_is_qualified_health_plan:
+ptc_is_qualified_health_plan:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "Qualified Health Plan for PTC"
   description: "Whether the plan is a qualified health plan for purposes of the premium tax credit per 26 USC 36B(c)(3)(A)"
-  formula: |
+  from 2013-01-01:
     # (A)(i): Must be a qualified health plan under PPACA 1301(a)
     if not is_ppaca_1301a_qualified_plan:
       return false
@@ -126,78 +126,3 @@ variable ptc_is_qualified_health_plan:
       return false
 
     return true
-  tests:
-    - name: "Standard QHP through Exchange"
-      period: 2024-01
-      inputs:
-        is_ppaca_1301a_qualified_plan: true
-        is_catastrophic_plan: false
-        enrolled_through_exchange: true
-        exchange_has_pre_enrollment_verification: true
-        enrolled_during_special_enrollment_period: false
-        special_enrollment_is_income_based: false
-      expect: true
-    - name: "Catastrophic plan excluded"
-      period: 2024-01
-      inputs:
-        is_ppaca_1301a_qualified_plan: true
-        is_catastrophic_plan: true
-        enrolled_through_exchange: true
-        exchange_has_pre_enrollment_verification: true
-        enrolled_during_special_enrollment_period: false
-        special_enrollment_is_income_based: false
-      expect: false
-    - name: "Not a PPACA 1301a plan"
-      period: 2024-01
-      inputs:
-        is_ppaca_1301a_qualified_plan: false
-        is_catastrophic_plan: false
-        enrolled_through_exchange: true
-        exchange_has_pre_enrollment_verification: true
-        enrolled_during_special_enrollment_period: false
-        special_enrollment_is_income_based: false
-      expect: false
-    - name: "Exchange lacks pre-enrollment verification"
-      period: 2028-01
-      inputs:
-        is_ppaca_1301a_qualified_plan: true
-        is_catastrophic_plan: false
-        enrolled_through_exchange: true
-        exchange_has_pre_enrollment_verification: false
-        enrolled_during_special_enrollment_period: false
-        special_enrollment_is_income_based: false
-      expect: false
-    - name: "Not enrolled through Exchange - verification not required"
-      period: 2024-01
-      inputs:
-        is_ppaca_1301a_qualified_plan: true
-        is_catastrophic_plan: false
-        enrolled_through_exchange: false
-        exchange_has_pre_enrollment_verification: false
-        enrolled_during_special_enrollment_period: false
-        special_enrollment_is_income_based: false
-      expect: true
-    - name: "Income-based special enrollment period excluded"
-      period: 2024-01
-      inputs:
-        is_ppaca_1301a_qualified_plan: true
-        is_catastrophic_plan: false
-        enrolled_through_exchange: true
-        exchange_has_pre_enrollment_verification: true
-        enrolled_during_special_enrollment_period: true
-        special_enrollment_is_income_based: true
-      expect: false
-    - name: "Event-based special enrollment period allowed"
-      period: 2024-01
-      inputs:
-        is_ppaca_1301a_qualified_plan: true
-        is_catastrophic_plan: false
-        enrolled_through_exchange: true
-        exchange_has_pre_enrollment_verification: true
-        enrolled_during_special_enrollment_period: true
-        special_enrollment_is_income_based: false
-      expect: true
-    - name: "All defaults - not qualified"
-      period: 2024-01
-      inputs: {}
-      expect: false

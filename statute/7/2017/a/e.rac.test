@@ -1,0 +1,39 @@
+allotment_payable_to_center:
+  - name: "Resident in center, allotment goes to center"
+    period: 2024-10
+    inputs:
+      resides_in_treatment_center: true
+      has_left_treatment_center: false
+    expect: true
+  - name: "Left center, allotment does not go to center"
+    period: 2024-10
+    inputs:
+      resides_in_treatment_center: true
+      has_left_treatment_center: true
+    expect: false
+  - name: "Not in treatment center"
+    period: 2024-10
+    inputs:
+      resides_in_treatment_center: false
+      has_left_treatment_center: false
+    expect: false
+
+allotment_payable_to_individual:
+  - name: "Left center, allotment goes to individual"
+    period: 2024-10
+    inputs:
+      resides_in_treatment_center: true
+      has_left_treatment_center: true
+    expect: true
+  - name: "Still in center, allotment does not go to individual"
+    period: 2024-10
+    inputs:
+      resides_in_treatment_center: true
+      has_left_treatment_center: false
+    expect: false
+  - name: "Not in treatment center, allotment goes to individual"
+    period: 2024-10
+    inputs:
+      resides_in_treatment_center: false
+      has_left_treatment_center: false
+    expect: true

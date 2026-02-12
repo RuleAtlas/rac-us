@@ -1,0 +1,37 @@
+ctc_disallowed_possession_coordination:
+  - name: "US mainland resident"
+    period: 2024-01
+    inputs:
+      is_mirror_code_possession_resident: false
+      is_american_samoa_resident: false
+      claimed_ctc_in_possession: false
+      american_samoa_plan_approved: false
+    expect: false
+  - name: "Mirror code possession, claimed in possession"
+    period: 2024-01
+    inputs:
+      is_mirror_code_possession_resident: true
+      is_american_samoa_resident: false
+      claimed_ctc_in_possession: true
+      american_samoa_plan_approved: false
+    expect: true
+  - name: "American Samoa with approved plan"
+    period: 2024-01
+    inputs:
+      is_mirror_code_possession_resident: false
+      is_american_samoa_resident: true
+      claimed_ctc_in_possession: false
+      american_samoa_plan_approved: true
+    expect: true
+
+puerto_rico_ctc_eligible:
+  - name: "Puerto Rico resident"
+    period: 2024-01
+    inputs:
+      is_puerto_rico_resident: true
+    expect: true
+  - name: "Non-PR resident"
+    period: 2024-01
+    inputs:
+      is_puerto_rico_resident: false
+    expect: false

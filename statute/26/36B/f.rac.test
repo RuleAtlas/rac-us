@@ -1,0 +1,75 @@
+ptc_after_advance_reconciliation:
+  - name: "No advance payments"
+    period: 2024-01
+    inputs:
+      ptc_premium_tax_credit: 5400
+      ptc_advance_payments: 0
+    expect: 5400
+  - name: "Partial advance payments"
+    period: 2024-01
+    inputs:
+      ptc_premium_tax_credit: 5400
+      ptc_advance_payments: 3000
+    expect: 2400
+  - name: "Advance equals credit"
+    period: 2024-01
+    inputs:
+      ptc_premium_tax_credit: 5400
+      ptc_advance_payments: 5400
+    expect: 0
+  - name: "Advance exceeds credit - floor at zero"
+    period: 2024-01
+    inputs:
+      ptc_premium_tax_credit: 4000
+      ptc_advance_payments: 6000
+    expect: 0
+  - name: "Zero credit with advance payments"
+    period: 2024-01
+    inputs:
+      ptc_premium_tax_credit: 0
+      ptc_advance_payments: 3000
+    expect: 0
+  - name: "Zero credit and zero advance"
+    period: 2024-01
+    inputs:
+      ptc_premium_tax_credit: 0
+      ptc_advance_payments: 0
+    expect: 0
+
+ptc_excess_advance_repayment:
+  - name: "No excess - advance below credit"
+    period: 2024-01
+    inputs:
+      ptc_advance_payments: 3000
+      ptc_premium_tax_credit: 5400
+    expect: 0
+  - name: "No excess - advance equals credit"
+    period: 2024-01
+    inputs:
+      ptc_advance_payments: 5400
+      ptc_premium_tax_credit: 5400
+    expect: 0
+  - name: "Excess advance payments"
+    period: 2024-01
+    inputs:
+      ptc_advance_payments: 7000
+      ptc_premium_tax_credit: 5400
+    expect: 1600
+  - name: "All advance with zero credit"
+    period: 2024-01
+    inputs:
+      ptc_advance_payments: 3000
+      ptc_premium_tax_credit: 0
+    expect: 3000
+  - name: "No advance no credit"
+    period: 2024-01
+    inputs:
+      ptc_advance_payments: 0
+      ptc_premium_tax_credit: 0
+    expect: 0
+  - name: "Large excess"
+    period: 2024-01
+    inputs:
+      ptc_advance_payments: 18000
+      ptc_premium_tax_credit: 5400
+    expect: 12600

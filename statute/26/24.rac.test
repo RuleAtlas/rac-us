@@ -1,0 +1,67 @@
+child_tax_credit:
+  - name: "Basic CTC with no disqualifications"
+    period: 2024-01
+    inputs:
+      ctc_after_advance_reconciliation: 4000
+      odc_amount: 500
+      ctc_meets_id_requirements: true
+      ctc_meets_full_year_requirement: true
+      ctc_disallowed_prior_claim: false
+      ctc_ssn_requirement_met: true
+      ctc_disallowed_possession_coordination: false
+    expect: 4500
+  - name: "CTC disqualified - missing ID"
+    period: 2024-01
+    inputs:
+      ctc_after_advance_reconciliation: 4000
+      odc_amount: 500
+      ctc_meets_id_requirements: false
+      ctc_meets_full_year_requirement: true
+      ctc_disallowed_prior_claim: false
+      ctc_ssn_requirement_met: true
+      ctc_disallowed_possession_coordination: false
+    expect: 0
+  - name: "CTC disqualified - prior claim fraud"
+    period: 2024-01
+    inputs:
+      ctc_after_advance_reconciliation: 4000
+      odc_amount: 500
+      ctc_meets_id_requirements: true
+      ctc_meets_full_year_requirement: true
+      ctc_disallowed_prior_claim: true
+      ctc_ssn_requirement_met: true
+      ctc_disallowed_possession_coordination: false
+    expect: 0
+  - name: "CTC disqualified - no SSN"
+    period: 2024-01
+    inputs:
+      ctc_after_advance_reconciliation: 4000
+      odc_amount: 500
+      ctc_meets_id_requirements: true
+      ctc_meets_full_year_requirement: true
+      ctc_disallowed_prior_claim: false
+      ctc_ssn_requirement_met: false
+      ctc_disallowed_possession_coordination: false
+    expect: 0
+
+refundable_ctc:
+  - name: "Basic ACTC with no disqualifications"
+    period: 2024-01
+    inputs:
+      actc_amount: 1400
+      ctc_meets_id_requirements: true
+      ctc_meets_full_year_requirement: true
+      ctc_disallowed_prior_claim: false
+      ctc_ssn_requirement_met: true
+      ctc_disallowed_possession_coordination: false
+    expect: 1400
+  - name: "ACTC disqualified"
+    period: 2024-01
+    inputs:
+      actc_amount: 1400
+      ctc_meets_id_requirements: false
+      ctc_meets_full_year_requirement: true
+      ctc_disallowed_prior_claim: false
+      ctc_ssn_requirement_met: true
+      ctc_disallowed_possession_coordination: false
+    expect: 0

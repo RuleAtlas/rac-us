@@ -1,6 +1,6 @@
 # 26 USC 36B(d)(1) - Family size
 
-text: """
+"""
 (d) Terms relating to income and families
 For purposes of this section—
 (1) Family size
@@ -16,7 +16,7 @@ exemptions) for the taxable year.
 # Section 36B(e)(1)(B) separately modifies family size for individuals not
 # lawfully present; that adjustment is encoded in 26/36B/e.
 
-input section_151_deduction_count:
+section_151_deduction_count:
   entity: TaxUnit
   period: Year
   dtype: Integer
@@ -24,32 +24,11 @@ input section_151_deduction_count:
   description: "Number of individuals for whom the taxpayer is allowed a deduction under section 151"
   default: 1
 
-variable ptc_family_size:
+ptc_family_size:
   entity: TaxUnit
   period: Year
   dtype: Integer
   label: "PTC Family Size"
   description: "Family size for purposes of 26 USC 36B per subsection (d)(1)"
-  formula: |
+  from 2013-01-01:
     return section_151_deduction_count
-  tests:
-    - name: "Single filer, no dependents"
-      period: 2024-01
-      inputs:
-        section_151_deduction_count: 1
-      expect: 1
-    - name: "Married couple, two dependents"
-      period: 2024-01
-      inputs:
-        section_151_deduction_count: 4
-      expect: 4
-    - name: "Single parent, one child"
-      period: 2024-01
-      inputs:
-        section_151_deduction_count: 2
-      expect: 2
-    - name: "Single filer, no deductions (edge case)"
-      period: 2024-01
-      inputs:
-        section_151_deduction_count: 0
-      expect: 0

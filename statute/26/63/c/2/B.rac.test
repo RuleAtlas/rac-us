@@ -1,0 +1,16 @@
+basic_std_ded_hoh:
+  - name: "Pre-TCJA head of household"
+    period: 2017-01
+    inputs:
+      tax_year: 2017
+    expect: 4400
+  - name: "TCJA head of household 2018"
+    period: 2018-01
+    inputs:
+      tax_year: 2018
+    expect: 18000
+  - name: "Post-2025 head of household"
+    period: 2026-01
+    inputs:
+      tax_year: 2026
+    expect: 23625

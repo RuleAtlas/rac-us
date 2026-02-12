@@ -1,0 +1,51 @@
+dependent_disqualified_from_credit:
+  - name: "Not a dependent - can claim credit"
+    period: 2024-01
+    inputs:
+      is_dependent_of_another_taxpayer: False
+    expect: False
+  - name: "Is a dependent - disqualified from credit"
+    period: 2024-01
+    inputs:
+      is_dependent_of_another_taxpayer: True
+    expect: True
+
+expenses_attributed_to_claiming_taxpayer:
+  - name: "Not a dependent - expenses not attributed"
+    period: 2024-01
+    inputs:
+      is_dependent_of_another_taxpayer: False
+      qualified_expenses_paid_by_dependent: 5000
+    expect: 0
+  - name: "Is dependent - expenses attributed to claiming taxpayer"
+    period: 2024-01
+    inputs:
+      is_dependent_of_another_taxpayer: True
+      qualified_expenses_paid_by_dependent: 5000
+    expect: 5000
+  - name: "Is dependent with zero expenses"
+    period: 2024-01
+    inputs:
+      is_dependent_of_another_taxpayer: True
+      qualified_expenses_paid_by_dependent: 0
+    expect: 0
+
+form_1098t_attributed_to_claiming_taxpayer:
+  - name: "Not a dependent - Form 1098-T not attributed"
+    period: 2024-01
+    inputs:
+      is_dependent_of_another_taxpayer: False
+      form_1098t_received_by_dependent: True
+    expect: False
+  - name: "Is dependent with Form 1098-T - attributed"
+    period: 2024-01
+    inputs:
+      is_dependent_of_another_taxpayer: True
+      form_1098t_received_by_dependent: True
+    expect: True
+  - name: "Is dependent without Form 1098-T - not attributed"
+    period: 2024-01
+    inputs:
+      is_dependent_of_another_taxpayer: True
+      form_1098t_received_by_dependent: False
+    expect: False

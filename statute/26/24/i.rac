@@ -1,6 +1,6 @@
 # 26 USC 24(i) - Inflation adjustments
 
-text: """
+"""
 (i) Inflation adjustments
 (1) Maximum amount of refundable credit
 In the case of a taxable year beginning after 2024, the $1,400 amount in subsection (h)(5)
@@ -24,36 +24,33 @@ rounded to the next lowest multiple of $100.
 """
 
 # Base year for ACTC inflation adjustment
-parameter actc_inflation_base_year:
+actc_inflation_base_year:
   description: "Base year for ACTC refundable limit inflation adjustment per 26 USC 24(i)(1)"
-  values:
-    2025-01-01: 2017
+  from 2025-01-01: 2017
 
 # Base year for credit amount inflation adjustment
-parameter ctc_credit_inflation_base_year:
+ctc_credit_inflation_base_year:
   description: "Base year for CTC credit amount inflation adjustment per 26 USC 24(i)(2)"
-  values:
-    2026-01-01: 2024
+  from 2026-01-01: 2024
 
 # Rounding increment
-parameter ctc_inflation_rounding:
+ctc_inflation_rounding:
   description: "Rounding increment for CTC inflation adjustments per 26 USC 24(i)(3)"
   unit: USD
-  values:
-    2025-01-01: 100
+  from 2025-01-01: 100
 
 # Note: The actual inflation-adjusted values would be computed by importing
 # the cost-of-living adjustment from 26 USC 1(f)(3) and applying the formula.
 # For statutory values, we record the base amounts and adjustment methodology.
 
-input cola_adjustment:
+cola_adjustment:
   entity: TaxUnit
   period: Year
   dtype: Float
   label: "Cost of Living Adjustment"
   description: "COLA per section 1(f)(3) with applicable base year substitution"
 
-variable actc_inflation_adjusted_max:
+actc_inflation_adjusted_max:
   imports:
     - 26/24/d#actc_max_per_child
   entity: TaxUnit
@@ -62,7 +59,7 @@ variable actc_inflation_adjusted_max:
   unit: USD
   label: "Inflation-Adjusted ACTC Maximum"
   description: "Inflation-adjusted maximum refundable CTC per child per 26 USC 24(i)(1)"
-  formula: |
+  from 2025-01-01:
     # For years after 2024, apply inflation adjustment
     base_amount = actc_max_per_child
     adjusted = base_amount * (1 + cola_adjustment)
@@ -70,27 +67,8 @@ variable actc_inflation_adjusted_max:
     # DSL lacks floor/integer division, so this returns adjusted value
     # Runtime engine should handle rounding per 24(i)(3)
     return adjusted
-  tests:
-    - name: "No inflation adjustment"
-      period: 2024-01
-      inputs:
-        actc_max_per_child: 1400
-        cola_adjustment: 0
-      expect: 1400
-    - name: "5% inflation (before rounding)"
-      period: 2025-01
-      inputs:
-        actc_max_per_child: 1400
-        cola_adjustment: 0.05
-      expect: 1470
-    - name: "10% inflation (before rounding)"
-      period: 2026-01
-      inputs:
-        actc_max_per_child: 1400
-        cola_adjustment: 0.10
-      expect: 1540
 
-variable ctc_credit_inflation_adjusted:
+ctc_credit_inflation_adjusted:
   imports:
     - 26/24/a#ctc_base_amount
   entity: TaxUnit
@@ -99,7 +77,7 @@ variable ctc_credit_inflation_adjusted:
   unit: USD
   label: "Inflation-Adjusted CTC Credit Amount"
   description: "Inflation-adjusted CTC credit per child per 26 USC 24(i)(2)"
-  formula: |
+  from 2025-01-01:
     # For years after 2025, apply inflation adjustment
     base_amount = ctc_base_amount
     adjusted = base_amount * (1 + cola_adjustment)
@@ -107,22 +85,3 @@ variable ctc_credit_inflation_adjusted:
     # DSL lacks floor/integer division, so this returns adjusted value
     # Runtime engine should handle rounding per 24(i)(3)
     return adjusted
-  tests:
-    - name: "No inflation adjustment"
-      period: 2025-01
-      inputs:
-        ctc_base_amount: 2200
-        cola_adjustment: 0
-      expect: 2200
-    - name: "5% inflation (before rounding)"
-      period: 2026-01
-      inputs:
-        ctc_base_amount: 2200
-        cola_adjustment: 0.05
-      expect: 2310
-    - name: "7% inflation (before rounding)"
-      period: 2026-01
-      inputs:
-        ctc_base_amount: 2200
-        cola_adjustment: 0.07
-      expect: 2354

@@ -1,0 +1,11 @@
+education_credit_25a_elected_out:
+  - name: "No election - section 25A applies"
+    period: 2024-01
+    inputs:
+      section_25a_election_not_to_apply: False
+    expect: False
+  - name: "Election made - section 25A does not apply"
+    period: 2024-01
+    inputs:
+      section_25a_election_not_to_apply: True
+    expect: True

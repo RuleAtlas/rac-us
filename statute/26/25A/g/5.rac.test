@@ -1,0 +1,28 @@
+sec_25A_expense_disallowed_for_double_benefit:
+  - name: "No expenses deducted elsewhere - no reduction"
+    period: 2024-01
+    inputs:
+      expense_deducted_under_other_chapter_1_provision: 0
+    expect: 0
+  - name: "All expenses deducted elsewhere - full reduction"
+    period: 2024-01
+    inputs:
+      expense_deducted_under_other_chapter_1_provision: 4000
+    expect: 4000
+  - name: "Partial expenses deducted elsewhere"
+    period: 2024-01
+    inputs:
+      expense_deducted_under_other_chapter_1_provision: 1500
+    expect: 1500
+
+double_benefit_disqualification_applies:
+  - name: "No double benefit - disqualification does not apply"
+    period: 2024-01
+    inputs:
+      expense_deducted_under_other_chapter_1_provision: 0
+    expect: False
+  - name: "Some expenses deducted - disqualification applies"
+    period: 2024-01
+    inputs:
+      expense_deducted_under_other_chapter_1_provision: 2000
+    expect: True

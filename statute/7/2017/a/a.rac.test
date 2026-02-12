@@ -1,0 +1,77 @@
+minimum_allotment:
+  - name: "Minimum allotment with $292 TFP cost for 1 member"
+    period: 2024-10
+    inputs:
+      thrifty_food_plan_cost_1_member: 292
+    expect: 23.36
+  - name: "Minimum allotment with $250 TFP cost for 1 member"
+    period: 2024-10
+    inputs:
+      thrifty_food_plan_cost_1_member: 250
+    expect: 20
+  - name: "Zero TFP cost yields zero minimum"
+    period: 2024-10
+    inputs:
+      thrifty_food_plan_cost_1_member: 0
+    expect: 0
+
+snap_allotment:
+  - name: "Family of 4, no income gets full TFP cost"
+    period: 2024-10
+    inputs:
+      household_size: 4
+      snap_net_income: 0
+      thrifty_food_plan_cost: 973
+      thrifty_food_plan_cost_1_member: 292
+    expect: 973
+  - name: "Family of 4, moderate income"
+    period: 2024-10
+    inputs:
+      household_size: 4
+      snap_net_income: 1500
+      thrifty_food_plan_cost: 973
+      thrifty_food_plan_cost_1_member: 292
+    expect: 523
+  - name: "Single person, no income gets TFP cost"
+    period: 2024-10
+    inputs:
+      household_size: 1
+      snap_net_income: 0
+      thrifty_food_plan_cost: 292
+      thrifty_food_plan_cost_1_member: 292
+      minimum_allotment: 23.36
+    expect: 292
+  - name: "Single person, high income gets minimum allotment"
+    period: 2024-10
+    inputs:
+      household_size: 1
+      snap_net_income: 900
+      thrifty_food_plan_cost: 292
+      thrifty_food_plan_cost_1_member: 292
+      minimum_allotment: 23.36
+    expect: 23.36
+  - name: "Two-person household gets minimum allotment floor"
+    period: 2024-10
+    inputs:
+      household_size: 2
+      snap_net_income: 1300
+      thrifty_food_plan_cost: 395
+      thrifty_food_plan_cost_1_member: 292
+      minimum_allotment: 23.36
+    expect: 23.36
+  - name: "Family of 3, income exceeds TFP cost yields zero"
+    period: 2024-10
+    inputs:
+      household_size: 3
+      snap_net_income: 3000
+      thrifty_food_plan_cost: 713
+      thrifty_food_plan_cost_1_member: 292
+    expect: 0
+  - name: "Family of 4, income produces exact result"
+    period: 2024-10
+    inputs:
+      household_size: 4
+      snap_net_income: 1000
+      thrifty_food_plan_cost: 973
+      thrifty_food_plan_cost_1_member: 292
+    expect: 673

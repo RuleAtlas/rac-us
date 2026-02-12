@@ -1,0 +1,11 @@
+institution_ein_requirement_met:
+  - name: "EIN provided"
+    period: 2024-01
+    inputs:
+      institution_ein_provided: True
+    expect: True
+  - name: "EIN not provided"
+    period: 2024-01
+    inputs:
+      institution_ein_provided: False
+    expect: False

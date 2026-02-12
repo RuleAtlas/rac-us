@@ -1,0 +1,40 @@
+odc_amount:
+  - name: "One other dependent"
+    period: 2024-01
+    inputs:
+      other_dependent_count: 1
+    expect: 500
+  - name: "Two other dependents"
+    period: 2024-01
+    inputs:
+      other_dependent_count: 2
+    expect: 1000
+  - name: "No other dependents"
+    period: 2024-01
+    inputs:
+      other_dependent_count: 0
+    expect: 0
+
+child_qualifies_for_ctc_ssn:
+  - name: "Child has SSN"
+    period: 2024-01
+    inputs:
+      child_has_ssn: true
+    expect: true
+  - name: "Child has ITIN only"
+    period: 2024-01
+    inputs:
+      child_has_ssn: false
+    expect: false
+
+ctc_ssn_requirement_met:
+  - name: "Taxpayer has SSN"
+    period: 2024-01
+    inputs:
+      taxpayer_has_ssn: true
+    expect: true
+  - name: "Taxpayer has ITIN only"
+    period: 2024-01
+    inputs:
+      taxpayer_has_ssn: false
+    expect: false

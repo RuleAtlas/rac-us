@@ -1,6 +1,6 @@
 # 26 USC 24(h) - Special rules for taxable years beginning after 2017
 
-text: """
+"""
 (h) Special rules for taxable years beginning after 2017
 (1) In general
 In the case of a taxable year beginning after December 31, 2017, this section shall
@@ -54,98 +54,59 @@ Social Security Act, and
 """
 
 # Credit amount for other dependents (non-qualifying children)
-parameter odc_credit_amount:
+odc_credit_amount:
   description: "Credit for other dependents per 26 USC 24(h)(4)(A)"
   unit: USD
-  values:
-    2018-01-01: 500
+  from 2018-01-01: 500
 
-input other_dependent_count:
+other_dependent_count:
   entity: TaxUnit
   period: Year
   dtype: Integer
   label: "Number of Other Dependents"
   description: "Count of dependents who are not qualifying children per 26 USC 24(h)(4)"
 
-input taxpayer_has_ssn:
+taxpayer_has_ssn:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "Taxpayer Has SSN"
   description: "Whether taxpayer (or spouse on joint return) has valid SSN per 26 USC 24(h)(7)"
 
-input child_has_ssn:
+child_has_ssn:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Child Has SSN"
   description: "Whether child has valid SSN issued before return due date per 26 USC 24(h)(7)"
 
-variable odc_amount:
+odc_amount:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Other Dependent Credit"
   description: "Credit for other dependents per 26 USC 24(h)(4)"
-  formula: |
+  from 2018-01-01:
     return other_dependent_count * odc_credit_amount
-  tests:
-    - name: "One other dependent"
-      period: 2024-01
-      inputs:
-        other_dependent_count: 1
-      expect: 500
-    - name: "Two other dependents"
-      period: 2024-01
-      inputs:
-        other_dependent_count: 2
-      expect: 1000
-    - name: "No other dependents"
-      period: 2024-01
-      inputs:
-        other_dependent_count: 0
-      expect: 0
 
-variable child_qualifies_for_ctc_ssn:
+child_qualifies_for_ctc_ssn:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Child Qualifies for CTC (SSN)"
   description: "Whether child qualifies for CTC based on SSN requirement per 26 USC 24(h)(7)"
-  formula: |
+  from 2018-01-01:
     return child_has_ssn
-  tests:
-    - name: "Child has SSN"
-      period: 2024-01
-      inputs:
-        child_has_ssn: true
-      expect: true
-    - name: "Child has ITIN only"
-      period: 2024-01
-      inputs:
-        child_has_ssn: false
-      expect: false
 
-variable ctc_ssn_requirement_met:
+ctc_ssn_requirement_met:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "CTC SSN Requirement Met"
   description: "Whether taxpayer meets SSN requirement per 26 USC 24(h)(7)"
-  formula: |
+  from 2018-01-01:
     return taxpayer_has_ssn
-  tests:
-    - name: "Taxpayer has SSN"
-      period: 2024-01
-      inputs:
-        taxpayer_has_ssn: true
-      expect: true
-    - name: "Taxpayer has ITIN only"
-      period: 2024-01
-      inputs:
-        taxpayer_has_ssn: false
-      expect: false
 
 # Note: The main credit amount change ($2,000 -> $2,200) and threshold changes
 # are incorporated in the parameter values in subsections (a) and (b)

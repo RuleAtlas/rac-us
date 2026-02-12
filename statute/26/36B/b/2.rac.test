@@ -1,0 +1,73 @@
+ptc_premium_assistance_amount:
+  - name: "Basic case - B is lesser (subsidy capped by benchmark)"
+    period: 2024-01
+    inputs:
+      ptc_monthly_premium: 800
+      ptc_slcsp_monthly_premium: 600
+      applicable_percentage: 0.085
+      household_income: 40000
+      months_per_year: 12
+    expect: 316.67
+  - name: "A is lesser (enrolled premium less than benchmark excess)"
+    period: 2024-01
+    inputs:
+      ptc_monthly_premium: 200
+      ptc_slcsp_monthly_premium: 600
+      applicable_percentage: 0.02
+      household_income: 20000
+      months_per_year: 12
+    expect: 200
+  - name: "Expected contribution exceeds SLCSP - no subsidy from (B)"
+    period: 2024-01
+    inputs:
+      ptc_monthly_premium: 500
+      ptc_slcsp_monthly_premium: 300
+      applicable_percentage: 0.095
+      household_income: 80000
+      months_per_year: 12
+    expect: 0
+  - name: "Zero enrolled premium - no assistance"
+    period: 2024-01
+    inputs:
+      ptc_monthly_premium: 0
+      ptc_slcsp_monthly_premium: 600
+      applicable_percentage: 0.06
+      household_income: 50000
+      months_per_year: 12
+    expect: 0
+  - name: "Zero SLCSP premium - B is zero"
+    period: 2024-01
+    inputs:
+      ptc_monthly_premium: 500
+      ptc_slcsp_monthly_premium: 0
+      applicable_percentage: 0.06
+      household_income: 50000
+      months_per_year: 12
+    expect: 0
+  - name: "Zero household income - full SLCSP as B"
+    period: 2024-01
+    inputs:
+      ptc_monthly_premium: 500
+      ptc_slcsp_monthly_premium: 600
+      applicable_percentage: 0.0
+      household_income: 0
+      months_per_year: 12
+    expect: 500
+  - name: "Very low income IRA period - 0% applicable percentage"
+    period: 2024-01
+    inputs:
+      ptc_monthly_premium: 400
+      ptc_slcsp_monthly_premium: 500
+      applicable_percentage: 0.0
+      household_income: 15000
+      months_per_year: 12
+    expect: 400
+  - name: "Equal premiums - subsidy equals excess of SLCSP over contribution"
+    period: 2024-01
+    inputs:
+      ptc_monthly_premium: 600
+      ptc_slcsp_monthly_premium: 600
+      applicable_percentage: 0.04
+      household_income: 36000
+      months_per_year: 12
+    expect: 480

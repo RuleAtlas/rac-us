@@ -1,0 +1,26 @@
+trust_income_tax:
+  - name: "First bracket only"
+    period: 2018-01
+    inputs:
+      taxable_income: 2000
+    expect: 200
+  - name: "Second bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 5000
+    expect: 843
+  - name: "Third bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 10000
+    expect: 2136.5
+  - name: "Top bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 20000
+    expect: 5786.5
+  - name: "Zero income"
+    period: 2018-01
+    inputs:
+      taxable_income: 0
+    expect: 0

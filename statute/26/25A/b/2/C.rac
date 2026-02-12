@@ -1,19 +1,18 @@
 # 26 USC 25A(b)(2)(C) - Credit allowed only for first 4 years
 
-text: """
+"""
 (C) Credit allowed only for first 4 years of postsecondary education
 The American Opportunity Tax Credit under subsection (a)(1) shall be allowed
 only for 4 taxable years with respect to any eligible student.
 """
 
 # Maximum years the American Opportunity Credit can be claimed per student
-parameter aotc_max_years:
+aotc_max_years:
   description: "Maximum number of taxable years AOTC can be claimed per eligible student"
   unit: years
-  values:
-    2009-01-01: 4
+  from 2009-01-01: 4
 
-input aotc_years_claimed:
+aotc_years_claimed:
   entity: Person
   period: Year
   dtype: Integer
@@ -21,37 +20,11 @@ input aotc_years_claimed:
   description: "Number of prior taxable years for which AOTC was claimed for this student"
   default: 0
 
-variable aotc_first_4_years_eligible:
+aotc_first_4_years_eligible:
   entity: Person
   period: Year
   dtype: Boolean
   label: "AOTC First 4 Years Eligibility"
   description: "Whether student is within first 4 years of AOTC eligibility per 26 USC 25A(b)(2)(C)"
-  formula: |
+  from 2009-01-01:
     return aotc_years_claimed < aotc_max_years
-  tests:
-    - name: "No prior claims - eligible"
-      period: 2024-01
-      inputs:
-        aotc_years_claimed: 0
-      expect: true
-    - name: "1 prior year - eligible"
-      period: 2024-01
-      inputs:
-        aotc_years_claimed: 1
-      expect: true
-    - name: "3 prior years - eligible"
-      period: 2024-01
-      inputs:
-        aotc_years_claimed: 3
-      expect: true
-    - name: "4 prior years - ineligible"
-      period: 2024-01
-      inputs:
-        aotc_years_claimed: 4
-      expect: false
-    - name: "5 prior years - ineligible"
-      period: 2024-01
-      inputs:
-        aotc_years_claimed: 5
-      expect: false

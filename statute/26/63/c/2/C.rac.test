@@ -1,0 +1,16 @@
+basic_std_ded_other:
+  - name: "Pre-TCJA single filer"
+    period: 2017-01
+    inputs:
+      tax_year: 2017
+    expect: 3000
+  - name: "TCJA single filer 2018"
+    period: 2018-01
+    inputs:
+      tax_year: 2018
+    expect: 12000
+  - name: "Post-2025 single filer"
+    period: 2026-01
+    inputs:
+      tax_year: 2026
+    expect: 15750

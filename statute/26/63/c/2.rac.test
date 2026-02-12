@@ -1,0 +1,46 @@
+basic_standard_deduction:
+  - name: "Joint filers 2018"
+    period: 2018-01
+    inputs:
+      tax_year: 2018
+      filing_status: "JOINT"
+      basic_std_ded_joint: 24000
+      basic_std_ded_hoh: 18000
+      basic_std_ded_other: 12000
+    expect: 24000
+  - name: "Surviving spouse 2018"
+    period: 2018-01
+    inputs:
+      tax_year: 2018
+      filing_status: "SURVIVING_SPOUSE"
+      basic_std_ded_joint: 24000
+      basic_std_ded_hoh: 18000
+      basic_std_ded_other: 12000
+    expect: 24000
+  - name: "Head of household 2018"
+    period: 2018-01
+    inputs:
+      tax_year: 2018
+      filing_status: "HEAD_OF_HOUSEHOLD"
+      basic_std_ded_joint: 24000
+      basic_std_ded_hoh: 18000
+      basic_std_ded_other: 12000
+    expect: 18000
+  - name: "Single filer 2018"
+    period: 2018-01
+    inputs:
+      tax_year: 2018
+      filing_status: "SINGLE"
+      basic_std_ded_joint: 24000
+      basic_std_ded_hoh: 18000
+      basic_std_ded_other: 12000
+    expect: 12000
+  - name: "MFS filer 2018"
+    period: 2018-01
+    inputs:
+      tax_year: 2018
+      filing_status: "MARRIED_FILING_SEPARATELY"
+      basic_std_ded_joint: 24000
+      basic_std_ded_hoh: 18000
+      basic_std_ded_other: 12000
+    expect: 12000

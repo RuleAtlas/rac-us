@@ -1,6 +1,6 @@
 # 26 USC 24(c) - Qualifying child
 
-text: """
+"""
 (c) Qualifying child
 For purposes of this section—
 (1) In general
@@ -14,40 +14,39 @@ all that follows "resident of the United States".
 """
 
 # Age threshold for qualifying child
-parameter ctc_qualifying_age:
+ctc_qualifying_age:
   description: "Maximum age for CTC qualifying child per 26 USC 24(c)(1)"
   unit: years
-  values:
-    1998-01-01: 17
+  from 1998-01-01: 17
 
-input child_age:
+child_age:
   entity: Person
   period: Year
   dtype: Integer
   label: "Child Age"
   description: "Age of child at end of calendar year"
 
-input is_qualifying_child_152c:
+is_qualifying_child_152c:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Qualifying Child per 152(c)"
   description: "Whether individual meets qualifying child definition under section 152(c)"
 
-input is_us_citizen_or_resident:
+is_us_citizen_or_resident:
   entity: Person
   period: Year
   dtype: Boolean
   label: "US Citizen or Resident"
   description: "Whether individual is US citizen or resident per 152(b)(3)(A)"
 
-variable is_ctc_qualifying_child:
+is_ctc_qualifying_child:
   entity: Person
   period: Year
   dtype: Boolean
   label: "CTC Qualifying Child"
   description: "Whether individual qualifies as qualifying child for CTC per 26 USC 24(c)"
-  formula: |
+  from 1998-01-01:
     # Must be qualifying child under 152(c)
     if not is_qualifying_child_152c:
       return False
@@ -58,39 +57,3 @@ variable is_ctc_qualifying_child:
     if not is_us_citizen_or_resident:
       return False
     return True
-  tests:
-    - name: "Qualifying 10-year-old"
-      period: 2024-01
-      inputs:
-        child_age: 10
-        is_qualifying_child_152c: true
-        is_us_citizen_or_resident: true
-      expect: true
-    - name: "16-year-old (still qualifies)"
-      period: 2024-01
-      inputs:
-        child_age: 16
-        is_qualifying_child_152c: true
-        is_us_citizen_or_resident: true
-      expect: true
-    - name: "17-year-old (too old)"
-      period: 2024-01
-      inputs:
-        child_age: 17
-        is_qualifying_child_152c: true
-        is_us_citizen_or_resident: true
-      expect: false
-    - name: "Non-citizen child"
-      period: 2024-01
-      inputs:
-        child_age: 10
-        is_qualifying_child_152c: true
-        is_us_citizen_or_resident: false
-      expect: false
-    - name: "Not qualifying child under 152(c)"
-      period: 2024-01
-      inputs:
-        child_age: 10
-        is_qualifying_child_152c: false
-        is_us_citizen_or_resident: true
-      expect: false

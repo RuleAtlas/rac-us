@@ -1,0 +1,109 @@
+advance_ctc_safe_harbor_threshold:
+  - name: "Joint filers"
+    period: 2021-01
+    inputs:
+      filing_status: "JOINT"
+    expect: 60000
+  - name: "Head of household"
+    period: 2021-01
+    inputs:
+      filing_status: "HEAD_OF_HOUSEHOLD"
+    expect: 50000
+  - name: "Single filer"
+    period: 2021-01
+    inputs:
+      filing_status: "SINGLE"
+    expect: 40000
+
+advance_ctc_excess_children:
+  - name: "Same children count"
+    period: 2021-01
+    inputs:
+      advance_ctc_children_count: 2
+      actual_ctc_children_count: 2
+    expect: 0
+  - name: "One fewer actual child"
+    period: 2021-01
+    inputs:
+      advance_ctc_children_count: 3
+      actual_ctc_children_count: 2
+    expect: 1
+  - name: "More actual than advance"
+    period: 2021-01
+    inputs:
+      advance_ctc_children_count: 1
+      actual_ctc_children_count: 2
+    expect: 0
+
+advance_ctc_safe_harbor_amount:
+  - name: "Below threshold, one excess child"
+    period: 2021-01
+    inputs:
+      advance_ctc_excess_children: 1
+      modified_agi: 30000
+      advance_ctc_safe_harbor_threshold: 40000
+    expect: 2000
+  - name: "At threshold, one excess child"
+    period: 2021-01
+    inputs:
+      advance_ctc_excess_children: 1
+      modified_agi: 40000
+      advance_ctc_safe_harbor_threshold: 40000
+    expect: 2000
+  - name: "At 150% of threshold (50% phase-out)"
+    period: 2021-01
+    inputs:
+      advance_ctc_excess_children: 1
+      modified_agi: 60000
+      advance_ctc_safe_harbor_threshold: 40000
+    expect: 1000
+  - name: "At 200% of threshold (fully phased out)"
+    period: 2021-01
+    inputs:
+      advance_ctc_excess_children: 1
+      modified_agi: 80000
+      advance_ctc_safe_harbor_threshold: 40000
+    expect: 0
+
+ctc_after_advance_reconciliation:
+  - name: "No advance payments"
+    period: 2021-01
+    inputs:
+      ctc_after_phaseout: 6000
+      advance_ctc_payments: 0
+    expect: 6000
+  - name: "Partial advance payments"
+    period: 2021-01
+    inputs:
+      ctc_after_phaseout: 6000
+      advance_ctc_payments: 3000
+    expect: 3000
+  - name: "Advance exceeds credit"
+    period: 2021-01
+    inputs:
+      ctc_after_phaseout: 4000
+      advance_ctc_payments: 5000
+    expect: 0
+
+advance_ctc_repayment:
+  - name: "No excess payments"
+    period: 2021-01
+    inputs:
+      advance_ctc_payments: 3000
+      ctc_after_phaseout: 6000
+      advance_ctc_safe_harbor_amount: 0
+    expect: 0
+  - name: "Excess with safe harbor"
+    period: 2021-01
+    inputs:
+      advance_ctc_payments: 6000
+      ctc_after_phaseout: 4000
+      advance_ctc_safe_harbor_amount: 2000
+    expect: 0
+  - name: "Excess exceeds safe harbor"
+    period: 2021-01
+    inputs:
+      advance_ctc_payments: 8000
+      ctc_after_phaseout: 4000
+      advance_ctc_safe_harbor_amount: 2000
+    expect: 2000

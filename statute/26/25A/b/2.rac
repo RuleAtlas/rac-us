@@ -1,6 +1,6 @@
 # 26 USC 25A(b)(2) - Limitations applicable to Hope Scholarship Credit
 
-text: """
+"""
 (2) Limitations applicable to Hope Scholarship Credit
 
 (A) Credit allowed only for 4 taxable years
@@ -31,7 +31,7 @@ with respect to which this section is being applied.
 # (C) Credit limited to first 4 years of postsecondary education (aotc_first_4_years_eligible)
 # (D) No credit for students with felony drug convictions (eligible_student_drug_conviction_disqualified)
 
-variable hope_scholarship_limitations_satisfied:
+hope_scholarship_limitations_satisfied:
   imports:
     - 26/25A/b/2/A#aotc_4_year_limit_met
     - 26/25A/b/2/B#aotc_half_time_requirement_met
@@ -42,7 +42,7 @@ variable hope_scholarship_limitations_satisfied:
   dtype: Boolean
   label: "Hope Scholarship Credit Limitations Satisfied"
   description: "Whether all limitations of 26 USC 25A(b)(2) are satisfied for the Hope Scholarship Credit (AOTC)"
-  formula: |
+  from 2013-01-01:
     # (A) Cannot have already claimed AOTC for 4 prior years
     if aotc_4_year_limit_met:
       return False
@@ -56,52 +56,3 @@ variable hope_scholarship_limitations_satisfied:
     if eligible_student_drug_conviction_disqualified:
       return False
     return True
-  tests:
-    - name: "All limitations satisfied - eligible"
-      period: 2024-01
-      inputs:
-        aotc_4_year_limit_met: False
-        aotc_half_time_requirement_met: True
-        aotc_first_4_years_eligible: True
-        eligible_student_drug_conviction_disqualified: False
-      expect: True
-    - name: "4 prior years claimed - ineligible per (A)"
-      period: 2024-01
-      inputs:
-        aotc_4_year_limit_met: True
-        aotc_half_time_requirement_met: True
-        aotc_first_4_years_eligible: True
-        eligible_student_drug_conviction_disqualified: False
-      expect: False
-    - name: "Not half-time student - ineligible per (B)"
-      period: 2024-01
-      inputs:
-        aotc_4_year_limit_met: False
-        aotc_half_time_requirement_met: False
-        aotc_first_4_years_eligible: True
-        eligible_student_drug_conviction_disqualified: False
-      expect: False
-    - name: "Beyond first 4 years - ineligible per (C)"
-      period: 2024-01
-      inputs:
-        aotc_4_year_limit_met: False
-        aotc_half_time_requirement_met: True
-        aotc_first_4_years_eligible: False
-        eligible_student_drug_conviction_disqualified: False
-      expect: False
-    - name: "Felony drug conviction - ineligible per (D)"
-      period: 2024-01
-      inputs:
-        aotc_4_year_limit_met: False
-        aotc_half_time_requirement_met: True
-        aotc_first_4_years_eligible: True
-        eligible_student_drug_conviction_disqualified: True
-      expect: False
-    - name: "Multiple limitations failed"
-      period: 2024-01
-      inputs:
-        aotc_4_year_limit_met: True
-        aotc_half_time_requirement_met: False
-        aotc_first_4_years_eligible: False
-        eligible_student_drug_conviction_disqualified: True
-      expect: False

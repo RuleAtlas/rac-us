@@ -1,0 +1,31 @@
+ptc_premium_tax_credit:
+  - name: "Applicable taxpayer receives full credit amount"
+    period: 2024-01
+    inputs:
+      is_applicable_taxpayer: true
+      ptc_premium_assistance_credit_amount: 5400
+    expect: 5400
+  - name: "Non-applicable taxpayer receives zero"
+    period: 2024-01
+    inputs:
+      is_applicable_taxpayer: false
+      ptc_premium_assistance_credit_amount: 5400
+    expect: 0
+  - name: "Applicable taxpayer with zero premium assistance"
+    period: 2024-01
+    inputs:
+      is_applicable_taxpayer: true
+      ptc_premium_assistance_credit_amount: 0
+    expect: 0
+  - name: "Non-applicable taxpayer with zero premium assistance"
+    period: 2024-01
+    inputs:
+      is_applicable_taxpayer: false
+      ptc_premium_assistance_credit_amount: 0
+    expect: 0
+  - name: "Applicable taxpayer - large credit"
+    period: 2024-01
+    inputs:
+      is_applicable_taxpayer: true
+      ptc_premium_assistance_credit_amount: 18_000
+    expect: 18_000
