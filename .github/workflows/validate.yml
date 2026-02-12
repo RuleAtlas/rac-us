@@ -19,11 +19,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Validate .rac schema
-        run: python3 scripts/validate_schema.py
+      - name: Install rac
+        run: pip install git+https://github.com/RulesFoundation/rac.git@feat/unified-syntax
 
-      - name: Validate imports resolve
-        run: python3 scripts/validate_imports.py
+      - name: Validate .rac schema and imports
+        run: python -m rac.validate all statute/
 
       - name: Checkout rac-validators
         uses: actions/checkout@v4

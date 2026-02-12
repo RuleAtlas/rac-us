@@ -19,8 +19,7 @@ rac-us/
 │   └── 7/               # Title 7 (Agriculture)
 │       ├── 2014/        # § 2014 - SNAP Eligibility
 │       └── 2017/        # § 2017 - SNAP Allotment
-├── RAC_SPEC.md           # Full .rac format specification
-└── scripts/              # Validation and conversion tools
+└── RAC_SPEC.md           # Full .rac format specification
 ```
 
 ## Filepath = Citation
@@ -77,11 +76,14 @@ threshold = income * medical_expense_threshold_rate
 ## Commands
 
 ```bash
-# Validate schema
-python scripts/test_new_schema.py
+# Validate all .rac files (schema + imports)
+python -m rac.validate all statute/
 
-# Convert old format to new (WIP)
-python scripts/convert_to_new_format.py --file path/to.rac --dry-run
+# Validate schema only
+python -m rac.validate schema statute/
+
+# Validate imports only
+python -m rac.validate imports statute/
 ```
 
 ## Exemplar Files
