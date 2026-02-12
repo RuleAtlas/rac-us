@@ -1,6 +1,6 @@
 # 7 USC 2017(a) - Value of allotment: Calculation
 
-text: """
+"""
 (a) Calculation
 The value of the allotment which State agencies shall be authorized to issue to
 any households certified as eligible to participate in the supplemental nutrition
@@ -14,27 +14,24 @@ section 2012 of this title, rounded to the nearest whole dollar increment.
 """
 
 # "30 per centum of the household's income"
-parameter income_contribution_rate:
+income_contribution_rate:
   description: "Share of household net income subtracted from TFP cost per 7 USC 2017(a)"
   unit: /1
-  values:
-    1977-10-01: 0.30
+  from 1977-10-01: 0.30
 
 # "8 percent of the cost of the thrifty food plan for a household containing 1 member"
-parameter minimum_allotment_rate:
+minimum_allotment_rate:
   description: "Minimum allotment as percent of 1-member TFP cost per 7 USC 2017(a)"
   unit: /1
-  values:
-    2008-10-01: 0.08
+  from 2008-10-01: 0.08
 
 # "households of one and two persons"
-parameter minimum_allotment_max_household_size:
+minimum_allotment_max_household_size:
   description: "Maximum household size eligible for minimum allotment per 7 USC 2017(a)"
   unit: persons
-  values:
-    1977-10-01: 2
+  from 1977-10-01: 2
 
-input household_size:
+household_size:
   entity: Household
   period: Month
   dtype: Integer
@@ -42,7 +39,7 @@ input household_size:
   description: "Number of persons in the household"
   default: 1
 
-input snap_net_income:
+snap_net_income:
   entity: Household
   period: Month
   dtype: Money
@@ -50,7 +47,7 @@ input snap_net_income:
   description: "Household net income as determined under 7 USC 2014(d) and (e)"
   default: 0
 
-input thrifty_food_plan_cost:
+thrifty_food_plan_cost:
   entity: Household
   period: Month
   dtype: Money
@@ -58,7 +55,7 @@ input thrifty_food_plan_cost:
   description: "Cost of the thrifty food plan for the household as determined under 7 USC 2012"
   default: 0
 
-input thrifty_food_plan_cost_1_member:
+thrifty_food_plan_cost_1_member:
   entity: Household
   period: Month
   dtype: Money
@@ -68,31 +65,15 @@ input thrifty_food_plan_cost_1_member:
 
 # Minimum allotment: "8 percent of the cost of the thrifty food plan for a
 # household containing 1 member ... rounded to the nearest whole dollar increment"
-variable minimum_allotment:
+minimum_allotment:
   entity: Household
   period: Month
   dtype: Money
   unit: USD
   label: "Minimum SNAP Allotment"
   description: "Minimum allotment for households of one and two persons per 7 USC 2017(a)"
-  formula: |
+  from 1977-10-01:
     return thrifty_food_plan_cost_1_member * minimum_allotment_rate
-  tests:
-    - name: "Minimum allotment with $292 TFP cost for 1 member"
-      period: 2024-10
-      inputs:
-        thrifty_food_plan_cost_1_member: 292
-      expect: 23.36
-    - name: "Minimum allotment with $250 TFP cost for 1 member"
-      period: 2024-10
-      inputs:
-        thrifty_food_plan_cost_1_member: 250
-      expect: 20
-    - name: "Zero TFP cost yields zero minimum"
-      period: 2024-10
-      inputs:
-        thrifty_food_plan_cost_1_member: 0
-      expect: 0
 
 # Full allotment: "equal to the cost to such households of the thrifty food plan
 # reduced by an amount equal to 30 per centum of the household's income ...
@@ -102,14 +83,14 @@ variable minimum_allotment:
 # Note: Statute requires "rounded to the nearest lower whole dollar" (floor).
 # DSL lacks floor(); runtime engine handles rounding per 7 USC 2017(a).
 # Tests use inputs that produce whole-dollar or exact results to avoid ambiguity.
-variable snap_allotment:
+snap_allotment:
   entity: Household
   period: Month
   dtype: Money
   unit: USD
   label: "SNAP Allotment"
   description: "Value of the allotment per 7 USC 2017(a)"
-  formula: |
+  from 1977-10-01:
     # TFP cost reduced by 30% of net income
     base_allotment = max(0, thrifty_food_plan_cost - snap_net_income * income_contribution_rate)
 
@@ -118,63 +99,3 @@ variable snap_allotment:
       return max(minimum_allotment, base_allotment)
 
     return base_allotment
-  tests:
-    - name: "Family of 4, no income gets full TFP cost"
-      period: 2024-10
-      inputs:
-        household_size: 4
-        snap_net_income: 0
-        thrifty_food_plan_cost: 973
-        thrifty_food_plan_cost_1_member: 292
-      expect: 973
-    - name: "Family of 4, moderate income"
-      period: 2024-10
-      inputs:
-        household_size: 4
-        snap_net_income: 1500
-        thrifty_food_plan_cost: 973
-        thrifty_food_plan_cost_1_member: 292
-      expect: 523
-    - name: "Single person, no income gets TFP cost"
-      period: 2024-10
-      inputs:
-        household_size: 1
-        snap_net_income: 0
-        thrifty_food_plan_cost: 292
-        thrifty_food_plan_cost_1_member: 292
-        minimum_allotment: 23.36
-      expect: 292
-    - name: "Single person, high income gets minimum allotment"
-      period: 2024-10
-      inputs:
-        household_size: 1
-        snap_net_income: 900
-        thrifty_food_plan_cost: 292
-        thrifty_food_plan_cost_1_member: 292
-        minimum_allotment: 23.36
-      expect: 23.36
-    - name: "Two-person household gets minimum allotment floor"
-      period: 2024-10
-      inputs:
-        household_size: 2
-        snap_net_income: 1300
-        thrifty_food_plan_cost: 395
-        thrifty_food_plan_cost_1_member: 292
-        minimum_allotment: 23.36
-      expect: 23.36
-    - name: "Family of 3, income exceeds TFP cost yields zero"
-      period: 2024-10
-      inputs:
-        household_size: 3
-        snap_net_income: 3000
-        thrifty_food_plan_cost: 713
-        thrifty_food_plan_cost_1_member: 292
-      expect: 0
-    - name: "Family of 4, income produces exact result"
-      period: 2024-10
-      inputs:
-        household_size: 4
-        snap_net_income: 1000
-        thrifty_food_plan_cost: 973
-        thrifty_food_plan_cost_1_member: 292
-      expect: 673

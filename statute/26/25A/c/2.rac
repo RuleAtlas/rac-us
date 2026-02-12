@@ -1,6 +1,6 @@
 # 26 USC 25A(c)(2) - Special rules for determining expenses
 
-text: """
+"""
 (2) Special rules for determining expenses
 (A) Coordination with American Opportunity Tax Credit
 The expenses taken into account under paragraph (1) shall not include expenses
@@ -17,7 +17,7 @@ skills of the individual.
 # (A) Expenses cannot be double-counted - if claimed for AOTC, cannot also claim for LLC
 # (B) LLC expenses can include job skill courses (broader than AOTC)
 
-input total_qualified_expenses:
+total_qualified_expenses:
   entity: Person
   period: Year
   dtype: Money
@@ -26,7 +26,7 @@ input total_qualified_expenses:
   description: "Total qualified tuition and related expenses paid per 26 USC 25A(f)(1)"
   default: 0
 
-input aotc_election_in_effect:
+aotc_election_in_effect:
   entity: Person
   period: Year
   dtype: Boolean
@@ -34,42 +34,17 @@ input aotc_election_in_effect:
   description: "Whether an election under subsection (a)(1) is in effect for this individual"
   default: False
 
-variable llc_eligible_expenses:
+llc_eligible_expenses:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: "LLC Eligible Expenses"
   description: "Qualified expenses eligible for Lifetime Learning Credit after coordination with AOTC per 26 USC 25A(c)(2)"
-  formula: |
+  from 2013-01-01:
     # Per (A): Expenses cannot include those for an individual with AOTC election
     if aotc_election_in_effect:
       return 0
     # Per (B): Expenses include those for job skill courses (no additional filtering needed here;
     # the broader definition is applied at the f(1) input level)
     return total_qualified_expenses
-  tests:
-    - name: "No AOTC election - full expenses eligible"
-      period: 2024-01
-      inputs:
-        total_qualified_expenses: 8000
-        aotc_election_in_effect: False
-      expect: 8000
-    - name: "AOTC election in effect - no LLC expenses"
-      period: 2024-01
-      inputs:
-        total_qualified_expenses: 8000
-        aotc_election_in_effect: True
-      expect: 0
-    - name: "Zero expenses"
-      period: 2024-01
-      inputs:
-        total_qualified_expenses: 0
-        aotc_election_in_effect: False
-      expect: 0
-    - name: "Graduate student job skills course"
-      period: 2024-01
-      inputs:
-        total_qualified_expenses: 5000
-        aotc_election_in_effect: False
-      expect: 5000

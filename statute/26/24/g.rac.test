@@ -1,0 +1,73 @@
+ctc_in_fraud_disallowance_period:
+  - name: "No fraud history"
+    period: 2024-01
+    inputs:
+      ctc_fraud_determination_year: 0
+      current_tax_year: 2024
+    expect: false
+  - name: "Within 10-year fraud period"
+    period: 2024-01
+    inputs:
+      ctc_fraud_determination_year: 2020
+      current_tax_year: 2024
+    expect: true
+  - name: "Beyond 10-year fraud period"
+    period: 2024-01
+    inputs:
+      ctc_fraud_determination_year: 2010
+      current_tax_year: 2024
+    expect: false
+
+ctc_in_reckless_disallowance_period:
+  - name: "No reckless history"
+    period: 2024-01
+    inputs:
+      ctc_reckless_determination_year: 0
+      current_tax_year: 2024
+    expect: false
+  - name: "Within 2-year reckless period"
+    period: 2024-01
+    inputs:
+      ctc_reckless_determination_year: 2023
+      current_tax_year: 2024
+    expect: true
+  - name: "Beyond 2-year reckless period"
+    period: 2024-01
+    inputs:
+      ctc_reckless_determination_year: 2020
+      current_tax_year: 2024
+    expect: false
+
+ctc_disallowed_prior_claim:
+  - name: "No prior issues"
+    period: 2024-01
+    inputs:
+      ctc_in_fraud_disallowance_period: false
+      ctc_in_reckless_disallowance_period: false
+      ctc_deficiency_requires_documentation: false
+      ctc_documentation_provided: false
+    expect: false
+  - name: "In fraud period"
+    period: 2024-01
+    inputs:
+      ctc_in_fraud_disallowance_period: true
+      ctc_in_reckless_disallowance_period: false
+      ctc_deficiency_requires_documentation: false
+      ctc_documentation_provided: false
+    expect: true
+  - name: "Documentation required but not provided"
+    period: 2024-01
+    inputs:
+      ctc_in_fraud_disallowance_period: false
+      ctc_in_reckless_disallowance_period: false
+      ctc_deficiency_requires_documentation: true
+      ctc_documentation_provided: false
+    expect: true
+  - name: "Documentation required and provided"
+    period: 2024-01
+    inputs:
+      ctc_in_fraud_disallowance_period: false
+      ctc_in_reckless_disallowance_period: false
+      ctc_deficiency_requires_documentation: true
+      ctc_documentation_provided: true
+    expect: false

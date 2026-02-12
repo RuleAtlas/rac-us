@@ -1,6 +1,6 @@
 # 26 USC 32(c) - Definitions and special rules
 
-text: """
+"""
 (c) Definitions and special rules
 For purposes of this section—
 
@@ -71,21 +71,19 @@ subsidized under such State program.
 # =============================================================================
 
 # Parameters for age thresholds per 32(c)(1)(A)(ii)(II)
-parameter eitc_min_age_childless:
+eitc_min_age_childless:
   description: "Minimum age for childless eligible individuals per 26 USC 32(c)(1)(A)(ii)(II)"
   unit: years
-  values:
-    1996-01-01: 25
+  from 1996-01-01: 25
 
-parameter eitc_max_age_childless:
+eitc_max_age_childless:
   description: "Maximum age for childless eligible individuals per 26 USC 32(c)(1)(A)(ii)(II)"
   unit: years
-  values:
-    1996-01-01: 65
+  from 1996-01-01: 65
 
 # Inputs for eligible individual determination
 
-input has_eitc_qualifying_child:
+has_eitc_qualifying_child:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -93,7 +91,7 @@ input has_eitc_qualifying_child:
   description: "Whether the taxpayer has a qualifying child for the taxable year per 26 USC 32(c)(1)(A)(i)"
   default: False
 
-input principal_abode_in_us_over_half_year:
+principal_abode_in_us_over_half_year:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -101,7 +99,7 @@ input principal_abode_in_us_over_half_year:
   description: "Whether principal place of abode is in the United States for more than one-half of the taxable year per 26 USC 32(c)(1)(A)(ii)(I)"
   default: True
 
-input taxpayer_age:
+taxpayer_age:
   entity: Person
   period: Year
   dtype: Integer
@@ -109,7 +107,7 @@ input taxpayer_age:
   description: "Age of the taxpayer before the close of the taxable year"
   default: 30
 
-input spouse_age:
+spouse_age:
   entity: Person
   period: Year
   dtype: Integer
@@ -117,7 +115,7 @@ input spouse_age:
   description: "Age of the taxpayer's spouse before the close of the taxable year"
   default: 0
 
-input is_married_eitc:
+is_married_eitc:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -125,7 +123,7 @@ input is_married_eitc:
   description: "Whether the individual is married for purposes of 26 USC 32(c)(1)(A)(ii)(II)"
   default: False
 
-input is_dependent_of_another:
+is_dependent_of_another:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -133,7 +131,7 @@ input is_dependent_of_another:
   description: "Whether the individual is a dependent for whom a deduction is allowable under section 151 to another taxpayer per 26 USC 32(c)(1)(A)(ii)(III)"
   default: False
 
-input is_qualifying_child_of_another:
+is_qualifying_child_of_another:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -141,7 +139,7 @@ input is_qualifying_child_of_another:
   description: "Whether the individual is the qualifying child of another taxpayer for the calendar year per 26 USC 32(c)(1)(B)"
   default: False
 
-input claims_section_911_benefits:
+claims_section_911_benefits:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -149,7 +147,7 @@ input claims_section_911_benefits:
   description: "Whether the individual claims benefits under section 911 (foreign earned income) per 26 USC 32(c)(1)(C)"
   default: False
 
-input is_nonresident_alien:
+is_nonresident_alien:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -157,7 +155,7 @@ input is_nonresident_alien:
   description: "Whether the individual is a nonresident alien for any portion of the taxable year per 26 USC 32(c)(1)(D)"
   default: False
 
-input elected_resident_treatment_6013:
+elected_resident_treatment_6013:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -165,7 +163,7 @@ input elected_resident_treatment_6013:
   description: "Whether the nonresident alien elected to be treated as a resident under section 6013(g) or (h) per 26 USC 32(c)(1)(D)"
   default: False
 
-input taxpayer_has_tin_on_return:
+taxpayer_has_tin_on_return:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -173,7 +171,7 @@ input taxpayer_has_tin_on_return:
   description: "Whether the taxpayer includes their TIN on the return per 26 USC 32(c)(1)(E)(i)"
   default: True
 
-input spouse_has_tin_on_return:
+spouse_has_tin_on_return:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -183,13 +181,13 @@ input spouse_has_tin_on_return:
 
 # Variables for eligible individual determination
 
-variable eitc_meets_age_requirement:
+eitc_meets_age_requirement:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "EITC Meets Age Requirement"
   description: "Whether taxpayer (or spouse if married) meets age requirement per 26 USC 32(c)(1)(A)(ii)(II)"
-  formula: |
+  from 1996-01-01:
     # Age requirement: "has attained age 25 but not attained age 65"
     # For married individuals, either spouse can satisfy the requirement
 
@@ -213,64 +211,14 @@ variable eitc_meets_age_requirement:
 
     # Neither meets age requirement
     return False
-  tests:
-    - name: "Single taxpayer age 30 - meets requirement"
-      period: 2024-01
-      inputs:
-        taxpayer_age: 30
-        spouse_age: 0
-        is_married_eitc: false
-      expect: true
-    - name: "Single taxpayer age 24 - too young"
-      period: 2024-01
-      inputs:
-        taxpayer_age: 24
-        spouse_age: 0
-        is_married_eitc: false
-      expect: false
-    - name: "Single taxpayer age 65 - too old"
-      period: 2024-01
-      inputs:
-        taxpayer_age: 65
-        spouse_age: 0
-        is_married_eitc: false
-      expect: false
-    - name: "Single taxpayer age 25 - meets minimum"
-      period: 2024-01
-      inputs:
-        taxpayer_age: 25
-        spouse_age: 0
-        is_married_eitc: false
-      expect: true
-    - name: "Single taxpayer age 64 - meets maximum"
-      period: 2024-01
-      inputs:
-        taxpayer_age: 64
-        spouse_age: 0
-        is_married_eitc: false
-      expect: true
-    - name: "Married - taxpayer 24, spouse 30 - spouse satisfies"
-      period: 2024-01
-      inputs:
-        taxpayer_age: 24
-        spouse_age: 30
-        is_married_eitc: true
-      expect: true
-    - name: "Married - taxpayer 70, spouse 66 - neither satisfies"
-      period: 2024-01
-      inputs:
-        taxpayer_age: 70
-        spouse_age: 66
-        is_married_eitc: true
-      expect: false
 
-variable eitc_meets_id_number_requirement:
+eitc_meets_id_number_requirement:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "EITC Meets ID Number Requirement"
   description: "Whether taxpayer meets identification number requirement per 26 USC 32(c)(1)(E)"
-  formula: |
+  from 1996-01-01:
     # (E)(i): Must include taxpayer's TIN
     if not taxpayer_has_tin_on_return:
       return False
@@ -278,74 +226,27 @@ variable eitc_meets_id_number_requirement:
     if is_married_eitc and not spouse_has_tin_on_return:
       return False
     return True
-  tests:
-    - name: "Single with TIN"
-      period: 2024-01
-      inputs:
-        taxpayer_has_tin_on_return: true
-        spouse_has_tin_on_return: true
-        is_married_eitc: false
-      expect: true
-    - name: "Single missing TIN"
-      period: 2024-01
-      inputs:
-        taxpayer_has_tin_on_return: false
-        spouse_has_tin_on_return: true
-        is_married_eitc: false
-      expect: false
-    - name: "Married both have TIN"
-      period: 2024-01
-      inputs:
-        taxpayer_has_tin_on_return: true
-        spouse_has_tin_on_return: true
-        is_married_eitc: true
-      expect: true
-    - name: "Married spouse missing TIN"
-      period: 2024-01
-      inputs:
-        taxpayer_has_tin_on_return: true
-        spouse_has_tin_on_return: false
-        is_married_eitc: true
-      expect: false
 
-variable eitc_nonresident_alien_eligible:
+eitc_nonresident_alien_eligible:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "EITC Nonresident Alien Eligible"
   description: "Whether nonresident alien meets eligibility exception per 26 USC 32(c)(1)(D)"
-  formula: |
+  from 1996-01-01:
     # (D): Nonresident aliens are ineligible unless elected resident treatment under 6013(g)/(h)
     if is_nonresident_alien:
       return elected_resident_treatment_6013
     # Not a nonresident alien - this rule does not disqualify
     return True
-  tests:
-    - name: "Not a nonresident alien"
-      period: 2024-01
-      inputs:
-        is_nonresident_alien: false
-      expect: true
-    - name: "Nonresident alien without 6013 election"
-      period: 2024-01
-      inputs:
-        is_nonresident_alien: true
-        elected_resident_treatment_6013: false
-      expect: false
-    - name: "Nonresident alien with 6013 election"
-      period: 2024-01
-      inputs:
-        is_nonresident_alien: true
-        elected_resident_treatment_6013: true
-      expect: true
 
-variable is_eitc_eligible_individual:
+is_eitc_eligible_individual:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "EITC Eligible Individual"
   description: "Whether the taxpayer is an eligible individual for EITC per 26 USC 32(c)(1)"
-  formula: |
+  from 1996-01-01:
     # (B) Qualifying child ineligible: If individual is a qualifying child of another,
     # they cannot be an eligible individual
     if is_qualifying_child_of_another:
@@ -379,139 +280,6 @@ variable is_eitc_eligible_individual:
     if is_dependent_of_another:
       return False
     return True
-  tests:
-    - name: "Individual with qualifying child"
-      period: 2024-01
-      inputs:
-        has_eitc_qualifying_child: true
-        is_qualifying_child_of_another: false
-        claims_section_911_benefits: false
-        eitc_nonresident_alien_eligible: true
-        eitc_meets_id_number_requirement: true
-        principal_abode_in_us_over_half_year: true
-        eitc_meets_age_requirement: true
-        is_dependent_of_another: false
-      expect: true
-    - name: "Childless individual meeting all requirements"
-      period: 2024-01
-      inputs:
-        has_eitc_qualifying_child: false
-        is_qualifying_child_of_another: false
-        claims_section_911_benefits: false
-        eitc_nonresident_alien_eligible: true
-        eitc_meets_id_number_requirement: true
-        principal_abode_in_us_over_half_year: true
-        eitc_meets_age_requirement: true
-        is_dependent_of_another: false
-      expect: true
-    - name: "Childless - abode not in US"
-      period: 2024-01
-      inputs:
-        has_eitc_qualifying_child: false
-        is_qualifying_child_of_another: false
-        claims_section_911_benefits: false
-        eitc_nonresident_alien_eligible: true
-        eitc_meets_id_number_requirement: true
-        principal_abode_in_us_over_half_year: false
-        eitc_meets_age_requirement: true
-        is_dependent_of_another: false
-      expect: false
-    - name: "Childless - too young"
-      period: 2024-01
-      inputs:
-        has_eitc_qualifying_child: false
-        is_qualifying_child_of_another: false
-        claims_section_911_benefits: false
-        eitc_nonresident_alien_eligible: true
-        eitc_meets_id_number_requirement: true
-        principal_abode_in_us_over_half_year: true
-        eitc_meets_age_requirement: false
-        is_dependent_of_another: false
-      expect: false
-    - name: "Childless - too old"
-      period: 2024-01
-      inputs:
-        has_eitc_qualifying_child: false
-        is_qualifying_child_of_another: false
-        claims_section_911_benefits: false
-        eitc_nonresident_alien_eligible: true
-        eitc_meets_id_number_requirement: true
-        principal_abode_in_us_over_half_year: true
-        eitc_meets_age_requirement: false
-        is_dependent_of_another: false
-      expect: false
-    - name: "Childless - is dependent of another"
-      period: 2024-01
-      inputs:
-        has_eitc_qualifying_child: false
-        is_qualifying_child_of_another: false
-        claims_section_911_benefits: false
-        eitc_nonresident_alien_eligible: true
-        eitc_meets_id_number_requirement: true
-        principal_abode_in_us_over_half_year: true
-        eitc_meets_age_requirement: true
-        is_dependent_of_another: true
-      expect: false
-    - name: "Is qualifying child of another taxpayer"
-      period: 2024-01
-      inputs:
-        has_eitc_qualifying_child: true
-        is_qualifying_child_of_another: true
-        claims_section_911_benefits: false
-        eitc_nonresident_alien_eligible: true
-        eitc_meets_id_number_requirement: true
-        principal_abode_in_us_over_half_year: true
-        eitc_meets_age_requirement: true
-        is_dependent_of_another: false
-      expect: false
-    - name: "Claims section 911 benefits"
-      period: 2024-01
-      inputs:
-        has_eitc_qualifying_child: true
-        is_qualifying_child_of_another: false
-        claims_section_911_benefits: true
-        eitc_nonresident_alien_eligible: true
-        eitc_meets_id_number_requirement: true
-        principal_abode_in_us_over_half_year: true
-        eitc_meets_age_requirement: true
-        is_dependent_of_another: false
-      expect: false
-    - name: "Nonresident alien without 6013 election"
-      period: 2024-01
-      inputs:
-        has_eitc_qualifying_child: true
-        is_qualifying_child_of_another: false
-        claims_section_911_benefits: false
-        eitc_nonresident_alien_eligible: false
-        eitc_meets_id_number_requirement: true
-        principal_abode_in_us_over_half_year: true
-        eitc_meets_age_requirement: true
-        is_dependent_of_another: false
-      expect: false
-    - name: "Nonresident alien with 6013 election"
-      period: 2024-01
-      inputs:
-        has_eitc_qualifying_child: true
-        is_qualifying_child_of_another: false
-        claims_section_911_benefits: false
-        eitc_nonresident_alien_eligible: true
-        eitc_meets_id_number_requirement: true
-        principal_abode_in_us_over_half_year: true
-        eitc_meets_age_requirement: true
-        is_dependent_of_another: false
-      expect: true
-    - name: "Missing taxpayer TIN"
-      period: 2024-01
-      inputs:
-        has_eitc_qualifying_child: true
-        is_qualifying_child_of_another: false
-        claims_section_911_benefits: false
-        eitc_nonresident_alien_eligible: true
-        eitc_meets_id_number_requirement: false
-        principal_abode_in_us_over_half_year: true
-        eitc_meets_age_requirement: true
-        is_dependent_of_another: false
-      expect: false
 
 # =============================================================================
 # 32(c)(2) - Earned income
@@ -519,7 +287,7 @@ variable is_eitc_eligible_individual:
 
 # Inputs for earned income computation
 
-input wages_salaries_tips:
+wages_salaries_tips:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -527,7 +295,7 @@ input wages_salaries_tips:
   description: "Wages, salaries, tips, and other employee compensation includible in gross income per 26 USC 32(c)(2)(A)(i)"
   default: 0
 
-input net_earnings_self_employment:
+net_earnings_self_employment:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -535,7 +303,7 @@ input net_earnings_self_employment:
   description: "Net earnings from self-employment per section 1402(a), determined with regard to 164(f) deduction per 26 USC 32(c)(2)(A)(ii)"
   default: 0
 
-input pension_annuity_income:
+pension_annuity_income:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -543,7 +311,7 @@ input pension_annuity_income:
   description: "Amount received as pension or annuity (excluded from earned income per 26 USC 32(c)(2)(B)(ii))"
   default: 0
 
-input income_section_871a:
+income_section_871a:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -551,7 +319,7 @@ input income_section_871a:
   description: "Income of nonresident alien not connected with US business (excluded per 26 USC 32(c)(2)(B)(iii))"
   default: 0
 
-input penal_institution_wages:
+penal_institution_wages:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -559,7 +327,7 @@ input penal_institution_wages:
   description: "Amount received for services while inmate at penal institution (excluded per 26 USC 32(c)(2)(B)(iv))"
   default: 0
 
-input subsidized_work_activity_income:
+subsidized_work_activity_income:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -569,13 +337,13 @@ input subsidized_work_activity_income:
 
 # Variable for earned income computation
 
-variable eitc_earned_income:
+eitc_earned_income:
   entity: TaxUnit
   period: Year
   dtype: Money
   label: "EITC Earned Income"
   description: "Earned income for EITC purposes per 26 USC 32(c)(2)"
-  formula: |
+  from 1996-01-01:
     # (A) Earned income includes:
     # (i) wages, salaries, tips, and other employee compensation includible in gross income
     # (ii) net earnings from self-employment (with 164(f) deduction)
@@ -596,68 +364,3 @@ variable eitc_earned_income:
 
     # Earned income cannot be negative
     return max(0, earned)
-  tests:
-    - name: "Wages only"
-      period: 2024-01
-      inputs:
-        wages_salaries_tips: 30000
-        net_earnings_self_employment: 0
-        penal_institution_wages: 0
-        subsidized_work_activity_income: 0
-      expect: 30000
-    - name: "Self-employment only"
-      period: 2024-01
-      inputs:
-        wages_salaries_tips: 0
-        net_earnings_self_employment: 20000
-        penal_institution_wages: 0
-        subsidized_work_activity_income: 0
-      expect: 20000
-    - name: "Combined wages and self-employment"
-      period: 2024-01
-      inputs:
-        wages_salaries_tips: 30000
-        net_earnings_self_employment: 10000
-        penal_institution_wages: 0
-        subsidized_work_activity_income: 0
-      expect: 40000
-    - name: "With penal institution exclusion"
-      period: 2024-01
-      inputs:
-        wages_salaries_tips: 30000
-        net_earnings_self_employment: 0
-        penal_institution_wages: 5000
-        subsidized_work_activity_income: 0
-      expect: 25000
-    - name: "With subsidized work activity exclusion"
-      period: 2024-01
-      inputs:
-        wages_salaries_tips: 30000
-        net_earnings_self_employment: 0
-        penal_institution_wages: 0
-        subsidized_work_activity_income: 3000
-      expect: 27000
-    - name: "Multiple exclusions"
-      period: 2024-01
-      inputs:
-        wages_salaries_tips: 30000
-        net_earnings_self_employment: 5000
-        penal_institution_wages: 2000
-        subsidized_work_activity_income: 1000
-      expect: 32000
-    - name: "Zero income"
-      period: 2024-01
-      inputs:
-        wages_salaries_tips: 0
-        net_earnings_self_employment: 0
-        penal_institution_wages: 0
-        subsidized_work_activity_income: 0
-      expect: 0
-    - name: "Exclusions exceed income - floor at zero"
-      period: 2024-01
-      inputs:
-        wages_salaries_tips: 5000
-        net_earnings_self_employment: 0
-        penal_institution_wages: 10000
-        subsidized_work_activity_income: 0
-      expect: 0

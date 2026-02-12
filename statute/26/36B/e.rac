@@ -1,6 +1,6 @@
 # 26 USC 36B(e) - Rules for individuals not lawfully present
 
-text: """
+"""
 (e) Rules for individuals not lawfully present
 (1) In general
 If 1 or more individuals for whom a taxpayer is allowed a deduction under
@@ -42,7 +42,7 @@ at least 1 individual in the tax household who is not lawfully present.
 # operates at the TaxUnit level by adjusting aggregates. The inputs capture
 # the portions attributable to non-lawfully-present individuals.
 
-input premiums_attributable_to_non_lawfully_present:
+premiums_attributable_to_non_lawfully_present:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -50,7 +50,7 @@ input premiums_attributable_to_non_lawfully_present:
   description: "The portion of aggregate premiums under 36B(b)(2)(A) attributable to individuals who are not lawfully present per 36B(e)(1)(A)"
   default: 0
 
-input income_attributable_to_non_lawfully_present:
+income_attributable_to_non_lawfully_present:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -58,7 +58,7 @@ input income_attributable_to_non_lawfully_present:
   description: "Amount of household income under 36B(b)(4)(A) attributable to individuals who are not lawfully present per 36B(e)(1)(B)"
   default: 0
 
-input aggregate_premiums_before_adjustment:
+aggregate_premiums_before_adjustment:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -66,7 +66,7 @@ input aggregate_premiums_before_adjustment:
   description: "Total premiums taken into account under 36B(b)(2)(A)(i) and (ii) before reduction for non-lawfully-present individuals"
   default: 0
 
-input household_income_before_adjustment:
+household_income_before_adjustment:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -74,7 +74,7 @@ input household_income_before_adjustment:
   description: "Household income otherwise taken into account under 36B(b)(4)(A) before reduction for non-lawfully-present individuals"
   default: 0
 
-input is_lawfully_present:
+is_lawfully_present:
   entity: Person
   period: Year
   dtype: Boolean
@@ -86,81 +86,31 @@ input is_lawfully_present:
 # (e)(1)(A) - Adjusted premiums
 # =============================================================================
 
-variable ptc_adjusted_premiums:
+ptc_adjusted_premiums:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "PTC Adjusted Premiums"
   description: "Aggregate premiums reduced by the portion attributable to non-lawfully-present individuals per 26 USC 36B(e)(1)(A)"
-  formula: |
+  from 2013-01-01:
     # (e)(1)(A): "the aggregate amount of premiums...shall be reduced by the
     # portion (if any) of such premiums which is attributable to such individuals"
     return max(0, aggregate_premiums_before_adjustment - premiums_attributable_to_non_lawfully_present)
-  tests:
-    - name: "No non-lawfully-present individuals - premiums unchanged"
-      period: 2024-01
-      inputs:
-        aggregate_premiums_before_adjustment: 12_000
-        premiums_attributable_to_non_lawfully_present: 0
-      expect: 12_000
-    - name: "Some premiums attributable to non-lawfully-present"
-      period: 2024-01
-      inputs:
-        aggregate_premiums_before_adjustment: 12_000
-        premiums_attributable_to_non_lawfully_present: 3_000
-      expect: 9_000
-    - name: "All premiums attributable to non-lawfully-present"
-      period: 2024-01
-      inputs:
-        aggregate_premiums_before_adjustment: 12_000
-        premiums_attributable_to_non_lawfully_present: 12_000
-      expect: 0
-    - name: "Zero premiums"
-      period: 2024-01
-      inputs:
-        aggregate_premiums_before_adjustment: 0
-        premiums_attributable_to_non_lawfully_present: 0
-      expect: 0
 
 # =============================================================================
 # (e)(1)(B) - Adjusted household income
 # =============================================================================
 
-variable ptc_adjusted_household_income:
+ptc_adjusted_household_income:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "PTC Adjusted Household Income"
   description: "Household income reduced by income attributable to non-lawfully-present individuals per 26 USC 36B(e)(1)(B)"
-  formula: |
+  from 2013-01-01:
     # (e)(1)(B): "the determination of household income shall be made by reducing
     # the income otherwise taken into account under subsection (b)(4)(A) by any
     # amount of such income that is attributable to individuals not lawfully present"
     return max(0, household_income_before_adjustment - income_attributable_to_non_lawfully_present)
-  tests:
-    - name: "No non-lawfully-present individuals - income unchanged"
-      period: 2024-01
-      inputs:
-        household_income_before_adjustment: 50_000
-        income_attributable_to_non_lawfully_present: 0
-      expect: 50_000
-    - name: "Some income attributable to non-lawfully-present"
-      period: 2024-01
-      inputs:
-        household_income_before_adjustment: 50_000
-        income_attributable_to_non_lawfully_present: 15_000
-      expect: 35_000
-    - name: "All income attributable to non-lawfully-present"
-      period: 2024-01
-      inputs:
-        household_income_before_adjustment: 50_000
-        income_attributable_to_non_lawfully_present: 50_000
-      expect: 0
-    - name: "Zero income"
-      period: 2024-01
-      inputs:
-        household_income_before_adjustment: 0
-        income_attributable_to_non_lawfully_present: 0
-      expect: 0

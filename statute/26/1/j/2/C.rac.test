@@ -1,0 +1,31 @@
+single_income_tax:
+  - name: "First bracket only"
+    period: 2018-01
+    inputs:
+      taxable_income: 5000
+    expect: 500
+  - name: "Second bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 25000
+    expect: 2809.50
+  - name: "Third bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 50000
+    expect: 6939.50
+  - name: "Fourth bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 100000
+    expect: 18289.50
+  - name: "Top bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 600000
+    expect: 187689.50
+  - name: "Zero income"
+    period: 2018-01
+    inputs:
+      taxable_income: 0
+    expect: 0

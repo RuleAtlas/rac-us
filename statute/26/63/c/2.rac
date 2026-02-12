@@ -1,6 +1,6 @@
 # 26 USC 63(c)(2) - Basic standard deduction
 
-text: """
+"""
 (2) Basic standard deduction
 For purposes of paragraph (1), the basic standard deduction is—
 (A) 200 percent of the dollar amount in effect under subparagraph (C) for the taxable year in the case of—
@@ -16,7 +16,7 @@ Note: Per 26 USC 63(c)(7)(A), for taxable years beginning after December 31, 201
 
 # Parent file that dispatches to appropriate basic standard deduction based on filing status
 
-variable basic_standard_deduction:
+basic_standard_deduction:
   imports:
     - 26/63/c/2/A#basic_std_ded_joint
     - 26/63/c/2/B#basic_std_ded_hoh
@@ -27,7 +27,7 @@ variable basic_standard_deduction:
   unit: "USD"
   label: "Basic Standard Deduction"
   description: "Basic standard deduction amount based on filing status per 26 USC 63(c)(2)"
-  formula: |
+  from 2013-01-01:
     # (A) Joint returns and surviving spouses: 200% of (C)
     if filing_status == "JOINT":
       return basic_std_ded_joint
@@ -38,61 +38,15 @@ variable basic_standard_deduction:
       return basic_std_ded_hoh
     # (C) All other cases (single, MFS)
     return basic_std_ded_other
-  tests:
-    - name: "Joint filers 2018"
-      period: 2018-01
-      inputs:
-        tax_year: 2018
-        filing_status: "JOINT"
-        basic_std_ded_joint: 24000
-        basic_std_ded_hoh: 18000
-        basic_std_ded_other: 12000
-      expect: 24000
-    - name: "Surviving spouse 2018"
-      period: 2018-01
-      inputs:
-        tax_year: 2018
-        filing_status: "SURVIVING_SPOUSE"
-        basic_std_ded_joint: 24000
-        basic_std_ded_hoh: 18000
-        basic_std_ded_other: 12000
-      expect: 24000
-    - name: "Head of household 2018"
-      period: 2018-01
-      inputs:
-        tax_year: 2018
-        filing_status: "HEAD_OF_HOUSEHOLD"
-        basic_std_ded_joint: 24000
-        basic_std_ded_hoh: 18000
-        basic_std_ded_other: 12000
-      expect: 18000
-    - name: "Single filer 2018"
-      period: 2018-01
-      inputs:
-        tax_year: 2018
-        filing_status: "SINGLE"
-        basic_std_ded_joint: 24000
-        basic_std_ded_hoh: 18000
-        basic_std_ded_other: 12000
-      expect: 12000
-    - name: "MFS filer 2018"
-      period: 2018-01
-      inputs:
-        tax_year: 2018
-        filing_status: "MARRIED_FILING_SEPARATELY"
-        basic_std_ded_joint: 24000
-        basic_std_ded_hoh: 18000
-        basic_std_ded_other: 12000
-      expect: 12000
 
-input tax_year:
+tax_year:
   entity: TaxUnit
   period: Year
   dtype: Integer
   label: "Tax Year"
   description: "The taxable year"
 
-input filing_status:
+filing_status:
   entity: TaxUnit
   period: Year
   dtype: Enum[SINGLE, JOINT, MARRIED_FILING_SEPARATELY, HEAD_OF_HOUSEHOLD, SURVIVING_SPOUSE]

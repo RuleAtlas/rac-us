@@ -1,6 +1,6 @@
 # 26 USC 25A(b)(3) - Eligible student
 
-text: """
+"""
 (3) Eligible student
 For purposes of this subsection, the term "eligible student" means, with respect to any
 academic period, a student who-
@@ -26,13 +26,12 @@ student is pursuing.
 # The half-time threshold (1/2) is explicitly stated in the statute.
 
 # Minimum course load fraction required for eligible student status
-parameter min_course_load_fraction:
+min_course_load_fraction:
   description: "Minimum fraction of normal full-time work load required for eligible student status per 26 USC 25A(b)(3)(B)"
   unit: /1
-  values:
-    1997-08-05: 0.5
+  from 1997-08-05: 0.5
 
-input meets_hea_484_requirements:
+meets_hea_484_requirements:
   entity: Person
   period: Year
   dtype: Boolean
@@ -40,7 +39,7 @@ input meets_hea_484_requirements:
   description: "Whether the student meets the requirements of section 484(a)(1) of the Higher Education Act of 1965 (20 U.S.C. 1091(a)(1)) per 26 USC 25A(b)(3)(A)"
   default: false
 
-input course_load_fraction:
+course_load_fraction:
   entity: Person
   period: Year
   dtype: Float
@@ -48,59 +47,16 @@ input course_load_fraction:
   description: "Fraction of normal full-time work load the student is carrying for the course of study per 26 USC 25A(b)(3)(B)"
   default: 0
 
-variable is_eligible_student:
+is_eligible_student:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Is Eligible Student"
   description: "Whether the individual meets the definition of eligible student per 26 USC 25A(b)(3)"
-  formula: |
+  from 1997-08-05:
     # Per 25A(b)(3): Both (A) and (B) must be satisfied
     # (A) Student meets requirements of HEA section 484(a)(1) (20 USC 1091(a)(1))
     # (B) Student is carrying at least 1/2 the normal full-time work load
     hea_requirement_met = meets_hea_484_requirements
     half_time_requirement_met = course_load_fraction >= min_course_load_fraction
     return hea_requirement_met and half_time_requirement_met
-  tests:
-    - name: "Both requirements met - eligible"
-      period: 2024-01
-      inputs:
-        meets_hea_484_requirements: true
-        course_load_fraction: 0.5
-      expect: true
-    - name: "Full-time student with HEA requirements - eligible"
-      period: 2024-01
-      inputs:
-        meets_hea_484_requirements: true
-        course_load_fraction: 1.0
-      expect: true
-    - name: "HEA met but less than half-time - not eligible"
-      period: 2024-01
-      inputs:
-        meets_hea_484_requirements: true
-        course_load_fraction: 0.4
-      expect: false
-    - name: "Half-time but HEA not met - not eligible"
-      period: 2024-01
-      inputs:
-        meets_hea_484_requirements: false
-        course_load_fraction: 0.5
-      expect: false
-    - name: "Neither requirement met - not eligible"
-      period: 2024-01
-      inputs:
-        meets_hea_484_requirements: false
-        course_load_fraction: 0.3
-      expect: false
-    - name: "Exactly at half-time threshold - eligible"
-      period: 2024-01
-      inputs:
-        meets_hea_484_requirements: true
-        course_load_fraction: 0.5
-      expect: true
-    - name: "Just below half-time threshold - not eligible"
-      period: 2024-01
-      inputs:
-        meets_hea_484_requirements: true
-        course_load_fraction: 0.49
-      expect: false

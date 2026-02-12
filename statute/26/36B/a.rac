@@ -1,6 +1,6 @@
 # 26 USC 36B(a) - In general
 
-text: """
+"""
 (a) In general
 In the case of an applicable taxpayer, there shall be allowed as a credit
 against the tax imposed by this subtitle for any taxable year an amount
@@ -17,7 +17,7 @@ taxable year.
 # Input: Whether the taxpayer is an applicable taxpayer per 36B(c)(1)
 # =============================================================================
 
-input is_applicable_taxpayer:
+is_applicable_taxpayer:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -29,7 +29,7 @@ input is_applicable_taxpayer:
 # 36B(a) - Premium tax credit
 # =============================================================================
 
-variable ptc_premium_tax_credit:
+ptc_premium_tax_credit:
   imports:
     - 26/36B/b/1#ptc_premium_assistance_credit_amount
   entity: TaxUnit
@@ -38,40 +38,9 @@ variable ptc_premium_tax_credit:
   unit: USD
   label: "Premium Tax Credit"
   description: "Refundable credit for coverage under a qualified health plan per 26 USC 36B(a)"
-  formula: |
+  from 2013-01-01:
     # (a): "In the case of an applicable taxpayer, there shall be allowed as a
     # credit...an amount equal to the premium assistance credit amount"
     if not is_applicable_taxpayer:
       return 0
     return ptc_premium_assistance_credit_amount
-  tests:
-    - name: "Applicable taxpayer receives full credit amount"
-      period: 2024-01
-      inputs:
-        is_applicable_taxpayer: true
-        ptc_premium_assistance_credit_amount: 5400
-      expect: 5400
-    - name: "Non-applicable taxpayer receives zero"
-      period: 2024-01
-      inputs:
-        is_applicable_taxpayer: false
-        ptc_premium_assistance_credit_amount: 5400
-      expect: 0
-    - name: "Applicable taxpayer with zero premium assistance"
-      period: 2024-01
-      inputs:
-        is_applicable_taxpayer: true
-        ptc_premium_assistance_credit_amount: 0
-      expect: 0
-    - name: "Non-applicable taxpayer with zero premium assistance"
-      period: 2024-01
-      inputs:
-        is_applicable_taxpayer: false
-        ptc_premium_assistance_credit_amount: 0
-      expect: 0
-    - name: "Applicable taxpayer - large credit"
-      period: 2024-01
-      inputs:
-        is_applicable_taxpayer: true
-        ptc_premium_assistance_credit_amount: 18_000
-      expect: 18_000

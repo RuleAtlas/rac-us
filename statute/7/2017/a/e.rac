@@ -1,4 +1,4 @@
-text: """
+"""
 (e) Allotments for households residing in centers
 (1) In general
 In the case of an individual who resides in a center for the purpose of a drug
@@ -21,7 +21,7 @@ representative of the individual for the purpose of receiving an allotment.
 #   - Individual receives allotment if they leave the center
 # No rates, dollar amounts, or formulas beyond boolean routing logic.
 
-input resides_in_treatment_center:
+resides_in_treatment_center:
   entity: Person
   period: Month
   dtype: Boolean
@@ -29,7 +29,7 @@ input resides_in_treatment_center:
   description: "Whether individual resides in a center for drug or alcoholic treatment per 7 USC 2012(m)(5)"
   default: false
 
-input has_left_treatment_center:
+has_left_treatment_center:
   entity: Person
   period: Month
   dtype: Boolean
@@ -39,47 +39,28 @@ input has_left_treatment_center:
 
 # (e)(1)(A): center receives allotment as authorized representative
 # for a period that is less than 1 month
-variable allotment_payable_to_center:
+allotment_payable_to_center:
   entity: Person
   period: Month
   dtype: Boolean
   label: "Allotment Payable to Treatment Center"
   description: "Whether the allotment is provided to the treatment center as authorized representative per 7 USC 2017(a)(e)(1)(A)"
-  formula: |
+  from 2013-01-01:
     # Center receives allotment only if individual resides there
     # and has not left; statute limits this to periods < 1 month
     # (period constraint enforced by State agency administration)
     if resides_in_treatment_center and not has_left_treatment_center:
       return true
     return false
-  tests:
-    - name: "Resident in center, allotment goes to center"
-      period: 2024-10
-      inputs:
-        resides_in_treatment_center: true
-        has_left_treatment_center: false
-      expect: true
-    - name: "Left center, allotment does not go to center"
-      period: 2024-10
-      inputs:
-        resides_in_treatment_center: true
-        has_left_treatment_center: true
-      expect: false
-    - name: "Not in treatment center"
-      period: 2024-10
-      inputs:
-        resides_in_treatment_center: false
-        has_left_treatment_center: false
-      expect: false
 
 # (e)(1)(B): individual receives allotment if they leave the center
-variable allotment_payable_to_individual:
+allotment_payable_to_individual:
   entity: Person
   period: Month
   dtype: Boolean
   label: "Allotment Payable to Individual"
   description: "Whether the allotment is provided directly to the individual per 7 USC 2017(a)(e)(1)(B)"
-  formula: |
+  from 2013-01-01:
     # Individual receives allotment if they have left the center
     if resides_in_treatment_center and has_left_treatment_center:
       return true
@@ -87,22 +68,3 @@ variable allotment_payable_to_individual:
     if not resides_in_treatment_center:
       return true
     return false
-  tests:
-    - name: "Left center, allotment goes to individual"
-      period: 2024-10
-      inputs:
-        resides_in_treatment_center: true
-        has_left_treatment_center: true
-      expect: true
-    - name: "Still in center, allotment does not go to individual"
-      period: 2024-10
-      inputs:
-        resides_in_treatment_center: true
-        has_left_treatment_center: false
-      expect: false
-    - name: "Not in treatment center, allotment goes to individual"
-      period: 2024-10
-      inputs:
-        resides_in_treatment_center: false
-        has_left_treatment_center: false
-      expect: true

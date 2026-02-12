@@ -1,0 +1,21 @@
+aotc_4_year_limit_met:
+  - name: "No prior years - eligible"
+    period: 2024-01
+    inputs:
+      prior_aotc_years_claimed: 0
+    expect: False
+  - name: "Three prior years - still eligible"
+    period: 2024-01
+    inputs:
+      prior_aotc_years_claimed: 3
+    expect: False
+  - name: "Four prior years - limit met"
+    period: 2024-01
+    inputs:
+      prior_aotc_years_claimed: 4
+    expect: True
+  - name: "More than four prior years - limit met"
+    period: 2024-01
+    inputs:
+      prior_aotc_years_claimed: 5
+    expect: True

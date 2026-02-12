@@ -1,0 +1,25 @@
+is_eligible_educational_institution:
+  - name: "Both requirements met - eligible"
+    period: 2024-01
+    inputs:
+      institution_described_in_hea_481: True
+      institution_title_iv_eligible: True
+    expect: True
+  - name: "Only HEA 481 requirement met - not eligible"
+    period: 2024-01
+    inputs:
+      institution_described_in_hea_481: True
+      institution_title_iv_eligible: False
+    expect: False
+  - name: "Only Title IV eligibility met - not eligible"
+    period: 2024-01
+    inputs:
+      institution_described_in_hea_481: False
+      institution_title_iv_eligible: True
+    expect: False
+  - name: "Neither requirement met - not eligible"
+    period: 2024-01
+    inputs:
+      institution_described_in_hea_481: False
+      institution_title_iv_eligible: False
+    expect: False

@@ -1,0 +1,163 @@
+household_income_pct_fpl:
+  - name: "200% FPL"
+    period: 2024-01
+    inputs:
+      household_income: 60000
+      poverty_line: 30000
+    expect: 2.0
+  - name: "150% FPL"
+    period: 2024-01
+    inputs:
+      household_income: 45000
+      poverty_line: 30000
+    expect: 1.5
+  - name: "Zero poverty line (edge case)"
+    period: 2024-01
+    inputs:
+      household_income: 50000
+      poverty_line: 0
+    expect: 0
+  - name: "Zero income"
+    period: 2024-01
+    inputs:
+      household_income: 0
+      poverty_line: 30000
+    expect: 0
+
+applicable_percentage_base:
+  - name: "At 100% FPL - first tier flat"
+    period: 2014-01
+    inputs:
+      household_income_pct_fpl: 1.0
+    expect: 0.02
+  - name: "At 133% FPL - top of tier 1"
+    period: 2014-01
+    inputs:
+      household_income_pct_fpl: 1.33
+    expect: 0.02
+  - name: "At 150% FPL - end of tier 2 (final = 4%)"
+    period: 2014-01
+    inputs:
+      household_income_pct_fpl: 1.50
+    expect: 0.04
+  - name: "At 200% FPL - end of tier 3 (final = 6.3%)"
+    period: 2014-01
+    inputs:
+      household_income_pct_fpl: 2.00
+    expect: 0.063
+  - name: "At 250% FPL - end of tier 4 (final = 8.05%)"
+    period: 2014-01
+    inputs:
+      household_income_pct_fpl: 2.50
+    expect: 0.0805
+  - name: "At 300% FPL - end of tier 5 (final = 9.5%)"
+    period: 2014-01
+    inputs:
+      household_income_pct_fpl: 3.00
+    expect: 0.095
+  - name: "At 400% FPL - end of tier 6 (final = 9.5%)"
+    period: 2014-01
+    inputs:
+      household_income_pct_fpl: 4.00
+    expect: 0.095
+  - name: "Midpoint of tier 3 (175% FPL) - linear interpolation"
+    period: 2014-01
+    inputs:
+      household_income_pct_fpl: 1.75
+    expect: 0.0515
+  - name: "Zero income"
+    period: 2014-01
+    inputs:
+      household_income_pct_fpl: 0
+    expect: 0.02
+
+applicable_percentage_ira:
+  - name: "At 100% FPL - zero premium (IRA)"
+    period: 2024-01
+    inputs:
+      household_income_pct_fpl: 1.0
+    expect: 0.0
+  - name: "At 150% FPL - top of tier 1 (zero)"
+    period: 2024-01
+    inputs:
+      household_income_pct_fpl: 1.50
+    expect: 0.0
+  - name: "At 200% FPL - end of tier 2 (final = 2%)"
+    period: 2024-01
+    inputs:
+      household_income_pct_fpl: 2.00
+    expect: 0.02
+  - name: "At 250% FPL - end of tier 3 (final = 4%)"
+    period: 2024-01
+    inputs:
+      household_income_pct_fpl: 2.50
+    expect: 0.04
+  - name: "At 300% FPL - end of tier 4 (final = 6%)"
+    period: 2024-01
+    inputs:
+      household_income_pct_fpl: 3.00
+    expect: 0.06
+  - name: "At 400% FPL - end of tier 5 (final = 8.5%)"
+    period: 2024-01
+    inputs:
+      household_income_pct_fpl: 4.00
+    expect: 0.085
+  - name: "At 500% FPL - above 400%, flat 8.5%"
+    period: 2024-01
+    inputs:
+      household_income_pct_fpl: 5.00
+    expect: 0.085
+  - name: "Midpoint of tier 5 (350% FPL) - linear interpolation"
+    period: 2024-01
+    inputs:
+      household_income_pct_fpl: 3.50
+    expect: 0.0725
+  - name: "Zero income"
+    period: 2024-01
+    inputs:
+      household_income_pct_fpl: 0
+    expect: 0.0
+
+applicable_percentage:
+  - name: "2024 (IRA period) - uses IRA table at 200% FPL"
+    period: 2024-01
+    inputs:
+      tax_year: 2024
+      applicable_percentage_ira: 0.02
+      applicable_percentage_base: 0.063
+    expect: 0.02
+  - name: "2024 (IRA period) - uses IRA table at 350% FPL"
+    period: 2024-01
+    inputs:
+      tax_year: 2024
+      applicable_percentage_ira: 0.0725
+      applicable_percentage_base: 0.095
+    expect: 0.0725
+  - name: "2026 (post-IRA) - reverts to base table"
+    period: 2026-01
+    inputs:
+      tax_year: 2026
+      applicable_percentage_ira: 0.02
+      applicable_percentage_base: 0.063
+    expect: 0.063
+  - name: "2014 (base table) - pre-IRA"
+    period: 2014-01
+    inputs:
+      tax_year: 2014
+      applicable_percentage_ira: 0.0
+      applicable_percentage_base: 0.02
+    expect: 0.02
+  - name: "2021 (first IRA year) - uses IRA table"
+    period: 2021-01
+    inputs:
+      tax_year: 2021
+      applicable_percentage_ira: 0.0
+      applicable_percentage_base: 0.02
+    expect: 0.0
+  - name: "2025 (last IRA year) - uses IRA table"
+    period: 2025-01
+    inputs:
+      tax_year: 2025
+      applicable_percentage_ira: 0.085
+      applicable_percentage_base: 0.095
+    expect: 0.085

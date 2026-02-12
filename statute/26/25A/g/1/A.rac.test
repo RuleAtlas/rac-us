@@ -1,0 +1,29 @@
+ssn_requirement_met:
+  - name: "Taxpayer has valid SSN, not claiming for dependent"
+    period: 2024-01
+    inputs:
+      taxpayer_has_valid_ssn: True
+      student_ssn_provided: False
+      claiming_for_non_spouse_dependent: False
+    expect: True
+  - name: "Claiming for dependent, student SSN provided"
+    period: 2024-01
+    inputs:
+      taxpayer_has_valid_ssn: True
+      student_ssn_provided: True
+      claiming_for_non_spouse_dependent: True
+    expect: True
+  - name: "Claiming for dependent, student SSN missing"
+    period: 2024-01
+    inputs:
+      taxpayer_has_valid_ssn: True
+      student_ssn_provided: False
+      claiming_for_non_spouse_dependent: True
+    expect: False
+  - name: "Taxpayer SSN invalid"
+    period: 2024-01
+    inputs:
+      taxpayer_has_valid_ssn: False
+      student_ssn_provided: True
+      claiming_for_non_spouse_dependent: False
+    expect: False

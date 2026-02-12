@@ -1,6 +1,6 @@
 # 26 USC 24 - Child tax credit
 
-text: """
+"""
 26 USC § 24 - Child tax credit
 
 (a) Allowance of credit - $1,000 (or modified amount) per qualifying child
@@ -18,7 +18,7 @@ text: """
 
 # Parent file importing key variables from subsections
 
-variable child_tax_credit:
+child_tax_credit:
   imports:
     - 26/24/a#ctc_maximum
     - 26/24/b#ctc_after_phaseout
@@ -36,7 +36,7 @@ variable child_tax_credit:
   unit: USD
   label: "Child Tax Credit"
   description: "Total child tax credit per 26 USC 24"
-  formula: |
+  from 2013-01-01:
     # Check all disqualifying conditions
     if not ctc_meets_id_requirements:
       return 0
@@ -50,53 +50,8 @@ variable child_tax_credit:
       return 0
     # Return credit after advance reconciliation plus other dependent credit
     return ctc_after_advance_reconciliation + odc_amount
-  tests:
-    - name: "Basic CTC with no disqualifications"
-      period: 2024-01
-      inputs:
-        ctc_after_advance_reconciliation: 4000
-        odc_amount: 500
-        ctc_meets_id_requirements: true
-        ctc_meets_full_year_requirement: true
-        ctc_disallowed_prior_claim: false
-        ctc_ssn_requirement_met: true
-        ctc_disallowed_possession_coordination: false
-      expect: 4500
-    - name: "CTC disqualified - missing ID"
-      period: 2024-01
-      inputs:
-        ctc_after_advance_reconciliation: 4000
-        odc_amount: 500
-        ctc_meets_id_requirements: false
-        ctc_meets_full_year_requirement: true
-        ctc_disallowed_prior_claim: false
-        ctc_ssn_requirement_met: true
-        ctc_disallowed_possession_coordination: false
-      expect: 0
-    - name: "CTC disqualified - prior claim fraud"
-      period: 2024-01
-      inputs:
-        ctc_after_advance_reconciliation: 4000
-        odc_amount: 500
-        ctc_meets_id_requirements: true
-        ctc_meets_full_year_requirement: true
-        ctc_disallowed_prior_claim: true
-        ctc_ssn_requirement_met: true
-        ctc_disallowed_possession_coordination: false
-      expect: 0
-    - name: "CTC disqualified - no SSN"
-      period: 2024-01
-      inputs:
-        ctc_after_advance_reconciliation: 4000
-        odc_amount: 500
-        ctc_meets_id_requirements: true
-        ctc_meets_full_year_requirement: true
-        ctc_disallowed_prior_claim: false
-        ctc_ssn_requirement_met: false
-        ctc_disallowed_possession_coordination: false
-      expect: 0
 
-variable refundable_ctc:
+refundable_ctc:
   imports:
     - 26/24/d#actc_amount
     - 26/24/e#ctc_meets_id_requirements
@@ -110,7 +65,7 @@ variable refundable_ctc:
   unit: USD
   label: "Refundable Child Tax Credit (ACTC)"
   description: "Refundable portion of CTC per 26 USC 24(d)"
-  formula: |
+  from 2013-01-01:
     # Check all disqualifying conditions
     if not ctc_meets_id_requirements:
       return 0
@@ -123,24 +78,3 @@ variable refundable_ctc:
     if ctc_disallowed_possession_coordination:
       return 0
     return actc_amount
-  tests:
-    - name: "Basic ACTC with no disqualifications"
-      period: 2024-01
-      inputs:
-        actc_amount: 1400
-        ctc_meets_id_requirements: true
-        ctc_meets_full_year_requirement: true
-        ctc_disallowed_prior_claim: false
-        ctc_ssn_requirement_met: true
-        ctc_disallowed_possession_coordination: false
-      expect: 1400
-    - name: "ACTC disqualified"
-      period: 2024-01
-      inputs:
-        actc_amount: 1400
-        ctc_meets_id_requirements: false
-        ctc_meets_full_year_requirement: true
-        ctc_disallowed_prior_claim: false
-        ctc_ssn_requirement_met: true
-        ctc_disallowed_possession_coordination: false
-      expect: 0

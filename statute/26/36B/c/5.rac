@@ -2,7 +2,7 @@
 # Added by P.L. 119-21, § 71303(a), July 4, 2025
 # Effective for taxable years beginning after December 31, 2027
 
-text: """
+"""
 (5) Exchange enrollment verification requirement
 (A) In general
 The term "coverage month" shall not include, with respect to any individual covered by
@@ -67,16 +67,15 @@ third-party sources in collecting information for verification by the applicant.
 # Parameters
 # =============================================================================
 
-parameter exchange_verification_effective_year:
+exchange_verification_effective_year:
   description: "First taxable year for Exchange enrollment verification requirement per P.L. 119-21 § 71303(c)"
-  values:
-    2025-07-04: 2028
+  from 2025-07-04: 2028
 
 # =============================================================================
 # Inputs
 # =============================================================================
 
-input tax_year:
+tax_year:
   entity: TaxUnit
   period: Year
   dtype: Integer
@@ -84,7 +83,7 @@ input tax_year:
   description: "Taxable year for determining applicability of the verification requirement"
   default: 2024
 
-input exchange_has_verified_eligibility:
+exchange_has_verified_eligibility:
   entity: TaxUnit
   period: Month
   dtype: Boolean
@@ -92,7 +91,7 @@ input exchange_has_verified_eligibility:
   description: "Whether the Exchange has verified the individual's eligibility per 26 USC 36B(c)(5)(A), including retroactive verification under (C)"
   default: true
 
-input enrolled_through_exchange:
+enrolled_through_exchange:
   entity: TaxUnit
   period: Month
   dtype: Boolean
@@ -100,7 +99,7 @@ input enrolled_through_exchange:
   description: "Whether the individual is covered by a qualified health plan enrolled in through an Exchange"
   default: true
 
-input verification_waived_for_special_enrollment:
+verification_waived_for_special_enrollment:
   entity: TaxUnit
   period: Month
   dtype: Boolean
@@ -112,13 +111,13 @@ input verification_waived_for_special_enrollment:
 # Variable: Coverage month verification requirement
 # =============================================================================
 
-variable ptc_month_passes_exchange_verification:
+ptc_month_passes_exchange_verification:
   entity: TaxUnit
   period: Month
   dtype: Boolean
   label: "Month Passes Exchange Verification"
   description: "Whether a month satisfies the Exchange enrollment verification requirement for coverage month status per 26 USC 36B(c)(5)"
-  formula: |
+  from 2025-07-04:
     # This provision only applies for taxable years beginning after 12/31/2027
     if tax_year < exchange_verification_effective_year:
       return true
@@ -133,56 +132,3 @@ variable ptc_month_passes_exchange_verification:
 
     # (A)/(C): Exchange must have verified eligibility (including retroactive)
     return exchange_has_verified_eligibility
-  tests:
-    - name: "Pre-effective date (2024) - always passes"
-      period: 2024-01
-      inputs:
-        tax_year: 2024
-        enrolled_through_exchange: true
-        exchange_has_verified_eligibility: false
-        verification_waived_for_special_enrollment: false
-      expect: true
-    - name: "Pre-effective date (2027) - always passes"
-      period: 2027-06
-      inputs:
-        tax_year: 2027
-        enrolled_through_exchange: true
-        exchange_has_verified_eligibility: false
-        verification_waived_for_special_enrollment: false
-      expect: true
-    - name: "Post-effective date (2028) - verified"
-      period: 2028-01
-      inputs:
-        tax_year: 2028
-        enrolled_through_exchange: true
-        exchange_has_verified_eligibility: true
-        verification_waived_for_special_enrollment: false
-      expect: true
-    - name: "Post-effective date (2028) - not verified"
-      period: 2028-03
-      inputs:
-        tax_year: 2028
-        enrolled_through_exchange: true
-        exchange_has_verified_eligibility: false
-        verification_waived_for_special_enrollment: false
-      expect: false
-    - name: "Post-effective date - not enrolled through Exchange"
-      period: 2028-01
-      inputs:
-        tax_year: 2028
-        enrolled_through_exchange: false
-        exchange_has_verified_eligibility: false
-        verification_waived_for_special_enrollment: false
-      expect: true
-    - name: "Post-effective date - verification waived for special enrollment"
-      period: 2028-01
-      inputs:
-        tax_year: 2028
-        enrolled_through_exchange: true
-        exchange_has_verified_eligibility: false
-        verification_waived_for_special_enrollment: true
-      expect: true
-    - name: "All defaults (2024, verified) - passes"
-      period: 2024-01
-      inputs: {}
-      expect: true

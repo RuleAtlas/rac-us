@@ -1,0 +1,26 @@
+aotc_first_4_years_eligible:
+  - name: "No prior claims - eligible"
+    period: 2024-01
+    inputs:
+      aotc_years_claimed: 0
+    expect: true
+  - name: "1 prior year - eligible"
+    period: 2024-01
+    inputs:
+      aotc_years_claimed: 1
+    expect: true
+  - name: "3 prior years - eligible"
+    period: 2024-01
+    inputs:
+      aotc_years_claimed: 3
+    expect: true
+  - name: "4 prior years - ineligible"
+    period: 2024-01
+    inputs:
+      aotc_years_claimed: 4
+    expect: false
+  - name: "5 prior years - ineligible"
+    period: 2024-01
+    inputs:
+      aotc_years_claimed: 5
+    expect: false

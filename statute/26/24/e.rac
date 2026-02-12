@@ -1,6 +1,6 @@
 # 26 USC 24(e) - Identification requirements
 
-text: """
+"""
 (e) Identification requirements
 (1) Qualifying child identification requirement
 No credit shall be allowed under this section to a taxpayer with respect to any
@@ -14,59 +14,37 @@ No credit shall be allowed under this section if the taxpayer identification num
 of the taxpayer was issued after the due date for filing the return for the taxable year.
 """
 
-input child_has_valid_tin:
+child_has_valid_tin:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Child Has Valid TIN"
   description: "Whether child has TIN issued on or before return due date per 26 USC 24(e)(1)"
 
-input taxpayer_has_valid_tin:
+taxpayer_has_valid_tin:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "Taxpayer Has Valid TIN"
   description: "Whether taxpayer TIN was issued on or before return due date per 26 USC 24(e)(2)"
 
-variable ctc_meets_id_requirements:
+ctc_meets_id_requirements:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "CTC Meets ID Requirements"
   description: "Whether taxpayer meets identification requirements per 26 USC 24(e)"
-  formula: |
+  from 2013-01-01:
     # Taxpayer must have valid TIN
     if not taxpayer_has_valid_tin:
       return False
     return True
-  tests:
-    - name: "Taxpayer has valid TIN"
-      period: 2024-01
-      inputs:
-        taxpayer_has_valid_tin: true
-      expect: true
-    - name: "Taxpayer TIN issued late"
-      period: 2024-01
-      inputs:
-        taxpayer_has_valid_tin: false
-      expect: false
 
-variable child_meets_ctc_id_requirement:
+child_meets_ctc_id_requirement:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Child Meets CTC ID Requirement"
   description: "Whether child meets identification requirement per 26 USC 24(e)(1)"
-  formula: |
+  from 2013-01-01:
     return child_has_valid_tin
-  tests:
-    - name: "Child has valid TIN"
-      period: 2024-01
-      inputs:
-        child_has_valid_tin: true
-      expect: true
-    - name: "Child TIN issued late"
-      period: 2024-01
-      inputs:
-        child_has_valid_tin: false
-      expect: false

@@ -1,7 +1,7 @@
 # 26 USC 36B(g) - Special rule for individuals who receive unemployment
 # compensation during 2021
 
-text: """
+"""
 (g) Special rule for individuals who receive unemployment compensation
 during 2021
 (1) In general
@@ -42,23 +42,21 @@ for purposes of paragraph (2)(C)(i)(II) or (4)(C)(ii) of subsection (c).
 # =============================================================================
 
 # (g)(1)(B): "133 percent of the poverty line"
-parameter ui_household_income_fpl_cap:
+ui_household_income_fpl_cap:
   description: "Household income cap as percent of poverty line for UI recipients per 26 USC 36B(g)(1)(B)"
   unit: /1
-  values:
-    2021-01-01: 1.33
+  from 2021-01-01: 1.33
 
 # Temporal boundary: this provision applies only to taxable year 2021
-parameter ui_special_rule_year:
+ui_special_rule_year:
   description: "Taxable year for which the unemployment compensation special rule applies per 26 USC 36B(g)(1)"
-  values:
-    2021-01-01: 2021
+  from 2021-01-01: 2021
 
 # =============================================================================
 # Inputs
 # =============================================================================
 
-input received_ui_compensation_2021:
+received_ui_compensation_2021:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -66,7 +64,7 @@ input received_ui_compensation_2021:
   description: "Whether the taxpayer has received, or has been approved to receive, unemployment compensation for any week beginning during 2021 per 26 USC 36B(g)(1)"
   default: false
 
-input joint_return_requirement_met:
+joint_return_requirement_met:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -78,13 +76,13 @@ input joint_return_requirement_met:
 # (g)(1)(A) - Applicable taxpayer treatment
 # =============================================================================
 
-variable ptc_ui_is_applicable_taxpayer:
+ptc_ui_is_applicable_taxpayer:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "UI Recipient Treated as Applicable Taxpayer"
   description: "Whether the taxpayer is treated as an applicable taxpayer by reason of receiving unemployment compensation per 26 USC 36B(g)(1)(A). Per (g)(4)(A), the joint return requirement of (c)(1)(C) still applies."
-  formula: |
+  from 2021-01-01:
     # (g)(1): "in the case of a taxpayer who has received, or has been
     # approved to receive, unemployment compensation for any week beginning
     # during 2021"
@@ -96,37 +94,12 @@ variable ptc_ui_is_applicable_taxpayer:
     if not joint_return_requirement_met:
       return false
     return true
-  tests:
-    - name: "UI recipient who meets joint return requirement"
-      period: 2021-01
-      inputs:
-        received_ui_compensation_2021: true
-        joint_return_requirement_met: true
-      expect: true
-    - name: "UI recipient who does not meet joint return requirement"
-      period: 2021-01
-      inputs:
-        received_ui_compensation_2021: true
-        joint_return_requirement_met: false
-      expect: false
-    - name: "Non-UI recipient"
-      period: 2021-01
-      inputs:
-        received_ui_compensation_2021: false
-        joint_return_requirement_met: true
-      expect: false
-    - name: "Non-UI recipient who also fails joint return"
-      period: 2021-01
-      inputs:
-        received_ui_compensation_2021: false
-        joint_return_requirement_met: false
-      expect: false
 
 # =============================================================================
 # (g)(1)(B) - Household income cap for PTC purposes
 # =============================================================================
 
-variable ptc_ui_capped_household_income:
+ptc_ui_capped_household_income:
   imports:
     - 26/36B/d/3#poverty_line
   entity: TaxUnit
@@ -135,7 +108,7 @@ variable ptc_ui_capped_household_income:
   unit: USD
   label: "UI-Capped Household Income for PTC"
   description: "Household income after applying the 133% FPL cap for UI recipients per 26 USC 36B(g)(1)(B). Per (g)(4)(B), this cap does NOT apply for affordability determinations under (c)(2)(C)(i)(II) or (c)(4)(C)(ii)."
-  formula: |
+  from 2021-01-01:
     # (g)(1)(B): "there shall not be taken into account any household income
     # of the taxpayer in excess of 133 percent of the poverty line for a
     # family of the size involved"
@@ -145,82 +118,21 @@ variable ptc_ui_capped_household_income:
       return household_income
     income_cap = poverty_line * ui_household_income_fpl_cap
     return min(household_income, income_cap)
-  tests:
-    - name: "UI recipient with income above 133% FPL - capped"
-      period: 2021-01
-      inputs:
-        received_ui_compensation_2021: true
-        household_income: 80_000
-        poverty_line: 30_000
-      expect: 39_900
-    - name: "UI recipient with income below 133% FPL - unchanged"
-      period: 2021-01
-      inputs:
-        received_ui_compensation_2021: true
-        household_income: 30_000
-        poverty_line: 30_000
-      expect: 30_000
-    - name: "UI recipient with income exactly at 133% FPL"
-      period: 2021-01
-      inputs:
-        received_ui_compensation_2021: true
-        household_income: 39_900
-        poverty_line: 30_000
-      expect: 39_900
-    - name: "Non-UI recipient - no cap applied"
-      period: 2021-01
-      inputs:
-        received_ui_compensation_2021: false
-        household_income: 80_000
-        poverty_line: 30_000
-      expect: 80_000
-    - name: "UI recipient with zero income"
-      period: 2021-01
-      inputs:
-        received_ui_compensation_2021: true
-        household_income: 0
-        poverty_line: 30_000
-      expect: 0
-    - name: "UI recipient with zero poverty line (edge case)"
-      period: 2021-01
-      inputs:
-        received_ui_compensation_2021: true
-        household_income: 50_000
-        poverty_line: 0
-      expect: 0
 
 # =============================================================================
 # (g)(4)(B) - Affordability uses uncapped household income
 # =============================================================================
 
-variable ptc_ui_affordability_household_income:
+ptc_ui_affordability_household_income:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Household Income for Affordability (UI Rule)"
   description: "Household income for affordability determinations under 36B(c)(2)(C)(i)(II) and (c)(4)(C)(ii), which is NOT subject to the (g)(1)(B) cap per 26 USC 36B(g)(4)(B)"
-  formula: |
+  from 2021-01-01:
     # (g)(4)(B): "Paragraph (1)(B) shall not apply to any determination of
     # household income for purposes of paragraph (2)(C)(i)(II) or (4)(C)(ii)
     # of subsection (c)"
     # For affordability, always use actual household income regardless of UI status
     return household_income
-  tests:
-    - name: "UI recipient - affordability uses actual income"
-      period: 2021-01
-      inputs:
-        received_ui_compensation_2021: true
-        household_income: 80_000
-      expect: 80_000
-    - name: "Non-UI recipient - affordability uses actual income"
-      period: 2021-01
-      inputs:
-        received_ui_compensation_2021: false
-        household_income: 80_000
-      expect: 80_000
-    - name: "Zero income"
-      period: 2021-01
-      inputs:
-        household_income: 0
-      expect: 0

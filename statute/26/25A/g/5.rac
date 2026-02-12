@@ -1,6 +1,6 @@
 # 26 USC 25A(g)(5) - Denial of double benefit
 
-text: """
+"""
 (5) Denial of double benefit
 No credit shall be allowed under this section for any expense for which a
 deduction is allowed under any other provision of this chapter.
@@ -19,7 +19,7 @@ deduction is allowed under any other provision of this chapter.
 # The rule is a Boolean eligibility gate: if a deduction was allowed for an
 # expense, no section 25A credit is permitted for that same expense.
 
-input expense_deducted_under_other_chapter_1_provision:
+expense_deducted_under_other_chapter_1_provision:
   entity: Person
   period: Year
   dtype: Money
@@ -28,50 +28,23 @@ input expense_deducted_under_other_chapter_1_provision:
   description: "Amount of qualified tuition and related expenses for which a deduction is allowed under any other provision of this chapter (Chapter 1)"
   default: 0
 
-variable sec_25A_expense_disallowed_for_double_benefit:
+sec_25A_expense_disallowed_for_double_benefit:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: "Section 25A Expense Disallowed for Double Benefit"
   description: "Amount of qualified expenses disallowed for section 25A credit because a deduction was allowed under another chapter 1 provision per 26 USC 25A(g)(5)"
-  formula: |
+  from 2013-01-01:
     # Per (g)(5): No credit for any expense for which a deduction is allowed
     # under any other provision of this chapter
     return expense_deducted_under_other_chapter_1_provision
-  tests:
-    - name: "No expenses deducted elsewhere - no reduction"
-      period: 2024-01
-      inputs:
-        expense_deducted_under_other_chapter_1_provision: 0
-      expect: 0
-    - name: "All expenses deducted elsewhere - full reduction"
-      period: 2024-01
-      inputs:
-        expense_deducted_under_other_chapter_1_provision: 4000
-      expect: 4000
-    - name: "Partial expenses deducted elsewhere"
-      period: 2024-01
-      inputs:
-        expense_deducted_under_other_chapter_1_provision: 1500
-      expect: 1500
 
-variable double_benefit_disqualification_applies:
+double_benefit_disqualification_applies:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Double Benefit Disqualification Applies"
   description: "Whether any qualified expenses are disqualified from section 25A credit due to deduction under another provision per 26 USC 25A(g)(5)"
-  formula: |
+  from 2013-01-01:
     return expense_deducted_under_other_chapter_1_provision > 0
-  tests:
-    - name: "No double benefit - disqualification does not apply"
-      period: 2024-01
-      inputs:
-        expense_deducted_under_other_chapter_1_provision: 0
-      expect: False
-    - name: "Some expenses deducted - disqualification applies"
-      period: 2024-01
-      inputs:
-        expense_deducted_under_other_chapter_1_provision: 2000
-      expect: True

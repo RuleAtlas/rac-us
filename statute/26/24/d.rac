@@ -1,6 +1,6 @@
 # 26 USC 24(d) - Portion of credit refundable
 
-text: """
+"""
 (d) Portion of credit refundable
 (1) In general
 The aggregate credits allowed to a taxpayer under subpart C shall be increased by
@@ -38,161 +38,101 @@ after 2024). Per (h)(6), the earned income threshold is $2,500 instead of $3,000
 """
 
 # Earned income threshold for refundable portion
-parameter actc_earned_income_threshold:
+actc_earned_income_threshold:
   description: "Earned income threshold for ACTC per 26 USC 24(d)(1)(B)(i)"
   unit: USD
-  values:
-    1998-01-01: 10000
-    2009-01-01: 3000
-    2018-01-01: 2500  # Modified by (h)(6)
+  from 1998-01-01: 10000
+  from 2009-01-01: 3000
+  from 2018-01-01: 2500  # Modified by (h)(6)
 
 # ACTC phase-in rate
-parameter actc_phasein_rate:
+actc_phasein_rate:
   description: "Phase-in rate for ACTC per 26 USC 24(d)(1)(B)(i)"
-  values:
-    1998-01-01: 0.10
-    2005-01-01: 0.15
+  from 1998-01-01: 0.10
+  from 2005-01-01: 0.15
 
 # Maximum refundable amount per child (post-TCJA)
-parameter actc_max_per_child:
+actc_max_per_child:
   description: "Maximum refundable CTC per child per 26 USC 24(h)(5)"
   unit: USD
-  values:
-    2018-01-01: 1400
+  from 2018-01-01: 1400
     # Indexed for inflation starting 2025 per 26 USC 24(i)(1)
 
 # Minimum qualifying children for SS tax calculation
-parameter actc_ss_min_children:
+actc_ss_min_children:
   description: "Minimum qualifying children for SS tax calculation per 26 USC 24(d)(1)(B)(ii)"
-  values:
-    1998-01-01: 3
+  from 1998-01-01: 3
 
-input earned_income:
+earned_income:
   entity: TaxUnit
   period: Year
   dtype: Money
   label: "Earned Income"
   description: "Earned income within meaning of section 32"
 
-input social_security_taxes:
+social_security_taxes:
   entity: TaxUnit
   period: Year
   dtype: Money
   label: "Social Security Taxes"
   description: "Social security taxes per 26 USC 24(d)(2)"
 
-input eitc_amount:
+eitc_amount:
   entity: TaxUnit
   period: Year
   dtype: Money
   label: "EITC Amount"
   description: "Earned income tax credit per section 32"
 
-input excludes_foreign_income:
+excludes_foreign_income:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "Excludes Foreign Income"
   description: "Whether taxpayer elects to exclude income under section 911"
 
-input qualifying_child_count:
+qualifying_child_count:
   entity: TaxUnit
   period: Year
   dtype: Integer
   label: "Number of Qualifying Children"
   description: "Count of qualifying children per 26 USC 24(c)"
 
-variable actc_earned_income_amount:
+actc_earned_income_amount:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "ACTC Earned Income Component"
   description: "15% of earned income over threshold per 26 USC 24(d)(1)(B)(i)"
-  formula: |
+  from 1998-01-01:
     excess_earned_income = max(0, earned_income - actc_earned_income_threshold)
     return excess_earned_income * actc_phasein_rate
-  tests:
-    - name: "Earned income below threshold"
-      period: 2024-01
-      inputs:
-        earned_income: 2000
-      expect: 0
-    - name: "Earned income at threshold"
-      period: 2024-01
-      inputs:
-        earned_income: 2500
-      expect: 0
-    - name: "$10,000 over threshold"
-      period: 2024-01
-      inputs:
-        earned_income: 12500
-      expect: 1500
-    - name: "$30,000 earned income"
-      period: 2024-01
-      inputs:
-        earned_income: 30000
-      expect: 4125
 
-variable actc_ss_excess_amount:
+actc_ss_excess_amount:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "ACTC Social Security Excess"
   description: "Excess of SS taxes over EITC per 26 USC 24(d)(1)(B)(ii)"
-  formula: |
+  from 1998-01-01:
     # Only applies to taxpayers with 3+ qualifying children
     if qualifying_child_count < actc_ss_min_children:
       return 0
     return max(0, social_security_taxes - eitc_amount)
-  tests:
-    - name: "Two children (not eligible)"
-      period: 2024-01
-      inputs:
-        qualifying_child_count: 2
-        social_security_taxes: 5000
-        eitc_amount: 2000
-      expect: 0
-    - name: "Three children, SS exceeds EITC"
-      period: 2024-01
-      inputs:
-        qualifying_child_count: 3
-        social_security_taxes: 5000
-        eitc_amount: 2000
-      expect: 3000
-    - name: "Three children, EITC exceeds SS"
-      period: 2024-01
-      inputs:
-        qualifying_child_count: 3
-        social_security_taxes: 2000
-        eitc_amount: 5000
-      expect: 0
 
-variable actc_limitation_increase:
+actc_limitation_increase:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "ACTC Limitation Increase"
   description: "Greater of earned income or SS excess amounts per 26 USC 24(d)(1)(B)"
-  formula: |
+  from 1998-01-01:
     return max(actc_earned_income_amount, actc_ss_excess_amount)
-  tests:
-    - name: "Earned income component greater"
-      period: 2024-01
-      inputs:
-        actc_earned_income_amount: 3000
-        actc_ss_excess_amount: 1000
-      expect: 3000
-    - name: "SS excess component greater"
-      period: 2024-01
-      inputs:
-        actc_earned_income_amount: 1000
-        actc_ss_excess_amount: 4000
-      expect: 4000
 
-variable actc_amount:
+actc_amount:
   imports:
     - 26/24/b#ctc_after_phaseout
   entity: TaxUnit
@@ -201,7 +141,7 @@ variable actc_amount:
   unit: USD
   label: "Additional Child Tax Credit"
   description: "Refundable portion of CTC per 26 USC 24(d)"
-  formula: |
+  from 1998-01-01:
     # Exception for foreign income exclusion
     if excludes_foreign_income:
       return 0
@@ -210,36 +150,3 @@ variable actc_amount:
     # Per (h)(5), cap at $1,400 per child for post-2017 years
     max_refundable = qualifying_child_count * actc_max_per_child
     return min(uncapped, max_refundable)
-  tests:
-    - name: "Low earner, one child"
-      period: 2024-01
-      inputs:
-        ctc_after_phaseout: 2000
-        actc_limitation_increase: 1500
-        excludes_foreign_income: false
-        qualifying_child_count: 1
-      expect: 1400
-    - name: "Moderate earner, two children"
-      period: 2024-01
-      inputs:
-        ctc_after_phaseout: 4000
-        actc_limitation_increase: 5000
-        excludes_foreign_income: false
-        qualifying_child_count: 2
-      expect: 2800
-    - name: "Foreign income exclusion"
-      period: 2024-01
-      inputs:
-        ctc_after_phaseout: 2000
-        actc_limitation_increase: 1500
-        excludes_foreign_income: true
-        qualifying_child_count: 1
-      expect: 0
-    - name: "High earner, full credit non-refundable"
-      period: 2024-01
-      inputs:
-        ctc_after_phaseout: 4000
-        actc_limitation_increase: 10000
-        excludes_foreign_income: false
-        qualifying_child_count: 2
-      expect: 2800

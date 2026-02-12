@@ -1,6 +1,6 @@
 # 26 USC 36B(d)(3) - Poverty line
 
-text: """
+"""
 (3) Poverty line
 (A) In general
 The term "poverty line" has the meaning given that term in section
@@ -22,7 +22,7 @@ such calendar year.
 # The poverty line varies by family size. This input represents the poverty
 # line for a family of the applicable size as determined by 36B(d)(1).
 
-input poverty_line:
+poverty_line:
   entity: TaxUnit
   period: Year
   dtype: Money

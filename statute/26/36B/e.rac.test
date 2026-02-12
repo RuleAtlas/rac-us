@@ -1,0 +1,51 @@
+ptc_adjusted_premiums:
+  - name: "No non-lawfully-present individuals - premiums unchanged"
+    period: 2024-01
+    inputs:
+      aggregate_premiums_before_adjustment: 12_000
+      premiums_attributable_to_non_lawfully_present: 0
+    expect: 12_000
+  - name: "Some premiums attributable to non-lawfully-present"
+    period: 2024-01
+    inputs:
+      aggregate_premiums_before_adjustment: 12_000
+      premiums_attributable_to_non_lawfully_present: 3_000
+    expect: 9_000
+  - name: "All premiums attributable to non-lawfully-present"
+    period: 2024-01
+    inputs:
+      aggregate_premiums_before_adjustment: 12_000
+      premiums_attributable_to_non_lawfully_present: 12_000
+    expect: 0
+  - name: "Zero premiums"
+    period: 2024-01
+    inputs:
+      aggregate_premiums_before_adjustment: 0
+      premiums_attributable_to_non_lawfully_present: 0
+    expect: 0
+
+ptc_adjusted_household_income:
+  - name: "No non-lawfully-present individuals - income unchanged"
+    period: 2024-01
+    inputs:
+      household_income_before_adjustment: 50_000
+      income_attributable_to_non_lawfully_present: 0
+    expect: 50_000
+  - name: "Some income attributable to non-lawfully-present"
+    period: 2024-01
+    inputs:
+      household_income_before_adjustment: 50_000
+      income_attributable_to_non_lawfully_present: 15_000
+    expect: 35_000
+  - name: "All income attributable to non-lawfully-present"
+    period: 2024-01
+    inputs:
+      household_income_before_adjustment: 50_000
+      income_attributable_to_non_lawfully_present: 50_000
+    expect: 0
+  - name: "Zero income"
+    period: 2024-01
+    inputs:
+      household_income_before_adjustment: 0
+      income_attributable_to_non_lawfully_present: 0
+    expect: 0

@@ -1,0 +1,88 @@
+ptc_ui_is_applicable_taxpayer:
+  - name: "UI recipient who meets joint return requirement"
+    period: 2021-01
+    inputs:
+      received_ui_compensation_2021: true
+      joint_return_requirement_met: true
+    expect: true
+  - name: "UI recipient who does not meet joint return requirement"
+    period: 2021-01
+    inputs:
+      received_ui_compensation_2021: true
+      joint_return_requirement_met: false
+    expect: false
+  - name: "Non-UI recipient"
+    period: 2021-01
+    inputs:
+      received_ui_compensation_2021: false
+      joint_return_requirement_met: true
+    expect: false
+  - name: "Non-UI recipient who also fails joint return"
+    period: 2021-01
+    inputs:
+      received_ui_compensation_2021: false
+      joint_return_requirement_met: false
+    expect: false
+
+ptc_ui_capped_household_income:
+  - name: "UI recipient with income above 133% FPL - capped"
+    period: 2021-01
+    inputs:
+      received_ui_compensation_2021: true
+      household_income: 80_000
+      poverty_line: 30_000
+    expect: 39_900
+  - name: "UI recipient with income below 133% FPL - unchanged"
+    period: 2021-01
+    inputs:
+      received_ui_compensation_2021: true
+      household_income: 30_000
+      poverty_line: 30_000
+    expect: 30_000
+  - name: "UI recipient with income exactly at 133% FPL"
+    period: 2021-01
+    inputs:
+      received_ui_compensation_2021: true
+      household_income: 39_900
+      poverty_line: 30_000
+    expect: 39_900
+  - name: "Non-UI recipient - no cap applied"
+    period: 2021-01
+    inputs:
+      received_ui_compensation_2021: false
+      household_income: 80_000
+      poverty_line: 30_000
+    expect: 80_000
+  - name: "UI recipient with zero income"
+    period: 2021-01
+    inputs:
+      received_ui_compensation_2021: true
+      household_income: 0
+      poverty_line: 30_000
+    expect: 0
+  - name: "UI recipient with zero poverty line (edge case)"
+    period: 2021-01
+    inputs:
+      received_ui_compensation_2021: true
+      household_income: 50_000
+      poverty_line: 0
+    expect: 0
+
+ptc_ui_affordability_household_income:
+  - name: "UI recipient - affordability uses actual income"
+    period: 2021-01
+    inputs:
+      received_ui_compensation_2021: true
+      household_income: 80_000
+    expect: 80_000
+  - name: "Non-UI recipient - affordability uses actual income"
+    period: 2021-01
+    inputs:
+      received_ui_compensation_2021: false
+      household_income: 80_000
+    expect: 80_000
+  - name: "Zero income"
+    period: 2021-01
+    inputs:
+      household_income: 0
+    expect: 0

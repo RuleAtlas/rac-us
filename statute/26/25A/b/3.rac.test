@@ -1,0 +1,43 @@
+is_eligible_student:
+  - name: "Both requirements met - eligible"
+    period: 2024-01
+    inputs:
+      meets_hea_484_requirements: true
+      course_load_fraction: 0.5
+    expect: true
+  - name: "Full-time student with HEA requirements - eligible"
+    period: 2024-01
+    inputs:
+      meets_hea_484_requirements: true
+      course_load_fraction: 1.0
+    expect: true
+  - name: "HEA met but less than half-time - not eligible"
+    period: 2024-01
+    inputs:
+      meets_hea_484_requirements: true
+      course_load_fraction: 0.4
+    expect: false
+  - name: "Half-time but HEA not met - not eligible"
+    period: 2024-01
+    inputs:
+      meets_hea_484_requirements: false
+      course_load_fraction: 0.5
+    expect: false
+  - name: "Neither requirement met - not eligible"
+    period: 2024-01
+    inputs:
+      meets_hea_484_requirements: false
+      course_load_fraction: 0.3
+    expect: false
+  - name: "Exactly at half-time threshold - eligible"
+    period: 2024-01
+    inputs:
+      meets_hea_484_requirements: true
+      course_load_fraction: 0.5
+    expect: true
+  - name: "Just below half-time threshold - not eligible"
+    period: 2024-01
+    inputs:
+      meets_hea_484_requirements: true
+      course_load_fraction: 0.49
+    expect: false

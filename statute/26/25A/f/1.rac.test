@@ -1,0 +1,153 @@
+qualified_tuition_and_related_expenses_llc:
+  - name: "Basic tuition only"
+    period: 2024-01
+    inputs:
+      tuition_paid: 10000
+      academic_fees_paid: 0
+      sports_games_hobbies_expenses: 0
+      sports_course_part_of_degree: False
+      student_activity_fees: 0
+      athletic_fees: 0
+      education_insurance_expenses: 0
+      other_nonacademic_expenses: 0
+    expect: 10000
+  - name: "Tuition plus academic fees"
+    period: 2024-01
+    inputs:
+      tuition_paid: 8000
+      academic_fees_paid: 500
+      sports_games_hobbies_expenses: 0
+      sports_course_part_of_degree: False
+      student_activity_fees: 0
+      athletic_fees: 0
+      education_insurance_expenses: 0
+      other_nonacademic_expenses: 0
+    expect: 8500
+  - name: "Sports course not part of degree - excluded"
+    period: 2024-01
+    inputs:
+      tuition_paid: 10000
+      academic_fees_paid: 0
+      sports_games_hobbies_expenses: 2000
+      sports_course_part_of_degree: False
+      student_activity_fees: 0
+      athletic_fees: 0
+      education_insurance_expenses: 0
+      other_nonacademic_expenses: 0
+    expect: 8000
+  - name: "Sports course part of degree - included"
+    period: 2024-01
+    inputs:
+      tuition_paid: 10000
+      academic_fees_paid: 0
+      sports_games_hobbies_expenses: 2000
+      sports_course_part_of_degree: True
+      student_activity_fees: 0
+      athletic_fees: 0
+      education_insurance_expenses: 0
+      other_nonacademic_expenses: 0
+    expect: 10000
+  - name: "Nonacademic fees excluded"
+    period: 2024-01
+    inputs:
+      tuition_paid: 10000
+      academic_fees_paid: 0
+      sports_games_hobbies_expenses: 0
+      sports_course_part_of_degree: False
+      student_activity_fees: 500
+      athletic_fees: 300
+      education_insurance_expenses: 200
+      other_nonacademic_expenses: 100
+    expect: 8900
+  - name: "Zero expenses"
+    period: 2024-01
+    inputs:
+      tuition_paid: 0
+      academic_fees_paid: 0
+      sports_games_hobbies_expenses: 0
+      sports_course_part_of_degree: False
+      student_activity_fees: 0
+      athletic_fees: 0
+      education_insurance_expenses: 0
+      other_nonacademic_expenses: 0
+    expect: 0
+
+qualified_tuition_and_related_expenses_aotc:
+  - name: "Tuition plus course materials for AOTC"
+    period: 2024-01
+    inputs:
+      tuition_paid: 10000
+      academic_fees_paid: 0
+      course_materials_paid: 1500
+      sports_games_hobbies_expenses: 0
+      sports_course_part_of_degree: False
+      student_activity_fees: 0
+      athletic_fees: 0
+      education_insurance_expenses: 0
+      other_nonacademic_expenses: 0
+    expect: 11500
+  - name: "AOTC with all components"
+    period: 2024-01
+    inputs:
+      tuition_paid: 8000
+      academic_fees_paid: 500
+      course_materials_paid: 1000
+      sports_games_hobbies_expenses: 0
+      sports_course_part_of_degree: False
+      student_activity_fees: 0
+      athletic_fees: 0
+      education_insurance_expenses: 0
+      other_nonacademic_expenses: 0
+    expect: 9500
+  - name: "AOTC sports exclusion"
+    period: 2024-01
+    inputs:
+      tuition_paid: 10000
+      academic_fees_paid: 0
+      course_materials_paid: 500
+      sports_games_hobbies_expenses: 2000
+      sports_course_part_of_degree: False
+      student_activity_fees: 0
+      athletic_fees: 0
+      education_insurance_expenses: 0
+      other_nonacademic_expenses: 0
+    expect: 8500
+  - name: "AOTC sports course part of degree - included"
+    period: 2024-01
+    inputs:
+      tuition_paid: 10000
+      academic_fees_paid: 0
+      course_materials_paid: 500
+      sports_games_hobbies_expenses: 2000
+      sports_course_part_of_degree: True
+      student_activity_fees: 0
+      athletic_fees: 0
+      education_insurance_expenses: 0
+      other_nonacademic_expenses: 0
+    expect: 10500
+  - name: "AOTC with nonacademic exclusions"
+    period: 2024-01
+    inputs:
+      tuition_paid: 10000
+      academic_fees_paid: 0
+      course_materials_paid: 500
+      sports_games_hobbies_expenses: 0
+      sports_course_part_of_degree: False
+      student_activity_fees: 200
+      athletic_fees: 100
+      education_insurance_expenses: 0
+      other_nonacademic_expenses: 0
+    expect: 10200
+  - name: "Zero AOTC expenses"
+    period: 2024-01
+    inputs:
+      tuition_paid: 0
+      academic_fees_paid: 0
+      course_materials_paid: 0
+      sports_games_hobbies_expenses: 0
+      sports_course_part_of_degree: False
+      student_activity_fees: 0
+      athletic_fees: 0
+      education_insurance_expenses: 0
+      other_nonacademic_expenses: 0
+    expect: 0

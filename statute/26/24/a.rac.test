@@ -1,0 +1,26 @@
+ctc_maximum:
+  - name: "One child, 2024"
+    period: 2024-01
+    inputs:
+      qualifying_child_count: 1
+    expect: 2000
+  - name: "Two children, 2024"
+    period: 2024-01
+    inputs:
+      qualifying_child_count: 2
+    expect: 4000
+  - name: "Three children, 2024"
+    period: 2024-01
+    inputs:
+      qualifying_child_count: 3
+    expect: 6000
+  - name: "No children"
+    period: 2024-01
+    inputs:
+      qualifying_child_count: 0
+    expect: 0
+  - name: "One child, 2025 (P.L. 119-21)"
+    period: 2025-01
+    inputs:
+      qualifying_child_count: 1
+    expect: 2200

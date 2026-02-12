@@ -1,6 +1,6 @@
 # 26 USC 25A(g)(1)(B) - Institution EIN requirement
 
-text: """
+"""
 (B) Institution
 No American Opportunity Tax Credit shall be allowed under this section unless
 the taxpayer includes the employer identification number of any institution to
@@ -11,7 +11,7 @@ under this section on the return of tax for the taxable year.
 # This requirement applies ONLY to AOTC (American Opportunity Tax Credit)
 # Taxpayer must include EIN of educational institution(s) where expenses were paid
 
-input institution_ein_provided:
+institution_ein_provided:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -19,25 +19,14 @@ input institution_ein_provided:
   description: "Whether EIN of educational institution is provided on tax return per 26 USC 25A(g)(1)(B)"
   default: True
 
-variable institution_ein_requirement_met:
+institution_ein_requirement_met:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "Institution EIN Requirement Met"
   description: "Whether institution EIN requirement of 26 USC 25A(g)(1)(B) is satisfied"
-  formula: |
+  from 2013-01-01:
     # Per (B): EIN must be provided for AOTC
     # Note: This variable just checks whether the EIN is provided
     # The parent variable in g/1.rac applies this only when claiming AOTC
     return institution_ein_provided
-  tests:
-    - name: "EIN provided"
-      period: 2024-01
-      inputs:
-        institution_ein_provided: True
-      expect: True
-    - name: "EIN not provided"
-      period: 2024-01
-      inputs:
-        institution_ein_provided: False
-      expect: False

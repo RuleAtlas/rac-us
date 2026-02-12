@@ -1,0 +1,16 @@
+aotc_half_time_requirement_met:
+  - name: "No academic periods as eligible student"
+    period: 2024-01
+    inputs:
+      eligible_student_academic_periods: 0
+    expect: false
+  - name: "One academic period as eligible student"
+    period: 2024-01
+    inputs:
+      eligible_student_academic_periods: 1
+    expect: true
+  - name: "Two academic periods as eligible student"
+    period: 2024-01
+    inputs:
+      eligible_student_academic_periods: 2
+    expect: true

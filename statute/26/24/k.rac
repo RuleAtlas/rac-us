@@ -1,6 +1,6 @@
 # 26 USC 24(k) - Application of credit in possessions
 
-text: """
+"""
 (k) Application of credit in possessions
 (1) Mirror code possessions
 (A) In general
@@ -64,48 +64,48 @@ referred to in subsection (b)(2) of such section.
 # This subsection primarily deals with administrative and coordination provisions
 # for US possessions. The key computational elements are:
 
-input is_mirror_code_possession_resident:
+is_mirror_code_possession_resident:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "Mirror Code Possession Resident"
   description: "Whether taxpayer is resident of possession with mirror code tax system"
 
-input is_puerto_rico_resident:
+is_puerto_rico_resident:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "Puerto Rico Resident"
   description: "Whether taxpayer is bona fide resident of Puerto Rico per section 937(a)"
 
-input is_american_samoa_resident:
+is_american_samoa_resident:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "American Samoa Resident"
   description: "Whether taxpayer is bona fide resident of American Samoa per section 937(a)"
 
-input american_samoa_plan_approved:
+american_samoa_plan_approved:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "American Samoa Plan Approved"
   description: "Whether American Samoa has approved distribution plan per 26 USC 24(k)(3)(B)"
 
-input claimed_ctc_in_possession:
+claimed_ctc_in_possession:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "Claimed CTC in Possession"
   description: "Whether credit allowable against possession taxes"
 
-variable ctc_disallowed_possession_coordination:
+ctc_disallowed_possession_coordination:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "CTC Disallowed (Possession Coordination)"
   description: "Whether CTC disallowed due to possession tax coordination per 26 USC 24(k)"
-  formula: |
+  from 2013-01-01:
     # Mirror code possession - disallow if claimed in possession
     if is_mirror_code_possession_resident and claimed_ctc_in_possession:
       return True
@@ -113,54 +113,18 @@ variable ctc_disallowed_possession_coordination:
     if is_american_samoa_resident and american_samoa_plan_approved:
       return True
     return False
-  tests:
-    - name: "US mainland resident"
-      period: 2024-01
-      inputs:
-        is_mirror_code_possession_resident: false
-        is_american_samoa_resident: false
-        claimed_ctc_in_possession: false
-        american_samoa_plan_approved: false
-      expect: false
-    - name: "Mirror code possession, claimed in possession"
-      period: 2024-01
-      inputs:
-        is_mirror_code_possession_resident: true
-        is_american_samoa_resident: false
-        claimed_ctc_in_possession: true
-        american_samoa_plan_approved: false
-      expect: true
-    - name: "American Samoa with approved plan"
-      period: 2024-01
-      inputs:
-        is_mirror_code_possession_resident: false
-        is_american_samoa_resident: true
-        claimed_ctc_in_possession: false
-        american_samoa_plan_approved: true
-      expect: true
 
-variable puerto_rico_ctc_eligible:
+puerto_rico_ctc_eligible:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "Puerto Rico CTC Eligible"
   description: "Whether Puerto Rico resident eligible for CTC per 26 USC 24(k)(2)"
-  formula: |
+  from 2013-01-01:
     # PR residents eligible for taxable years after 2021
     if is_puerto_rico_resident:
       return True
     return False
-  tests:
-    - name: "Puerto Rico resident"
-      period: 2024-01
-      inputs:
-        is_puerto_rico_resident: true
-      expect: true
-    - name: "Non-PR resident"
-      period: 2024-01
-      inputs:
-        is_puerto_rico_resident: false
-      expect: false
 
 # Note: The special rule for Puerto Rico residents under (k)(2)(B)(ii) modifies
 # the ACTC calculation by removing the 3+ children requirement. This is handled

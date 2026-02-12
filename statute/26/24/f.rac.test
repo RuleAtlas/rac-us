@@ -1,0 +1,19 @@
+ctc_meets_full_year_requirement:
+  - name: "Full 12-month year"
+    period: 2024-01
+    inputs:
+      tax_year_months: 12
+      taxpayer_deceased: false
+    expect: true
+  - name: "Short year, not deceased"
+    period: 2024-01
+    inputs:
+      tax_year_months: 6
+      taxpayer_deceased: false
+    expect: false
+  - name: "Short year due to death"
+    period: 2024-01
+    inputs:
+      tax_year_months: 6
+      taxpayer_deceased: true
+    expect: true

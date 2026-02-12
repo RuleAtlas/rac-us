@@ -1,6 +1,6 @@
 # 26 USC 24(g) - Restrictions on taxpayers who improperly claimed credit in prior year
 
-text: """
+"""
 (g) Restrictions on taxpayers who improperly claimed credit in prior year
 (1) Taxpayers making prior fraudulent or reckless claims
 (A) In general
@@ -25,123 +25,83 @@ demonstrate eligibility for such credit.
 """
 
 # Disallowance period for fraud
-parameter ctc_fraud_disallowance_years:
+ctc_fraud_disallowance_years:
   description: "Disallowance period for fraudulent CTC claims per 26 USC 24(g)(1)(B)(i)"
   unit: years
-  values:
-    2016-01-01: 10
+  from 2016-01-01: 10
 
 # Disallowance period for reckless/intentional disregard
-parameter ctc_reckless_disallowance_years:
+ctc_reckless_disallowance_years:
   description: "Disallowance period for reckless CTC claims per 26 USC 24(g)(1)(B)(ii)"
   unit: years
-  values:
-    2016-01-01: 2
+  from 2016-01-01: 2
 
-input ctc_fraud_determination_year:
+ctc_fraud_determination_year:
   entity: TaxUnit
   period: Year
   dtype: Integer
   label: "CTC Fraud Determination Year"
   description: "Year of final determination of fraudulent CTC claim (0 if none)"
 
-input ctc_reckless_determination_year:
+ctc_reckless_determination_year:
   entity: TaxUnit
   period: Year
   dtype: Integer
   label: "CTC Reckless Determination Year"
   description: "Year of final determination of reckless CTC claim (0 if none)"
 
-input ctc_deficiency_requires_documentation:
+ctc_deficiency_requires_documentation:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "CTC Documentation Required"
   description: "Whether taxpayer must provide documentation due to prior denial per 26 USC 24(g)(2)"
 
-input ctc_documentation_provided:
+ctc_documentation_provided:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "CTC Documentation Provided"
   description: "Whether required documentation has been provided"
 
-input current_tax_year:
+current_tax_year:
   entity: TaxUnit
   period: Year
   dtype: Integer
   label: "Current Tax Year"
   description: "The current taxable year"
 
-variable ctc_in_fraud_disallowance_period:
+ctc_in_fraud_disallowance_period:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "In CTC Fraud Disallowance Period"
   description: "Whether taxpayer is in disallowance period due to fraud per 26 USC 24(g)(1)(B)(i)"
-  formula: |
+  from 2016-01-01:
     if ctc_fraud_determination_year == 0:
       return False
     years_since_fraud = current_tax_year - ctc_fraud_determination_year
     return years_since_fraud <= ctc_fraud_disallowance_years
-  tests:
-    - name: "No fraud history"
-      period: 2024-01
-      inputs:
-        ctc_fraud_determination_year: 0
-        current_tax_year: 2024
-      expect: false
-    - name: "Within 10-year fraud period"
-      period: 2024-01
-      inputs:
-        ctc_fraud_determination_year: 2020
-        current_tax_year: 2024
-      expect: true
-    - name: "Beyond 10-year fraud period"
-      period: 2024-01
-      inputs:
-        ctc_fraud_determination_year: 2010
-        current_tax_year: 2024
-      expect: false
 
-variable ctc_in_reckless_disallowance_period:
+ctc_in_reckless_disallowance_period:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "In CTC Reckless Disallowance Period"
   description: "Whether taxpayer is in disallowance period due to reckless claim per 26 USC 24(g)(1)(B)(ii)"
-  formula: |
+  from 2016-01-01:
     if ctc_reckless_determination_year == 0:
       return False
     years_since_reckless = current_tax_year - ctc_reckless_determination_year
     return years_since_reckless <= ctc_reckless_disallowance_years
-  tests:
-    - name: "No reckless history"
-      period: 2024-01
-      inputs:
-        ctc_reckless_determination_year: 0
-        current_tax_year: 2024
-      expect: false
-    - name: "Within 2-year reckless period"
-      period: 2024-01
-      inputs:
-        ctc_reckless_determination_year: 2023
-        current_tax_year: 2024
-      expect: true
-    - name: "Beyond 2-year reckless period"
-      period: 2024-01
-      inputs:
-        ctc_reckless_determination_year: 2020
-        current_tax_year: 2024
-      expect: false
 
-variable ctc_disallowed_prior_claim:
+ctc_disallowed_prior_claim:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "CTC Disallowed Due to Prior Claim"
   description: "Whether CTC is disallowed due to prior improper claim per 26 USC 24(g)"
-  formula: |
+  from 2016-01-01:
     # Fraud disallowance
     if ctc_in_fraud_disallowance_period:
       return True
@@ -152,36 +112,3 @@ variable ctc_disallowed_prior_claim:
     if ctc_deficiency_requires_documentation and not ctc_documentation_provided:
       return True
     return False
-  tests:
-    - name: "No prior issues"
-      period: 2024-01
-      inputs:
-        ctc_in_fraud_disallowance_period: false
-        ctc_in_reckless_disallowance_period: false
-        ctc_deficiency_requires_documentation: false
-        ctc_documentation_provided: false
-      expect: false
-    - name: "In fraud period"
-      period: 2024-01
-      inputs:
-        ctc_in_fraud_disallowance_period: true
-        ctc_in_reckless_disallowance_period: false
-        ctc_deficiency_requires_documentation: false
-        ctc_documentation_provided: false
-      expect: true
-    - name: "Documentation required but not provided"
-      period: 2024-01
-      inputs:
-        ctc_in_fraud_disallowance_period: false
-        ctc_in_reckless_disallowance_period: false
-        ctc_deficiency_requires_documentation: true
-        ctc_documentation_provided: false
-      expect: true
-    - name: "Documentation required and provided"
-      period: 2024-01
-      inputs:
-        ctc_in_fraud_disallowance_period: false
-        ctc_in_reckless_disallowance_period: false
-        ctc_deficiency_requires_documentation: true
-        ctc_documentation_provided: true
-      expect: false

@@ -1,0 +1,53 @@
+ptc_month_passes_exchange_verification:
+  - name: "Pre-effective date (2024) - always passes"
+    period: 2024-01
+    inputs:
+      tax_year: 2024
+      enrolled_through_exchange: true
+      exchange_has_verified_eligibility: false
+      verification_waived_for_special_enrollment: false
+    expect: true
+  - name: "Pre-effective date (2027) - always passes"
+    period: 2027-06
+    inputs:
+      tax_year: 2027
+      enrolled_through_exchange: true
+      exchange_has_verified_eligibility: false
+      verification_waived_for_special_enrollment: false
+    expect: true
+  - name: "Post-effective date (2028) - verified"
+    period: 2028-01
+    inputs:
+      tax_year: 2028
+      enrolled_through_exchange: true
+      exchange_has_verified_eligibility: true
+      verification_waived_for_special_enrollment: false
+    expect: true
+  - name: "Post-effective date (2028) - not verified"
+    period: 2028-03
+    inputs:
+      tax_year: 2028
+      enrolled_through_exchange: true
+      exchange_has_verified_eligibility: false
+      verification_waived_for_special_enrollment: false
+    expect: false
+  - name: "Post-effective date - not enrolled through Exchange"
+    period: 2028-01
+    inputs:
+      tax_year: 2028
+      enrolled_through_exchange: false
+      exchange_has_verified_eligibility: false
+      verification_waived_for_special_enrollment: false
+    expect: true
+  - name: "Post-effective date - verification waived for special enrollment"
+    period: 2028-01
+    inputs:
+      tax_year: 2028
+      enrolled_through_exchange: true
+      exchange_has_verified_eligibility: false
+      verification_waived_for_special_enrollment: true
+    expect: true
+  - name: "All defaults (2024, verified) - passes"
+    period: 2024-01
+    inputs: {}
+    expect: true

@@ -1,0 +1,26 @@
+hoh_income_tax:
+  - name: "First bracket only"
+    period: 2018-01
+    inputs:
+      taxable_income: 10000
+    expect: 1000
+  - name: "Second bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 40000
+    expect: 4528
+  - name: "Third bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 70000
+    expect: 9948
+  - name: "Top bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 600000
+    expect: 186298
+  - name: "Zero income"
+    period: 2018-01
+    inputs:
+      taxable_income: 0
+    expect: 0

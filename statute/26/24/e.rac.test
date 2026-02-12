@@ -1,0 +1,23 @@
+ctc_meets_id_requirements:
+  - name: "Taxpayer has valid TIN"
+    period: 2024-01
+    inputs:
+      taxpayer_has_valid_tin: true
+    expect: true
+  - name: "Taxpayer TIN issued late"
+    period: 2024-01
+    inputs:
+      taxpayer_has_valid_tin: false
+    expect: false
+
+child_meets_ctc_id_requirement:
+  - name: "Child has valid TIN"
+    period: 2024-01
+    inputs:
+      child_has_valid_tin: true
+    expect: true
+  - name: "Child TIN issued late"
+    period: 2024-01
+    inputs:
+      child_has_valid_tin: false
+    expect: false

@@ -1,0 +1,25 @@
+llc_eligible_expenses:
+  - name: "No AOTC election - full expenses eligible"
+    period: 2024-01
+    inputs:
+      total_qualified_expenses: 8000
+      aotc_election_in_effect: False
+    expect: 8000
+  - name: "AOTC election in effect - no LLC expenses"
+    period: 2024-01
+    inputs:
+      total_qualified_expenses: 8000
+      aotc_election_in_effect: True
+    expect: 0
+  - name: "Zero expenses"
+    period: 2024-01
+    inputs:
+      total_qualified_expenses: 0
+      aotc_election_in_effect: False
+    expect: 0
+  - name: "Graduate student job skills course"
+    period: 2024-01
+    inputs:
+      total_qualified_expenses: 5000
+      aotc_election_in_effect: False
+    expect: 5000

@@ -1,6 +1,6 @@
 # 26 USC 24(j) - Reconciliation of credit and advance credit
 
-text: """
+"""
 (j) Reconciliation of credit and advance credit
 (1) In general
 The amount of the credit allowed under this section to any taxpayer for any taxable
@@ -46,80 +46,75 @@ such taxable year.
 """
 
 # Safe harbor income thresholds
-parameter advance_ctc_safe_harbor_threshold_joint:
+advance_ctc_safe_harbor_threshold_joint:
   description: "Safe harbor income threshold for joint returns per 26 USC 24(j)(2)(B)(iii)(I)"
   unit: USD
-  values:
-    2021-01-01: 60000
+  from 2021-01-01: 60000
 
-parameter advance_ctc_safe_harbor_threshold_hoh:
+advance_ctc_safe_harbor_threshold_hoh:
   description: "Safe harbor income threshold for HOH per 26 USC 24(j)(2)(B)(iii)(II)"
   unit: USD
-  values:
-    2021-01-01: 50000
+  from 2021-01-01: 50000
 
-parameter advance_ctc_safe_harbor_threshold_other:
+advance_ctc_safe_harbor_threshold_other:
   description: "Safe harbor income threshold for others per 26 USC 24(j)(2)(B)(iii)(III)"
   unit: USD
-  values:
-    2021-01-01: 40000
+  from 2021-01-01: 40000
 
 # Safe harbor amount per child
-parameter advance_ctc_safe_harbor_per_child:
+advance_ctc_safe_harbor_per_child:
   description: "Safe harbor amount per excess advance child per 26 USC 24(j)(2)(B)(iv)(I)"
   unit: USD
-  values:
-    2021-01-01: 2000
+  from 2021-01-01: 2000
 
 # Safe harbor phase-out multiplier
-parameter advance_ctc_safe_harbor_phaseout_multiple:
+advance_ctc_safe_harbor_phaseout_multiple:
   description: "Multiple of threshold for full safe harbor phase-out per 26 USC 24(j)(2)(B)(i)"
-  values:
-    2021-01-01: 2
+  from 2021-01-01: 2
 
-input advance_ctc_payments:
+advance_ctc_payments:
   entity: TaxUnit
   period: Year
   dtype: Money
   label: "Advance CTC Payments"
   description: "Total advance CTC payments received under section 7527A"
 
-input advance_ctc_children_count:
+advance_ctc_children_count:
   entity: TaxUnit
   period: Year
   dtype: Integer
   label: "Advance CTC Children Count"
   description: "Number of children used to determine advance payments"
 
-input actual_ctc_children_count:
+actual_ctc_children_count:
   entity: TaxUnit
   period: Year
   dtype: Integer
   label: "Actual CTC Children Count"
   description: "Number of qualifying children for actual credit"
 
-input filing_status:
+filing_status:
   entity: TaxUnit
   period: Year
   dtype: Enum[SINGLE, JOINT, SEPARATE, HEAD_OF_HOUSEHOLD, SURVIVING_SPOUSE]
   label: "Filing Status"
   description: "Tax filing status per 26 USC 1"
 
-input modified_agi:
+modified_agi:
   entity: TaxUnit
   period: Year
   dtype: Money
   label: "Modified Adjusted Gross Income"
   description: "AGI plus amounts excluded under sections 911, 931, 933"
 
-variable advance_ctc_safe_harbor_threshold:
+advance_ctc_safe_harbor_threshold:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Advance CTC Safe Harbor Threshold"
   description: "Applicable income threshold for safe harbor per 26 USC 24(j)(2)(B)(iii)"
-  formula: |
+  from 2021-01-01:
     if filing_status == "JOINT":
       return advance_ctc_safe_harbor_threshold_joint
     if filing_status == "SURVIVING_SPOUSE":
@@ -127,59 +122,24 @@ variable advance_ctc_safe_harbor_threshold:
     if filing_status == "HEAD_OF_HOUSEHOLD":
       return advance_ctc_safe_harbor_threshold_hoh
     return advance_ctc_safe_harbor_threshold_other
-  tests:
-    - name: "Joint filers"
-      period: 2021-01
-      inputs:
-        filing_status: "JOINT"
-      expect: 60000
-    - name: "Head of household"
-      period: 2021-01
-      inputs:
-        filing_status: "HEAD_OF_HOUSEHOLD"
-      expect: 50000
-    - name: "Single filer"
-      period: 2021-01
-      inputs:
-        filing_status: "SINGLE"
-      expect: 40000
 
-variable advance_ctc_excess_children:
+advance_ctc_excess_children:
   entity: TaxUnit
   period: Year
   dtype: Integer
   label: "Excess Advance CTC Children"
   description: "Children in advance minus actual qualifying children per 26 USC 24(j)(2)(B)(iv)(II)"
-  formula: |
+  from 2021-01-01:
     return max(0, advance_ctc_children_count - actual_ctc_children_count)
-  tests:
-    - name: "Same children count"
-      period: 2021-01
-      inputs:
-        advance_ctc_children_count: 2
-        actual_ctc_children_count: 2
-      expect: 0
-    - name: "One fewer actual child"
-      period: 2021-01
-      inputs:
-        advance_ctc_children_count: 3
-        actual_ctc_children_count: 2
-      expect: 1
-    - name: "More actual than advance"
-      period: 2021-01
-      inputs:
-        advance_ctc_children_count: 1
-        actual_ctc_children_count: 2
-      expect: 0
 
-variable advance_ctc_safe_harbor_amount:
+advance_ctc_safe_harbor_amount:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Advance CTC Safe Harbor Amount"
   description: "Safe harbor amount for excess advance CTC per 26 USC 24(j)(2)(B)"
-  formula: |
+  from 2021-01-01:
     # Base safe harbor = $2,000 x excess children
     base_safe_harbor = advance_ctc_excess_children * advance_ctc_safe_harbor_per_child
 
@@ -199,37 +159,8 @@ variable advance_ctc_safe_harbor_amount:
     reduction_ratio = excess_income / threshold
     reduced_amount = base_safe_harbor * (1 - reduction_ratio)
     return max(0, reduced_amount)
-  tests:
-    - name: "Below threshold, one excess child"
-      period: 2021-01
-      inputs:
-        advance_ctc_excess_children: 1
-        modified_agi: 30000
-        advance_ctc_safe_harbor_threshold: 40000
-      expect: 2000
-    - name: "At threshold, one excess child"
-      period: 2021-01
-      inputs:
-        advance_ctc_excess_children: 1
-        modified_agi: 40000
-        advance_ctc_safe_harbor_threshold: 40000
-      expect: 2000
-    - name: "At 150% of threshold (50% phase-out)"
-      period: 2021-01
-      inputs:
-        advance_ctc_excess_children: 1
-        modified_agi: 60000
-        advance_ctc_safe_harbor_threshold: 40000
-      expect: 1000
-    - name: "At 200% of threshold (fully phased out)"
-      period: 2021-01
-      inputs:
-        advance_ctc_excess_children: 1
-        modified_agi: 80000
-        advance_ctc_safe_harbor_threshold: 40000
-      expect: 0
 
-variable ctc_after_advance_reconciliation:
+ctc_after_advance_reconciliation:
   imports:
     - 26/24/b#ctc_after_phaseout
   entity: TaxUnit
@@ -238,29 +169,10 @@ variable ctc_after_advance_reconciliation:
   unit: USD
   label: "CTC After Advance Reconciliation"
   description: "CTC reduced by advance payments per 26 USC 24(j)(1)"
-  formula: |
+  from 2021-01-01:
     return max(0, ctc_after_phaseout - advance_ctc_payments)
-  tests:
-    - name: "No advance payments"
-      period: 2021-01
-      inputs:
-        ctc_after_phaseout: 6000
-        advance_ctc_payments: 0
-      expect: 6000
-    - name: "Partial advance payments"
-      period: 2021-01
-      inputs:
-        ctc_after_phaseout: 6000
-        advance_ctc_payments: 3000
-      expect: 3000
-    - name: "Advance exceeds credit"
-      period: 2021-01
-      inputs:
-        ctc_after_phaseout: 4000
-        advance_ctc_payments: 5000
-      expect: 0
 
-variable advance_ctc_repayment:
+advance_ctc_repayment:
   imports:
     - 26/24/b#ctc_after_phaseout
   entity: TaxUnit
@@ -269,30 +181,8 @@ variable advance_ctc_repayment:
   unit: USD
   label: "Advance CTC Repayment"
   description: "Tax increase due to excess advance payments per 26 USC 24(j)(2)"
-  formula: |
+  from 2021-01-01:
     # Gross excess of advance over credit
     gross_excess = max(0, advance_ctc_payments - ctc_after_phaseout)
     # Reduce by safe harbor
     return max(0, gross_excess - advance_ctc_safe_harbor_amount)
-  tests:
-    - name: "No excess payments"
-      period: 2021-01
-      inputs:
-        advance_ctc_payments: 3000
-        ctc_after_phaseout: 6000
-        advance_ctc_safe_harbor_amount: 0
-      expect: 0
-    - name: "Excess with safe harbor"
-      period: 2021-01
-      inputs:
-        advance_ctc_payments: 6000
-        ctc_after_phaseout: 4000
-        advance_ctc_safe_harbor_amount: 2000
-      expect: 0
-    - name: "Excess exceeds safe harbor"
-      period: 2021-01
-      inputs:
-        advance_ctc_payments: 8000
-        ctc_after_phaseout: 4000
-        advance_ctc_safe_harbor_amount: 2000
-      expect: 2000

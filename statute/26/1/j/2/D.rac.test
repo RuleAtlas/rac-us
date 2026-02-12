@@ -1,0 +1,21 @@
+mfs_income_tax:
+  - name: "First bracket only"
+    period: 2018-01
+    inputs:
+      taxable_income: 5000
+    expect: 500
+  - name: "Second bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 25000
+    expect: 2809.5
+  - name: "Top bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 400000
+    expect: 117689.5
+  - name: "Zero income"
+    period: 2018-01
+    inputs:
+      taxable_income: 0
+    expect: 0

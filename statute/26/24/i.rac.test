@@ -1,0 +1,39 @@
+actc_inflation_adjusted_max:
+  - name: "No inflation adjustment"
+    period: 2024-01
+    inputs:
+      actc_max_per_child: 1400
+      cola_adjustment: 0
+    expect: 1400
+  - name: "5% inflation (before rounding)"
+    period: 2025-01
+    inputs:
+      actc_max_per_child: 1400
+      cola_adjustment: 0.05
+    expect: 1470
+  - name: "10% inflation (before rounding)"
+    period: 2026-01
+    inputs:
+      actc_max_per_child: 1400
+      cola_adjustment: 0.10
+    expect: 1540
+
+ctc_credit_inflation_adjusted:
+  - name: "No inflation adjustment"
+    period: 2025-01
+    inputs:
+      ctc_base_amount: 2200
+      cola_adjustment: 0
+    expect: 2200
+  - name: "5% inflation (before rounding)"
+    period: 2026-01
+    inputs:
+      ctc_base_amount: 2200
+      cola_adjustment: 0.05
+    expect: 2310
+  - name: "7% inflation (before rounding)"
+    period: 2026-01
+    inputs:
+      ctc_base_amount: 2200
+      cola_adjustment: 0.07
+    expect: 2354

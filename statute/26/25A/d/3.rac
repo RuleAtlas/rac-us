@@ -2,24 +2,25 @@
 
 status: obsolete
 
-text: |
-  (3) Inflation adjustment
-  [Struck by Pub. L. 116-260, div. EE, title I, sec. 104(a)(1), Dec. 27, 2020, 134 Stat. 3040]
+"""
+(3) Inflation adjustment
+[Struck by Pub. L. 116-260, div. EE, title I, sec. 104(a)(1), Dec. 27, 2020, 134 Stat. 3040]
 
-  This paragraph was redesignated as (d)(2) "Modified adjusted gross income" by Pub. L. 116-260,
-  effective for taxable years beginning after December 31, 2020.
+This paragraph was redesignated as (d)(2) "Modified adjusted gross income" by Pub. L. 116-260,
+effective for taxable years beginning after December 31, 2020.
 
-  The former inflation adjustment provision for 26 USC 25A(d) no longer exists in current law.
-  The 2020 amendment established fixed dollar thresholds ($80,000/$160,000 for single/joint) and
-  phase-out ranges ($10,000/$20,000) that are not subject to inflation indexing.
+The former inflation adjustment provision for 26 USC 25A(d) no longer exists in current law.
+The 2020 amendment established fixed dollar thresholds ($80,000/$160,000 for single/joint) and
+phase-out ranges ($10,000/$20,000) that are not subject to inflation indexing.
 
-  Prior law contained separate income limitations with inflation adjustments for:
-  - American Opportunity Tax Credit (former (d)(1))
-  - Lifetime Learning Credit (former (d)(2))
-  - Inflation adjustment provision (former (d)(3))
+Prior law contained separate income limitations with inflation adjustments for:
+- American Opportunity Tax Credit (former (d)(1))
+- Lifetime Learning Credit (former (d)(2))
+- Inflation adjustment provision (former (d)(3))
 
-  Current law consolidated these into:
-  - (d)(1) In general - unified phase-out formula with fixed amounts
-  - (d)(2) Modified adjusted gross income - definition only (redesignated from former (d)(3))
+Current law consolidated these into:
+- (d)(1) In general - unified phase-out formula with fixed amounts
+- (d)(2) Modified adjusted gross income - definition only (redesignated from former (d)(3))
+"""
 
 # No parameters, variables, or formulas - provision no longer exists

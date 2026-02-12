@@ -2,33 +2,34 @@
 
 status: obsolete
 
-text: |
-  (h) Inflation adjustment
-  [Struck by Pub. L. 116-260, div. EE, title I, sec. 104(a)(2), Dec. 27, 2020, 134 Stat. 3041]
+"""
+(h) Inflation adjustment
+[Struck by Pub. L. 116-260, div. EE, title I, sec. 104(a)(2), Dec. 27, 2020, 134 Stat. 3041]
 
-  Prior to repeal, this subsection read:
+Prior to repeal, this subsection read:
 
-  (h) Inflation adjustment
-  (1) In general
-  In the case of a taxable year beginning after 2001, the $40,000 and $80,000 amounts in
-  subsection (d)(2) shall each be increased by an amount equal to-
-  (A) such dollar amount, multiplied by
-  (B) the cost-of-living adjustment determined under section 1(f)(3) for the calendar year
-  in which the taxable year begins, determined by substituting "calendar year 2000" for
-  "calendar year 2016" in subparagraph (A)(ii) thereof.
-  (2) Rounding
-  If any amount as adjusted under paragraph (1) is not a multiple of $1,000, such amount
-  shall be rounded to the next lowest multiple of $1,000.
+(h) Inflation adjustment
+(1) In general
+In the case of a taxable year beginning after 2001, the $40,000 and $80,000 amounts in
+subsection (d)(2) shall each be increased by an amount equal to-
+(A) such dollar amount, multiplied by
+(B) the cost-of-living adjustment determined under section 1(f)(3) for the calendar year
+in which the taxable year begins, determined by substituting "calendar year 2000" for
+"calendar year 2016" in subparagraph (A)(ii) thereof.
+(2) Rounding
+If any amount as adjusted under paragraph (1) is not a multiple of $1,000, such amount
+shall be rounded to the next lowest multiple of $1,000.
 
-  This subsection provided inflation adjustments to the Lifetime Learning Credit income
-  limitations under the former subsection (d)(2). The 2020 amendment (Pub. L. 116-260)
-  struck this subsection effective for taxable years beginning after December 31, 2020.
+This subsection provided inflation adjustments to the Lifetime Learning Credit income
+limitations under the former subsection (d)(2). The 2020 amendment (Pub. L. 116-260)
+struck this subsection effective for taxable years beginning after December 31, 2020.
 
-  Current law:
-  - Subsection (d)(1) now provides unified income limitations ($80,000/$160,000) for both
-    AOTC and LLC, with a $10,000/$20,000 phase-out range
-  - These amounts are NOT indexed for inflation under current law
-  - The former (d)(2) which contained separate LLC income limits was struck
-  - The former (d)(3) "Modified adjusted gross income" was redesignated as (d)(2)
+Current law:
+- Subsection (d)(1) now provides unified income limitations ($80,000/$160,000) for both
+  AOTC and LLC, with a $10,000/$20,000 phase-out range
+- These amounts are NOT indexed for inflation under current law
+- The former (d)(2) which contained separate LLC income limits was struck
+- The former (d)(3) "Modified adjusted gross income" was redesignated as (d)(2)
+"""
 
 # No parameters, variables, or formulas - provision no longer exists in current law

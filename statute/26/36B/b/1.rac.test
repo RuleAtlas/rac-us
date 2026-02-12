@@ -1,0 +1,31 @@
+ptc_premium_assistance_credit_amount:
+  - name: "Full year coverage (12 months)"
+    period: 2024-01
+    inputs:
+      ptc_premium_assistance_amount: 450
+      ptc_coverage_months: 12
+    expect: 5400
+  - name: "Partial year coverage (6 months)"
+    period: 2024-01
+    inputs:
+      ptc_premium_assistance_amount: 450
+      ptc_coverage_months: 6
+    expect: 2700
+  - name: "Single month of coverage"
+    period: 2024-01
+    inputs:
+      ptc_premium_assistance_amount: 300
+      ptc_coverage_months: 1
+    expect: 300
+  - name: "No coverage months"
+    period: 2024-01
+    inputs:
+      ptc_premium_assistance_amount: 450
+      ptc_coverage_months: 0
+    expect: 0
+  - name: "Zero premium assistance amount"
+    period: 2024-01
+    inputs:
+      ptc_premium_assistance_amount: 0
+      ptc_coverage_months: 12
+    expect: 0

@@ -1,6 +1,6 @@
 # 26 USC 25A(g)(4) - Treatment of certain prepayments
 
-text: """
+"""
 (4) Treatment of certain prepayments
 If qualified tuition and related expenses are paid by the taxpayer during a taxable
 year for an academic period which begins during the first 3 months following such
@@ -19,12 +19,11 @@ as beginning during such taxable year.
 # Per (g)(4), expenses are treated as if academic period began in 2024,
 # so taxpayer may claim credit on 2024 return.
 
-parameter prepayment_months_allowed:
+prepayment_months_allowed:
   description: "Number of months into the following year within which an academic period may begin for prepaid expenses to be treated as current year per 26 USC 25A(g)(4)"
-  values:
-    1997-08-05: 3
+  from 1997-08-05: 3
 
-input qualified_expenses_paid_current_year:
+qualified_expenses_paid_current_year:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -33,7 +32,7 @@ input qualified_expenses_paid_current_year:
   description: "Amount of qualified tuition and related expenses paid during the current taxable year"
   default: 0
 
-input academic_period_begins_following_year:
+academic_period_begins_following_year:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -41,7 +40,7 @@ input academic_period_begins_following_year:
   description: "Whether the academic period for which expenses were paid begins in the following taxable year"
   default: False
 
-input academic_period_begins_month:
+academic_period_begins_month:
   entity: TaxUnit
   period: Year
   dtype: Integer
@@ -49,65 +48,28 @@ input academic_period_begins_month:
   description: "Month (1-12) in which the academic period begins, where 1=January. Only relevant if academic period begins in following year."
   default: 1
 
-variable prepaid_expenses_eligible_current_year:
+prepaid_expenses_eligible_current_year:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "Prepaid Expenses Eligible Current Year"
   description: "Whether prepaid qualified expenses for a following-year academic period are eligible to be treated as current year expenses per 26 USC 25A(g)(4)"
-  formula: |
+  from 1997-08-05:
     # Per (g)(4): Academic period must begin during first 3 months following the taxable year
     if not academic_period_begins_following_year:
       # Academic period begins in current year - standard treatment, not prepayment rule
       return False
     # Check if academic period begins within allowed months (January, February, or March)
     return academic_period_begins_month <= prepayment_months_allowed
-  tests:
-    - name: "Academic period in current year - not a prepayment"
-      period: 2024-01
-      inputs:
-        academic_period_begins_following_year: False
-        academic_period_begins_month: 9
-      expect: False
-    - name: "Academic period begins January of following year - eligible"
-      period: 2024-01
-      inputs:
-        academic_period_begins_following_year: True
-        academic_period_begins_month: 1
-      expect: True
-    - name: "Academic period begins February of following year - eligible"
-      period: 2024-01
-      inputs:
-        academic_period_begins_following_year: True
-        academic_period_begins_month: 2
-      expect: True
-    - name: "Academic period begins March of following year - eligible"
-      period: 2024-01
-      inputs:
-        academic_period_begins_following_year: True
-        academic_period_begins_month: 3
-      expect: True
-    - name: "Academic period begins April of following year - not eligible"
-      period: 2024-01
-      inputs:
-        academic_period_begins_following_year: True
-        academic_period_begins_month: 4
-      expect: False
-    - name: "Academic period begins September of following year - not eligible"
-      period: 2024-01
-      inputs:
-        academic_period_begins_following_year: True
-        academic_period_begins_month: 9
-      expect: False
 
-variable qualified_expenses_treated_as_current_year:
+qualified_expenses_treated_as_current_year:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "Qualified Expenses Treated as Current Year"
   description: "Amount of qualified expenses that may be treated as paid for an academic period beginning in the current year per 26 USC 25A(g)(4)"
-  formula: |
+  from 1997-08-05:
     # Recompute eligibility inline (test runner evaluates variables independently)
     prepaid_eligible = academic_period_begins_following_year and academic_period_begins_month <= prepayment_months_allowed
     if prepaid_eligible:
@@ -119,46 +81,3 @@ variable qualified_expenses_treated_as_current_year:
       return qualified_expenses_paid_current_year
     # Academic period begins after first 3 months of following year - cannot claim in current year
     return 0
-  tests:
-    - name: "Current year academic period - full amount eligible"
-      period: 2024-01
-      inputs:
-        qualified_expenses_paid_current_year: 4000
-        academic_period_begins_following_year: False
-        academic_period_begins_month: 8
-      expect: 4000
-    - name: "Prepaid for January start - full amount eligible under (g)(4)"
-      period: 2024-01
-      inputs:
-        qualified_expenses_paid_current_year: 5000
-        academic_period_begins_following_year: True
-        academic_period_begins_month: 1
-      expect: 5000
-    - name: "Prepaid for March start - full amount eligible under (g)(4)"
-      period: 2024-01
-      inputs:
-        qualified_expenses_paid_current_year: 3500
-        academic_period_begins_following_year: True
-        academic_period_begins_month: 3
-      expect: 3500
-    - name: "Prepaid for April start - not eligible, zero for current year"
-      period: 2024-01
-      inputs:
-        qualified_expenses_paid_current_year: 4000
-        academic_period_begins_following_year: True
-        academic_period_begins_month: 4
-      expect: 0
-    - name: "Prepaid for fall semester following year - not eligible"
-      period: 2024-01
-      inputs:
-        qualified_expenses_paid_current_year: 6000
-        academic_period_begins_following_year: True
-        academic_period_begins_month: 9
-      expect: 0
-    - name: "Zero expenses paid - zero result"
-      period: 2024-01
-      inputs:
-        qualified_expenses_paid_current_year: 0
-        academic_period_begins_following_year: True
-        academic_period_begins_month: 1
-      expect: 0

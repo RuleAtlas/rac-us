@@ -1,0 +1,92 @@
+actc_earned_income_amount:
+  - name: "Earned income below threshold"
+    period: 2024-01
+    inputs:
+      earned_income: 2000
+    expect: 0
+  - name: "Earned income at threshold"
+    period: 2024-01
+    inputs:
+      earned_income: 2500
+    expect: 0
+  - name: "$10,000 over threshold"
+    period: 2024-01
+    inputs:
+      earned_income: 12500
+    expect: 1500
+  - name: "$30,000 earned income"
+    period: 2024-01
+    inputs:
+      earned_income: 30000
+    expect: 4125
+
+actc_ss_excess_amount:
+  - name: "Two children (not eligible)"
+    period: 2024-01
+    inputs:
+      qualifying_child_count: 2
+      social_security_taxes: 5000
+      eitc_amount: 2000
+    expect: 0
+  - name: "Three children, SS exceeds EITC"
+    period: 2024-01
+    inputs:
+      qualifying_child_count: 3
+      social_security_taxes: 5000
+      eitc_amount: 2000
+    expect: 3000
+  - name: "Three children, EITC exceeds SS"
+    period: 2024-01
+    inputs:
+      qualifying_child_count: 3
+      social_security_taxes: 2000
+      eitc_amount: 5000
+    expect: 0
+
+actc_limitation_increase:
+  - name: "Earned income component greater"
+    period: 2024-01
+    inputs:
+      actc_earned_income_amount: 3000
+      actc_ss_excess_amount: 1000
+    expect: 3000
+  - name: "SS excess component greater"
+    period: 2024-01
+    inputs:
+      actc_earned_income_amount: 1000
+      actc_ss_excess_amount: 4000
+    expect: 4000
+
+actc_amount:
+  - name: "Low earner, one child"
+    period: 2024-01
+    inputs:
+      ctc_after_phaseout: 2000
+      actc_limitation_increase: 1500
+      excludes_foreign_income: false
+      qualifying_child_count: 1
+    expect: 1400
+  - name: "Moderate earner, two children"
+    period: 2024-01
+    inputs:
+      ctc_after_phaseout: 4000
+      actc_limitation_increase: 5000
+      excludes_foreign_income: false
+      qualifying_child_count: 2
+    expect: 2800
+  - name: "Foreign income exclusion"
+    period: 2024-01
+    inputs:
+      ctc_after_phaseout: 2000
+      actc_limitation_increase: 1500
+      excludes_foreign_income: true
+      qualifying_child_count: 1
+    expect: 0
+  - name: "High earner, full credit non-refundable"
+    period: 2024-01
+    inputs:
+      ctc_after_phaseout: 4000
+      actc_limitation_increase: 10000
+      excludes_foreign_income: false
+      qualifying_child_count: 2
+    expect: 2800

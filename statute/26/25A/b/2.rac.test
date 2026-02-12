@@ -1,0 +1,49 @@
+hope_scholarship_limitations_satisfied:
+  - name: "All limitations satisfied - eligible"
+    period: 2024-01
+    inputs:
+      aotc_4_year_limit_met: False
+      aotc_half_time_requirement_met: True
+      aotc_first_4_years_eligible: True
+      eligible_student_drug_conviction_disqualified: False
+    expect: True
+  - name: "4 prior years claimed - ineligible per (A)"
+    period: 2024-01
+    inputs:
+      aotc_4_year_limit_met: True
+      aotc_half_time_requirement_met: True
+      aotc_first_4_years_eligible: True
+      eligible_student_drug_conviction_disqualified: False
+    expect: False
+  - name: "Not half-time student - ineligible per (B)"
+    period: 2024-01
+    inputs:
+      aotc_4_year_limit_met: False
+      aotc_half_time_requirement_met: False
+      aotc_first_4_years_eligible: True
+      eligible_student_drug_conviction_disqualified: False
+    expect: False
+  - name: "Beyond first 4 years - ineligible per (C)"
+    period: 2024-01
+    inputs:
+      aotc_4_year_limit_met: False
+      aotc_half_time_requirement_met: True
+      aotc_first_4_years_eligible: False
+      eligible_student_drug_conviction_disqualified: False
+    expect: False
+  - name: "Felony drug conviction - ineligible per (D)"
+    period: 2024-01
+    inputs:
+      aotc_4_year_limit_met: False
+      aotc_half_time_requirement_met: True
+      aotc_first_4_years_eligible: True
+      eligible_student_drug_conviction_disqualified: True
+    expect: False
+  - name: "Multiple limitations failed"
+    period: 2024-01
+    inputs:
+      aotc_4_year_limit_met: True
+      aotc_half_time_requirement_met: False
+      aotc_first_4_years_eligible: False
+      eligible_student_drug_conviction_disqualified: True
+    expect: False

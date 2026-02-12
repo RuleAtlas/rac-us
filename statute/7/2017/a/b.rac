@@ -2,7 +2,7 @@
 
 status: boilerplate
 
-text: """
+"""
 (b) Benefits not deemed income or resources for certain purposes
 The value of benefits that may be provided under this chapter shall not be
 considered income or resources for any purpose under any Federal, State, or
@@ -18,16 +18,12 @@ individual or individuals because of the receipt of benefits under this chapter.
 # legal protection. Encoded as a Boolean variable that is always true for any
 # individual receiving SNAP benefits.
 
-variable snap_benefits_excluded_from_income:
+snap_benefits_excluded_from_income:
   entity: Person
   period: Month
   dtype: Boolean
   label: "SNAP Benefits Excluded from Income"
   description: "Whether SNAP benefits are excluded from income and resources per 7 USC 2017(a)(b)"
   default: true
-  formula: |
+  from 2013-01-01:
     return true
-  tests:
-    - name: "SNAP benefits always excluded from income"
-      period: 2024-10
-      expect: true

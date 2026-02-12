@@ -1,0 +1,26 @@
+joint_income_tax:
+  - name: "First bracket only"
+    period: 2018-01
+    inputs:
+      taxable_income: 10000
+    expect: 1000
+  - name: "Second bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 50000
+    expect: 5619
+  - name: "Third bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 100000
+    expect: 13879
+  - name: "Top bracket"
+    period: 2018-01
+    inputs:
+      taxable_income: 700000
+    expect: 198379
+  - name: "Zero income"
+    period: 2018-01
+    inputs:
+      taxable_income: 0
+    expect: 0

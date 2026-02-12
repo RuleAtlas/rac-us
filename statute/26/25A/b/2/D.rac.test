@@ -1,0 +1,11 @@
+eligible_student_drug_conviction_disqualified:
+  - name: "No conviction - not disqualified"
+    period: 2024-01
+    inputs:
+      has_felony_drug_conviction: false
+    expect: false
+  - name: "Has conviction - disqualified"
+    period: 2024-01
+    inputs:
+      has_felony_drug_conviction: true
+    expect: true

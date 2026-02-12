@@ -1,6 +1,6 @@
 # 26 USC 24(b) - Limitations
 
-text: """
+"""
 (b) Limitations
 (1) Limitation based on adjusted gross income
 The amount of the credit allowable under subsection (a) shall be reduced (but not
@@ -22,62 +22,57 @@ any other case).
 """
 
 # Pre-TCJA phaseout thresholds (subsection (b)(2))
-parameter ctc_threshold_joint:
+ctc_threshold_joint:
   description: "CTC phaseout threshold for joint returns per 26 USC 24(b)(2)(A)"
   unit: USD
-  values:
-    1998-01-01: 110000
-    2018-01-01: 400000  # Modified by (h)(3)
+  from 1998-01-01: 110000
+  from 2018-01-01: 400000  # Modified by (h)(3)
 
-parameter ctc_threshold_single:
+ctc_threshold_single:
   description: "CTC phaseout threshold for unmarried individuals per 26 USC 24(b)(2)(B)"
   unit: USD
-  values:
-    1998-01-01: 75000
-    2018-01-01: 200000  # Modified by (h)(3)
+  from 1998-01-01: 75000
+  from 2018-01-01: 200000  # Modified by (h)(3)
 
-parameter ctc_threshold_separate:
+ctc_threshold_separate:
   description: "CTC phaseout threshold for MFS per 26 USC 24(b)(2)(C)"
   unit: USD
-  values:
-    1998-01-01: 55000
-    2018-01-01: 200000  # Modified by (h)(3)
+  from 1998-01-01: 55000
+  from 2018-01-01: 200000  # Modified by (h)(3)
 
 # Phaseout rate
-parameter ctc_phaseout_reduction:
+ctc_phaseout_reduction:
   description: "CTC reduction per $1,000 of excess MAGI per 26 USC 24(b)(1)"
   unit: USD
-  values:
-    1998-01-01: 50
+  from 1998-01-01: 50
 
-parameter ctc_phaseout_increment:
+ctc_phaseout_increment:
   description: "MAGI increment for CTC phaseout per 26 USC 24(b)(1)"
   unit: USD
-  values:
-    1998-01-01: 1000
+  from 1998-01-01: 1000
 
-input modified_agi:
+modified_agi:
   entity: TaxUnit
   period: Year
   dtype: Money
   label: "Modified Adjusted Gross Income"
   description: "AGI plus amounts excluded under sections 911, 931, 933"
 
-input filing_status:
+filing_status:
   entity: TaxUnit
   period: Year
   dtype: String
   label: "Filing Status"
   description: "Tax filing status per 26 USC 1"
 
-variable ctc_threshold:
+ctc_threshold:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
   label: "CTC Phaseout Threshold"
   description: "Applicable threshold amount based on filing status per 26 USC 24(b)(2)"
-  formula: |
+  from 1998-01-01:
     if filing_status == "JOINT":
       return ctc_threshold_joint
     if filing_status == "SURVIVING_SPOUSE":
@@ -86,24 +81,8 @@ variable ctc_threshold:
       return ctc_threshold_separate
     # Single and HOH use single threshold
     return ctc_threshold_single
-  tests:
-    - name: "Joint filers 2024"
-      period: 2024-01
-      inputs:
-        filing_status: "JOINT"
-      expect: 400000
-    - name: "Single filers 2024"
-      period: 2024-01
-      inputs:
-        filing_status: "SINGLE"
-      expect: 200000
-    - name: "MFS 2024"
-      period: 2024-01
-      inputs:
-        filing_status: "SEPARATE"
-      expect: 200000
 
-variable ctc_phaseout_amount:
+ctc_phaseout_amount:
   imports:
     - 26/24/a#ctc_maximum
   entity: TaxUnit
@@ -112,7 +91,7 @@ variable ctc_phaseout_amount:
   unit: USD
   label: "CTC Phaseout Amount"
   description: "Reduction in CTC due to income phaseout per 26 USC 24(b)(1)"
-  formula: |
+  from 1998-01-01:
     # Compute phaseout for joint/surviving spouse threshold
     # Per statute: reduce by $50 for each $1,000 (or fraction thereof)
     # Using integer math: increments = ceil(excess / 1000) = (excess + 999) / 1000 (truncated)
@@ -138,37 +117,8 @@ variable ctc_phaseout_amount:
       return separate_reduction
     # Single and HOH
     return single_reduction
-  tests:
-    - name: "Below threshold - Joint"
-      period: 2024-01
-      inputs:
-        modified_agi: 200000
-        filing_status: "JOINT"
-        ctc_maximum: 4000
-      expect: 0
-    - name: "At threshold - Joint"
-      period: 2024-01
-      inputs:
-        modified_agi: 400000
-        filing_status: "JOINT"
-        ctc_maximum: 4000
-      expect: 0
-    - name: "$20,000 over threshold - Joint"
-      period: 2024-01
-      inputs:
-        modified_agi: 420000
-        filing_status: "JOINT"
-        ctc_maximum: 4000
-      expect: 1000
-    - name: "Fully phased out - Joint"
-      period: 2024-01
-      inputs:
-        modified_agi: 500000
-        filing_status: "JOINT"
-        ctc_maximum: 4000
-      expect: 4000
 
-variable ctc_after_phaseout:
+ctc_after_phaseout:
   imports:
     - 26/24/a#ctc_maximum
   entity: TaxUnit
@@ -177,24 +127,5 @@ variable ctc_after_phaseout:
   unit: USD
   label: "CTC After Income Phaseout"
   description: "Child tax credit after income limitation per 26 USC 24(b)"
-  formula: |
+  from 1998-01-01:
     return max(0, ctc_maximum - ctc_phaseout_amount)
-  tests:
-    - name: "No phaseout"
-      period: 2024-01
-      inputs:
-        ctc_maximum: 4000
-        ctc_phaseout_amount: 0
-      expect: 4000
-    - name: "Partial phaseout"
-      period: 2024-01
-      inputs:
-        ctc_maximum: 4000
-        ctc_phaseout_amount: 1000
-      expect: 3000
-    - name: "Full phaseout"
-      period: 2024-01
-      inputs:
-        ctc_maximum: 4000
-        ctc_phaseout_amount: 5000
-      expect: 0

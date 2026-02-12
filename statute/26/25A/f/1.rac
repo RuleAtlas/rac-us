@@ -1,6 +1,6 @@
 # Qualified tuition and related expenses
 
-text: """
+"""
 (1) Qualified tuition and related expenses
 (A) In general
 The term "qualified tuition and related expenses" means tuition and fees required
@@ -42,7 +42,7 @@ shall be applied by substituting "tuition, fees, and course materials" for
 # - Various exclusions per (B) and (C)
 
 # Input: Raw tuition paid to eligible educational institution
-input tuition_paid:
+tuition_paid:
   entity: Person
   period: Year
   dtype: Money
@@ -52,7 +52,7 @@ input tuition_paid:
   default: 0
 
 # Input: Academic fees paid (enrollment/attendance related)
-input academic_fees_paid:
+academic_fees_paid:
   entity: Person
   period: Year
   dtype: Money
@@ -62,7 +62,7 @@ input academic_fees_paid:
   default: 0
 
 # Input: Course materials paid (books, supplies, equipment for AOTC)
-input course_materials_paid:
+course_materials_paid:
   entity: Person
   period: Year
   dtype: Money
@@ -72,7 +72,7 @@ input course_materials_paid:
   default: 0
 
 # Input: Sports/games/hobbies expenses (excluded per (B) unless part of degree)
-input sports_games_hobbies_expenses:
+sports_games_hobbies_expenses:
   entity: Person
   period: Year
   dtype: Money
@@ -82,7 +82,7 @@ input sports_games_hobbies_expenses:
   default: 0
 
 # Input: Whether sports/games/hobbies course is part of degree program
-input sports_course_part_of_degree:
+sports_course_part_of_degree:
   entity: Person
   period: Year
   dtype: Boolean
@@ -91,7 +91,7 @@ input sports_course_part_of_degree:
   default: False
 
 # Input: Student activity fees (excluded per (C))
-input student_activity_fees:
+student_activity_fees:
   entity: Person
   period: Year
   dtype: Money
@@ -101,7 +101,7 @@ input student_activity_fees:
   default: 0
 
 # Input: Athletic fees (excluded per (C))
-input athletic_fees:
+athletic_fees:
   entity: Person
   period: Year
   dtype: Money
@@ -111,7 +111,7 @@ input athletic_fees:
   default: 0
 
 # Input: Insurance expenses (excluded per (C))
-input education_insurance_expenses:
+education_insurance_expenses:
   entity: Person
   period: Year
   dtype: Money
@@ -121,7 +121,7 @@ input education_insurance_expenses:
   default: 0
 
 # Input: Other nonacademic expenses (excluded per (C))
-input other_nonacademic_expenses:
+other_nonacademic_expenses:
   entity: Person
   period: Year
   dtype: Money
@@ -132,14 +132,14 @@ input other_nonacademic_expenses:
 
 # Variable: Qualified tuition and related expenses for LLC
 # Per (A)-(C): tuition + academic fees, excluding sports/hobbies (unless degree), excluding nonacademic fees
-variable qualified_tuition_and_related_expenses_llc:
+qualified_tuition_and_related_expenses_llc:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: "Qualified Tuition and Related Expenses (LLC)"
   description: "Qualified tuition and related expenses for Lifetime Learning Credit per 26 USC 25A(f)(1)(A)-(C)"
-  formula: |
+  from 2013-01-01:
     # Base: tuition and academic fees per (A)
     base_expenses = tuition_paid + academic_fees_paid
     # Nonacademic fees excluded per (C)
@@ -150,90 +150,17 @@ variable qualified_tuition_and_related_expenses_llc:
       return max(0, base_expenses - nonacademic_exclusion)
     # Not part of degree program - sports expenses excluded
     return max(0, base_expenses - sports_games_hobbies_expenses - nonacademic_exclusion)
-  tests:
-    - name: "Basic tuition only"
-      period: 2024-01
-      inputs:
-        tuition_paid: 10000
-        academic_fees_paid: 0
-        sports_games_hobbies_expenses: 0
-        sports_course_part_of_degree: False
-        student_activity_fees: 0
-        athletic_fees: 0
-        education_insurance_expenses: 0
-        other_nonacademic_expenses: 0
-      expect: 10000
-    - name: "Tuition plus academic fees"
-      period: 2024-01
-      inputs:
-        tuition_paid: 8000
-        academic_fees_paid: 500
-        sports_games_hobbies_expenses: 0
-        sports_course_part_of_degree: False
-        student_activity_fees: 0
-        athletic_fees: 0
-        education_insurance_expenses: 0
-        other_nonacademic_expenses: 0
-      expect: 8500
-    - name: "Sports course not part of degree - excluded"
-      period: 2024-01
-      inputs:
-        tuition_paid: 10000
-        academic_fees_paid: 0
-        sports_games_hobbies_expenses: 2000
-        sports_course_part_of_degree: False
-        student_activity_fees: 0
-        athletic_fees: 0
-        education_insurance_expenses: 0
-        other_nonacademic_expenses: 0
-      expect: 8000
-    - name: "Sports course part of degree - included"
-      period: 2024-01
-      inputs:
-        tuition_paid: 10000
-        academic_fees_paid: 0
-        sports_games_hobbies_expenses: 2000
-        sports_course_part_of_degree: True
-        student_activity_fees: 0
-        athletic_fees: 0
-        education_insurance_expenses: 0
-        other_nonacademic_expenses: 0
-      expect: 10000
-    - name: "Nonacademic fees excluded"
-      period: 2024-01
-      inputs:
-        tuition_paid: 10000
-        academic_fees_paid: 0
-        sports_games_hobbies_expenses: 0
-        sports_course_part_of_degree: False
-        student_activity_fees: 500
-        athletic_fees: 300
-        education_insurance_expenses: 200
-        other_nonacademic_expenses: 100
-      expect: 8900
-    - name: "Zero expenses"
-      period: 2024-01
-      inputs:
-        tuition_paid: 0
-        academic_fees_paid: 0
-        sports_games_hobbies_expenses: 0
-        sports_course_part_of_degree: False
-        student_activity_fees: 0
-        athletic_fees: 0
-        education_insurance_expenses: 0
-        other_nonacademic_expenses: 0
-      expect: 0
 
 # Variable: Qualified tuition and related expenses for AOTC
 # Per (D): Same as LLC but also includes course materials
-variable qualified_tuition_and_related_expenses_aotc:
+qualified_tuition_and_related_expenses_aotc:
   entity: Person
   period: Year
   dtype: Money
   unit: USD
   label: "Qualified Tuition and Related Expenses (AOTC)"
   description: "Qualified tuition and related expenses for American Opportunity Tax Credit per 26 USC 25A(f)(1)(A)-(D)"
-  formula: |
+  from 2013-01-01:
     # Per (D): For AOTC, include course materials in addition to tuition and fees
     base_expenses = tuition_paid + academic_fees_paid + course_materials_paid
     # Nonacademic fees excluded per (C)
@@ -244,82 +171,3 @@ variable qualified_tuition_and_related_expenses_aotc:
       return max(0, base_expenses - nonacademic_exclusion)
     # Not part of degree program - sports expenses excluded
     return max(0, base_expenses - sports_games_hobbies_expenses - nonacademic_exclusion)
-  tests:
-    - name: "Tuition plus course materials for AOTC"
-      period: 2024-01
-      inputs:
-        tuition_paid: 10000
-        academic_fees_paid: 0
-        course_materials_paid: 1500
-        sports_games_hobbies_expenses: 0
-        sports_course_part_of_degree: False
-        student_activity_fees: 0
-        athletic_fees: 0
-        education_insurance_expenses: 0
-        other_nonacademic_expenses: 0
-      expect: 11500
-    - name: "AOTC with all components"
-      period: 2024-01
-      inputs:
-        tuition_paid: 8000
-        academic_fees_paid: 500
-        course_materials_paid: 1000
-        sports_games_hobbies_expenses: 0
-        sports_course_part_of_degree: False
-        student_activity_fees: 0
-        athletic_fees: 0
-        education_insurance_expenses: 0
-        other_nonacademic_expenses: 0
-      expect: 9500
-    - name: "AOTC sports exclusion"
-      period: 2024-01
-      inputs:
-        tuition_paid: 10000
-        academic_fees_paid: 0
-        course_materials_paid: 500
-        sports_games_hobbies_expenses: 2000
-        sports_course_part_of_degree: False
-        student_activity_fees: 0
-        athletic_fees: 0
-        education_insurance_expenses: 0
-        other_nonacademic_expenses: 0
-      expect: 8500
-    - name: "AOTC sports course part of degree - included"
-      period: 2024-01
-      inputs:
-        tuition_paid: 10000
-        academic_fees_paid: 0
-        course_materials_paid: 500
-        sports_games_hobbies_expenses: 2000
-        sports_course_part_of_degree: True
-        student_activity_fees: 0
-        athletic_fees: 0
-        education_insurance_expenses: 0
-        other_nonacademic_expenses: 0
-      expect: 10500
-    - name: "AOTC with nonacademic exclusions"
-      period: 2024-01
-      inputs:
-        tuition_paid: 10000
-        academic_fees_paid: 0
-        course_materials_paid: 500
-        sports_games_hobbies_expenses: 0
-        sports_course_part_of_degree: False
-        student_activity_fees: 200
-        athletic_fees: 100
-        education_insurance_expenses: 0
-        other_nonacademic_expenses: 0
-      expect: 10200
-    - name: "Zero AOTC expenses"
-      period: 2024-01
-      inputs:
-        tuition_paid: 0
-        academic_fees_paid: 0
-        course_materials_paid: 0
-        sports_games_hobbies_expenses: 0
-        sports_course_part_of_degree: False
-        student_activity_fees: 0
-        athletic_fees: 0
-        education_insurance_expenses: 0
-        other_nonacademic_expenses: 0
-      expect: 0

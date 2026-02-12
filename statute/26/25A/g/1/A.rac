@@ -1,7 +1,7 @@
 # 26 USC 25A(g)(1)(A) - Social security number requirement
 # status: stub - created for import resolution from 26/25A/g/1
 
-text: """
+"""
 (A) Social security number requirement
 No credit shall be allowed under subsection (a) to an individual unless the
 individual includes on the return of tax for the taxable year—
@@ -15,7 +15,7 @@ name and social security number of such individual.
 # For credits claimed on behalf of others (non-spouse students), student's name and SSN also required
 # SSN definition in subparagraph (C) cross-references 26 USC 24(h)(7)
 
-input taxpayer_has_valid_ssn:
+taxpayer_has_valid_ssn:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -23,7 +23,7 @@ input taxpayer_has_valid_ssn:
   description: "Whether taxpayer has a valid SSN per 26 USC 25A(g)(1)(A)(i)"
   default: True
 
-input student_ssn_provided:
+student_ssn_provided:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -31,7 +31,7 @@ input student_ssn_provided:
   description: "Whether student's name and SSN are provided when required per 26 USC 25A(g)(1)(A)(ii)"
   default: True
 
-input claiming_for_non_spouse_dependent:
+claiming_for_non_spouse_dependent:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -39,13 +39,13 @@ input claiming_for_non_spouse_dependent:
   description: "Whether credit is claimed for individual other than taxpayer or taxpayer's spouse"
   default: False
 
-variable ssn_requirement_met:
+ssn_requirement_met:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "SSN Requirement Met"
   description: "Whether SSN requirements of 26 USC 25A(g)(1)(A) are satisfied"
-  formula: |
+  from 2013-01-01:
     # Per (i): Taxpayer must include their SSN
     if not taxpayer_has_valid_ssn:
       return False
@@ -53,32 +53,3 @@ variable ssn_requirement_met:
     if claiming_for_non_spouse_dependent and not student_ssn_provided:
       return False
     return True
-  tests:
-    - name: "Taxpayer has valid SSN, not claiming for dependent"
-      period: 2024-01
-      inputs:
-        taxpayer_has_valid_ssn: True
-        student_ssn_provided: False
-        claiming_for_non_spouse_dependent: False
-      expect: True
-    - name: "Claiming for dependent, student SSN provided"
-      period: 2024-01
-      inputs:
-        taxpayer_has_valid_ssn: True
-        student_ssn_provided: True
-        claiming_for_non_spouse_dependent: True
-      expect: True
-    - name: "Claiming for dependent, student SSN missing"
-      period: 2024-01
-      inputs:
-        taxpayer_has_valid_ssn: True
-        student_ssn_provided: False
-        claiming_for_non_spouse_dependent: True
-      expect: False
-    - name: "Taxpayer SSN invalid"
-      period: 2024-01
-      inputs:
-        taxpayer_has_valid_ssn: False
-        student_ssn_provided: True
-        claiming_for_non_spouse_dependent: False
-      expect: False

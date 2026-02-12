@@ -1,6 +1,6 @@
 # 26 USC 25A(g)(1) - Identification requirement
 
-text: """
+"""
 (1) Identification requirement
 (A) Social security number requirement
 No credit shall be allowed under subsection (a) to an individual unless the
@@ -29,7 +29,7 @@ meaning given such term in section 24(h)(7).
 # The subsection is split into: g/1/A.rac, g/1/B.rac, g/1/C.rac for detailed encoding.
 # This file provides the aggregate eligibility determination.
 
-input claiming_aotc:
+claiming_aotc:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -37,7 +37,7 @@ input claiming_aotc:
   description: "Whether taxpayer is claiming American Opportunity Tax Credit per 26 USC 25A(a)(1)"
   default: False
 
-variable sec_25A_identification_requirement_met:
+sec_25A_identification_requirement_met:
   imports:
     - 26/25A/g/1/A#ssn_requirement_met
     - 26/25A/g/1/B#institution_ein_requirement_met
@@ -46,7 +46,7 @@ variable sec_25A_identification_requirement_met:
   dtype: Boolean
   label: "Section 25A Identification Requirement Met"
   description: "Whether identification requirements of 26 USC 25A(g)(1) are satisfied for education credit"
-  formula: |
+  from 2013-01-01:
     # Per (A): SSN requirement must be met for any credit under subsection (a)
     if not ssn_requirement_met:
       return False
@@ -54,39 +54,3 @@ variable sec_25A_identification_requirement_met:
     if claiming_aotc and not institution_ein_requirement_met:
       return False
     return True
-  tests:
-    - name: "SSN requirement met, not claiming AOTC"
-      period: 2024-01
-      inputs:
-        ssn_requirement_met: True
-        institution_ein_requirement_met: False
-        claiming_aotc: False
-      expect: True
-    - name: "SSN requirement met, claiming AOTC with EIN"
-      period: 2024-01
-      inputs:
-        ssn_requirement_met: True
-        institution_ein_requirement_met: True
-        claiming_aotc: True
-      expect: True
-    - name: "SSN requirement met, claiming AOTC without EIN"
-      period: 2024-01
-      inputs:
-        ssn_requirement_met: True
-        institution_ein_requirement_met: False
-        claiming_aotc: True
-      expect: False
-    - name: "SSN requirement not met"
-      period: 2024-01
-      inputs:
-        ssn_requirement_met: False
-        institution_ein_requirement_met: True
-        claiming_aotc: True
-      expect: False
-    - name: "All requirements met"
-      period: 2024-01
-      inputs:
-        ssn_requirement_met: True
-        institution_ein_requirement_met: True
-        claiming_aotc: True
-      expect: True

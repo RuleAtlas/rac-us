@@ -1,6 +1,6 @@
 # 26 USC 24(f) - Taxable year must be full taxable year
 
-text: """
+"""
 (f) Taxable year must be full taxable year
 Except in the case of a taxable year closed by reason of the death of the taxpayer,
 no credit shall be allowable under this section in the case of a taxable year
@@ -8,54 +8,34 @@ covering a period of less than 12 months.
 """
 
 # Minimum months for full taxable year
-parameter ctc_min_tax_year_months:
+ctc_min_tax_year_months:
   description: "Minimum months for full taxable year per 26 USC 24(f)"
   unit: months
-  values:
-    1998-01-01: 12
+  from 1998-01-01: 12
 
-input tax_year_months:
+tax_year_months:
   entity: TaxUnit
   period: Year
   dtype: Integer
   label: "Tax Year Months"
   description: "Number of months in taxable year"
 
-input taxpayer_deceased:
+taxpayer_deceased:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "Taxpayer Deceased"
   description: "Whether taxable year closed due to taxpayer death"
 
-variable ctc_meets_full_year_requirement:
+ctc_meets_full_year_requirement:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "CTC Meets Full Year Requirement"
   description: "Whether taxpayer meets full taxable year requirement per 26 USC 24(f)"
-  formula: |
+  from 1998-01-01:
     # Exception for death
     if taxpayer_deceased:
       return True
     # Otherwise must be full 12-month year
     return tax_year_months >= ctc_min_tax_year_months
-  tests:
-    - name: "Full 12-month year"
-      period: 2024-01
-      inputs:
-        tax_year_months: 12
-        taxpayer_deceased: false
-      expect: true
-    - name: "Short year, not deceased"
-      period: 2024-01
-      inputs:
-        tax_year_months: 6
-        taxpayer_deceased: false
-      expect: false
-    - name: "Short year due to death"
-      period: 2024-01
-      inputs:
-        tax_year_months: 6
-        taxpayer_deceased: true
-      expect: true

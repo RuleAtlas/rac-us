@@ -1,0 +1,36 @@
+sec_25A_identification_requirement_met:
+  - name: "SSN requirement met, not claiming AOTC"
+    period: 2024-01
+    inputs:
+      ssn_requirement_met: True
+      institution_ein_requirement_met: False
+      claiming_aotc: False
+    expect: True
+  - name: "SSN requirement met, claiming AOTC with EIN"
+    period: 2024-01
+    inputs:
+      ssn_requirement_met: True
+      institution_ein_requirement_met: True
+      claiming_aotc: True
+    expect: True
+  - name: "SSN requirement met, claiming AOTC without EIN"
+    period: 2024-01
+    inputs:
+      ssn_requirement_met: True
+      institution_ein_requirement_met: False
+      claiming_aotc: True
+    expect: False
+  - name: "SSN requirement not met"
+    period: 2024-01
+    inputs:
+      ssn_requirement_met: False
+      institution_ein_requirement_met: True
+      claiming_aotc: True
+    expect: False
+  - name: "All requirements met"
+    period: 2024-01
+    inputs:
+      ssn_requirement_met: True
+      institution_ein_requirement_met: True
+      claiming_aotc: True
+    expect: True

@@ -1,6 +1,6 @@
 # 26 USC 25A(e) - Election not to have section apply
 
-text: """
+"""
 (e) Election not to have section apply
 A taxpayer may elect not to have this section apply with respect to the qualified
 tuition and related expenses of an individual for any taxable year.
@@ -12,7 +12,7 @@ tuition and related expenses of an individual for any taxable year.
 # when claiming the deduction for higher education expenses (when available)
 # or other tax provisions would result in greater tax savings.
 
-input section_25a_election_not_to_apply:
+section_25a_election_not_to_apply:
   entity: Person
   period: Year
   dtype: Boolean
@@ -20,22 +20,11 @@ input section_25a_election_not_to_apply:
   description: "Whether taxpayer has elected not to have section 25A apply to this individual's qualified expenses per 26 USC 25A(e)"
   default: False
 
-variable education_credit_25a_elected_out:
+education_credit_25a_elected_out:
   entity: Person
   period: Year
   dtype: Boolean
   label: "Education Credit Section 25A Elected Out"
   description: "Whether taxpayer has made the election under 26 USC 25A(e) not to have section 25A apply for this individual"
-  formula: |
+  from 2013-01-01:
     return section_25a_election_not_to_apply
-  tests:
-    - name: "No election - section 25A applies"
-      period: 2024-01
-      inputs:
-        section_25a_election_not_to_apply: False
-      expect: False
-    - name: "Election made - section 25A does not apply"
-      period: 2024-01
-      inputs:
-        section_25a_election_not_to_apply: True
-      expect: True

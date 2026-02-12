@@ -1,0 +1,21 @@
+ptc_family_size:
+  - name: "Single filer, no dependents"
+    period: 2024-01
+    inputs:
+      section_151_deduction_count: 1
+    expect: 1
+  - name: "Married couple, two dependents"
+    period: 2024-01
+    inputs:
+      section_151_deduction_count: 4
+    expect: 4
+  - name: "Single parent, one child"
+    period: 2024-01
+    inputs:
+      section_151_deduction_count: 2
+    expect: 2
+  - name: "Single filer, no deductions (edge case)"
+    period: 2024-01
+    inputs:
+      section_151_deduction_count: 0
+    expect: 0

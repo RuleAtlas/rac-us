@@ -1,6 +1,6 @@
 # 26 USC 1(j)(2) - Rate tables
 
-text: """
+"""
 (2) Rate tables
 [Subparagraphs (A) through (F) provide tax rate tables for different filing statuses
 that apply in lieu of the tables in subsections (a) through (e) for taxable years
@@ -22,14 +22,14 @@ enum FilingStatus:
     - HEAD_OF_HOUSEHOLD
     - SURVIVING_SPOUSE
 
-input filing_status:
+filing_status:
   entity: TaxUnit
   period: Year
   dtype: Enum[FilingStatus]
   label: "Filing Status"
   description: "Tax filing status per 26 USC 1"
 
-variable tcja_income_tax:
+tcja_income_tax:
   imports:
     - 26/1/j/2/A#joint_income_tax
     - 26/1/j/2/B#hoh_income_tax
@@ -42,7 +42,7 @@ variable tcja_income_tax:
   unit: "USD"
   label: "TCJA Income Tax"
   description: "Income tax per 26 USC 1(j)(2) rate tables based on filing status"
-  formula: |
+  from 2013-01-01:
     # Select tax calculation based on filing status
     if filing_status == "JOINT":
       return joint_income_tax

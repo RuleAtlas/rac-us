@@ -1,4 +1,4 @@
-text: """
+"""
 (f) Reconciliation of credit and advance credit
 (1) In general
 The amount of the credit allowed under this section for any taxable year
@@ -44,7 +44,7 @@ advance payments.
 # Input: Advance payments received under ACA section 1412
 # =============================================================================
 
-input ptc_advance_payments:
+ptc_advance_payments:
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -56,7 +56,7 @@ input ptc_advance_payments:
 # (f)(1) - Credit after reduction for advance payments
 # =============================================================================
 
-variable ptc_after_advance_reconciliation:
+ptc_after_advance_reconciliation:
   imports:
     - 26/36B/a#ptc_premium_tax_credit
   entity: TaxUnit
@@ -65,54 +65,17 @@ variable ptc_after_advance_reconciliation:
   unit: USD
   label: "PTC After Advance Reconciliation"
   description: "Premium tax credit reduced by advance payments per 26 USC 36B(f)(1)"
-  formula: |
+  from 2013-01-01:
     # (f)(1): "The amount of the credit allowed under this section for any
     # taxable year shall be reduced (but not below zero) by the amount of any
     # advance payment of such credit under section 1412"
     return max(0, ptc_premium_tax_credit - ptc_advance_payments)
-  tests:
-    - name: "No advance payments"
-      period: 2024-01
-      inputs:
-        ptc_premium_tax_credit: 5400
-        ptc_advance_payments: 0
-      expect: 5400
-    - name: "Partial advance payments"
-      period: 2024-01
-      inputs:
-        ptc_premium_tax_credit: 5400
-        ptc_advance_payments: 3000
-      expect: 2400
-    - name: "Advance equals credit"
-      period: 2024-01
-      inputs:
-        ptc_premium_tax_credit: 5400
-        ptc_advance_payments: 5400
-      expect: 0
-    - name: "Advance exceeds credit - floor at zero"
-      period: 2024-01
-      inputs:
-        ptc_premium_tax_credit: 4000
-        ptc_advance_payments: 6000
-      expect: 0
-    - name: "Zero credit with advance payments"
-      period: 2024-01
-      inputs:
-        ptc_premium_tax_credit: 0
-        ptc_advance_payments: 3000
-      expect: 0
-    - name: "Zero credit and zero advance"
-      period: 2024-01
-      inputs:
-        ptc_premium_tax_credit: 0
-        ptc_advance_payments: 0
-      expect: 0
 
 # =============================================================================
 # (f)(2) - Tax increase for excess advance payments
 # =============================================================================
 
-variable ptc_excess_advance_repayment:
+ptc_excess_advance_repayment:
   imports:
     - 26/36B/a#ptc_premium_tax_credit
   entity: TaxUnit
@@ -121,7 +84,7 @@ variable ptc_excess_advance_repayment:
   unit: USD
   label: "PTC Excess Advance Repayment"
   description: "Tax increase due to excess advance PTC payments per 26 USC 36B(f)(2)"
-  formula: |
+  from 2013-01-01:
     # (f)(2): "If the advance payments...exceed the credit allowed by this
     # section (determined without regard to paragraph (1)), the tax imposed
     # by this chapter...shall be increased by the amount of such excess."
@@ -129,40 +92,3 @@ variable ptc_excess_advance_repayment:
     # "determined without regard to paragraph (1)" means we compare advance
     # payments to the full credit amount before the (f)(1) reduction.
     return max(0, ptc_advance_payments - ptc_premium_tax_credit)
-  tests:
-    - name: "No excess - advance below credit"
-      period: 2024-01
-      inputs:
-        ptc_advance_payments: 3000
-        ptc_premium_tax_credit: 5400
-      expect: 0
-    - name: "No excess - advance equals credit"
-      period: 2024-01
-      inputs:
-        ptc_advance_payments: 5400
-        ptc_premium_tax_credit: 5400
-      expect: 0
-    - name: "Excess advance payments"
-      period: 2024-01
-      inputs:
-        ptc_advance_payments: 7000
-        ptc_premium_tax_credit: 5400
-      expect: 1600
-    - name: "All advance with zero credit"
-      period: 2024-01
-      inputs:
-        ptc_advance_payments: 3000
-        ptc_premium_tax_credit: 0
-      expect: 3000
-    - name: "No advance no credit"
-      period: 2024-01
-      inputs:
-        ptc_advance_payments: 0
-        ptc_premium_tax_credit: 0
-      expect: 0
-    - name: "Large excess"
-      period: 2024-01
-      inputs:
-        ptc_advance_payments: 18000
-        ptc_premium_tax_credit: 5400
-      expect: 12600

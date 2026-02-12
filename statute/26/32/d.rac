@@ -1,6 +1,6 @@
 # 26 USC 32(d) - Married individuals
 
-text: """
+"""
 (d) Married individuals
 In the case of an individual who is married (within the meaning of section 7703),
 this section shall apply only if a joint return is filed for the taxable year
@@ -10,7 +10,7 @@ under section 6013.
 # This subsection establishes a bright-line rule: married individuals must file
 # a joint return to claim EITC. Married filing separately (MFS) is disqualified.
 
-input is_married:
+is_married:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -18,7 +18,7 @@ input is_married:
   description: "Whether the individual is married within the meaning of section 7703"
   default: false
 
-input files_joint_return:
+files_joint_return:
   entity: TaxUnit
   period: Year
   dtype: Boolean
@@ -26,34 +26,15 @@ input files_joint_return:
   description: "Whether a joint return is filed under section 6013"
   default: false
 
-variable eitc_eligible_under_32d:
+eitc_eligible_under_32d:
   entity: TaxUnit
   period: Year
   dtype: Boolean
   label: "EITC eligible under 32(d)"
   description: "Whether eligible for EITC under the married individuals rule of 26 USC 32(d)"
-  formula: |
+  from 2013-01-01:
     # If not married, this rule does not disqualify
     if not is_married:
       return true
     # If married, must file joint return
     return files_joint_return
-  tests:
-    - name: "Single individual - eligible"
-      period: 2024-01
-      inputs:
-        is_married: false
-        files_joint_return: false
-      expect: true
-    - name: "Married filing jointly - eligible"
-      period: 2024-01
-      inputs:
-        is_married: true
-        files_joint_return: true
-      expect: true
-    - name: "Married filing separately - ineligible"
-      period: 2024-01
-      inputs:
-        is_married: true
-        files_joint_return: false
-      expect: false
