@@ -2,18 +2,18 @@ eitc_eligible_under_32d:
   - name: "Single individual - eligible"
     period: 2024-01
     inputs:
-      is_married: false
-      files_joint_return: false
-    expect: true
+        is_married: 0
+        files_joint_return: 0
+    expect: 1
   - name: "Married filing jointly - eligible"
     period: 2024-01
     inputs:
-      is_married: true
-      files_joint_return: true
-    expect: true
+        is_married: 1
+        files_joint_return: 1
+    expect: 1
   - name: "Married filing separately - ineligible"
     period: 2024-01
     inputs:
-      is_married: true
-      files_joint_return: false
-    expect: false
+        is_married: 1
+        files_joint_return: 0
+    expect: 0

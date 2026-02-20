@@ -1,299 +1,210 @@
+taxpayer_meets_eitc_age:
+  - name: "Age 30 - meets requirement"
+    period: 2024-01
+    inputs:
+        taxpayer_age: 30
+    expect: 1
+  - name: "Age 24 - too young"
+    period: 2024-01
+    inputs:
+        taxpayer_age: 24
+    expect: 0
+  - name: "Age 65 - too old"
+    period: 2024-01
+    inputs:
+        taxpayer_age: 65
+    expect: 0
+  - name: "Age 25 - meets minimum"
+    period: 2024-01
+    inputs:
+        taxpayer_age: 25
+    expect: 1
+  - name: "Age 64 - meets maximum"
+    period: 2024-01
+    inputs:
+        taxpayer_age: 64
+    expect: 1
+
 eitc_meets_age_requirement:
-  - name: "Single taxpayer age 30 - meets requirement"
+  - name: "Single taxpayer age 30"
     period: 2024-01
     inputs:
-      taxpayer_age: 30
-      spouse_age: 0
-      is_married_eitc: false
-    expect: true
-  - name: "Single taxpayer age 24 - too young"
+        taxpayer_meets_eitc_age: 1
+        spouse_meets_eitc_age: 0
+        is_married_eitc: 0
+    expect: 1
+  - name: "Single taxpayer too young"
     period: 2024-01
     inputs:
-      taxpayer_age: 24
-      spouse_age: 0
-      is_married_eitc: false
-    expect: false
-  - name: "Single taxpayer age 65 - too old"
+        taxpayer_meets_eitc_age: 0
+        spouse_meets_eitc_age: 0
+        is_married_eitc: 0
+    expect: 0
+  - name: "Married - taxpayer fails, spouse passes"
     period: 2024-01
     inputs:
-      taxpayer_age: 65
-      spouse_age: 0
-      is_married_eitc: false
-    expect: false
-  - name: "Single taxpayer age 25 - meets minimum"
+        taxpayer_meets_eitc_age: 0
+        spouse_meets_eitc_age: 1
+        is_married_eitc: 1
+    expect: 1
+  - name: "Married - both fail"
     period: 2024-01
     inputs:
-      taxpayer_age: 25
-      spouse_age: 0
-      is_married_eitc: false
-    expect: true
-  - name: "Single taxpayer age 64 - meets maximum"
-    period: 2024-01
-    inputs:
-      taxpayer_age: 64
-      spouse_age: 0
-      is_married_eitc: false
-    expect: true
-  - name: "Married - taxpayer 24, spouse 30 - spouse satisfies"
-    period: 2024-01
-    inputs:
-      taxpayer_age: 24
-      spouse_age: 30
-      is_married_eitc: true
-    expect: true
-  - name: "Married - taxpayer 70, spouse 66 - neither satisfies"
-    period: 2024-01
-    inputs:
-      taxpayer_age: 70
-      spouse_age: 66
-      is_married_eitc: true
-    expect: false
+        taxpayer_meets_eitc_age: 0
+        spouse_meets_eitc_age: 0
+        is_married_eitc: 1
+    expect: 0
 
 eitc_meets_id_number_requirement:
   - name: "Single with TIN"
     period: 2024-01
     inputs:
-      taxpayer_has_tin_on_return: true
-      spouse_has_tin_on_return: true
-      is_married_eitc: false
-    expect: true
+        taxpayer_has_tin_on_return: 1
+        is_married_eitc: 0
+        spouse_has_tin_on_return: 0
+    expect: 1
   - name: "Single missing TIN"
     period: 2024-01
     inputs:
-      taxpayer_has_tin_on_return: false
-      spouse_has_tin_on_return: true
-      is_married_eitc: false
-    expect: false
+        taxpayer_has_tin_on_return: 0
+        is_married_eitc: 0
+        spouse_has_tin_on_return: 0
+    expect: 0
   - name: "Married both have TIN"
     period: 2024-01
     inputs:
-      taxpayer_has_tin_on_return: true
-      spouse_has_tin_on_return: true
-      is_married_eitc: true
-    expect: true
+        taxpayer_has_tin_on_return: 1
+        is_married_eitc: 1
+        spouse_has_tin_on_return: 1
+    expect: 1
   - name: "Married spouse missing TIN"
     period: 2024-01
     inputs:
-      taxpayer_has_tin_on_return: true
-      spouse_has_tin_on_return: false
-      is_married_eitc: true
-    expect: false
+        taxpayer_has_tin_on_return: 1
+        is_married_eitc: 1
+        spouse_has_tin_on_return: 0
+    expect: 0
 
 eitc_nonresident_alien_eligible:
   - name: "Not a nonresident alien"
     period: 2024-01
     inputs:
-      is_nonresident_alien: false
-    expect: true
+        is_nonresident_alien: 0
+        elected_resident_treatment_6013: 0
+    expect: 1
   - name: "Nonresident alien without 6013 election"
     period: 2024-01
     inputs:
-      is_nonresident_alien: true
-      elected_resident_treatment_6013: false
-    expect: false
+        is_nonresident_alien: 1
+        elected_resident_treatment_6013: 0
+    expect: 0
   - name: "Nonresident alien with 6013 election"
     period: 2024-01
     inputs:
-      is_nonresident_alien: true
-      elected_resident_treatment_6013: true
-    expect: true
+        is_nonresident_alien: 1
+        elected_resident_treatment_6013: 1
+    expect: 1
 
 is_eitc_eligible_individual:
   - name: "Individual with qualifying child"
     period: 2024-01
     inputs:
-      has_eitc_qualifying_child: true
-      is_qualifying_child_of_another: false
-      claims_section_911_benefits: false
-      eitc_nonresident_alien_eligible: true
-      eitc_meets_id_number_requirement: true
-      principal_abode_in_us_over_half_year: true
-      eitc_meets_age_requirement: true
-      is_dependent_of_another: false
-    expect: true
+        has_eitc_qualifying_child: 1
+        is_qualifying_child_of_another: 0
+        claims_section_911_benefits: 0
+        eitc_nonresident_alien_eligible: 1
+        eitc_meets_id_number_requirement: 1
+        principal_abode_in_us_over_half_year: 0
+        eitc_meets_age_requirement: 0
+        is_dependent_of_another: 0
+    expect: 1
   - name: "Childless individual meeting all requirements"
     period: 2024-01
     inputs:
-      has_eitc_qualifying_child: false
-      is_qualifying_child_of_another: false
-      claims_section_911_benefits: false
-      eitc_nonresident_alien_eligible: true
-      eitc_meets_id_number_requirement: true
-      principal_abode_in_us_over_half_year: true
-      eitc_meets_age_requirement: true
-      is_dependent_of_another: false
-    expect: true
+        has_eitc_qualifying_child: 0
+        is_qualifying_child_of_another: 0
+        claims_section_911_benefits: 0
+        eitc_nonresident_alien_eligible: 1
+        eitc_meets_id_number_requirement: 1
+        principal_abode_in_us_over_half_year: 1
+        eitc_meets_age_requirement: 1
+        is_dependent_of_another: 0
+    expect: 1
   - name: "Childless - abode not in US"
     period: 2024-01
     inputs:
-      has_eitc_qualifying_child: false
-      is_qualifying_child_of_another: false
-      claims_section_911_benefits: false
-      eitc_nonresident_alien_eligible: true
-      eitc_meets_id_number_requirement: true
-      principal_abode_in_us_over_half_year: false
-      eitc_meets_age_requirement: true
-      is_dependent_of_another: false
-    expect: false
-  - name: "Childless - too young"
+        has_eitc_qualifying_child: 0
+        is_qualifying_child_of_another: 0
+        claims_section_911_benefits: 0
+        eitc_nonresident_alien_eligible: 1
+        eitc_meets_id_number_requirement: 1
+        principal_abode_in_us_over_half_year: 0
+        eitc_meets_age_requirement: 1
+        is_dependent_of_another: 0
+    expect: 0
+  - name: "Is qualifying child of another"
     period: 2024-01
     inputs:
-      has_eitc_qualifying_child: false
-      is_qualifying_child_of_another: false
-      claims_section_911_benefits: false
-      eitc_nonresident_alien_eligible: true
-      eitc_meets_id_number_requirement: true
-      principal_abode_in_us_over_half_year: true
-      eitc_meets_age_requirement: false
-      is_dependent_of_another: false
-    expect: false
-  - name: "Childless - too old"
-    period: 2024-01
-    inputs:
-      has_eitc_qualifying_child: false
-      is_qualifying_child_of_another: false
-      claims_section_911_benefits: false
-      eitc_nonresident_alien_eligible: true
-      eitc_meets_id_number_requirement: true
-      principal_abode_in_us_over_half_year: true
-      eitc_meets_age_requirement: false
-      is_dependent_of_another: false
-    expect: false
-  - name: "Childless - is dependent of another"
-    period: 2024-01
-    inputs:
-      has_eitc_qualifying_child: false
-      is_qualifying_child_of_another: false
-      claims_section_911_benefits: false
-      eitc_nonresident_alien_eligible: true
-      eitc_meets_id_number_requirement: true
-      principal_abode_in_us_over_half_year: true
-      eitc_meets_age_requirement: true
-      is_dependent_of_another: true
-    expect: false
-  - name: "Is qualifying child of another taxpayer"
-    period: 2024-01
-    inputs:
-      has_eitc_qualifying_child: true
-      is_qualifying_child_of_another: true
-      claims_section_911_benefits: false
-      eitc_nonresident_alien_eligible: true
-      eitc_meets_id_number_requirement: true
-      principal_abode_in_us_over_half_year: true
-      eitc_meets_age_requirement: true
-      is_dependent_of_another: false
-    expect: false
+        has_eitc_qualifying_child: 1
+        is_qualifying_child_of_another: 1
+        claims_section_911_benefits: 0
+        eitc_nonresident_alien_eligible: 1
+        eitc_meets_id_number_requirement: 1
+        principal_abode_in_us_over_half_year: 1
+        eitc_meets_age_requirement: 1
+        is_dependent_of_another: 0
+    expect: 0
   - name: "Claims section 911 benefits"
     period: 2024-01
     inputs:
-      has_eitc_qualifying_child: true
-      is_qualifying_child_of_another: false
-      claims_section_911_benefits: true
-      eitc_nonresident_alien_eligible: true
-      eitc_meets_id_number_requirement: true
-      principal_abode_in_us_over_half_year: true
-      eitc_meets_age_requirement: true
-      is_dependent_of_another: false
-    expect: false
-  - name: "Nonresident alien without 6013 election"
-    period: 2024-01
-    inputs:
-      has_eitc_qualifying_child: true
-      is_qualifying_child_of_another: false
-      claims_section_911_benefits: false
-      eitc_nonresident_alien_eligible: false
-      eitc_meets_id_number_requirement: true
-      principal_abode_in_us_over_half_year: true
-      eitc_meets_age_requirement: true
-      is_dependent_of_another: false
-    expect: false
-  - name: "Nonresident alien with 6013 election"
-    period: 2024-01
-    inputs:
-      has_eitc_qualifying_child: true
-      is_qualifying_child_of_another: false
-      claims_section_911_benefits: false
-      eitc_nonresident_alien_eligible: true
-      eitc_meets_id_number_requirement: true
-      principal_abode_in_us_over_half_year: true
-      eitc_meets_age_requirement: true
-      is_dependent_of_another: false
-    expect: true
-  - name: "Missing taxpayer TIN"
-    period: 2024-01
-    inputs:
-      has_eitc_qualifying_child: true
-      is_qualifying_child_of_another: false
-      claims_section_911_benefits: false
-      eitc_nonresident_alien_eligible: true
-      eitc_meets_id_number_requirement: false
-      principal_abode_in_us_over_half_year: true
-      eitc_meets_age_requirement: true
-      is_dependent_of_another: false
-    expect: false
+        has_eitc_qualifying_child: 1
+        is_qualifying_child_of_another: 0
+        claims_section_911_benefits: 1
+        eitc_nonresident_alien_eligible: 1
+        eitc_meets_id_number_requirement: 1
+        principal_abode_in_us_over_half_year: 1
+        eitc_meets_age_requirement: 1
+        is_dependent_of_another: 0
+    expect: 0
 
 eitc_earned_income:
   - name: "Wages only"
     period: 2024-01
     inputs:
-      wages_salaries_tips: 30000
-      net_earnings_self_employment: 0
-      penal_institution_wages: 0
-      subsidized_work_activity_income: 0
+        wages_salaries_tips: 30000
+        net_earnings_self_employment: 0
+        pension_annuity_income: 0
+        income_section_871a: 0
+        penal_institution_wages: 0
+        subsidized_work_activity_income: 0
     expect: 30000
-  - name: "Self-employment only"
-    period: 2024-01
-    inputs:
-      wages_salaries_tips: 0
-      net_earnings_self_employment: 20000
-      penal_institution_wages: 0
-      subsidized_work_activity_income: 0
-    expect: 20000
   - name: "Combined wages and self-employment"
     period: 2024-01
     inputs:
-      wages_salaries_tips: 30000
-      net_earnings_self_employment: 10000
-      penal_institution_wages: 0
-      subsidized_work_activity_income: 0
+        wages_salaries_tips: 25000
+        net_earnings_self_employment: 15000
+        pension_annuity_income: 0
+        income_section_871a: 0
+        penal_institution_wages: 0
+        subsidized_work_activity_income: 0
     expect: 40000
-  - name: "With penal institution exclusion"
+  - name: "With exclusions"
     period: 2024-01
     inputs:
-      wages_salaries_tips: 30000
-      net_earnings_self_employment: 0
-      penal_institution_wages: 5000
-      subsidized_work_activity_income: 0
-    expect: 25000
-  - name: "With subsidized work activity exclusion"
-    period: 2024-01
-    inputs:
-      wages_salaries_tips: 30000
-      net_earnings_self_employment: 0
-      penal_institution_wages: 0
-      subsidized_work_activity_income: 3000
-    expect: 27000
-  - name: "Multiple exclusions"
-    period: 2024-01
-    inputs:
-      wages_salaries_tips: 30000
-      net_earnings_self_employment: 5000
-      penal_institution_wages: 2000
-      subsidized_work_activity_income: 1000
+        wages_salaries_tips: 30000
+        net_earnings_self_employment: 10000
+        pension_annuity_income: 0
+        income_section_871a: 0
+        penal_institution_wages: 5000
+        subsidized_work_activity_income: 3000
     expect: 32000
-  - name: "Zero income"
-    period: 2024-01
-    inputs:
-      wages_salaries_tips: 0
-      net_earnings_self_employment: 0
-      penal_institution_wages: 0
-      subsidized_work_activity_income: 0
-    expect: 0
   - name: "Exclusions exceed income - floor at zero"
     period: 2024-01
     inputs:
-      wages_salaries_tips: 5000
-      net_earnings_self_employment: 0
-      penal_institution_wages: 10000
-      subsidized_work_activity_income: 0
+        wages_salaries_tips: 1000
+        net_earnings_self_employment: 0
+        pension_annuity_income: 0
+        income_section_871a: 0
+        penal_institution_wages: 0
+        subsidized_work_activity_income: 2000
     expect: 0

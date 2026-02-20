@@ -2,90 +2,73 @@ eitc_ssn_valid_for_work:
   - name: "Valid work-authorized SSN"
     period: 2024-01
     inputs:
-      eitc_taxpayer_has_work_authorized_ssn: true
-      eitc_ssn_previously_disqualified: false
-    expect: true
-  - name: "SSN not work-authorized (ITIN)"
+        eitc_taxpayer_has_work_authorized_ssn: 1
+        eitc_ssn_previously_disqualified: 0
+    expect: 1
+  - name: "SSN not work-authorized"
     period: 2024-01
     inputs:
-      eitc_taxpayer_has_work_authorized_ssn: false
-      eitc_ssn_previously_disqualified: false
-    expect: false
+        eitc_taxpayer_has_work_authorized_ssn: 0
+        eitc_ssn_previously_disqualified: 0
+    expect: 0
   - name: "Previously disqualified SSN"
     period: 2024-01
     inputs:
-      eitc_taxpayer_has_work_authorized_ssn: true
-      eitc_ssn_previously_disqualified: true
-    expect: false
+        eitc_taxpayer_has_work_authorized_ssn: 1
+        eitc_ssn_previously_disqualified: 1
+    expect: 0
 
 eitc_child_id_requirement_met:
   - name: "Child has valid TIN"
     period: 2024-01
     inputs:
-      qualifying_child_has_valid_tin: true
-    expect: true
-  - name: "Child TIN issued late"
+        qualifying_child_has_valid_tin: 1
+    expect: 1
+  - name: "Child missing TIN"
     period: 2024-01
     inputs:
-      qualifying_child_has_valid_tin: false
-    expect: false
+        qualifying_child_has_valid_tin: 0
+    expect: 0
 
 eitc_childless_id_requirement_met:
   - name: "Has TIN and work-authorized SSN"
     period: 2024-01
     inputs:
-      eitc_taxpayer_has_tin: true
-      eitc_taxpayer_has_work_authorized_ssn: true
-      eitc_ssn_previously_disqualified: false
-    expect: true
+        eitc_taxpayer_has_tin: 1
+        eitc_ssn_valid_for_work: 1
+    expect: 1
   - name: "Missing TIN"
     period: 2024-01
     inputs:
-      eitc_taxpayer_has_tin: false
-      eitc_taxpayer_has_work_authorized_ssn: true
-      eitc_ssn_previously_disqualified: false
-    expect: false
+        eitc_taxpayer_has_tin: 0
+        eitc_ssn_valid_for_work: 1
+    expect: 0
   - name: "Has TIN but no work-authorized SSN"
     period: 2024-01
     inputs:
-      eitc_taxpayer_has_tin: true
-      eitc_taxpayer_has_work_authorized_ssn: false
-      eitc_ssn_previously_disqualified: false
-    expect: false
-  - name: "Previously disqualified"
-    period: 2024-01
-    inputs:
-      eitc_taxpayer_has_tin: true
-      eitc_taxpayer_has_work_authorized_ssn: true
-      eitc_ssn_previously_disqualified: true
-    expect: false
+        eitc_taxpayer_has_tin: 1
+        eitc_ssn_valid_for_work: 0
+    expect: 0
 
 eitc_id_requirements_met:
-  - name: "Taxpayer with children meets requirements"
+  - name: "With qualifying children - TIN present"
     period: 2024-01
     inputs:
-      has_qualifying_child_for_eitc: true
-      eitc_taxpayer_has_tin: true
-    expect: true
-  - name: "Taxpayer with children missing TIN"
+        has_qualifying_child_for_eitc: 1
+        eitc_child_id_requirement_met: 1
+        eitc_childless_id_requirement_met: 0
+    expect: 1
+  - name: "Childless - meets requirements"
     period: 2024-01
     inputs:
-      has_qualifying_child_for_eitc: true
-      eitc_taxpayer_has_tin: false
-    expect: false
-  - name: "Childless taxpayer with valid TIN and SSN"
+        has_qualifying_child_for_eitc: 0
+        eitc_child_id_requirement_met: 0
+        eitc_childless_id_requirement_met: 1
+    expect: 1
+  - name: "Childless - missing requirements"
     period: 2024-01
     inputs:
-      has_qualifying_child_for_eitc: false
-      eitc_taxpayer_has_tin: true
-      eitc_taxpayer_has_work_authorized_ssn: true
-      eitc_ssn_previously_disqualified: false
-    expect: true
-  - name: "Childless taxpayer without work-authorized SSN"
-    period: 2024-01
-    inputs:
-      has_qualifying_child_for_eitc: false
-      eitc_taxpayer_has_tin: true
-      eitc_taxpayer_has_work_authorized_ssn: false
-      eitc_ssn_previously_disqualified: false
-    expect: false
+        has_qualifying_child_for_eitc: 0
+        eitc_child_id_requirement_met: 0
+        eitc_childless_id_requirement_met: 0
+    expect: 0

@@ -2,99 +2,95 @@ net_rent_royalty_income:
   - name: "No rent/royalty income"
     period: 2024-01
     inputs:
-      gross_rent_royalty_income: 0
-      rent_royalty_deductions_noninterest: 0
-      rent_royalty_interest_deductions: 0
+        gross_rent_royalty_income: 0
+        rent_royalty_deductions_noninterest: 0
+        rent_royalty_interest_deductions: 0
     expect: 0
   - name: "Positive net rent income"
     period: 2024-01
     inputs:
-      gross_rent_royalty_income: 15_000
-      rent_royalty_deductions_noninterest: 5_000
-      rent_royalty_interest_deductions: 2_000
-    expect: 8_000
+        gross_rent_royalty_income: 10000
+        rent_royalty_deductions_noninterest: 1500
+        rent_royalty_interest_deductions: 500
+    expect: 8000
   - name: "Deductions exceed gross - floor at zero"
     period: 2024-01
     inputs:
-      gross_rent_royalty_income: 5_000
-      rent_royalty_deductions_noninterest: 4_000
-      rent_royalty_interest_deductions: 3_000
+        gross_rent_royalty_income: 1000
+        rent_royalty_deductions_noninterest: 800
+        rent_royalty_interest_deductions: 500
     expect: 0
 
 net_passive_income:
   - name: "No passive activity"
     period: 2024-01
     inputs:
-      gross_passive_income: 0
-      passive_activity_losses: 0
+        gross_passive_income: 0
+        passive_activity_losses: 0
     expect: 0
   - name: "Net passive income"
     period: 2024-01
     inputs:
-      gross_passive_income: 10_000
-      passive_activity_losses: 3_000
-    expect: 7_000
+        gross_passive_income: 10000
+        passive_activity_losses: 3000
+    expect: 7000
   - name: "Losses exceed income - floor at zero"
     period: 2024-01
     inputs:
-      gross_passive_income: 2_000
-      passive_activity_losses: 5_000
+        gross_passive_income: 2000
+        passive_activity_losses: 5000
     expect: 0
 
 disqualified_income:
   - name: "No disqualified income"
     period: 2024-01
     inputs:
-      taxable_interest_income: 0
-      dividend_income: 0
-      tax_exempt_interest_income: 0
-      net_rent_royalty_income: 0
-      capital_gain_net_income: 0
-      net_passive_income: 0
+        taxable_interest_income: 0
+        dividend_income: 0
+        tax_exempt_interest_income: 0
+        net_rent_royalty_income: 0
+        capital_gain_net_income: 0
+        net_passive_income: 0
     expect: 0
   - name: "Interest and dividends only"
     period: 2024-01
     inputs:
-      taxable_interest_income: 500
-      dividend_income: 1_500
-      tax_exempt_interest_income: 0
-      net_rent_royalty_income: 0
-      capital_gain_net_income: 0
-      net_passive_income: 0
-    expect: 2_000
+        taxable_interest_income: 1000
+        dividend_income: 1000
+        tax_exempt_interest_income: 0
+        net_rent_royalty_income: 0
+        capital_gain_net_income: 0
+        net_passive_income: 0
+    expect: 2000
   - name: "All components"
     period: 2024-01
     inputs:
-      taxable_interest_income: 1_000
-      dividend_income: 2_000
-      tax_exempt_interest_income: 500
-      net_rent_royalty_income: 3_000
-      capital_gain_net_income: 2_500
-      net_passive_income: 1_000
-    expect: 10_000
+        taxable_interest_income: 1000
+        dividend_income: 1000
+        tax_exempt_interest_income: 500
+        net_rent_royalty_income: 3000
+        capital_gain_net_income: 2500
+        net_passive_income: 2000
+    expect: 10000
 
 eitc_denied_excessive_investment_income:
   - name: "Below limit - not denied"
     period: 2024-01
     inputs:
-      disqualified_income: 5_000
-      disqualified_income_limit: 11_600
-    expect: false
+        disqualified_income: 5000
+    expect: 0
   - name: "At limit - not denied"
     period: 2024-01
     inputs:
-      disqualified_income: 11_600
-      disqualified_income_limit: 11_600
-    expect: false
+        disqualified_income: 11600
+    expect: 0
   - name: "Above limit - denied"
     period: 2024-01
     inputs:
-      disqualified_income: 12_000
-      disqualified_income_limit: 11_600
-    expect: true
+        disqualified_income: 11601
+    expect: 1
   - name: "No investment income - not denied"
     period: 2024-01
     inputs:
-      disqualified_income: 0
-      disqualified_income_limit: 11_600
-    expect: false
+        disqualified_income: 0
+    expect: 0

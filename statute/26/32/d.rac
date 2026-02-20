@@ -5,19 +5,26 @@
 # this section shall apply only if a joint return is filed for the taxable year
 # under section 6013.
 
-# This subsection establishes a bright-line rule: married individuals must file
-# a joint return to claim EITC. Married filing separately (MFS) is disqualified.
+# =============================================================================
+# Inputs
+# =============================================================================
 
 is_married:
-    entity: taxunit
+    entity: TaxUnit
     from 2024-01-01: 0
-
 
 files_joint_return:
-    entity: taxunit
+    entity: TaxUnit
     from 2024-01-01: 0
 
+# =============================================================================
+# Variable: EITC eligible under 32(d) married filing requirement
+# Not married => eligible. Married => must file jointly.
+# =============================================================================
 
 eitc_eligible_under_32d:
-    entity: taxunit
-    from 2013-01-01: files_joint_return
+    entity: TaxUnit
+    from 2024-01-01:
+        if not is_married: 1
+        else: if files_joint_return: 1
+        else: 0

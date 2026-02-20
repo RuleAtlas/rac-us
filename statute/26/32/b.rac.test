@@ -2,113 +2,113 @@ eitc_credit_percentage:
   - name: "No qualifying children"
     period: 2024-01
     inputs:
-      qualifying_children_count: 0
+        qualifying_children_count: 0
     expect: 0.0765
   - name: "1 qualifying child"
     period: 2024-01
     inputs:
-      qualifying_children_count: 1
+        qualifying_children_count: 1
     expect: 0.34
   - name: "2 qualifying children"
     period: 2024-01
     inputs:
-      qualifying_children_count: 2
+        qualifying_children_count: 2
     expect: 0.40
   - name: "3 qualifying children"
     period: 2024-01
     inputs:
-      qualifying_children_count: 3
+        qualifying_children_count: 3
     expect: 0.45
   - name: "4 qualifying children (3 or more)"
     period: 2024-01
     inputs:
-      qualifying_children_count: 4
+        qualifying_children_count: 4
     expect: 0.45
 
 eitc_phaseout_percentage:
   - name: "No qualifying children"
     period: 2024-01
     inputs:
-      qualifying_children_count: 0
+        qualifying_children_count: 0
     expect: 0.0765
   - name: "1 qualifying child"
     period: 2024-01
     inputs:
-      qualifying_children_count: 1
+        qualifying_children_count: 1
     expect: 0.1598
   - name: "2 qualifying children"
     period: 2024-01
     inputs:
-      qualifying_children_count: 2
+        qualifying_children_count: 2
     expect: 0.2106
   - name: "3 or more qualifying children"
     period: 2024-01
     inputs:
-      qualifying_children_count: 3
+        qualifying_children_count: 3
     expect: 0.2106
 
 eitc_earned_income_amount:
   - name: "No qualifying children"
     period: 2024-01
     inputs:
-      qualifying_children_count: 0
-    expect: 4220
+        qualifying_children_count: 0
+    expect: 8260
   - name: "1 qualifying child"
     period: 2024-01
     inputs:
-      qualifying_children_count: 1
-    expect: 6330
+        qualifying_children_count: 1
+    expect: 12391
   - name: "2 qualifying children"
     period: 2024-01
     inputs:
-      qualifying_children_count: 2
-    expect: 8890
+        qualifying_children_count: 2
+    expect: 17400
   - name: "3 or more qualifying children"
     period: 2024-01
     inputs:
-      qualifying_children_count: 3
-    expect: 8890
+        qualifying_children_count: 3
+    expect: 17400
 
 eitc_phaseout_amount:
   - name: "No children, single"
     period: 2024-01
     inputs:
-      qualifying_children_count: 0
-      is_joint_return: false
-    expect: 5280
+        qualifying_children_count: 0
+        is_joint_return: 0
+    expect: 10330
   - name: "No children, joint return"
     period: 2024-01
     inputs:
-      qualifying_children_count: 0
-      is_joint_return: true
-    expect: 10280
+        qualifying_children_count: 0
+        is_joint_return: 1
+    expect: 17250
   - name: "1 child, single"
     period: 2024-01
     inputs:
-      qualifying_children_count: 1
-      is_joint_return: false
-    expect: 11610
+        qualifying_children_count: 1
+        is_joint_return: 0
+    expect: 22720
   - name: "1 child, joint return"
     period: 2024-01
     inputs:
-      qualifying_children_count: 1
-      is_joint_return: true
-    expect: 16610
+        qualifying_children_count: 1
+        is_joint_return: 1
+    expect: 29640
   - name: "2 children, single"
     period: 2024-01
     inputs:
-      qualifying_children_count: 2
-      is_joint_return: false
-    expect: 11610
+        qualifying_children_count: 2
+        is_joint_return: 0
+    expect: 22720
   - name: "2 children, joint return"
     period: 2024-01
     inputs:
-      qualifying_children_count: 2
-      is_joint_return: true
-    expect: 16610
+        qualifying_children_count: 2
+        is_joint_return: 1
+    expect: 29640
   - name: "3 children, joint return"
     period: 2024-01
     inputs:
-      qualifying_children_count: 3
-      is_joint_return: true
-    expect: 16610
+        qualifying_children_count: 3
+        is_joint_return: 1
+    expect: 29640

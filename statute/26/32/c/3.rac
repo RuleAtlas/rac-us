@@ -1,66 +1,45 @@
 # 26 USC 32(c)(3) - Qualifying child
 
 # (3) Qualifying child
-# (A) In general
-# The term "qualifying child" means a qualifying child of the taxpayer (as defined
-# in section 152(c), determined without regard to paragraph (1)(D) thereof and
-# section 152(e)).
+# (A) In general - qualifying child per 152(c), without regard to 152(c)(1)(D) and 152(e)
+# (B) Married individual - not qualifying child if married at year end,
+#     unless taxpayer claims 151 deduction
+# (C) Place of abode - principal place of abode must be in the United States
+# (D) Identification requirements - name, age, and TIN on return
 
-# (B) Married individual
-# The term "qualifying child" shall not include an individual who is married as of
-# the close of the taxpayer's taxable year unless the taxpayer is entitled to a
-# deduction under section 151 for such taxable year with respect to such individual
-# (or would be so entitled but for section 152(e)).
-
-# (C) Place of abode
-# For purposes of subparagraph (A), the requirements of section 152(c)(1)(B) shall
-# be met only if the principal place of abode is in the United States.
-
-# (D) Identification requirements
-# (i) In general
-# A qualifying child shall not be taken into account under subsection (b) unless the
-# taxpayer includes the name, age, and TIN of the qualifying child on the return of
-# tax for the taxable year.
-# (ii) Other methods
-# The Secretary may prescribe other methods for providing the information described
-# in clause (i).
-
-# This subsection defines "qualifying child" for EITC purposes.
-# It modifies the general 152(c) definition with:
-# - Ignores 152(c)(1)(D) (tie-breaker rules) and 152(e) (custodial parent rules)
-# - Adds married child exclusion unless taxpayer claims dependency deduction
-# - Requires principal place of abode to be in the United States
-# - Requires name, age, and TIN on return
-
-# Inputs for qualifying child determination
+# =============================================================================
+# Inputs
+# =============================================================================
 
 is_qualifying_child_152c:
-    entity: person
+    entity: TaxUnit
     from 2024-01-01: 0
-
 
 child_is_married:
-    entity: person
+    entity: TaxUnit
     from 2024-01-01: 0
-
 
 taxpayer_claims_151_deduction_for_child:
-    entity: person
+    entity: TaxUnit
     from 2024-01-01: 0
-
 
 child_principal_abode_in_us:
-    entity: person
+    entity: TaxUnit
     from 2024-01-01: 0
-
 
 child_tin_included_on_return:
-    entity: person
+    entity: TaxUnit
     from 2024-01-01: 0
 
-
-# Variable implementing the qualifying child definition for EITC
+# =============================================================================
+# Variable: Qualifying child for EITC per 32(c)(3)
+# =============================================================================
 
 is_eitc_qualifying_child:
-    entity: person
-    from 2013-01-01: True
+    entity: TaxUnit
+    from 2024-01-01:
+        if not is_qualifying_child_152c: 0
+        else: if child_is_married and not taxpayer_claims_151_deduction_for_child: 0
+        else: if not child_principal_abode_in_us: 0
+        else: if not child_tin_included_on_return: 0
+        else: 1

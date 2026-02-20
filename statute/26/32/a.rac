@@ -9,69 +9,110 @@
 
 # (2) Limitation
 # The amount of the credit allowable to a taxpayer under paragraph (1) for any taxable year
-# shall not exceed the excess (if any) of—
+# shall not exceed the excess (if any) of--
 # (A) the credit percentage of the earned income amount, over
 # (B) the phaseout percentage of so much of the adjusted gross income (or, if greater, the
 # earned income) of the taxpayer for the taxable year as exceeds the phaseout amount.
 
 # =============================================================================
-# Input: Adjusted gross income (required for phaseout calculation)
+# Inputs
 # =============================================================================
 
 adjusted_gross_income:
-    entity: taxunit
+    entity: TaxUnit
     from 2024-01-01: 0
 
+eitc_earned_income:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+eitc_credit_percentage:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+eitc_earned_income_amount:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+eitc_phaseout_percentage:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+eitc_phaseout_amount:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+is_eitc_eligible_individual:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+eitc_eligible_under_32d:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+eitc_denied_excessive_investment_income:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+eitc_disallowed_improper_claim:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+eitc_id_requirements_met:
+    entity: TaxUnit
+    from 2024-01-01: 0
 
 # =============================================================================
 # 32(a)(1) - Credit amount before limitation
 # =============================================================================
 
 eitc_credit_before_limitation:
-    entity: taxunit
-    from 2013-01-01: eitc_credit_percentage * (min(eitc_earned_income, eitc_earned_income_amount))
-
+    entity: TaxUnit
+    from 2024-01-01: eitc_credit_percentage * min(eitc_earned_income, eitc_earned_income_amount)
 
 # =============================================================================
 # 32(a)(2)(A) - Maximum credit (credit percentage of earned income amount)
 # =============================================================================
 
 eitc_maximum_credit:
-    entity: taxunit
-    from 2013-01-01: eitc_credit_percentage * eitc_earned_income_amount
-
+    entity: TaxUnit
+    from 2024-01-01: eitc_credit_percentage * eitc_earned_income_amount
 
 # =============================================================================
-# 32(a)(2)(B) - Phaseout base income
+# 32(a)(2)(B) - Phaseout base income (greater of AGI or earned income)
 # =============================================================================
 
 eitc_phaseout_base:
-    entity: taxunit
-    from 2013-01-01: max(adjusted_gross_income, eitc_earned_income)
-
+    entity: TaxUnit
+    from 2024-01-01: max(adjusted_gross_income, eitc_earned_income)
 
 # =============================================================================
 # 32(a)(2)(B) - Phaseout reduction amount
 # =============================================================================
 
 eitc_phaseout_reduction:
-    entity: taxunit
-    from 2013-01-01: eitc_phaseout_percentage * (max(0, eitc_phaseout_base - eitc_phaseout_amount))
-
+    entity: TaxUnit
+    from 2024-01-01: eitc_phaseout_percentage * max(0, eitc_phaseout_base - eitc_phaseout_amount)
 
 # =============================================================================
 # 32(a)(2) - Credit after limitation
 # =============================================================================
 
 eitc_credit_after_limitation:
-    entity: taxunit
-    from 2013-01-01: max(0, eitc_maximum_credit - eitc_phaseout_reduction)
-
+    entity: TaxUnit
+    from 2024-01-01: max(0, eitc_maximum_credit - eitc_phaseout_reduction)
 
 # =============================================================================
 # 32(a) - Final earned income credit
+# Applies all eligibility gates from 32(c), 32(d), 32(i), 32(k), 32(m)
 # =============================================================================
 
 earned_income_credit:
-    entity: taxunit
-    from 2013-01-01: min(eitc_credit_before_limitation, eitc_credit_after_limitation)
+    entity: TaxUnit
+    from 2024-01-01:
+        if not is_eitc_eligible_individual: 0
+        else: if not eitc_eligible_under_32d: 0
+        else: if eitc_denied_excessive_investment_income: 0
+        else: if eitc_disallowed_improper_claim: 0
+        else: if not eitc_id_requirements_met: 0
+        else: min(eitc_credit_before_limitation, eitc_credit_after_limitation)

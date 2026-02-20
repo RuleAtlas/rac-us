@@ -2,112 +2,93 @@ eitc_in_fraud_disallowance_period:
   - name: "No fraud determination"
     period: 2024-01
     inputs:
-      eitc_fraud_determination_year: 0
-      current_tax_year: 2024
-    expect: false
+        eitc_fraud_determination_year: 0
+        current_tax_year: 2024
+    expect: 0
   - name: "Within 10-year fraud period"
     period: 2024-01
     inputs:
-      eitc_fraud_determination_year: 2020
-      current_tax_year: 2024
-    expect: true
+        eitc_fraud_determination_year: 2020
+        current_tax_year: 2024
+    expect: 1
   - name: "Beyond 10-year fraud period"
     period: 2024-01
     inputs:
-      eitc_fraud_determination_year: 2010
-      current_tax_year: 2024
-    expect: false
+        eitc_fraud_determination_year: 2010
+        current_tax_year: 2024
+    expect: 0
   - name: "At boundary of 10-year period"
     period: 2024-01
     inputs:
-      eitc_fraud_determination_year: 2014
-      current_tax_year: 2024
-    expect: true
+        eitc_fraud_determination_year: 2014
+        current_tax_year: 2024
+    expect: 1
 
 eitc_in_reckless_disallowance_period:
   - name: "No reckless determination"
     period: 2024-01
     inputs:
-      eitc_reckless_determination_year: 0
-      current_tax_year: 2024
-    expect: false
+        eitc_reckless_determination_year: 0
+        current_tax_year: 2024
+    expect: 0
   - name: "Within 2-year reckless period"
     period: 2024-01
     inputs:
-      eitc_reckless_determination_year: 2023
-      current_tax_year: 2024
-    expect: true
+        eitc_reckless_determination_year: 2023
+        current_tax_year: 2024
+    expect: 1
   - name: "Beyond 2-year reckless period"
     period: 2024-01
     inputs:
-      eitc_reckless_determination_year: 2020
-      current_tax_year: 2024
-    expect: false
+        eitc_reckless_determination_year: 2020
+        current_tax_year: 2024
+    expect: 0
   - name: "At boundary of 2-year period"
     period: 2024-01
     inputs:
-      eitc_reckless_determination_year: 2022
-      current_tax_year: 2024
-    expect: true
+        eitc_reckless_determination_year: 2022
+        current_tax_year: 2024
+    expect: 1
 
 eitc_requires_recertification:
   - name: "No prior denial"
     period: 2024-01
     inputs:
-      eitc_denied_via_deficiency_procedures: false
-    expect: false
-  - name: "Prior denial via deficiency procedures"
+        eitc_denied_via_deficiency_procedures: 0
+        eitc_recertification_info_provided: 0
+    expect: 0
+  - name: "Prior denial, info not provided"
     period: 2024-01
     inputs:
-      eitc_denied_via_deficiency_procedures: true
-    expect: true
+        eitc_denied_via_deficiency_procedures: 1
+        eitc_recertification_info_provided: 0
+    expect: 1
+  - name: "Prior denial, info provided"
+    period: 2024-01
+    inputs:
+        eitc_denied_via_deficiency_procedures: 1
+        eitc_recertification_info_provided: 1
+    expect: 0
 
 eitc_disallowed_improper_claim:
   - name: "No prior issues"
     period: 2024-01
     inputs:
-      eitc_in_fraud_disallowance_period: false
-      eitc_in_reckless_disallowance_period: false
-      eitc_requires_recertification: false
-      eitc_recertification_info_provided: true
-    expect: false
+        eitc_in_fraud_disallowance_period: 0
+        eitc_in_reckless_disallowance_period: 0
+        eitc_requires_recertification: 0
+    expect: 0
   - name: "In fraud disallowance period"
     period: 2024-01
     inputs:
-      eitc_in_fraud_disallowance_period: true
-      eitc_in_reckless_disallowance_period: false
-      eitc_requires_recertification: false
-      eitc_recertification_info_provided: true
-    expect: true
-  - name: "In reckless disallowance period"
+        eitc_in_fraud_disallowance_period: 1
+        eitc_in_reckless_disallowance_period: 0
+        eitc_requires_recertification: 0
+    expect: 1
+  - name: "Requires recertification"
     period: 2024-01
     inputs:
-      eitc_in_fraud_disallowance_period: false
-      eitc_in_reckless_disallowance_period: true
-      eitc_requires_recertification: false
-      eitc_recertification_info_provided: true
-    expect: true
-  - name: "Deficiency denial but info provided"
-    period: 2024-01
-    inputs:
-      eitc_in_fraud_disallowance_period: false
-      eitc_in_reckless_disallowance_period: false
-      eitc_requires_recertification: true
-      eitc_recertification_info_provided: true
-    expect: false
-  - name: "Deficiency denial and info NOT provided"
-    period: 2024-01
-    inputs:
-      eitc_in_fraud_disallowance_period: false
-      eitc_in_reckless_disallowance_period: false
-      eitc_requires_recertification: true
-      eitc_recertification_info_provided: false
-    expect: true
-  - name: "Both fraud and reckless - fraud takes precedence"
-    period: 2024-01
-    inputs:
-      eitc_in_fraud_disallowance_period: true
-      eitc_in_reckless_disallowance_period: true
-      eitc_requires_recertification: false
-      eitc_recertification_info_provided: true
-    expect: true
+        eitc_in_fraud_disallowance_period: 0
+        eitc_in_reckless_disallowance_period: 0
+        eitc_requires_recertification: 1
+    expect: 1

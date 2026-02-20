@@ -1,143 +1,140 @@
 # 26 USC 32(b) - Percentages and amounts
 
 # (b) Percentages and amounts
-# For purposes of subsection (a)—
+# For purposes of subsection (a)--
 
 # (1) Percentages
 # The credit percentage and the phaseout percentage shall be determined as follows:
-
-# In the case of an eligible individual with:   The credit percentage is:  The phaseout percentage is:
-# 1 qualifying child                            34                         15.98
-# 2 qualifying children                         40                         21.06
-# 3 or more qualifying children                 45                         21.06
-# No qualifying children                        7.65                       7.65
+# 1 qualifying child: credit 34%, phaseout 15.98%
+# 2 qualifying children: credit 40%, phaseout 21.06%
+# 3 or more qualifying children: credit 45%, phaseout 21.06%
+# No qualifying children: credit 7.65%, phaseout 7.65%
 
 # (2) Amounts
-# (A) In general
-# Subject to subparagraph (B), the earned income amount and the phaseout amount shall be determined as follows:
-
-# In the case of an eligible individual with:   The earned income amount is:  The phaseout amount is:
-# 1 qualifying child                            $6,330                        $11,610
-# 2 or more qualifying children                 $8,890                        $11,610
-# No qualifying children                        $4,220                        $5,280
-
-# (B) Joint returns
-# In the case of a joint return filed by an eligible individual and such individual's spouse,
-# the phaseout amount determined under subparagraph (A) shall be increased by $5,000.
+# (A) In general - earned income amount and phaseout amount by children count
+# (B) Joint returns - phaseout amount increased by joint_return_phaseout_increase
 
 # =============================================================================
-# 32(b)(1) - Percentages
+# Parameters - Credit percentages per 32(b)(1)
 # =============================================================================
 
-# Credit percentages per 32(b)(1)
 eitc_credit_percentage_0:
     from 1996-01-01: 0.0765
-
 
 eitc_credit_percentage_1:
     from 1996-01-01: 0.34
 
-
 eitc_credit_percentage_2:
     from 1996-01-01: 0.40
-
 
 eitc_credit_percentage_3plus:
     from 2009-01-01: 0.45
 
+# =============================================================================
+# Parameters - Phaseout percentages per 32(b)(1)
+# =============================================================================
 
-# Phaseout percentages per 32(b)(1)
 eitc_phaseout_percentage_0:
     from 1996-01-01: 0.0765
-
 
 eitc_phaseout_percentage_1:
     from 1996-01-01: 0.1598
 
-
 eitc_phaseout_percentage_2plus:
     from 1996-01-01: 0.2106
 
-
 # =============================================================================
-# 32(b)(2)(A) - Amounts (base statutory values, subject to 32(j) inflation adjustment)
+# Parameters - Earned income amounts per 32(b)(2)(A)
+# Inflation-adjusted per 32(j); values from Rev. Proc. 2023-34 (TY 2024)
 # =============================================================================
 
-# Earned income amounts per 32(b)(2)(A)
 eitc_earned_income_amount_0:
     from 1996-01-01: 4220
-
+    from 2024-01-01: 8260
 
 eitc_earned_income_amount_1:
     from 1996-01-01: 6330
-
+    from 2024-01-01: 12391
 
 eitc_earned_income_amount_2plus:
     from 1996-01-01: 8890
+    from 2024-01-01: 17400
 
+# =============================================================================
+# Parameters - Phaseout amounts per 32(b)(2)(A)
+# Inflation-adjusted per 32(j); values from Rev. Proc. 2023-34 (TY 2024)
+# =============================================================================
 
-# Phaseout amounts per 32(b)(2)(A)
 eitc_phaseout_amount_0:
     from 1996-01-01: 5280
-
+    from 2024-01-01: 10330
 
 eitc_phaseout_amount_1plus:
     from 1996-01-01: 11610
-
+    from 2024-01-01: 22720
 
 # =============================================================================
-# 32(b)(2)(B) - Joint return phaseout increase
+# Parameters - Joint return phaseout increase per 32(b)(2)(B)
+# Inflation-adjusted per 32(j); value from Rev. Proc. 2023-34 (TY 2024)
 # =============================================================================
 
 eitc_joint_return_phaseout_increase:
     from 2002-01-01: 5000
-
+    from 2024-01-01: 6920
 
 # =============================================================================
 # Inputs
 # =============================================================================
 
 qualifying_children_count:
-    entity: taxunit
+    entity: TaxUnit
     from 2024-01-01: 0
-
 
 is_joint_return:
-    entity: taxunit
+    entity: TaxUnit
     from 2024-01-01: 0
 
-
 # =============================================================================
-# Variables - Credit percentage per 32(b)(1)
+# Variable: Credit percentage per 32(b)(1)
 # =============================================================================
 
 eitc_credit_percentage:
-    entity: taxunit
-    from 1996-01-01: eitc_credit_percentage_3plus
-
+    entity: TaxUnit
+    from 2024-01-01:
+        if qualifying_children_count == 0: eitc_credit_percentage_0
+        else: if qualifying_children_count == 1: eitc_credit_percentage_1
+        else: if qualifying_children_count == 2: eitc_credit_percentage_2
+        else: eitc_credit_percentage_3plus
 
 # =============================================================================
-# Variables - Phaseout percentage per 32(b)(1)
+# Variable: Phaseout percentage per 32(b)(1)
 # =============================================================================
 
 eitc_phaseout_percentage:
-    entity: taxunit
-    from 1996-01-01: eitc_phaseout_percentage_2plus
-
+    entity: TaxUnit
+    from 2024-01-01:
+        if qualifying_children_count == 0: eitc_phaseout_percentage_0
+        else: if qualifying_children_count == 1: eitc_phaseout_percentage_1
+        else: eitc_phaseout_percentage_2plus
 
 # =============================================================================
-# Variables - Earned income amount per 32(b)(2)(A)
+# Variable: Earned income amount per 32(b)(2)(A)
 # =============================================================================
 
 eitc_earned_income_amount:
-    entity: taxunit
-    from 1996-01-01: eitc_earned_income_amount_2plus
-
+    entity: TaxUnit
+    from 2024-01-01:
+        if qualifying_children_count == 0: eitc_earned_income_amount_0
+        else: if qualifying_children_count == 1: eitc_earned_income_amount_1
+        else: eitc_earned_income_amount_2plus
 
 # =============================================================================
-# Variables - Phaseout amount per 32(b)(2)(A) and (B)
+# Variable: Phaseout amount per 32(b)(2)(A) and (B)
+# Joint filers get increased phaseout amount per 32(b)(2)(B)
 # =============================================================================
 
 eitc_phaseout_amount:
-    entity: taxunit
-    from 1996-01-01: eitc_phaseout_amount_1plus
+    entity: TaxUnit
+    from 2024-01-01:
+        if qualifying_children_count == 0: eitc_phaseout_amount_0 + is_joint_return * eitc_joint_return_phaseout_increase
+        else: eitc_phaseout_amount_1plus + is_joint_return * eitc_joint_return_phaseout_increase
