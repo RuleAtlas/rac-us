@@ -142,8 +142,10 @@ actc_amount:
   label: "Additional Child Tax Credit"
   description: "Refundable portion of CTC per 26 USC 24(d)"
   from 1998-01-01:
-    # Exception for foreign income exclusion
-    uncapped = min(ctc_after_phaseout, actc_limitation_increase)
-    # Per (h)(5), cap at $1,400 per child for post-2017 years
-    max_refundable = qualifying_child_count * actc_max_per_child
-    min(uncapped, max_refundable)
+    # (d)(3): Exception for taxpayers excluding foreign earned income
+    if excludes_foreign_income: 0
+    else:
+      uncapped = min(ctc_after_phaseout, actc_limitation_increase)
+      # Per (h)(5), cap at $1,400 per child for post-2017 years
+      max_refundable = qualifying_child_count * actc_max_per_child
+      min(uncapped, max_refundable)

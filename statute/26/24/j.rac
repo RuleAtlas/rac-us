@@ -138,14 +138,14 @@ advance_ctc_safe_harbor_amount:
     # Base safe harbor = $2,000 x excess children
     base_safe_harbor = advance_ctc_excess_children * advance_ctc_safe_harbor_per_child
 
-    # Check if income exceeds 200% of threshold (no safe harbor)
+    # Phase-out: reduce safe harbor by ratio of excess income over threshold
     threshold = advance_ctc_safe_harbor_threshold
-    max_income = threshold * advance_ctc_safe_harbor_phaseout_multiple
-
-    excess_income = modified_agi - threshold
-    reduction_ratio = excess_income / threshold
-    reduced_amount = base_safe_harbor * (1 - reduction_ratio)
-    max(0, reduced_amount)
+    excess_income = max(0, modified_agi - threshold)
+    if threshold == 0: 0
+    else:
+      reduction_ratio = excess_income / threshold
+      reduced_amount = base_safe_harbor * (1 - reduction_ratio)
+      max(0, reduced_amount)
 ctc_after_advance_reconciliation:
   imports:
     - 26/24/b#ctc_after_phaseout

@@ -291,11 +291,11 @@ failsafe_gdp_pct:
 
 ira_start_year:
   description: "First taxable year for IRA temporary percentages per 26 USC 36B(b)(3)(A)(iii)"
-  from 2021-01-01: 2021
+  from 2014-01-01: 2021
 
 ira_end_year:
   description: "Last taxable year for IRA temporary percentages per 26 USC 36B(b)(3)(A)(iii)"
-  from 2021-01-01: 2025
+  from 2014-01-01: 2025
 
 # =============================================================================
 # Inputs

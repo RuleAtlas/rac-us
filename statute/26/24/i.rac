@@ -59,6 +59,9 @@ actc_inflation_adjusted_max:
   unit: USD
   label: "Inflation-Adjusted ACTC Maximum"
   description: "Inflation-adjusted maximum refundable CTC per child per 26 USC 24(i)(1)"
+  from 2018-01-01:
+    # For years through 2024, no inflation adjustment
+    actc_max_per_child
   from 2025-01-01:
     # For years after 2024, apply inflation adjustment
     base_amount = actc_max_per_child

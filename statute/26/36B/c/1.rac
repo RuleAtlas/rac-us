@@ -135,11 +135,18 @@ is_applicable_taxpayer:
   description: "Whether the taxpayer is an applicable taxpayer per 26 USC 36B(c)(1)"
   from 2014-01-01:
     # (D): No credit for dependents
-
+    if is_dependent: False
     # (C): Married taxpayers must file joint return
-
-    income_pct = household_income_pct_fpl
-
-    # (B): Lawfully present alien below 100% FPL and Medicaid-ineligible
-    # due to alien status → treated as applicable taxpayer
-    0
+    elif is_married and not files_joint_return: False
+    else:
+      income_pct = household_income_pct_fpl
+      # (B): Lawfully present alien below 100% FPL and Medicaid-ineligible
+      # due to alien status → treated as applicable taxpayer
+      is_alien_exception = is_lawfully_present_alien and is_medicaid_ineligible_due_to_alien_status and income_pct < min_fpl_pct
+      # (E): For 2021-2025, remove 400% upper cap
+      upper_cap_removed = tax_year >= temp_rule_start_year and tax_year <= temp_rule_end_year
+      if is_alien_exception: True
+      elif income_pct < min_fpl_pct: False
+      elif upper_cap_removed: True
+      elif income_pct > max_fpl_pct: False
+      else: True

@@ -120,9 +120,12 @@ ptc_month_passes_exchange_verification:
   dtype: Boolean
   label: "Month Passes Exchange Verification"
   description: "Whether a month satisfies the Exchange enrollment verification requirement for coverage month status per 26 USC 36B(c)(5)"
+  from 2014-01-01:
+    # Before this provision's enactment, all months pass (no verification needed)
+    True
   from 2025-07-04:
     # This provision only applies for taxable years beginning after 12/31/2027
-    if tax_year < exchange_verification_effective_year: true
-    elif not enrolled_through_exchange: true
-    elif verification_waived_for_special_enrollment: true
+    if tax_year < exchange_verification_effective_year: True
+    elif not enrolled_through_exchange: True
+    elif verification_waived_for_special_enrollment: True
     else: exchange_has_verified_eligibility

@@ -105,13 +105,12 @@ ptc_ui_capped_household_income:
   label: "UI-Capped Household Income for PTC"
   description: "Household income after applying the 133% FPL cap for UI recipients per 26 USC 36B(g)(1)(B). Per (g)(4)(B), this cap does NOT apply for affordability determinations under (c)(2)(C)(i)(II) or (c)(4)(C)(ii)."
   from 2021-01-01:
-    # (g)(1)(B): "there shall not be taken into account any household income
-    # of the taxpayer in excess of 133 percent of the poverty line for a
-    # family of the size involved"
-    # This effectively caps household income at 133% FPL for PTC calculation
-    # purposes (but NOT for affordability under (g)(4)(B)).
-    income_cap = poverty_line * ui_household_income_fpl_cap
-    min(household_income, income_cap)
+    # (g)(1): Only applies to taxpayers who received UI compensation during 2021
+    if not received_ui_compensation_2021: household_income
+    else:
+      # (g)(1)(B): Cap household income at 133% FPL for PTC calculation
+      income_cap = poverty_line * ui_household_income_fpl_cap
+      min(household_income, income_cap)
 # =============================================================================
 # (g)(4)(B) - Affordability uses uncapped household income
 # =============================================================================
