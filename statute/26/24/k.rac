@@ -107,13 +107,9 @@ ctc_disallowed_possession_coordination:
   description: "Whether CTC disallowed due to possession tax coordination per 26 USC 24(k)"
   from 2013-01-01:
     # Mirror code possession - disallow if claimed in possession
-    if is_mirror_code_possession_resident and claimed_ctc_in_possession:
-      return True
-    # American Samoa with approved plan - covered by local distribution
-    if is_american_samoa_resident and american_samoa_plan_approved:
-      return True
-    return False
-
+    if is_mirror_code_possession_resident and claimed_ctc_in_possession: True
+    elif is_american_samoa_resident and american_samoa_plan_approved: True
+    else: False
 puerto_rico_ctc_eligible:
   entity: TaxUnit
   period: Year
@@ -122,10 +118,8 @@ puerto_rico_ctc_eligible:
   description: "Whether Puerto Rico resident eligible for CTC per 26 USC 24(k)(2)"
   from 2013-01-01:
     # PR residents eligible for taxable years after 2021
-    if is_puerto_rico_resident:
-      return True
-    return False
-
+    if is_puerto_rico_resident: True
+    else: False
 # Note: The special rule for Puerto Rico residents under (k)(2)(B)(ii) modifies
 # the ACTC calculation by removing the 3+ children requirement. This is handled
 # by conditioning the actc_ss_excess_amount in subsection (d) on residency.

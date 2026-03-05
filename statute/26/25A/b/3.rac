@@ -59,4 +59,4 @@ is_eligible_student:
     # (B) Student is carrying at least 1/2 the normal full-time work load
     hea_requirement_met = meets_hea_484_requirements
     half_time_requirement_met = course_load_fraction >= min_course_load_fraction
-    return hea_requirement_met and half_time_requirement_met
+    hea_requirement_met and half_time_requirement_met

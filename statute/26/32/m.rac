@@ -96,10 +96,8 @@ eitc_ssn_valid_for_work:
   from 2013-01-01:
     # Per (3)(A): SSN must be issued to US citizen or work-authorized alien
     # Per (3)(B): SSN not valid if previously disqualified for misuse
-    if eitc_ssn_previously_disqualified:
-      return False
-    return eitc_taxpayer_has_work_authorized_ssn
-
+    if eitc_ssn_previously_disqualified: False
+    else: eitc_taxpayer_has_work_authorized_ssn
 eitc_child_id_requirement_met:
   entity: Person
   period: Year
@@ -108,8 +106,7 @@ eitc_child_id_requirement_met:
   description: "Whether qualifying child meets identification requirements per 26 USC 32(m)(1)"
   from 2013-01-01:
     # Per (1): Child must have TIN issued on or before return due date
-    return qualifying_child_has_valid_tin
-
+    qualifying_child_has_valid_tin
 eitc_childless_id_requirement_met:
   entity: TaxUnit
   period: Year
@@ -118,13 +115,9 @@ eitc_childless_id_requirement_met:
   description: "Whether childless eligible individual meets ID requirements per 26 USC 32(m)(2)"
   from 2013-01-01:
     # Per (2)(A): Must have valid TIN
-    if not eitc_taxpayer_has_tin:
-      return False
-    # Per (2)(B): Must have work-authorized SSN issued before due date
-    if not eitc_ssn_valid_for_work:
-      return False
-    return True
-
+    if not eitc_taxpayer_has_tin: False
+    elif not eitc_ssn_valid_for_work: False
+    else: True
 eitc_id_requirements_met:
   entity: TaxUnit
   period: Year
@@ -136,10 +129,5 @@ eitc_id_requirements_met:
     # For childless taxpayers: taxpayer must meet (m)(2)
     # Note: Child-level checks are done separately per child
     # This variable checks taxpayer-level requirements
-    if has_qualifying_child_for_eitc:
-      # Taxpayer with children - child TIN checked at child level
-      # Taxpayer must still meet general ID requirements
-      return eitc_taxpayer_has_tin
-    else:
-      # Childless taxpayer - stricter requirements under (m)(2)
-      return eitc_childless_id_requirement_met
+    if has_qualifying_child_for_eitc: eitc_taxpayer_has_tin
+    else: eitc_childless_id_requirement_met

@@ -49,10 +49,8 @@ allotment_payable_to_center:
     # Center receives allotment only if individual resides there
     # and has not left; statute limits this to periods < 1 month
     # (period constraint enforced by State agency administration)
-    if resides_in_treatment_center and not has_left_treatment_center:
-      return true
-    return false
-
+    if resides_in_treatment_center and not has_left_treatment_center: true
+    else: false
 # (e)(1)(B): individual receives allotment if they leave the center
 allotment_payable_to_individual:
   entity: Person
@@ -62,9 +60,6 @@ allotment_payable_to_individual:
   description: "Whether the allotment is provided directly to the individual per 7 USC 2017(a)(e)(1)(B)"
   from 2013-01-01:
     # Individual receives allotment if they have left the center
-    if resides_in_treatment_center and has_left_treatment_center:
-      return true
-    # Also payable to individual if not in treatment center at all
-    if not resides_in_treatment_center:
-      return true
-    return false
+    if resides_in_treatment_center and has_left_treatment_center: true
+    elif not resides_in_treatment_center: true
+    else: false

@@ -44,15 +44,8 @@ hope_scholarship_limitations_satisfied:
   description: "Whether all limitations of 26 USC 25A(b)(2) are satisfied for the Hope Scholarship Credit (AOTC)"
   from 2013-01-01:
     # (A) Cannot have already claimed AOTC for 4 prior years
-    if aotc_4_year_limit_met:
-      return False
-    # (B) Must be at least half-time student for at least one academic period
-    if not aotc_half_time_requirement_met:
-      return False
-    # (C) Must be within first 4 years of postsecondary education
-    if not aotc_first_4_years_eligible:
-      return False
-    # (D) Cannot have felony drug conviction
-    if eligible_student_drug_conviction_disqualified:
-      return False
-    return True
+    if aotc_4_year_limit_met: False
+    elif not aotc_half_time_requirement_met: False
+    elif not aotc_first_4_years_eligible: False
+    elif eligible_student_drug_conviction_disqualified: False
+    else: True

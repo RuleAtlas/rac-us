@@ -66,8 +66,7 @@ actc_inflation_adjusted_max:
     # Note: Statute requires rounding to next lowest $100 multiple
     # DSL lacks floor/integer division, so this returns adjusted value
     # Runtime engine should handle rounding per 24(i)(3)
-    return adjusted
-
+    adjusted
 ctc_credit_inflation_adjusted:
   imports:
     - 26/24/a#ctc_base_amount
@@ -84,4 +83,4 @@ ctc_credit_inflation_adjusted:
     # Note: Statute requires rounding to next lowest $100 multiple
     # DSL lacks floor/integer division, so this returns adjusted value
     # Runtime engine should handle rounding per 24(i)(3)
-    return adjusted
+    adjusted

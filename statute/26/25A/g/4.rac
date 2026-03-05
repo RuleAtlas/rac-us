@@ -56,12 +56,8 @@ prepaid_expenses_eligible_current_year:
   description: "Whether prepaid qualified expenses for a following-year academic period are eligible to be treated as current year expenses per 26 USC 25A(g)(4)"
   from 1997-08-05:
     # Per (g)(4): Academic period must begin during first 3 months following the taxable year
-    if not academic_period_begins_following_year:
-      # Academic period begins in current year - standard treatment, not prepayment rule
-      return False
-    # Check if academic period begins within allowed months (January, February, or March)
-    return academic_period_begins_month <= prepayment_months_allowed
-
+    if not academic_period_begins_following_year: False
+    else: academic_period_begins_month <= prepayment_months_allowed
 qualified_expenses_treated_as_current_year:
   entity: TaxUnit
   period: Year
@@ -72,12 +68,6 @@ qualified_expenses_treated_as_current_year:
   from 1997-08-05:
     # Recompute eligibility inline (test runner evaluates variables independently)
     prepaid_eligible = academic_period_begins_following_year and academic_period_begins_month <= prepayment_months_allowed
-    if prepaid_eligible:
-      # Prepaid expenses for following-year academic period starting in first 3 months
-      # are treated as if academic period began in current year
-      return qualified_expenses_paid_current_year
-    if not academic_period_begins_following_year:
-      # Standard case: academic period begins in current year
-      return qualified_expenses_paid_current_year
-    # Academic period begins after first 3 months of following year - cannot claim in current year
-    return 0
+    if prepaid_eligible: qualified_expenses_paid_current_year
+    elif not academic_period_begins_following_year: qualified_expenses_paid_current_year
+    else: 0

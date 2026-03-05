@@ -36,10 +36,8 @@ basic_std_ded_hoh:
   description: "Basic standard deduction for head of household filers per 26 USC 63(c)(2)(B)"
   from 1988-01-01:
     # TCJA provisions apply for taxable years beginning after 2017
-    if tax_year >= tcja_effective_year:
-      return basic_std_ded_hoh_tcja
-    return basic_std_ded_hoh_pre_tcja
-
+    if tax_year >= tcja_effective_year: basic_std_ded_hoh_tcja
+    else: basic_std_ded_hoh_pre_tcja
 tax_year:
   entity: TaxUnit
   period: Year

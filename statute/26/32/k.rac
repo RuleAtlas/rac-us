@@ -84,13 +84,9 @@ eitc_in_fraud_disallowance_period:
   label: "In EITC Fraud Disallowance Period"
   description: "Whether current year is within fraud disallowance period per 26 USC 32(k)(1)(B)(i)"
   from 1997-01-01:
-    if eitc_fraud_determination_year == 0:
-      return False
     years_since_fraud = current_tax_year - eitc_fraud_determination_year
-    if years_since_fraud > 0 and years_since_fraud <= fraud_disallowance_years:
-      return True
-    return False
-
+    if years_since_fraud > 0 and years_since_fraud <= fraud_disallowance_years: True
+    else: False
 eitc_in_reckless_disallowance_period:
   entity: TaxUnit
   period: Year
@@ -98,13 +94,9 @@ eitc_in_reckless_disallowance_period:
   label: "In EITC Reckless Disregard Disallowance Period"
   description: "Whether current year is within reckless disregard disallowance period per 26 USC 32(k)(1)(B)(ii)"
   from 1997-01-01:
-    if eitc_reckless_determination_year == 0:
-      return False
     years_since_reckless = current_tax_year - eitc_reckless_determination_year
-    if years_since_reckless > 0 and years_since_reckless <= reckless_disallowance_years:
-      return True
-    return False
-
+    if years_since_reckless > 0 and years_since_reckless <= reckless_disallowance_years: True
+    else: False
 eitc_requires_recertification:
   entity: TaxUnit
   period: Year
@@ -112,10 +104,8 @@ eitc_requires_recertification:
   label: "EITC Requires Recertification"
   description: "Whether taxpayer must provide recertification info per 26 USC 32(k)(2)"
   from 1997-01-01:
-    if eitc_denied_via_deficiency_procedures:
-      return True
-    return False
-
+    if eitc_denied_via_deficiency_procedures: True
+    else: False
 eitc_disallowed_improper_claim:
   entity: TaxUnit
   period: Year
@@ -124,11 +114,7 @@ eitc_disallowed_improper_claim:
   description: "Whether EITC disallowed due to improper prior claim per 26 USC 32(k)"
   from 1997-01-01:
     # (k)(1)(A) - No credit in disallowance period (fraud or reckless)
-    if eitc_in_fraud_disallowance_period:
-      return True
-    if eitc_in_reckless_disallowance_period:
-      return True
-    # (k)(2) - No credit unless recertification info provided
-    if eitc_requires_recertification and not eitc_recertification_info_provided:
-      return True
-    return False
+    if eitc_in_fraud_disallowance_period: True
+    elif eitc_in_reckless_disallowance_period: True
+    elif eitc_requires_recertification and not eitc_recertification_info_provided: True
+    else: False

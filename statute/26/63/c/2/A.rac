@@ -24,8 +24,7 @@ basic_std_ded_joint:
   description: "Basic standard deduction for joint filers and surviving spouses per 26 USC 63(c)(2)(A)"
   from 1988-01-01:
     # 200 percent of the subparagraph (C) amount
-    return basic_std_ded_other * joint_multiplier
-
+    basic_std_ded_other * joint_multiplier
 tax_year:
   entity: TaxUnit
   period: Year

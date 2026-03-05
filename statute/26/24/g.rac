@@ -78,11 +78,8 @@ ctc_in_fraud_disallowance_period:
   label: "In CTC Fraud Disallowance Period"
   description: "Whether taxpayer is in disallowance period due to fraud per 26 USC 24(g)(1)(B)(i)"
   from 2016-01-01:
-    if ctc_fraud_determination_year == 0:
-      return False
     years_since_fraud = current_tax_year - ctc_fraud_determination_year
-    return years_since_fraud <= ctc_fraud_disallowance_years
-
+    years_since_fraud <= ctc_fraud_disallowance_years
 ctc_in_reckless_disallowance_period:
   entity: TaxUnit
   period: Year
@@ -90,11 +87,8 @@ ctc_in_reckless_disallowance_period:
   label: "In CTC Reckless Disallowance Period"
   description: "Whether taxpayer is in disallowance period due to reckless claim per 26 USC 24(g)(1)(B)(ii)"
   from 2016-01-01:
-    if ctc_reckless_determination_year == 0:
-      return False
     years_since_reckless = current_tax_year - ctc_reckless_determination_year
-    return years_since_reckless <= ctc_reckless_disallowance_years
-
+    years_since_reckless <= ctc_reckless_disallowance_years
 ctc_disallowed_prior_claim:
   entity: TaxUnit
   period: Year
@@ -103,12 +97,7 @@ ctc_disallowed_prior_claim:
   description: "Whether CTC is disallowed due to prior improper claim per 26 USC 24(g)"
   from 2016-01-01:
     # Fraud disallowance
-    if ctc_in_fraud_disallowance_period:
-      return True
-    # Reckless disallowance
-    if ctc_in_reckless_disallowance_period:
-      return True
-    # Documentation requirement not met
-    if ctc_deficiency_requires_documentation and not ctc_documentation_provided:
-      return True
-    return False
+    if ctc_in_fraud_disallowance_period: True
+    elif ctc_in_reckless_disallowance_period: True
+    elif ctc_deficiency_requires_documentation and not ctc_documentation_provided: True
+    else: False

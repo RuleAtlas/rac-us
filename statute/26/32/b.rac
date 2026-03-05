@@ -147,15 +147,10 @@ eitc_credit_percentage:
   description: "Credit percentage based on number of qualifying children per 26 USC 32(b)(1)"
   from 1996-01-01:
     # 32(b)(1): Credit percentage depends on number of qualifying children
-    if qualifying_children_count == 0:
-      return eitc_credit_percentage_0
-    if qualifying_children_count == 1:
-      return eitc_credit_percentage_1
-    if qualifying_children_count == 2:
-      return eitc_credit_percentage_2
-    # 3 or more qualifying children
-    return eitc_credit_percentage_3plus
-
+    if qualifying_children_count == 0: eitc_credit_percentage_0
+    elif qualifying_children_count == 1: eitc_credit_percentage_1
+    elif qualifying_children_count == 2: eitc_credit_percentage_2
+    else: eitc_credit_percentage_3plus
 # =============================================================================
 # Variables - Phaseout percentage per 32(b)(1)
 # =============================================================================
@@ -169,13 +164,9 @@ eitc_phaseout_percentage:
   description: "Phaseout percentage based on number of qualifying children per 26 USC 32(b)(1)"
   from 1996-01-01:
     # 32(b)(1): Phaseout percentage depends on number of qualifying children
-    if qualifying_children_count == 0:
-      return eitc_phaseout_percentage_0
-    if qualifying_children_count == 1:
-      return eitc_phaseout_percentage_1
-    # 2 or more qualifying children (same rate for 2, 3+)
-    return eitc_phaseout_percentage_2plus
-
+    if qualifying_children_count == 0: eitc_phaseout_percentage_0
+    elif qualifying_children_count == 1: eitc_phaseout_percentage_1
+    else: eitc_phaseout_percentage_2plus
 # =============================================================================
 # Variables - Earned income amount per 32(b)(2)(A)
 # =============================================================================
@@ -189,13 +180,9 @@ eitc_earned_income_amount:
   description: "Earned income amount based on number of qualifying children per 26 USC 32(b)(2)(A)"
   from 1996-01-01:
     # 32(b)(2)(A): Earned income amount depends on number of qualifying children
-    if qualifying_children_count == 0:
-      return eitc_earned_income_amount_0
-    if qualifying_children_count == 1:
-      return eitc_earned_income_amount_1
-    # 2 or more qualifying children
-    return eitc_earned_income_amount_2plus
-
+    if qualifying_children_count == 0: eitc_earned_income_amount_0
+    elif qualifying_children_count == 1: eitc_earned_income_amount_1
+    else: eitc_earned_income_amount_2plus
 # =============================================================================
 # Variables - Phaseout amount per 32(b)(2)(A) and (B)
 # =============================================================================
@@ -209,13 +196,7 @@ eitc_phaseout_amount:
   description: "Phaseout amount based on number of qualifying children per 26 USC 32(b)(2)(A), increased for joint returns per 32(b)(2)(B)"
   from 1996-01-01:
     # 32(b)(2)(A): Base phaseout amount depends on number of qualifying children
-    if qualifying_children_count == 0:
-      base_amount = eitc_phaseout_amount_0
-    else:
-      # 1 or more qualifying children share same base phaseout
-      base_amount = eitc_phaseout_amount_1plus
-
+    base_amount = if qualifying_children_count == 0: eitc_phaseout_amount_0 else: eitc_phaseout_amount_1plus
     # 32(b)(2)(B): Joint return increase
-    if is_joint_return:
-      return base_amount + eitc_joint_return_phaseout_increase
-    return base_amount
+    if is_joint_return: base_amount + eitc_joint_return_phaseout_increase
+    else: base_amount

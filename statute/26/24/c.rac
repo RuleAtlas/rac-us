@@ -48,12 +48,7 @@ is_ctc_qualifying_child:
   description: "Whether individual qualifies as qualifying child for CTC per 26 USC 24(c)"
   from 1998-01-01:
     # Must be qualifying child under 152(c)
-    if not is_qualifying_child_152c:
-      return False
-    # Must not have attained age 17
-    if child_age >= ctc_qualifying_age:
-      return False
-    # Must meet citizenship/residency requirement
-    if not is_us_citizen_or_resident:
-      return False
-    return True
+    if not is_qualifying_child_152c: False
+    elif child_age >= ctc_qualifying_age: False
+    elif not is_us_citizen_or_resident: False
+    else: True

@@ -145,12 +145,8 @@ qualified_tuition_and_related_expenses_llc:
     # Nonacademic fees excluded per (C)
     nonacademic_exclusion = student_activity_fees + athletic_fees + education_insurance_expenses + other_nonacademic_expenses
     # Sports/games/hobbies exception per (B): excluded UNLESS part of degree program
-    if sports_course_part_of_degree:
-      # Part of degree program - sports expenses included
-      return max(0, base_expenses - nonacademic_exclusion)
-    # Not part of degree program - sports expenses excluded
-    return max(0, base_expenses - sports_games_hobbies_expenses - nonacademic_exclusion)
-
+    if sports_course_part_of_degree: max(0, base_expenses - nonacademic_exclusion)
+    else: max(0, base_expenses - sports_games_hobbies_expenses - nonacademic_exclusion)
 # Variable: Qualified tuition and related expenses for AOTC
 # Per (D): Same as LLC but also includes course materials
 qualified_tuition_and_related_expenses_aotc:
@@ -166,8 +162,5 @@ qualified_tuition_and_related_expenses_aotc:
     # Nonacademic fees excluded per (C)
     nonacademic_exclusion = student_activity_fees + athletic_fees + education_insurance_expenses + other_nonacademic_expenses
     # Sports/games/hobbies exception per (B): excluded UNLESS part of degree program
-    if sports_course_part_of_degree:
-      # Part of degree program - sports expenses included
-      return max(0, base_expenses - nonacademic_exclusion)
-    # Not part of degree program - sports expenses excluded
-    return max(0, base_expenses - sports_games_hobbies_expenses - nonacademic_exclusion)
+    if sports_course_part_of_degree: max(0, base_expenses - nonacademic_exclusion)
+    else: max(0, base_expenses - sports_games_hobbies_expenses - nonacademic_exclusion)

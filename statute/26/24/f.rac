@@ -35,7 +35,5 @@ ctc_meets_full_year_requirement:
   description: "Whether taxpayer meets full taxable year requirement per 26 USC 24(f)"
   from 1998-01-01:
     # Exception for death
-    if taxpayer_deceased:
-      return True
-    # Otherwise must be full 12-month year
-    return tax_year_months >= ctc_min_tax_year_months
+    if taxpayer_deceased: True
+    else: tax_year_months >= ctc_min_tax_year_months

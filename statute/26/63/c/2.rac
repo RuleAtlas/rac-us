@@ -29,16 +29,10 @@ basic_standard_deduction:
   description: "Basic standard deduction amount based on filing status per 26 USC 63(c)(2)"
   from 2013-01-01:
     # (A) Joint returns and surviving spouses: 200% of (C)
-    if filing_status == "JOINT":
-      return basic_std_ded_joint
-    if filing_status == "SURVIVING_SPOUSE":
-      return basic_std_ded_joint
-    # (B) Head of household
-    if filing_status == "HEAD_OF_HOUSEHOLD":
-      return basic_std_ded_hoh
-    # (C) All other cases (single, MFS)
-    return basic_std_ded_other
-
+    if filing_status == "JOINT": basic_std_ded_joint
+    elif filing_status == "SURVIVING_SPOUSE": basic_std_ded_joint
+    elif filing_status == "HEAD_OF_HOUSEHOLD": basic_std_ded_hoh
+    else: basic_std_ded_other
 tax_year:
   entity: TaxUnit
   period: Year

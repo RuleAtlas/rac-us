@@ -69,8 +69,7 @@ ptc_after_advance_reconciliation:
     # (f)(1): "The amount of the credit allowed under this section for any
     # taxable year shall be reduced (but not below zero) by the amount of any
     # advance payment of such credit under section 1412"
-    return max(0, ptc_premium_tax_credit - ptc_advance_payments)
-
+    max(0, ptc_premium_tax_credit - ptc_advance_payments)
 # =============================================================================
 # (f)(2) - Tax increase for excess advance payments
 # =============================================================================
@@ -91,4 +90,4 @@ ptc_excess_advance_repayment:
     #
     # "determined without regard to paragraph (1)" means we compare advance
     # payments to the full credit amount before the (f)(1) reduction.
-    return max(0, ptc_advance_payments - ptc_premium_tax_credit)
+    max(0, ptc_advance_payments - ptc_premium_tax_credit)

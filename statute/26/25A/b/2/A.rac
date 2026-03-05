@@ -27,4 +27,4 @@ aotc_4_year_limit_met:
   label: "AOTC 4-Year Limit Met"
   description: "Whether student has used AOTC for 4 prior years, disqualifying further claims per 26 USC 25A(b)(2)(A)"
   from 1997-08-05:
-    return prior_aotc_years_claimed >= max_aotc_years
+    prior_aotc_years_claimed >= max_aotc_years

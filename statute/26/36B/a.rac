@@ -41,6 +41,5 @@ ptc_premium_tax_credit:
   from 2013-01-01:
     # (a): "In the case of an applicable taxpayer, there shall be allowed as a
     # credit...an amount equal to the premium assistance credit amount"
-    if not is_applicable_taxpayer:
-      return 0
-    return ptc_premium_assistance_credit_amount
+    if not is_applicable_taxpayer: 0
+    else: ptc_premium_assistance_credit_amount

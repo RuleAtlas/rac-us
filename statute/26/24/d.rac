@@ -111,8 +111,7 @@ actc_earned_income_amount:
   description: "15% of earned income over threshold per 26 USC 24(d)(1)(B)(i)"
   from 1998-01-01:
     excess_earned_income = max(0, earned_income - actc_earned_income_threshold)
-    return excess_earned_income * actc_phasein_rate
-
+    excess_earned_income * actc_phasein_rate
 actc_ss_excess_amount:
   entity: TaxUnit
   period: Year
@@ -122,10 +121,8 @@ actc_ss_excess_amount:
   description: "Excess of SS taxes over EITC per 26 USC 24(d)(1)(B)(ii)"
   from 1998-01-01:
     # Only applies to taxpayers with 3+ qualifying children
-    if qualifying_child_count < actc_ss_min_children:
-      return 0
-    return max(0, social_security_taxes - eitc_amount)
-
+    if qualifying_child_count < actc_ss_min_children: 0
+    else: max(0, social_security_taxes - eitc_amount)
 actc_limitation_increase:
   entity: TaxUnit
   period: Year
@@ -134,8 +131,7 @@ actc_limitation_increase:
   label: "ACTC Limitation Increase"
   description: "Greater of earned income or SS excess amounts per 26 USC 24(d)(1)(B)"
   from 1998-01-01:
-    return max(actc_earned_income_amount, actc_ss_excess_amount)
-
+    max(actc_earned_income_amount, actc_ss_excess_amount)
 actc_amount:
   imports:
     - 26/24/b#ctc_after_phaseout
@@ -147,10 +143,7 @@ actc_amount:
   description: "Refundable portion of CTC per 26 USC 24(d)"
   from 1998-01-01:
     # Exception for foreign income exclusion
-    if excludes_foreign_income:
-      return 0
-    # Lesser of (A) credit amount or (B) limitation increase
     uncapped = min(ctc_after_phaseout, actc_limitation_increase)
     # Per (h)(5), cap at $1,400 per child for post-2017 years
     max_refundable = qualifying_child_count * actc_max_per_child
-    return min(uncapped, max_refundable)
+    min(uncapped, max_refundable)

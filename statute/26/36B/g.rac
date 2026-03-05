@@ -88,13 +88,9 @@ ptc_ui_is_applicable_taxpayer:
     # during 2021"
     # (g)(1)(A): "such taxpayer shall be treated as an applicable taxpayer"
     # (g)(4)(A): "shall not affect the application of subsection (c)(1)(C)"
-    if not received_ui_compensation_2021:
-      return false
-    # Per (g)(4)(A), joint return requirement still applies
-    if not joint_return_requirement_met:
-      return false
-    return true
-
+    if not received_ui_compensation_2021: false
+    elif not joint_return_requirement_met: false
+    else: true
 # =============================================================================
 # (g)(1)(B) - Household income cap for PTC purposes
 # =============================================================================
@@ -114,11 +110,8 @@ ptc_ui_capped_household_income:
     # family of the size involved"
     # This effectively caps household income at 133% FPL for PTC calculation
     # purposes (but NOT for affordability under (g)(4)(B)).
-    if not received_ui_compensation_2021:
-      return household_income
     income_cap = poverty_line * ui_household_income_fpl_cap
-    return min(household_income, income_cap)
-
+    min(household_income, income_cap)
 # =============================================================================
 # (g)(4)(B) - Affordability uses uncapped household income
 # =============================================================================
@@ -135,4 +128,4 @@ ptc_ui_affordability_household_income:
     # household income for purposes of paragraph (2)(C)(i)(II) or (4)(C)(ii)
     # of subsection (c)"
     # For affordability, always use actual household income regardless of UI status
-    return household_income
+    household_income

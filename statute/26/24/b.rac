@@ -73,15 +73,10 @@ ctc_threshold:
   label: "CTC Phaseout Threshold"
   description: "Applicable threshold amount based on filing status per 26 USC 24(b)(2)"
   from 1998-01-01:
-    if filing_status == "JOINT":
-      return ctc_threshold_joint
-    if filing_status == "SURVIVING_SPOUSE":
-      return ctc_threshold_joint
-    if filing_status == "SEPARATE":
-      return ctc_threshold_separate
-    # Single and HOH use single threshold
-    return ctc_threshold_single
-
+    if filing_status == "JOINT": ctc_threshold_joint
+    elif filing_status == "SURVIVING_SPOUSE": ctc_threshold_joint
+    elif filing_status == "SEPARATE": ctc_threshold_separate
+    else: ctc_threshold_single
 ctc_phaseout_amount:
   imports:
     - 26/24/a#ctc_maximum
@@ -109,15 +104,10 @@ ctc_phaseout_amount:
     separate_reduction = min(separate_excess * joint_rate, ctc_maximum)
 
     # Select appropriate reduction based on filing status
-    if filing_status == "JOINT":
-      return joint_reduction
-    if filing_status == "SURVIVING_SPOUSE":
-      return joint_reduction
-    if filing_status == "SEPARATE":
-      return separate_reduction
-    # Single and HOH
-    return single_reduction
-
+    if filing_status == "JOINT": joint_reduction
+    elif filing_status == "SURVIVING_SPOUSE": joint_reduction
+    elif filing_status == "SEPARATE": separate_reduction
+    else: single_reduction
 ctc_after_phaseout:
   imports:
     - 26/24/a#ctc_maximum
@@ -128,4 +118,4 @@ ctc_after_phaseout:
   label: "CTC After Income Phaseout"
   description: "Child tax credit after income limitation per 26 USC 24(b)"
   from 1998-01-01:
-    return max(0, ctc_maximum - ctc_phaseout_amount)
+    max(0, ctc_maximum - ctc_phaseout_amount)

@@ -48,9 +48,6 @@ sec_25A_identification_requirement_met:
   description: "Whether identification requirements of 26 USC 25A(g)(1) are satisfied for education credit"
   from 2013-01-01:
     # Per (A): SSN requirement must be met for any credit under subsection (a)
-    if not ssn_requirement_met:
-      return False
-    # Per (B): Institution EIN required only for AOTC
-    if claiming_aotc and not institution_ein_requirement_met:
-      return False
-    return True
+    if not ssn_requirement_met: False
+    elif claiming_aotc and not institution_ein_requirement_met: False
+    else: True

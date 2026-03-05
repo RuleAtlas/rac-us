@@ -26,4 +26,4 @@ snap_benefits_excluded_from_income:
   description: "Whether SNAP benefits are excluded from income and resources per 7 USC 2017(a)(b)"
   default: true
   from 2013-01-01:
-    return true
+    true

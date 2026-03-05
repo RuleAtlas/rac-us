@@ -44,15 +44,9 @@ tcja_income_tax:
   description: "Income tax per 26 USC 1(j)(2) rate tables based on filing status"
   from 2013-01-01:
     # Select tax calculation based on filing status
-    if filing_status == "JOINT":
-      return joint_income_tax
-    if filing_status == "SURVIVING_SPOUSE":
-      return joint_income_tax
-    if filing_status == "HEAD_OF_HOUSEHOLD":
-      return hoh_income_tax
-    if filing_status == "SINGLE":
-      return single_income_tax
-    if filing_status == "SEPARATE":
-      return mfs_income_tax
-    # Default to single if status unknown
-    return single_income_tax
+    if filing_status == "JOINT": joint_income_tax
+    elif filing_status == "SURVIVING_SPOUSE": joint_income_tax
+    elif filing_status == "HEAD_OF_HOUSEHOLD": hoh_income_tax
+    elif filing_status == "SINGLE": single_income_tax
+    elif filing_status == "SEPARATE": mfs_income_tax
+    else: single_income_tax

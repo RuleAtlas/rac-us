@@ -96,8 +96,7 @@ ptc_adjusted_premiums:
   from 2013-01-01:
     # (e)(1)(A): "the aggregate amount of premiums...shall be reduced by the
     # portion (if any) of such premiums which is attributable to such individuals"
-    return max(0, aggregate_premiums_before_adjustment - premiums_attributable_to_non_lawfully_present)
-
+    max(0, aggregate_premiums_before_adjustment - premiums_attributable_to_non_lawfully_present)
 # =============================================================================
 # (e)(1)(B) - Adjusted household income
 # =============================================================================
@@ -113,4 +112,4 @@ ptc_adjusted_household_income:
     # (e)(1)(B): "the determination of household income shall be made by reducing
     # the income otherwise taken into account under subsection (b)(4)(A) by any
     # amount of such income that is attributable to individuals not lawfully present"
-    return max(0, household_income_before_adjustment - income_attributable_to_non_lawfully_present)
+    max(0, household_income_before_adjustment - income_attributable_to_non_lawfully_present)

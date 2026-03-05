@@ -24,4 +24,4 @@ eligible_student_drug_conviction_disqualified:
   label: "Disqualified by Felony Drug Conviction"
   description: "Whether student is disqualified from eligible student status due to felony drug conviction per 26 USC 25A(b)(2)(D)"
   from 2013-01-01:
-    return has_felony_drug_conviction
+    has_felony_drug_conviction

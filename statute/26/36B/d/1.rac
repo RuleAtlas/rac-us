@@ -31,4 +31,4 @@ ptc_family_size:
   label: "PTC Family Size"
   description: "Family size for purposes of 26 USC 36B per subsection (d)(1)"
   from 2013-01-01:
-    return section_151_deduction_count
+    section_151_deduction_count

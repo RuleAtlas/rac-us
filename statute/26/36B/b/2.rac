@@ -67,4 +67,4 @@ ptc_premium_assistance_amount:
     amount_b = max(0, ptc_slcsp_monthly_premium - expected_contribution)
 
     # Lesser of (A) or (B)
-    return min(amount_a, amount_b)
+    min(amount_a, amount_b)

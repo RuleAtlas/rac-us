@@ -78,4 +78,4 @@ trust_income_tax:
     bracket_4_income = max(0, taxable_income - trust_bracket_4_threshold)
     tax_4 = bracket_4_income * trust_rate_4
 
-    return tax_1 + tax_2 + tax_3 + tax_4
+    tax_1 + tax_2 + tax_3 + tax_4

@@ -87,21 +87,12 @@ is_eitc_qualifying_child:
   from 2013-01-01:
     # (A) In general: Must be qualifying child under 152(c)
     # (determined without regard to 152(c)(1)(D) and 152(e))
-    if not is_qualifying_child_152c:
-      return False
-
+    # (A) In general: Must be qualifying child under 152(c)
+    if not is_qualifying_child_152c: False
     # (B) Married individual: Exclude married child unless taxpayer claims 151 deduction
-    if child_is_married:
-      if not taxpayer_claims_151_deduction_for_child:
-        return False
-
+    elif child_is_married and not taxpayer_claims_151_deduction_for_child: False
     # (C) Place of abode: Principal place must be in the United States
-    if not child_principal_abode_in_us:
-      return False
-
+    elif not child_principal_abode_in_us: False
     # (D)(i) Identification requirements: Must include name, age, TIN on return
-    # Note: (D)(ii) is administrative ("Secretary may prescribe other methods")
-    if not child_tin_included_on_return:
-      return False
-
-    return True
+    elif not child_tin_included_on_return: False
+    else: True

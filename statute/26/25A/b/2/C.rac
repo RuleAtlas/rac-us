@@ -27,4 +27,4 @@ aotc_first_4_years_eligible:
   label: "AOTC First 4 Years Eligibility"
   description: "Whether student is within first 4 years of AOTC eligibility per 26 USC 25A(b)(2)(C)"
   from 2009-01-01:
-    return aotc_years_claimed < aotc_max_years
+    aotc_years_claimed < aotc_max_years

@@ -55,8 +55,7 @@ dependent_disqualified_from_credit:
   label: "Dependent Disqualified From Credit"
   description: "Whether the individual is disqualified from claiming section 25A credit due to being claimed as a dependent per 26 USC 25A(g)(3)(A)"
   from 2013-01-01:
-    return is_dependent_of_another_taxpayer
-
+    is_dependent_of_another_taxpayer
 expenses_attributed_to_claiming_taxpayer:
   entity: Person
   period: Year
@@ -67,10 +66,8 @@ expenses_attributed_to_claiming_taxpayer:
   from 2013-01-01:
     # Per (B): If individual is claimed as dependent, their expenses are attributed
     # to the taxpayer claiming them
-    if is_dependent_of_another_taxpayer:
-      return qualified_expenses_paid_by_dependent
-    return 0
-
+    if is_dependent_of_another_taxpayer: qualified_expenses_paid_by_dependent
+    else: 0
 form_1098t_attributed_to_claiming_taxpayer:
   entity: Person
   period: Year
@@ -80,6 +77,5 @@ form_1098t_attributed_to_claiming_taxpayer:
   from 2013-01-01:
     # Per (C): If individual is claimed as dependent, Form 1098-T received by them
     # is treated as received by the taxpayer claiming them
-    if is_dependent_of_another_taxpayer:
-      return form_1098t_received_by_dependent
-    return False
+    if is_dependent_of_another_taxpayer: form_1098t_received_by_dependent
+    else: False

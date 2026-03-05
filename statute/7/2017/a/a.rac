@@ -73,8 +73,7 @@ minimum_allotment:
   label: "Minimum SNAP Allotment"
   description: "Minimum allotment for households of one and two persons per 7 USC 2017(a)"
   from 1977-10-01:
-    return thrifty_food_plan_cost_1_member * minimum_allotment_rate
-
+    thrifty_food_plan_cost_1_member * minimum_allotment_rate
 # Full allotment: "equal to the cost to such households of the thrifty food plan
 # reduced by an amount equal to 30 per centum of the household's income ...
 # rounded to the nearest lower whole dollar"
@@ -95,7 +94,5 @@ snap_allotment:
     base_allotment = max(0, thrifty_food_plan_cost - snap_net_income * income_contribution_rate)
 
     # Proviso: for households of 1-2 persons, minimum allotment floor applies
-    if household_size <= minimum_allotment_max_household_size:
-      return max(minimum_allotment, base_allotment)
-
-    return base_allotment
+    if household_size <= minimum_allotment_max_household_size: max(minimum_allotment, base_allotment)
+    else: base_allotment

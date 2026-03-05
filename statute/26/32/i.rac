@@ -126,8 +126,7 @@ net_rent_royalty_income:
     # 32(i)(2)(C): excess of (i) gross income over (ii) sum of deductions
     total_deductions = rent_royalty_deductions_noninterest + rent_royalty_interest_deductions
     excess = gross_rent_royalty_income - total_deductions
-    return max(0, excess)
-
+    max(0, excess)
 # Variable: Net passive income per 32(i)(2)(E)
 net_passive_income:
   entity: TaxUnit
@@ -139,8 +138,7 @@ net_passive_income:
   from 2021-01-01:
     # 32(i)(2)(E): excess of (i) aggregate income over (ii) aggregate losses
     excess = gross_passive_income - passive_activity_losses
-    return max(0, excess)
-
+    max(0, excess)
 # Variable: Total disqualified income per 32(i)(2)
 disqualified_income:
   entity: TaxUnit
@@ -161,8 +159,7 @@ disqualified_income:
     # 32(i)(2)(E): net passive income (computed in separate variable)
     passive = net_passive_income
     # Sum all components
-    return interest_dividends + exempt_interest + rent_royalty + cap_gains + passive
-
+    interest_dividends + exempt_interest + rent_royalty + cap_gains + passive
 # Variable: EITC denied due to excessive investment income per 32(i)(1)
 eitc_denied_excessive_investment_income:
   entity: TaxUnit
@@ -172,4 +169,4 @@ eitc_denied_excessive_investment_income:
   description: "Whether EITC is denied due to disqualified income exceeding limit per 26 USC 32(i)(1)"
   from 2021-01-01:
     # 32(i)(1): No credit if disqualified income exceeds limit
-    return disqualified_income > disqualified_income_limit
+    disqualified_income > disqualified_income_limit

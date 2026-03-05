@@ -95,8 +95,7 @@ eitc_inflation_adjusted_earned_income_amount_0:
     # Apply inflation adjustment: base * (1 + COLA)
     # Note: Rounding to nearest $10 per 32(j)(2) is handled by runtime
     adjusted = eitc_base_earned_income_amount_0 * (1 + eitc_cola_adjustment)
-    return adjusted
-
+    adjusted
 eitc_inflation_adjusted_earned_income_amount_1:
   entity: TaxUnit
   period: Year
@@ -108,8 +107,7 @@ eitc_inflation_adjusted_earned_income_amount_1:
     # Apply inflation adjustment: base * (1 + COLA)
     # Note: Rounding to nearest $10 per 32(j)(2) is handled by runtime
     adjusted = eitc_base_earned_income_amount_1 * (1 + eitc_cola_adjustment)
-    return adjusted
-
+    adjusted
 eitc_inflation_adjusted_earned_income_amount_2:
   entity: TaxUnit
   period: Year
@@ -121,8 +119,7 @@ eitc_inflation_adjusted_earned_income_amount_2:
     # Apply inflation adjustment: base * (1 + COLA)
     # Note: Rounding to nearest $10 per 32(j)(2) is handled by runtime
     adjusted = eitc_base_earned_income_amount_2 * (1 + eitc_cola_adjustment)
-    return adjusted
-
+    adjusted
 eitc_inflation_adjusted_phaseout_amount_0:
   entity: TaxUnit
   period: Year
@@ -134,8 +131,7 @@ eitc_inflation_adjusted_phaseout_amount_0:
     # Apply inflation adjustment: base * (1 + COLA)
     # Note: Rounding to nearest $10 per 32(j)(2) is handled by runtime
     adjusted = eitc_base_phaseout_amount_0 * (1 + eitc_cola_adjustment)
-    return adjusted
-
+    adjusted
 eitc_inflation_adjusted_phaseout_amount_1plus:
   entity: TaxUnit
   period: Year
@@ -147,4 +143,4 @@ eitc_inflation_adjusted_phaseout_amount_1plus:
     # Apply inflation adjustment: base * (1 + COLA)
     # Note: Rounding to nearest $10 per 32(j)(2) is handled by runtime
     adjusted = eitc_base_phaseout_amount_1plus * (1 + eitc_cola_adjustment)
-    return adjusted
+    adjusted

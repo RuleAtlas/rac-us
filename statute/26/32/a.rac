@@ -48,8 +48,7 @@ eitc_credit_before_limitation:
     # "credit percentage of so much of the taxpayer's earned income...as does not exceed
     # the earned income amount"
     income_subject_to_credit = min(eitc_earned_income, eitc_earned_income_amount)
-    return eitc_credit_percentage * income_subject_to_credit
-
+    eitc_credit_percentage * income_subject_to_credit
 # =============================================================================
 # 32(a)(2)(A) - Maximum credit (credit percentage of earned income amount)
 # =============================================================================
@@ -66,8 +65,7 @@ eitc_maximum_credit:
   description: "Maximum credit amount per 26 USC 32(a)(2)(A) = credit percentage * earned income amount"
   from 2013-01-01:
     # (a)(2)(A): "the credit percentage of the earned income amount"
-    return eitc_credit_percentage * eitc_earned_income_amount
-
+    eitc_credit_percentage * eitc_earned_income_amount
 # =============================================================================
 # 32(a)(2)(B) - Phaseout base income
 # =============================================================================
@@ -83,8 +81,7 @@ eitc_phaseout_base:
   description: "Income base for phaseout = greater of AGI or earned income per 26 USC 32(a)(2)(B)"
   from 2013-01-01:
     # (a)(2)(B): "the adjusted gross income (or, if greater, the earned income)"
-    return max(adjusted_gross_income, eitc_earned_income)
-
+    max(adjusted_gross_income, eitc_earned_income)
 # =============================================================================
 # 32(a)(2)(B) - Phaseout reduction amount
 # =============================================================================
@@ -103,8 +100,7 @@ eitc_phaseout_reduction:
     # (a)(2)(B): "the phaseout percentage of so much of the [phaseout_base]...
     # as exceeds the phaseout amount"
     excess_over_phaseout = max(0, eitc_phaseout_base - eitc_phaseout_amount)
-    return eitc_phaseout_percentage * excess_over_phaseout
-
+    eitc_phaseout_percentage * excess_over_phaseout
 # =============================================================================
 # 32(a)(2) - Credit after limitation
 # =============================================================================
@@ -121,8 +117,7 @@ eitc_credit_after_limitation:
     # (A) = maximum credit
     # (B) = phaseout reduction
     # "the excess (if any) of (A) over (B)"
-    return max(0, eitc_maximum_credit - eitc_phaseout_reduction)
-
+    max(0, eitc_maximum_credit - eitc_phaseout_reduction)
 # =============================================================================
 # 32(a) - Final earned income credit
 # =============================================================================
@@ -144,27 +139,9 @@ earned_income_credit:
     # Check all eligibility requirements before allowing credit
 
     # 32(c)(1): Must be an eligible individual
-    if not is_eitc_eligible_individual:
-      return 0
-
-    # 32(d): Married individuals must file joint return
-    if not eitc_eligible_under_32d:
-      return 0
-
-    # 32(i): Disallowed if excessive investment income
-    if eitc_denied_excessive_investment_income:
-      return 0
-
-    # 32(k): Disallowed if improper prior claim
-    if eitc_disallowed_improper_claim:
-      return 0
-
-    # 32(m): Must meet identification requirements
-    if not eitc_id_requirements_met:
-      return 0
-
-    # 32(a)(1) and (2): Compute credit with limitation
-    # Credit = min(credit_before_limitation, credit_after_limitation)
-    # But since credit_after_limitation caps the maximum, we use the lesser of
-    # (1) the phase-in calculation and (2) the phase-out calculation
-    return min(eitc_credit_before_limitation, eitc_credit_after_limitation)
+    if not is_eitc_eligible_individual: 0
+    elif not eitc_eligible_under_32d: 0
+    elif eitc_denied_excessive_investment_income: 0
+    elif eitc_disallowed_improper_claim: 0
+    elif not eitc_id_requirements_met: 0
+    else: min(eitc_credit_before_limitation, eitc_credit_after_limitation)

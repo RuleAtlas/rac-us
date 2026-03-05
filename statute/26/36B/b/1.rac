@@ -40,4 +40,4 @@ ptc_premium_assistance_credit_amount:
   from 2013-01-01:
     # (b)(1): "the sum of the premium assistance amounts determined under
     # paragraph (2) with respect to all coverage months"
-    return ptc_premium_assistance_amount * ptc_coverage_months
+    ptc_premium_assistance_amount * ptc_coverage_months

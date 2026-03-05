@@ -37,4 +37,4 @@ aotc_half_time_requirement_met:
   from 1997-08-05:
     # Credit allowed only if individual is an eligible student (at least half-time)
     # for at least one academic period beginning during the taxable year
-    return eligible_student_academic_periods >= min_academic_periods_for_aotc
+    eligible_student_academic_periods >= min_academic_periods_for_aotc

@@ -108,21 +108,8 @@ ptc_is_qualified_health_plan:
   description: "Whether the plan is a qualified health plan for purposes of the premium tax credit per 26 USC 36B(c)(3)(A)"
   from 2013-01-01:
     # (A)(i): Must be a qualified health plan under PPACA 1301(a)
-    if not is_ppaca_1301a_qualified_plan:
-      return false
-
-    # (A)(i): Excludes catastrophic plans under PPACA 1302(e)
-    if is_catastrophic_plan:
-      return false
-
-    # (A)(ii): If enrolled through Exchange, Exchange must have pre-enrollment
-    # verification process (effective for taxable years beginning after 12/31/2027)
-    if enrolled_through_exchange and not exchange_has_pre_enrollment_verification:
-      return false
-
-    # (A)(iii): Excludes plans enrolled in during certain special enrollment
-    # periods that are income-based and not triggered by qualifying events
-    if enrolled_during_special_enrollment_period and special_enrollment_is_income_based:
-      return false
-
-    return true
+    if not is_ppaca_1301a_qualified_plan: false
+    elif is_catastrophic_plan: false
+    elif enrolled_through_exchange and not exchange_has_pre_enrollment_verification: false
+    elif enrolled_during_special_enrollment_period and special_enrollment_is_income_based: false
+    else: true

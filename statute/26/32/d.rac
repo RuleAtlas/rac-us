@@ -34,7 +34,5 @@ eitc_eligible_under_32d:
   description: "Whether eligible for EITC under the married individuals rule of 26 USC 32(d)"
   from 2013-01-01:
     # If not married, this rule does not disqualify
-    if not is_married:
-      return true
-    # If married, must file joint return
-    return files_joint_return
+    if not is_married: true
+    else: files_joint_return

@@ -29,4 +29,4 @@ institution_ein_requirement_met:
     # Per (B): EIN must be provided for AOTC
     # Note: This variable just checks whether the EIN is provided
     # The parent variable in g/1.rac applies this only when claiming AOTC
-    return institution_ein_provided
+    institution_ein_provided

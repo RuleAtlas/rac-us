@@ -38,19 +38,12 @@ child_tax_credit:
   description: "Total child tax credit per 26 USC 24"
   from 2013-01-01:
     # Check all disqualifying conditions
-    if not ctc_meets_id_requirements:
-      return 0
-    if not ctc_meets_full_year_requirement:
-      return 0
-    if ctc_disallowed_prior_claim:
-      return 0
-    if not ctc_ssn_requirement_met:
-      return 0
-    if ctc_disallowed_possession_coordination:
-      return 0
-    # Return credit after advance reconciliation plus other dependent credit
-    return ctc_after_advance_reconciliation + odc_amount
-
+    if not ctc_meets_id_requirements: 0
+    elif not ctc_meets_full_year_requirement: 0
+    elif ctc_disallowed_prior_claim: 0
+    elif not ctc_ssn_requirement_met: 0
+    elif ctc_disallowed_possession_coordination: 0
+    else: ctc_after_advance_reconciliation + odc_amount
 refundable_ctc:
   imports:
     - 26/24/d#actc_amount
@@ -67,14 +60,9 @@ refundable_ctc:
   description: "Refundable portion of CTC per 26 USC 24(d)"
   from 2013-01-01:
     # Check all disqualifying conditions
-    if not ctc_meets_id_requirements:
-      return 0
-    if not ctc_meets_full_year_requirement:
-      return 0
-    if ctc_disallowed_prior_claim:
-      return 0
-    if not ctc_ssn_requirement_met:
-      return 0
-    if ctc_disallowed_possession_coordination:
-      return 0
-    return actc_amount
+    if not ctc_meets_id_requirements: 0
+    elif not ctc_meets_full_year_requirement: 0
+    elif ctc_disallowed_prior_claim: 0
+    elif not ctc_ssn_requirement_met: 0
+    elif ctc_disallowed_possession_coordination: 0
+    else: actc_amount

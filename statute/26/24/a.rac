@@ -41,4 +41,4 @@ ctc_maximum:
   label: "Maximum Child Tax Credit"
   description: "Maximum CTC before limitations per 26 USC 24(a)"
   from 1998-01-01:
-    return qualifying_child_count * ctc_base_amount
+    qualifying_child_count * ctc_base_amount

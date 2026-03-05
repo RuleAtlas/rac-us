@@ -54,4 +54,4 @@ magi_for_25A:
   label: "Modified AGI for Education Credits"
   description: "Modified adjusted gross income for purposes of 26 USC 25A per subsection (d)(2)"
   from 2013-01-01:
-    return adjusted_gross_income + section_911_exclusion + section_931_exclusion + section_933_exclusion
+    adjusted_gross_income + section_911_exclusion + section_931_exclusion + section_933_exclusion

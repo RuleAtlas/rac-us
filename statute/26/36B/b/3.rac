@@ -330,10 +330,8 @@ household_income_pct_fpl:
   label: "Household Income as Percent of FPL"
   description: "Household income expressed as a ratio of the federal poverty line per 26 USC 36B(b)(3)(A)"
   from 2014-01-01:
-    if poverty_line == 0:
-      return 0
-    return household_income / poverty_line
-
+    if poverty_line == 0: 0
+    else: household_income / poverty_line
 # =============================================================================
 # Variable: Applicable percentage under clause (i) base table
 # =============================================================================
@@ -350,37 +348,19 @@ applicable_percentage_base:
     income_ratio = household_income_pct_fpl
 
     # Tier 1: Up to 133% FPL
-    if income_ratio <= base_tier_2_threshold:
-      return base_initial_1
-
+    if income_ratio <= base_tier_2_threshold: base_initial_1
     # Tier 2: 133% up to 150% FPL
-    if income_ratio <= base_tier_3_threshold:
-      fraction = (income_ratio - base_tier_2_threshold) / (base_tier_3_threshold - base_tier_2_threshold)
-      return base_initial_2 + (base_final_2 - base_initial_2) * fraction
-
+    elif income_ratio <= base_tier_3_threshold: base_initial_2 + (base_final_2 - base_initial_2) * (income_ratio - base_tier_2_threshold) / (base_tier_3_threshold - base_tier_2_threshold)
     # Tier 3: 150% up to 200% FPL
-    if income_ratio <= base_tier_4_threshold:
-      fraction = (income_ratio - base_tier_3_threshold) / (base_tier_4_threshold - base_tier_3_threshold)
-      return base_initial_3 + (base_final_3 - base_initial_3) * fraction
-
+    elif income_ratio <= base_tier_4_threshold: base_initial_3 + (base_final_3 - base_initial_3) * (income_ratio - base_tier_3_threshold) / (base_tier_4_threshold - base_tier_3_threshold)
     # Tier 4: 200% up to 250% FPL
-    if income_ratio <= base_tier_5_threshold:
-      fraction = (income_ratio - base_tier_4_threshold) / (base_tier_5_threshold - base_tier_4_threshold)
-      return base_initial_4 + (base_final_4 - base_initial_4) * fraction
-
+    elif income_ratio <= base_tier_5_threshold: base_initial_4 + (base_final_4 - base_initial_4) * (income_ratio - base_tier_4_threshold) / (base_tier_5_threshold - base_tier_4_threshold)
     # Tier 5: 250% up to 300% FPL
-    if income_ratio <= base_tier_6_threshold:
-      fraction = (income_ratio - base_tier_5_threshold) / (base_tier_6_threshold - base_tier_5_threshold)
-      return base_initial_5 + (base_final_5 - base_initial_5) * fraction
-
+    elif income_ratio <= base_tier_6_threshold: base_initial_5 + (base_final_5 - base_initial_5) * (income_ratio - base_tier_5_threshold) / (base_tier_6_threshold - base_tier_5_threshold)
     # Tier 6: 300% up to 400% FPL
-    if income_ratio <= base_tier_upper:
-      fraction = (income_ratio - base_tier_6_threshold) / (base_tier_upper - base_tier_6_threshold)
-      return base_initial_6 + (base_final_6 - base_initial_6) * fraction
-
-    # Above 400% FPL: not an applicable taxpayer under base table (no subsidy)
-    return base_final_6
-
+    elif income_ratio <= base_tier_upper: base_initial_6 + (base_final_6 - base_initial_6) * (income_ratio - base_tier_6_threshold) / (base_tier_upper - base_tier_6_threshold)
+    # Above 400% FPL
+    else: base_final_6
 # =============================================================================
 # Variable: Applicable percentage under clause (iii) IRA temporary table
 # =============================================================================
@@ -396,32 +376,17 @@ applicable_percentage_ira:
     income_ratio = household_income_pct_fpl
 
     # Tier 1: Up to 150% FPL
-    if income_ratio <= ira_tier_2_threshold:
-      return ira_initial_1
-
+    if income_ratio <= ira_tier_2_threshold: ira_initial_1
     # Tier 2: 150% up to 200% FPL
-    if income_ratio <= ira_tier_3_threshold:
-      fraction = (income_ratio - ira_tier_2_threshold) / (ira_tier_3_threshold - ira_tier_2_threshold)
-      return ira_initial_2 + (ira_final_2 - ira_initial_2) * fraction
-
+    elif income_ratio <= ira_tier_3_threshold: ira_initial_2 + (ira_final_2 - ira_initial_2) * (income_ratio - ira_tier_2_threshold) / (ira_tier_3_threshold - ira_tier_2_threshold)
     # Tier 3: 200% up to 250% FPL
-    if income_ratio <= ira_tier_4_threshold:
-      fraction = (income_ratio - ira_tier_3_threshold) / (ira_tier_4_threshold - ira_tier_3_threshold)
-      return ira_initial_3 + (ira_final_3 - ira_initial_3) * fraction
-
+    elif income_ratio <= ira_tier_4_threshold: ira_initial_3 + (ira_final_3 - ira_initial_3) * (income_ratio - ira_tier_3_threshold) / (ira_tier_4_threshold - ira_tier_3_threshold)
     # Tier 4: 250% up to 300% FPL
-    if income_ratio <= ira_tier_5_threshold:
-      fraction = (income_ratio - ira_tier_4_threshold) / (ira_tier_5_threshold - ira_tier_4_threshold)
-      return ira_initial_4 + (ira_final_4 - ira_initial_4) * fraction
-
+    elif income_ratio <= ira_tier_5_threshold: ira_initial_4 + (ira_final_4 - ira_initial_4) * (income_ratio - ira_tier_4_threshold) / (ira_tier_5_threshold - ira_tier_4_threshold)
     # Tier 5: 300% up to 400% FPL
-    if income_ratio <= ira_tier_6_threshold:
-      fraction = (income_ratio - ira_tier_5_threshold) / (ira_tier_6_threshold - ira_tier_5_threshold)
-      return ira_initial_5 + (ira_final_5 - ira_initial_5) * fraction
-
-    # Tier 6: 400% and higher - flat rate
-    return ira_final_6
-
+    elif income_ratio <= ira_tier_6_threshold: ira_initial_5 + (ira_final_5 - ira_initial_5) * (income_ratio - ira_tier_5_threshold) / (ira_tier_6_threshold - ira_tier_5_threshold)
+    # Tier 6: 400% and higher
+    else: ira_final_6
 # =============================================================================
 # Variable: Applicable percentage (combined, selecting correct table by year)
 # =============================================================================
@@ -435,9 +400,5 @@ applicable_percentage:
   from 2014-01-01:
     # Clause (iii): For taxable years 2021-2025, use IRA temporary table
     # and clause (ii) indexing does not apply
-    if tax_year >= ira_start_year and tax_year <= ira_end_year:
-      return applicable_percentage_ira
-
-    # Otherwise, use base table from clause (i)
-    # (clause (ii) indexing is handled via indexed_by on the base parameters)
-    return applicable_percentage_base
+    if tax_year >= ira_start_year and tax_year <= ira_end_year: applicable_percentage_ira
+    else: applicable_percentage_base

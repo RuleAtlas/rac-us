@@ -43,8 +43,5 @@ llc_eligible_expenses:
   description: "Qualified expenses eligible for Lifetime Learning Credit after coordination with AOTC per 26 USC 25A(c)(2)"
   from 2013-01-01:
     # Per (A): Expenses cannot include those for an individual with AOTC election
-    if aotc_election_in_effect:
-      return 0
-    # Per (B): Expenses include those for job skill courses (no additional filtering needed here;
-    # the broader definition is applied at the f(1) input level)
-    return total_qualified_expenses
+    if aotc_election_in_effect: 0
+    else: total_qualified_expenses

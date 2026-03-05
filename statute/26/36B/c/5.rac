@@ -122,16 +122,7 @@ ptc_month_passes_exchange_verification:
   description: "Whether a month satisfies the Exchange enrollment verification requirement for coverage month status per 26 USC 36B(c)(5)"
   from 2025-07-04:
     # This provision only applies for taxable years beginning after 12/31/2027
-    if tax_year < exchange_verification_effective_year:
-      return true
-
-    # (A): Only applies to plans enrolled in through an Exchange
-    if not enrolled_through_exchange:
-      return true
-
-    # (E): Secretary may waive for special enrollment due to family size change
-    if verification_waived_for_special_enrollment:
-      return true
-
-    # (A)/(C): Exchange must have verified eligibility (including retroactive)
-    return exchange_has_verified_eligibility
+    if tax_year < exchange_verification_effective_year: true
+    elif not enrolled_through_exchange: true
+    elif verification_waived_for_special_enrollment: true
+    else: exchange_has_verified_eligibility

@@ -47,9 +47,6 @@ ssn_requirement_met:
   description: "Whether SSN requirements of 26 USC 25A(g)(1)(A) are satisfied"
   from 2013-01-01:
     # Per (i): Taxpayer must include their SSN
-    if not taxpayer_has_valid_ssn:
-      return False
-    # Per (ii): If claiming for non-spouse dependent, their name and SSN required
-    if claiming_for_non_spouse_dependent and not student_ssn_provided:
-      return False
-    return True
+    if not taxpayer_has_valid_ssn: False
+    elif claiming_for_non_spouse_dependent and not student_ssn_provided: False
+    else: True

@@ -27,4 +27,4 @@ education_credit_25a_elected_out:
   label: "Education Credit Section 25A Elected Out"
   description: "Whether taxpayer has made the election under 26 USC 25A(e) not to have section 25A apply for this individual"
   from 2013-01-01:
-    return section_25a_election_not_to_apply
+    section_25a_election_not_to_apply

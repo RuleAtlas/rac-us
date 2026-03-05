@@ -36,10 +36,8 @@ ctc_meets_id_requirements:
   description: "Whether taxpayer meets identification requirements per 26 USC 24(e)"
   from 2013-01-01:
     # Taxpayer must have valid TIN
-    if not taxpayer_has_valid_tin:
-      return False
-    return True
-
+    if not taxpayer_has_valid_tin: False
+    else: True
 child_meets_ctc_id_requirement:
   entity: Person
   period: Year
@@ -47,4 +45,4 @@ child_meets_ctc_id_requirement:
   label: "Child Meets CTC ID Requirement"
   description: "Whether child meets identification requirement per 26 USC 24(e)(1)"
   from 2013-01-01:
-    return child_has_valid_tin
+    child_has_valid_tin
