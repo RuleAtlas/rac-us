@@ -19,38 +19,41 @@ rac-us/
 │   └── 7/               # Title 7 (Agriculture)
 │       ├── 2014/        # § 2014 - SNAP Eligibility
 │       └── 2017/        # § 2017 - SNAP Allotment
-└── RAC_SPEC.md           # Full .rac format specification
 ```
 
-## Filepath = Citation
+## Filepath = citation
 
 ```
 statute/26/32/c/2/A.rac  →  26 USC § 32(c)(2)(A)
 statute/7/2017/a.rac     →  7 USC § 2017(a)
 ```
 
-## .rac Format v2
+## .rac format
 
-See `RAC_SPEC.md` for full specification. Key features:
+See `rac/docs/RAC_SPEC.md` for full specification. Key features:
 
-**Named declarations** (not blocks):
+**No keyword prefixes** — type inferred from fields:
 ```yaml
-parameter contribution_rate:
-  values:
-    1977-01-01: 0.30
+# Parameter (no entity field)
+contribution_rate:
+  description: "Household contribution as share of net income"
+  from 1977-01-01: 0.30
 
-variable snap_allotment:
-  imports: [7/2014#household_size]
+# Computed value (has entity field)
+snap_allotment:
+  imports:
+    - 7/2014#household_size
   entity: Household
   period: Month
   dtype: Money
-  formula: ...
-  tests:
-    - inputs: {...}
-      expect: 823
+  from 2024-01-01:
+    if not snap_eligible: 0
+    else: max_allotment - net_income * contribution_rate
 ```
 
-**Self-contained**: text, parameters, variables, tests in one file.
+**Expression-based formulas** — the last expression is the value. No `return` keyword.
+
+**Self-contained**: statute text, parameters, computed values, and tests in one file.
 
 **Import syntax**: `path#variable` or `path#variable as alias`
 
@@ -59,7 +62,7 @@ variable snap_allotment:
 - Same-file variables: in scope for later variables (dependency order)
 - Imports: in scope for that variable's formula only
 
-## Formula Rules
+## Formula rules
 
 **Allowed literals**: only -1, 0, 1, 2, 3
 
@@ -84,15 +87,14 @@ python -m rac.validate schema statute/
 
 # Validate imports only
 python -m rac.validate imports statute/
+
+# Run inline tests
+python -m rac.test_runner statute/ -v
 ```
 
-## Exemplar Files
+## Related repos
 
-New format exemplars:
-- `statute/7/2017/a/allotment_new.rac` - SNAP allotment
-
-## Related Repos
-
-- **rac-compile** - DSL compiler and runtime
+- **rac** - DSL parser, compiler, and runtime
 - **atlas** - Source document archive
+- **autorac** - AI-assisted statute encoding
 - **rac-validators** - Validation against external calculators
