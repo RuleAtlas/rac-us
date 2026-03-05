@@ -192,13 +192,11 @@ eitc_meets_age_requirement:
     # For married individuals, either spouse can satisfy the requirement
 
     # Check if taxpayer meets age: >= 25 AND < 65
-    taxpayer_at_least_25 = taxpayer_age >= eitc_min_age_childless
-    taxpayer_under_65 = taxpayer_age < eitc_max_age_childless
-
-    spouse_at_least_25 = spouse_age >= eitc_min_age_childless
-    spouse_under_65 = spouse_age < eitc_max_age_childless
-
-    if spouse_at_least_25 and spouse_under_65: True
+    taxpayer_meets_age = taxpayer_age >= eitc_min_age_childless and taxpayer_age < eitc_max_age_childless
+    # For married, either spouse can satisfy the requirement
+    spouse_meets_age = spouse_age >= eitc_min_age_childless and spouse_age < eitc_max_age_childless
+    if taxpayer_meets_age: True
+    elif is_married_eitc and spouse_meets_age: True
     else: False
 eitc_meets_id_number_requirement:
   entity: TaxUnit
