@@ -1,0 +1,31 @@
+# 26 USC 24(d)(3) tests
+
+ctc_refundable_foreign_income_exception:
+    - name: "Taxpayer does not elect section 911 exclusion"
+      period: 2024-01
+      inputs:
+          elects_section_911_exclusion: false
+      expect: true
+
+    - name: "Taxpayer elects section 911 exclusion"
+      period: 2024-01
+      inputs:
+          elects_section_911_exclusion: true
+      expect: false
+
+    - name: "Default - no election"
+      period: 2024-01
+      inputs: {}
+      expect: true
+
+    - name: "Earlier year - no election"
+      period: 2018-01
+      inputs:
+          elects_section_911_exclusion: false
+      expect: true
+
+    - name: "Earlier year - with election"
+      period: 2018-01
+      inputs:
+          elects_section_911_exclusion: true
+      expect: false

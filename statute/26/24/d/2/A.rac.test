@@ -1,0 +1,47 @@
+# 26 USC 24(d)(2)(A) tests
+
+social_security_taxes:
+    - name: "All zero inputs"
+      period: 2024-01
+      inputs:
+        fica_employee_tax: 0
+        railroad_retirement_tier1_tax: 0
+        self_employment_tax: 0
+        railroad_employee_representative_tax: 0
+      expect: 0
+
+    - name: "FICA only"
+      period: 2024-01
+      inputs:
+        fica_employee_tax: 5000
+        railroad_retirement_tier1_tax: 0
+        self_employment_tax: 0
+        railroad_employee_representative_tax: 0
+      expect: 5000
+
+    - name: "Self-employment tax at 50 percent"
+      period: 2024-01
+      inputs:
+        fica_employee_tax: 0
+        railroad_retirement_tier1_tax: 0
+        self_employment_tax: 10000
+        railroad_employee_representative_tax: 0
+      expect: 5000
+
+    - name: "All components"
+      period: 2024-01
+      inputs:
+        fica_employee_tax: 3000
+        railroad_retirement_tier1_tax: 1000
+        self_employment_tax: 8000
+        railroad_employee_representative_tax: 2000
+      expect: 9000
+
+    - name: "Railroad employee representative tax at 50 percent"
+      period: 2024-01
+      inputs:
+        fica_employee_tax: 0
+        railroad_retirement_tier1_tax: 0
+        self_employment_tax: 0
+        railroad_employee_representative_tax: 6000
+      expect: 3000

@@ -1,0 +1,27 @@
+# 26 USC 24(d)(3) - Exception for taxpayers excluding foreign earned income
+
+"""
+(3) Exception for taxpayers excluding foreign earned income.—
+Paragraph (1) shall not apply to any taxpayer for any taxable year
+if such taxpayer elects to exclude any amount from gross income
+under section 911 for such taxable year.
+"""
+
+elects_section_911_exclusion:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Elects foreign earned income exclusion"
+    description: "Whether the taxpayer elects to exclude any amount from gross income under section 911"
+    default: false
+
+ctc_refundable_foreign_income_exception:
+    imports:
+        - 26/24/d/1#ctc_refundable_amount
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Exception for foreign earned income exclusion"
+    description: "Paragraph (1) shall not apply if taxpayer elects section 911 exclusion"
+    from 1998-01-01:
+        not elects_section_911_exclusion

@@ -1,0 +1,18 @@
+# 26 USC Section 24(d)(1)(A) - Credit without regard to limitations
+
+"""
+(A) the credit which would be allowed under this section without regard
+to this subsection and the limitation under section 26(a), or
+"""
+
+ctc_without_limitations:
+    imports:
+        - 26/24/a#ctc_allowance
+        - 26/24/b#ctc_phaseout_reduction
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    label: "CTC without limitations"
+    description: "Child tax credit allowed under section 24 without regard to subsection (d) refundability and section 26(a) tax liability limitation"
+    from 1998-01-01:
+        max(0, ctc_allowance - ctc_phaseout_reduction)

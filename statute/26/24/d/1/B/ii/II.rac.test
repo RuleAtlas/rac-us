@@ -1,0 +1,20 @@
+# 26 USC 24(d)(1)(B)(ii)(II) tests
+
+section_32_credit:
+    - name: "No earned income credit"
+      period: 2024-01
+      inputs:
+        earned_income_credit: 0
+      expect: 0
+
+    - name: "Typical EITC amount"
+      period: 2024-01
+      inputs:
+        earned_income_credit: 3995
+      expect: 3995
+
+    - name: "Maximum EITC for family with 3 children"
+      period: 2024-01
+      inputs:
+        earned_income_credit: 7830
+      expect: 7830

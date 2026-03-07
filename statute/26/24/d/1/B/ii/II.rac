@@ -1,0 +1,17 @@
+# 26 USC 24(d)(1)(B)(ii)(II) - Section 32 credit for the taxable year
+
+"""
+(II) the credit allowed under section 32 for the taxable year.
+"""
+
+section_32_credit:
+    imports:
+        - 26/32#earned_income_credit
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Section 32 credit for the taxable year"
+    description: "The credit allowed under section 32 (earned income credit) for the taxable year, per 26 USC 24(d)(1)(B)(ii)(II)"
+    from 2001-01-01:
+        return earned_income_credit

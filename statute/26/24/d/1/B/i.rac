@@ -1,0 +1,27 @@
+# 26 USC 24(d)(1)(B)(i) - Earned income component of additional child tax credit
+
+"""
+(i) 15 percent of so much of the taxpayer's earned income (within
+the meaning of section 32) which is taken into account in computing
+taxable income for the taxable year as exceeds $3,000, or
+"""
+
+earned_income_rate:
+    description: "Rate applied to earned income above threshold"
+    unit: rate
+    from 2001-01-01: 0.15
+
+earned_income_threshold:
+    description: "Earned income threshold for additional child tax credit"
+    unit: USD
+    from 2001-01-01: 3000
+    from 2018-01-01: 2500
+
+earned_income_component:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: "USD"
+    label: "Earned income component of additional child tax credit"
+    description: "15% of earned income in excess of threshold per 26 USC 24(d)(1)(B)(i)"
+    from 2001-01-01: earned_income_rate * max(0, earned_income - earned_income_threshold)

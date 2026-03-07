@@ -1,0 +1,43 @@
+# 26 USC 24(d)(2)(A) - Social security taxes - In general
+
+"""
+(A) In general.-- The term "social security taxes" means, with respect to
+any taxpayer for any taxable year--
+  (i) the amount of the taxes imposed by sections 3101 and 3201(a) on
+      amounts received by the taxpayer during the calendar year in which
+      the taxable year begins,
+  (ii) 50 percent of the taxes imposed by section 1401 on the
+       self-employment income of the taxpayer for the taxable year, and
+  (iii) 50 percent of the taxes imposed by section 3211(a) on amounts
+        received by the taxpayer during the calendar year in which the
+        taxable year begins.
+"""
+
+status: encoded
+
+self_employment_tax_share:
+    description: "Share of self-employment tax (section 1401) included in social security taxes"
+    unit: rate
+    from 1998-01-01: 0.5
+
+railroad_employee_rep_tax_share:
+    description: "Share of railroad retirement employee representative tax (section 3211(a)) included in social security taxes"
+    unit: rate
+    from 1998-01-01: 0.5
+
+social_security_taxes:
+    imports:
+        - 26/3101#fica_employee_tax
+        - 26/3201/a#railroad_retirement_tier1_tax
+        - 26/1401#self_employment_tax
+        - 26/3211/a#railroad_employee_representative_tax
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Social security taxes"
+    description: "Social security taxes as defined in 26 USC 24(d)(2)(A) for purposes of the additional child tax credit"
+    from 1998-01-01:
+        se_portion = self_employment_tax_share * self_employment_tax
+        rr_portion = railroad_employee_rep_tax_share * railroad_employee_representative_tax
+        fica_employee_tax + railroad_retirement_tier1_tax + se_portion + rr_portion

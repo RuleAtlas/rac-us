@@ -1,0 +1,32 @@
+# 26 USC 24(d)(1)(B)(i) tests
+
+earned_income_component:
+    - name: "Earned income below threshold - zero result"
+      period: 2024-01
+      inputs:
+        earned_income: 2000
+      expect: 0
+
+    - name: "Earned income at threshold - zero result"
+      period: 2024-01
+      inputs:
+        earned_income: 2500
+      expect: 0
+
+    - name: "Earned income above threshold"
+      period: 2024-01
+      inputs:
+        earned_income: 12500
+      expect: 1500
+
+    - name: "Pre-TCJA threshold of $3,000"
+      period: 2017-01
+      inputs:
+        earned_income: 13000
+      expect: 1500
+
+    - name: "Zero earned income"
+      period: 2024-01
+      inputs:
+        earned_income: 0
+      expect: 0
