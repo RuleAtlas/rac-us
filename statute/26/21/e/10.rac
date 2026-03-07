@@ -1,0 +1,27 @@
+# 26 USC Section 21(e)(10) - Identifying information required with respect to qualifying individuals
+
+"""
+(10) Identifying information required with respect to qualifying individuals.--
+No credit shall be allowed under this section with respect to any qualifying
+individual unless the TIN of such individual is included on the return
+claiming the credit.
+"""
+
+status: encoded
+
+qualifying_individual_tin_provided:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Qualifying individual TIN provided on return"
+    description: "Whether the TIN of the qualifying individual is included on the return claiming the credit per 26 USC 21(e)(10)"
+    default: false
+
+qualifying_individual_meets_tin_requirement:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Qualifying individual meets TIN requirement"
+    description: "No credit shall be allowed with respect to any qualifying individual unless their TIN is included on the return per 26 USC 21(e)(10)"
+    from 2002-01-01:
+        qualifying_individual_tin_provided

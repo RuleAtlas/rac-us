@@ -1,0 +1,37 @@
+# 26 USC Section 21(b)(1)(C) tests
+
+is_spouse_qualifying_individual:
+    - name: "Incapable spouse sharing abode full year"
+      period: 2024-01
+      inputs:
+          spouse_incapable_of_self_care: true
+          spouse_same_abode_fraction: 1.0
+      expect: true
+
+    - name: "Incapable spouse sharing abode for more than half"
+      period: 2024-01
+      inputs:
+          spouse_incapable_of_self_care: true
+          spouse_same_abode_fraction: 0.75
+      expect: true
+
+    - name: "Incapable spouse sharing abode for exactly half (not qualifying)"
+      period: 2024-01
+      inputs:
+          spouse_incapable_of_self_care: true
+          spouse_same_abode_fraction: 0.5
+      expect: false
+
+    - name: "Capable spouse sharing abode full year (not qualifying)"
+      period: 2024-01
+      inputs:
+          spouse_incapable_of_self_care: false
+          spouse_same_abode_fraction: 1.0
+      expect: false
+
+    - name: "Incapable spouse not sharing abode (not qualifying)"
+      period: 2024-01
+      inputs:
+          spouse_incapable_of_self_care: true
+          spouse_same_abode_fraction: 0.0
+      expect: false

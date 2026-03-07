@@ -1,0 +1,13 @@
+# 26 USC Section 21(g)(2)(B) - Increased dollar limit for 2+ qualifying individuals (2021)
+
+"""
+(B) by substituting "$16,000" for "$6,000" in paragraph (2) thereof.
+"""
+
+status: encoded
+
+expense_limit_two_or_more_qualifying_individuals_2021:
+    description: "Maximum employment-related expenses creditable with 2 or more qualifying individuals for 2021"
+    unit: USD
+    from 2021-01-01: 16000
+    from 2022-01-01: 6000

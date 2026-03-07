@@ -1,0 +1,13 @@
+# 26 USC Section 21(g)(3)(A) - Substitution of 50 percent for 35 percent (2021)
+
+"""
+(A) by substituting "50 percent" for "35 percent", and
+"""
+
+status: encoded
+
+first_reduction_floor_2021:
+    description: "Minimum applicable percentage after first reduction for 2021 (substituting 50% for 35%)"
+    unit: rate
+    from 2021-01-01: 0.50
+    from 2022-01-01: 0.35

@@ -1,0 +1,61 @@
+# 26 USC Section 21(a)(1) - In general
+
+"""
+(1) In general.-- In the case of an individual for which there are 1 or
+more qualifying individuals (as defined in subsection (b)(1)) with respect
+to such individual, there shall be allowed as a credit against the tax
+imposed by this chapter for the taxable year an amount equal to the
+applicable percentage of the employment-related expenses (as defined in
+subsection (b)(2)) paid by such individual during the taxable year.
+"""
+
+status: encoded
+
+base_applicable_percentage:
+    description: "Base applicable percentage before reductions per 26 USC 21(a)(2)"
+    unit: rate
+    from 2002-01-01: 0.50
+
+applicable_percentage:
+    imports:
+        - 26/21/a/2/A#first_reduction
+        - 26/21/a/2/B#further_reduction
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "Applicable percentage"
+    description: "Applicable percentage of employment-related expenses per 26 USC 21(a)(2): 50% reduced by (A) and further reduced by (B)"
+    from 2002-01-01:
+        result = base_applicable_percentage - first_reduction - further_reduction
+        return max(0, result)
+
+creditable_expenses:
+    imports:
+        - 26/21/c/1#expense_limit_one_qualifying_individual
+        - 26/21/c/2#expense_limit_two_or_more_qualifying_individuals
+        - 26/21/d#earned_income_limit
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Creditable employment-related expenses"
+    description: "Employment-related expenses subject to dollar limit per 26 USC 21(c) and earned income limit per 26 USC 21(d)"
+    from 2002-01-01:
+        if number_of_qualifying_individuals >= 2:
+            dollar_limit = expense_limit_two_or_more_qualifying_individuals
+        else:
+            dollar_limit = expense_limit_one_qualifying_individual
+        capped = min(employment_related_expenses, dollar_limit)
+        return min(capped, earned_income_limit)
+
+child_and_dependent_care_credit:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Child and Dependent Care Credit"
+    description: "Credit for household and dependent care services per 26 USC 21(a)(1): applicable percentage of creditable employment-related expenses"
+    from 2002-01-01:
+        if number_of_qualifying_individuals >= 1:
+            return applicable_percentage * creditable_expenses
+        return 0

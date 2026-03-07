@@ -1,0 +1,32 @@
+# 26 USC Section 21(e)(4)(B) tests
+
+spouse_not_in_household_last_months:
+    - name: "Spouse absent all last 6 months"
+      period: 2024-01
+      inputs:
+        months_spouse_absent_end_of_year: 6
+      expect: true
+
+    - name: "Spouse absent last 7 months (exceeds threshold)"
+      period: 2024-01
+      inputs:
+        months_spouse_absent_end_of_year: 7
+      expect: true
+
+    - name: "Spouse absent only 5 months (below threshold)"
+      period: 2024-01
+      inputs:
+        months_spouse_absent_end_of_year: 5
+      expect: false
+
+    - name: "Spouse present entire year"
+      period: 2024-01
+      inputs:
+        months_spouse_absent_end_of_year: 0
+      expect: false
+
+    - name: "Boundary - exactly at threshold"
+      period: 2024-01
+      inputs:
+        months_spouse_absent_end_of_year: 6
+      expect: true

@@ -1,0 +1,22 @@
+# 26 USC Section 21(e)(2) - Joint return required
+
+"""
+(2) Married couples must file joint return.--
+If the taxpayer is married at the close of the taxable year, the credit
+shall be allowed under subsection (a) only if the taxpayer and his spouse
+file a joint return for the taxable year.
+"""
+
+status: encoded
+
+joint_return_required:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Meets joint return requirement for CDCTC"
+    description: "If married, taxpayer must file joint return to claim credit per 26 USC 21(e)(2)"
+    from 2002-01-01:
+        if is_married:
+            files_joint_return
+        else:
+            1

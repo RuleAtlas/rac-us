@@ -1,0 +1,32 @@
+# 26 USC Section 21(b)(2)(B)(ii) - Other qualifying individual (8hr rule)
+
+"""
+(ii) a qualifying individual (not described in paragraph (1)(A)) who
+regularly spends at least 8 hours each day in the taxpayer's household.
+"""
+
+min_daily_hours_in_household:
+    description: "Minimum hours per day a non-child qualifying individual must regularly spend in the taxpayer's household for outside-household expenses to qualify"
+    unit: hours
+    from 2002-01-01: 8
+
+daily_hours_in_taxpayer_household:
+    entity: Person
+    period: Year
+    dtype: Integer
+    label: "Daily hours in taxpayer household"
+    description: "Number of hours per day the qualifying individual regularly spends in the taxpayer's household"
+    default: 0
+
+meets_8hr_household_rule:
+    imports:
+        - 26/21/b/1/A#is_qualifying_individual_under_13
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Meets 8-hour household rule"
+    description: "Whether a non-child qualifying individual regularly spends at least 8 hours each day in the taxpayer's household per 26 USC 21(b)(2)(B)(ii)"
+    from 2002-01-01:
+        is_not_child_dependent = not is_qualifying_individual_under_13
+        meets_hours = daily_hours_in_taxpayer_household >= min_daily_hours_in_household
+        is_not_child_dependent and meets_hours

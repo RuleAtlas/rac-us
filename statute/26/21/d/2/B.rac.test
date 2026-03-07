@@ -1,0 +1,14 @@
+# 26 USC Section 21(d)(2)(B) tests
+
+deemed_earned_income_two_or_more_qualifying:
+    - name: "Value is $500 for 2024"
+      period: 2024-01
+      expect: 500
+
+    - name: "Value is $500 for 2010"
+      period: 2010-01
+      expect: 500
+
+    - name: "Value is $500 for 2002"
+      period: 2002-01
+      expect: 500

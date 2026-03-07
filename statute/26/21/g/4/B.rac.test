@@ -1,0 +1,32 @@
+# 26 USC Section 21(g)(4)(B) tests
+
+phaseout_percentage:
+    - name: "AGI below threshold - full 20%"
+      period: 2021-01
+      inputs:
+        adjusted_gross_income: 350000
+      expect: 0.20
+
+    - name: "AGI at threshold - full 20%"
+      period: 2021-01
+      inputs:
+        adjusted_gross_income: 400000
+      expect: 0.20
+
+    - name: "AGI $1 over threshold - reduced by 1 ppt (fraction rounds up)"
+      period: 2021-01
+      inputs:
+        adjusted_gross_income: 400001
+      expect: 0.19
+
+    - name: "AGI $10,000 over threshold - reduced by 5 ppts"
+      period: 2021-01
+      inputs:
+        adjusted_gross_income: 410000
+      expect: 0.15
+
+    - name: "AGI $40,000+ over threshold - phaseout percentage is zero"
+      period: 2021-01
+      inputs:
+        adjusted_gross_income: 440000
+      expect: 0

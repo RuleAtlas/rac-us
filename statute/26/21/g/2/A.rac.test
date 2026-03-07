@@ -1,0 +1,17 @@
+# 26 USC Section 21(g)(2)(A) tests
+
+expense_limit_one_qualifying_individual_2021:
+    - name: "2021 increased limit is $8,000"
+      period: 2021-01
+      inputs: {}
+      expect: 8000
+
+    - name: "2022 reverts to $3,000"
+      period: 2022-01
+      inputs: {}
+      expect: 3000
+
+    - name: "2023 remains at $3,000"
+      period: 2023-01
+      inputs: {}
+      expect: 3000

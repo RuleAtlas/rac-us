@@ -1,0 +1,23 @@
+# 26 USC Section 21(b)(2)(D) - Dependent care center defined
+
+"""
+(D) Dependent care center defined.-- For purposes of this paragraph,
+the term "dependent care center" means any facility which--
+(i) provides care for more than six individuals (other than
+individuals who reside at the facility), and
+(ii) receives a fee, payment, or grant for providing services for any
+of the individuals (regardless of whether such facility is operated
+for profit).
+"""
+
+is_dependent_care_center:
+    imports:
+        - 26/21/b/2/D/i#meets_dependent_care_center_size_test
+        - 26/21/b/2/D/ii#receives_fee_payment_or_grant
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Is a dependent care center"
+    description: "Whether a facility qualifies as a dependent care center per 26 USC 21(b)(2)(D) - must both provide care for more than six non-resident individuals and receive a fee, payment, or grant"
+    from 2002-01-01:
+        meets_dependent_care_center_size_test and receives_fee_payment_or_grant

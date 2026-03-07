@@ -1,0 +1,41 @@
+# 26 USC Section 21(a)(2)(A) - First reduction of applicable percentage
+
+"""
+(A) reduced (but not below 35 percent) by 1 percentage point for each
+$2,000 or fraction thereof by which the taxpayer's adjusted gross income
+for the taxable year exceeds $15,000, and
+"""
+
+status: encoded
+
+first_reduction_agi_threshold:
+    description: "AGI threshold above which first reduction begins"
+    unit: USD
+    from 2002-01-01: 15000
+
+first_reduction_agi_increment:
+    description: "AGI increment per 1 percentage point reduction"
+    unit: USD
+    from 2002-01-01: 2000
+
+first_reduction_rate_per_increment:
+    description: "Percentage point reduction per AGI increment"
+    unit: rate
+    from 2002-01-01: 0.01
+
+first_reduction_floor:
+    description: "Minimum applicable percentage after first reduction"
+    unit: rate
+    from 2002-01-01: 0.35
+
+first_reduction:
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "First reduction of applicable percentage"
+    description: "Reduction in applicable percentage per 26 USC 21(a)(2)(A): 1 percentage point per $2,000 or fraction thereof of AGI exceeding $15,000, not below 35%"
+    from 2002-01-01:
+        excess_agi = max(0, adjusted_gross_income - first_reduction_agi_threshold)
+        increments = -floor(-excess_agi / first_reduction_agi_increment)
+        reduction = increments * first_reduction_rate_per_increment
+        max(0, reduction)

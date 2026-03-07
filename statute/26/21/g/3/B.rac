@@ -1,0 +1,13 @@
+# 26 USC Section 21(g)(3)(B) - Substitution of $125,000 for $15,000 (2021)
+
+"""
+(B) by substituting "$125,000" for "$15,000".
+"""
+
+status: encoded
+
+first_reduction_agi_threshold_2021:
+    description: "AGI threshold above which first reduction begins for 2021 (substituting $125,000 for $15,000)"
+    unit: USD
+    from 2021-01-01: 125000
+    from 2022-01-01: 15000

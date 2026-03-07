@@ -1,0 +1,19 @@
+# 26 USC Section 21(e)(8) - Educational organization defined
+
+"""
+(8) Educational organization defined.-- The term "educational organization"
+means an educational organization described in section 170(b)(1)(A)(ii).
+"""
+
+status: encoded
+
+is_educational_organization:
+    imports:
+        - 26/170/b/1/A/ii#is_educational_organization_170
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Educational organization defined for CDCTC"
+    description: "Per 26 USC 21(e)(8), an educational organization is one described in section 170(b)(1)(A)(ii)"
+    from 1976-01-01:
+        is_educational_organization_170

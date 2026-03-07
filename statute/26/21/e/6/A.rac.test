@@ -1,0 +1,19 @@
+# 26 USC Section 21(e)(6)(A) tests
+
+care_provider_disqualified_as_dependent:
+    - name: "Provider is dependent - disqualified"
+      period: 2024-01
+      inputs:
+        provider_is_dependent_of_taxpayer_or_spouse: true
+      expect: true
+
+    - name: "Provider is not dependent - not disqualified"
+      period: 2024-01
+      inputs:
+        provider_is_dependent_of_taxpayer_or_spouse: false
+      expect: false
+
+    - name: "Provider not dependent - default"
+      period: 2024-01
+      inputs: {}
+      expect: false

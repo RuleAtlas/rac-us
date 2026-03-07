@@ -1,0 +1,43 @@
+# 26 USC Section 21(g)(4)(B) - Phaseout percentage defined
+
+"""
+(B) Phaseout percentage.-- The term "phaseout percentage" means 20 percent
+reduced (but not below zero) by 1 percentage point for each $2,000 (or
+fraction thereof) by which the taxpayer's adjusted gross income for the
+taxable year exceeds $400,000.
+"""
+
+status: encoded
+
+phaseout_base_rate:
+    description: "Base rate for phaseout percentage"
+    unit: rate
+    from 2021-01-01: 0.20
+    from 2022-01-01: 0.20
+
+phaseout_agi_threshold:
+    description: "AGI threshold above which phaseout percentage begins to reduce"
+    unit: USD
+    from 2021-01-01: 400000
+
+phaseout_agi_increment:
+    description: "AGI increment per 1 percentage point reduction of phaseout percentage"
+    unit: USD
+    from 2021-01-01: 2000
+
+phaseout_rate_per_increment:
+    description: "Percentage point reduction per AGI increment"
+    unit: rate
+    from 2021-01-01: 0.01
+
+phaseout_percentage:
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "Phaseout percentage"
+    description: "Phaseout percentage per 26 USC 21(g)(4)(B): 20% reduced by 1 percentage point per $2,000 or fraction thereof of AGI exceeding $400,000, not below zero"
+    from 2021-01-01:
+        excess_agi = max(0, adjusted_gross_income - phaseout_agi_threshold)
+        increments = ceil(excess_agi / phaseout_agi_increment)
+        reduction = increments * phaseout_rate_per_increment
+        max(0, phaseout_base_rate - reduction)

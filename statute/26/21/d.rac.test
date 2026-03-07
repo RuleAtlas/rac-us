@@ -1,0 +1,53 @@
+# 26 USC Section 21(d) tests
+
+earned_income_limit:
+    - name: "Unmarried individual with earned income"
+      period: 2024-01
+      inputs:
+        is_married: false
+        earned_income: 25000
+        number_of_qualifying_individuals: 1
+      expect: 25000
+
+    - name: "Married, lesser of spouse incomes"
+      period: 2024-01
+      inputs:
+        is_married: true
+        earned_income: 40000
+        spouse_earned_income: 15000
+        spouse_is_student_or_incapable: false
+        number_of_qualifying_individuals: 1
+      expect: 15000
+
+    - name: "Married with student spouse, 1 QI, 12 months"
+      period: 2024-01
+      inputs:
+        is_married: true
+        earned_income: 40000
+        spouse_earned_income: 0
+        spouse_is_student_or_incapable: true
+        months_spouse_student_or_incapable: 12
+        number_of_qualifying_individuals: 1
+      expect: 3000
+
+    - name: "Married with student spouse, 2 QIs, 12 months"
+      period: 2024-01
+      inputs:
+        is_married: true
+        earned_income: 40000
+        spouse_earned_income: 0
+        spouse_is_student_or_incapable: true
+        months_spouse_student_or_incapable: 12
+        number_of_qualifying_individuals: 2
+      expect: 6000
+
+    - name: "Married with student spouse whose actual income exceeds deemed"
+      period: 2024-01
+      inputs:
+        is_married: true
+        earned_income: 40000
+        spouse_earned_income: 10000
+        spouse_is_student_or_incapable: true
+        months_spouse_student_or_incapable: 12
+        number_of_qualifying_individuals: 1
+      expect: 10000

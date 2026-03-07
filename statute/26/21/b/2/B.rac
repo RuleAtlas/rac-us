@@ -1,0 +1,22 @@
+# 26 USC Section 21(b)(2)(B) - Exception for outside-household services
+
+"""
+(B) Exception.-- Employment-related expenses described in subparagraph
+(A) which are incurred for services outside the taxpayer's household
+shall be taken into account only if incurred for the care of--
+(i) a qualifying individual described in paragraph (1)(A), or
+(ii) a qualifying individual (not described in paragraph (1)(A)) who
+regularly spends at least 8 hours each day in the taxpayer's household.
+"""
+
+outside_household_expenses_qualify:
+    imports:
+        - 26/21/b/2/B/i#outside_household_care_qualifies_under_13
+        - 26/21/b/2/B/ii#meets_8hr_household_rule
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Outside household expenses qualify"
+    description: "Whether employment-related expenses for services outside the taxpayer's household qualify per 26 USC 21(b)(2)(B) - must be for care of a dependent under 13 or a qualifying individual who spends at least 8 hours daily in the household"
+    from 2002-01-01:
+        outside_household_care_qualifies_under_13 or meets_8hr_household_rule

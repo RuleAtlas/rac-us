@@ -1,0 +1,38 @@
+# 26 USC Section 21(b)(1)(C) - Incapable spouse
+
+"""
+(C) the spouse of the taxpayer, if the spouse is physically or mentally
+incapable of caring for himself or herself and who has the same principal
+place of abode as the taxpayer for more than one-half of such taxable year.
+"""
+
+spouse_incapable_of_self_care:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Spouse incapable of self-care"
+    description: "Whether the taxpayer's spouse is physically or mentally incapable of caring for himself or herself"
+    default: false
+
+spouse_same_abode_fraction:
+    entity: Person
+    period: Year
+    dtype: Rate
+    label: "Fraction of year spouse shares principal abode"
+    description: "Fraction of the taxable year the spouse has the same principal place of abode as the taxpayer"
+    default: 0
+
+min_abode_fraction:
+    description: "Minimum fraction of taxable year spouse must share principal place of abode (more than one-half)"
+    unit: rate
+    from 1976-01-01: 0.5
+
+is_spouse_qualifying_individual:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Spouse is qualifying individual"
+    description: "Whether the taxpayer's spouse qualifies under 26 USC 21(b)(1)(C) as physically or mentally incapable of self-care and sharing principal abode for more than half the year"
+    from 1976-01-01:
+        meets_abode_test = spouse_same_abode_fraction > min_abode_fraction
+        spouse_incapable_of_self_care and meets_abode_test

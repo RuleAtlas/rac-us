@@ -1,0 +1,35 @@
+# 26 USC Section 21(e)(6)(B) tests
+
+care_provider_disqualified_as_child_under_19:
+    - name: "Child of taxpayer age 15 - disqualified"
+      period: 2024-01
+      inputs:
+        care_provider_is_child_of_taxpayer: true
+        care_provider_age: 15
+      expect: true
+
+    - name: "Child of taxpayer age 19 - not disqualified"
+      period: 2024-01
+      inputs:
+        care_provider_is_child_of_taxpayer: true
+        care_provider_age: 19
+      expect: false
+
+    - name: "Child of taxpayer age 18 - disqualified"
+      period: 2024-01
+      inputs:
+        care_provider_is_child_of_taxpayer: true
+        care_provider_age: 18
+      expect: true
+
+    - name: "Not child of taxpayer age 15 - not disqualified"
+      period: 2024-01
+      inputs:
+        care_provider_is_child_of_taxpayer: false
+        care_provider_age: 15
+      expect: false
+
+    - name: "Default inputs - not disqualified"
+      period: 2024-01
+      inputs: {}
+      expect: false

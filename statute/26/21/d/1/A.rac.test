@@ -1,0 +1,30 @@
+# 26 USC Section 21(d)(1)(A) tests
+
+unmarried_earned_income_limit:
+    - name: "Unmarried with earned income"
+      period: 2024-01
+      inputs:
+        is_married: false
+        earned_income: 30000
+      expect: 30000
+
+    - name: "Unmarried with zero earned income"
+      period: 2024-01
+      inputs:
+        is_married: false
+        earned_income: 0
+      expect: 0
+
+    - name: "Married individual returns zero"
+      period: 2024-01
+      inputs:
+        is_married: true
+        earned_income: 50000
+      expect: 0
+
+    - name: "Unmarried with high earned income"
+      period: 2024-01
+      inputs:
+        is_married: false
+        earned_income: 150000
+      expect: 150000

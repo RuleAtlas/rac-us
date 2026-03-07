@@ -1,0 +1,40 @@
+# 26 USC Section 21(e)(6)(B) - Child under 19
+
+"""
+(B) who is a child of the taxpayer (within the meaning of section
+152(f)(1)) who has not attained the age of 19 at the close of the
+taxable year.
+"""
+
+status: encoded
+
+care_provider_age_threshold:
+    description: "Age threshold for disqualifying a child of the taxpayer as care provider"
+    unit: Year
+    from 1976-01-01: 19
+
+care_provider_is_child_of_taxpayer:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Care provider is child of taxpayer"
+    description: "Whether the care provider is a child of the taxpayer within the meaning of section 152(f)(1)"
+    default: false
+
+care_provider_age:
+    entity: Person
+    period: Year
+    dtype: Integer
+    label: "Care provider age at close of taxable year"
+    description: "Age of the care provider at the close of the taxable year"
+    default: 0
+
+care_provider_disqualified_as_child_under_19:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Care provider disqualified under 21(e)(6)(B)"
+    description: "Whether the care provider is disqualified from the dependent care credit because they are a child of the taxpayer who has not attained age 19 at the close of the taxable year, per 26 USC 21(e)(6)(B)"
+    from 1976-01-01:
+        is_under_threshold = care_provider_age < care_provider_age_threshold
+        care_provider_is_child_of_taxpayer and is_under_threshold

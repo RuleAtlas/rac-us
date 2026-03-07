@@ -1,0 +1,33 @@
+# 26 USC Section 21(e)(1) - Place of abode
+
+"""
+(1) Place of abode.-- An individual shall not be treated as having the
+same principal place of abode of the taxpayer if at any time during the
+taxable year of the taxpayer the relationship between the individual and
+the taxpayer is in violation of local law.
+"""
+
+relationship_violates_local_law:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Relationship violates local law"
+    description: "Whether the relationship between the individual and the taxpayer is in violation of local law at any time during the taxable year"
+    default: false
+
+shares_principal_place_of_abode:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Shares principal place of abode with taxpayer (factual)"
+    description: "Whether the individual factually shares the same principal place of abode as the taxpayer"
+    default: false
+
+has_same_principal_place_of_abode:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Treated as having same principal place of abode"
+    description: "Whether the individual is treated as having the same principal place of abode as the taxpayer, per 26 USC 21(e)(1). False if relationship violates local law."
+    from 1976-01-01:
+        shares_principal_place_of_abode and not relationship_violates_local_law

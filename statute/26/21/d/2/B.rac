@@ -1,0 +1,12 @@
+# 26 USC Section 21(d)(2)(B) - Deemed earned income with 2+ qualifying individuals
+
+"""
+(B) $500 if subsection (c)(2) applies for the taxable year.
+"""
+
+status: encoded
+
+deemed_earned_income_two_or_more_qualifying:
+    description: "Monthly deemed earned income for student/incapacitated spouse when there are 2 or more qualifying individuals"
+    unit: USD
+    from 2002-01-01: 500

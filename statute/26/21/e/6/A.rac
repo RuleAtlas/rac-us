@@ -1,0 +1,26 @@
+# 26 USC Section 21(e)(6)(A) - Dependent deduction allowable
+
+"""
+(A) with respect to whom, for the taxable year, a deduction under
+section 151(c) (relating to deduction for personal exemptions for
+dependents) is allowable either to the taxpayer or his spouse, or
+"""
+
+status: encoded
+
+provider_is_dependent_of_taxpayer_or_spouse:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Care provider is dependent of taxpayer or spouse"
+    description: "Whether a deduction under section 151(c) for personal exemptions for dependents is allowable with respect to the care provider, either to the taxpayer or the taxpayer's spouse"
+    default: false
+
+care_provider_disqualified_as_dependent:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Care provider disqualified under 21(e)(6)(A)"
+    description: "Whether the care provider is disqualified from the dependent care credit because a deduction under section 151(c) is allowable for the provider to the taxpayer or spouse, per 26 USC 21(e)(6)(A)"
+    from 1976-01-01:
+        provider_is_dependent_of_taxpayer_or_spouse

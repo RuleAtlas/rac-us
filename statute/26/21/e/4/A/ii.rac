@@ -1,0 +1,31 @@
+# 26 USC Section 21(e)(4)(A)(ii) - Over half cost
+
+"""
+(A) an individual who is married and who files a separate return--
+  (ii) furnishes over half of the cost of maintaining such household
+  during the taxable year, and
+"""
+
+status: encoded
+
+half_cost_threshold:
+    description: "Fraction of household maintenance costs the individual must furnish"
+    unit: rate
+    from 1976-01-01: 0.5
+
+furnishes_over_half_household_cost:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Furnishes over half the cost of maintaining household"
+    description: "Whether the individual furnishes over half of the cost of maintaining the household during the taxable year, per 26 USC 21(e)(4)(A)(ii)"
+    from 1976-01-01:
+        fraction_of_household_cost_furnished > half_cost_threshold
+
+fraction_of_household_cost_furnished:
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "Fraction of household maintenance cost furnished by individual"
+    description: "Fraction of the cost of maintaining the household furnished by the individual during the taxable year"
+    default: 0

@@ -1,0 +1,42 @@
+# 26 USC Section 21(d)(1)(B) tests
+
+married_earned_income_limit:
+    - name: "Married, both have income - spouse lower"
+      period: 2024-01
+      inputs:
+          is_married: true
+          earned_income: 50000
+          spouse_earned_income: 30000
+      expect: 30000
+
+    - name: "Married, both have income - taxpayer lower"
+      period: 2024-01
+      inputs:
+          is_married: true
+          earned_income: 20000
+          spouse_earned_income: 45000
+      expect: 20000
+
+    - name: "Married, spouse has zero income"
+      period: 2024-01
+      inputs:
+          is_married: true
+          earned_income: 60000
+          spouse_earned_income: 0
+      expect: 0
+
+    - name: "Not married - returns zero"
+      period: 2024-01
+      inputs:
+          is_married: false
+          earned_income: 40000
+          spouse_earned_income: 0
+      expect: 0
+
+    - name: "Married, equal income"
+      period: 2024-01
+      inputs:
+          is_married: true
+          earned_income: 35000
+          spouse_earned_income: 35000
+      expect: 35000

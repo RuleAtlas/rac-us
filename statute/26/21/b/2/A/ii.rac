@@ -1,0 +1,13 @@
+# 26 USC Section 21(b)(2)(A)(ii) - Care of qualifying individual
+
+"""
+(ii) expenses for the care of a qualifying individual.
+"""
+
+is_qualifying_individual_care_expense:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Qualifying individual care expense"
+    description: "Whether the expense is for the care of a qualifying individual per 26 USC 21(b)(2)(A)(ii)"
+    default: false

@@ -1,0 +1,30 @@
+# 26 USC Section 21(b)(2)(B) tests
+
+outside_household_expenses_qualify:
+    - name: "Under-13 dependent qualifies"
+      period: 2024-01
+      inputs:
+        outside_household_care_qualifies_under_13: true
+        meets_8hr_household_rule: false
+      expect: true
+
+    - name: "Non-child meeting 8hr rule qualifies"
+      period: 2024-01
+      inputs:
+        outside_household_care_qualifies_under_13: false
+        meets_8hr_household_rule: true
+      expect: true
+
+    - name: "Both conditions met"
+      period: 2024-01
+      inputs:
+        outside_household_care_qualifies_under_13: true
+        meets_8hr_household_rule: true
+      expect: true
+
+    - name: "Neither condition met - does not qualify"
+      period: 2024-01
+      inputs:
+        outside_household_care_qualifies_under_13: false
+        meets_8hr_household_rule: false
+      expect: false

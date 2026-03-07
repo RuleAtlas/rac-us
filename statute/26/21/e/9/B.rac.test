@@ -1,0 +1,30 @@
+# 26 USC Section 21(e)(9)(B) tests
+
+meets_501c3_provider_id_requirement:
+    - name: "501(c)(3) org with name and address on return"
+      period: 2024-01
+      inputs:
+        provider_is_501c3_exempt: true
+        provider_name_address_on_return: true
+      expect: true
+
+    - name: "501(c)(3) org without name and address on return"
+      period: 2024-01
+      inputs:
+        provider_is_501c3_exempt: true
+        provider_name_address_on_return: false
+      expect: false
+
+    - name: "Non-501(c)(3) provider with name and address"
+      period: 2024-01
+      inputs:
+        provider_is_501c3_exempt: false
+        provider_name_address_on_return: true
+      expect: false
+
+    - name: "Non-501(c)(3) provider without name and address"
+      period: 2024-01
+      inputs:
+        provider_is_501c3_exempt: false
+        provider_name_address_on_return: false
+      expect: false

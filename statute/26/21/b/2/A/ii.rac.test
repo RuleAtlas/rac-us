@@ -1,0 +1,19 @@
+# 26 USC Section 21(b)(2)(A)(ii) tests
+
+is_qualifying_individual_care_expense:
+    - name: "Expense is for care of qualifying individual"
+      period: 2024-01
+      inputs:
+          is_qualifying_individual_care_expense: true
+      expect: true
+
+    - name: "Expense is not for care of qualifying individual"
+      period: 2024-01
+      inputs:
+          is_qualifying_individual_care_expense: false
+      expect: false
+
+    - name: "Default is false"
+      period: 2024-01
+      inputs: {}
+      expect: false

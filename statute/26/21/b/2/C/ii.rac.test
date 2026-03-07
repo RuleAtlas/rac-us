@@ -1,0 +1,19 @@
+# 26 USC Section 21(b)(2)(C)(ii) tests
+
+meets_subparagraph_b_requirements:
+    - name: "Default - requirements not met"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Requirements met"
+      period: 2024-01
+      inputs:
+        meets_subparagraph_b_requirements: true
+      expect: true
+
+    - name: "Requirements explicitly not met"
+      period: 2024-01
+      inputs:
+        meets_subparagraph_b_requirements: false
+      expect: false

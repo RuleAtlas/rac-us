@@ -1,0 +1,48 @@
+# 26 USC Section 21(b)(1)(B) - Incapable dependent
+
+"""
+(B) a dependent of the taxpayer (as defined in section 152, determined
+without regard to subsections (b)(1), (b)(2), and (d)(1)(B)) who is
+physically or mentally incapable of caring for himself or herself and
+who has the same principal place of abode as the taxpayer for more than
+one-half of such taxable year, or
+"""
+
+min_abode_share:
+    description: "Minimum share of taxable year dependent must share principal place of abode with taxpayer"
+    unit: rate
+    from 2002-01-01: 0.5
+
+is_dependent_under_section_152:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Is dependent under section 152 (without regard to (b)(1), (b)(2), (d)(1)(B))"
+    description: "Whether the individual is a dependent as defined in section 152, determined without regard to subsections (b)(1), (b)(2), and (d)(1)(B)"
+    default: false
+
+is_incapable_of_self_care:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Physically or mentally incapable of self-care"
+    description: "Whether the individual is physically or mentally incapable of caring for himself or herself"
+    default: false
+
+share_of_year_in_taxpayer_abode:
+    entity: Person
+    period: Year
+    dtype: Rate
+    label: "Share of year in taxpayer principal abode"
+    description: "Share of taxable year the individual has the same principal place of abode as the taxpayer"
+    default: 0
+
+is_qualifying_individual_incapable_dependent:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Qualifying individual - incapable dependent"
+    description: "Whether the individual is a qualifying individual under 26 USC 21(b)(1)(B) as an incapable dependent sharing the taxpayer's principal place of abode"
+    from 2002-01-01:
+        meets_abode_test = share_of_year_in_taxpayer_abode > min_abode_share
+        is_dependent_under_section_152 and is_incapable_of_self_care and meets_abode_test

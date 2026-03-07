@@ -1,0 +1,37 @@
+# 26 USC Section 21(b)(2)(B)(ii) tests
+
+meets_8hr_household_rule:
+    - name: "Non-child dependent spending 8+ hours qualifies"
+      period: 2024-01
+      inputs:
+          is_qualifying_individual_under_13: false
+          daily_hours_in_taxpayer_household: 10
+      expect: true
+
+    - name: "Non-child dependent spending less than 8 hours does not qualify"
+      period: 2024-01
+      inputs:
+          is_qualifying_individual_under_13: false
+          daily_hours_in_taxpayer_household: 6
+      expect: false
+
+    - name: "Child dependent under 13 does not meet this rule (uses different path)"
+      period: 2024-01
+      inputs:
+          is_qualifying_individual_under_13: true
+          daily_hours_in_taxpayer_household: 10
+      expect: false
+
+    - name: "Exactly 8 hours meets the threshold"
+      period: 2024-01
+      inputs:
+          is_qualifying_individual_under_13: false
+          daily_hours_in_taxpayer_household: 8
+      expect: true
+
+    - name: "Zero hours does not qualify"
+      period: 2024-01
+      inputs:
+          is_qualifying_individual_under_13: false
+          daily_hours_in_taxpayer_household: 0
+      expect: false

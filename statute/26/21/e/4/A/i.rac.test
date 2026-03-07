@@ -1,0 +1,32 @@
+# 26 USC Section 21(e)(4)(A)(i) tests
+
+maintains_home_for_qualifying_individual:
+    - name: "Qualifying individual in home for full year"
+      period: 2024-01
+      inputs:
+        fraction_of_year_qualifying_individual_in_home: 1.0
+      expect: true
+
+    - name: "Qualifying individual in home for exactly half (not more than half)"
+      period: 2024-01
+      inputs:
+        fraction_of_year_qualifying_individual_in_home: 0.5
+      expect: false
+
+    - name: "Qualifying individual in home for just over half"
+      period: 2024-01
+      inputs:
+        fraction_of_year_qualifying_individual_in_home: 0.51
+      expect: true
+
+    - name: "Qualifying individual not in home"
+      period: 2024-01
+      inputs:
+        fraction_of_year_qualifying_individual_in_home: 0
+      expect: false
+
+    - name: "Qualifying individual in home for less than half"
+      period: 2024-01
+      inputs:
+        fraction_of_year_qualifying_individual_in_home: 0.3
+      expect: false

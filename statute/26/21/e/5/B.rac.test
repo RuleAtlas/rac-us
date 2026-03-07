@@ -1,0 +1,42 @@
+# 26 USC Section 21(e)(5)(B) tests
+
+is_under_13_or_incapable:
+    - name: "Child under 13, capable"
+      period: 2024-01
+      inputs:
+        age: 10
+        qualifying_age_limit: 13
+        is_incapable_of_self_care: false
+      expect: true
+
+    - name: "Child exactly 13, capable"
+      period: 2024-01
+      inputs:
+        age: 13
+        qualifying_age_limit: 13
+        is_incapable_of_self_care: false
+      expect: false
+
+    - name: "Child over 13, incapable"
+      period: 2024-01
+      inputs:
+        age: 16
+        qualifying_age_limit: 13
+        is_incapable_of_self_care: true
+      expect: true
+
+    - name: "Child over 13, capable"
+      period: 2024-01
+      inputs:
+        age: 16
+        qualifying_age_limit: 13
+        is_incapable_of_self_care: false
+      expect: false
+
+    - name: "Newborn, capable"
+      period: 2024-01
+      inputs:
+        age: 0
+        qualifying_age_limit: 13
+        is_incapable_of_self_care: false
+      expect: true

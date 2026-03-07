@@ -1,0 +1,32 @@
+# 26 USC Section 21(e)(4)(A)(ii) tests
+
+furnishes_over_half_household_cost:
+    - name: "Furnishes exactly half - not over half"
+      period: 2024-01
+      inputs:
+          fraction_of_household_cost_furnished: 0.5
+      expect: false
+
+    - name: "Furnishes over half"
+      period: 2024-01
+      inputs:
+          fraction_of_household_cost_furnished: 0.75
+      expect: true
+
+    - name: "Furnishes zero"
+      period: 2024-01
+      inputs:
+          fraction_of_household_cost_furnished: 0
+      expect: false
+
+    - name: "Furnishes all costs"
+      period: 2024-01
+      inputs:
+          fraction_of_household_cost_furnished: 1.0
+      expect: true
+
+    - name: "Furnishes just over half"
+      period: 2024-01
+      inputs:
+          fraction_of_household_cost_furnished: 0.51
+      expect: true

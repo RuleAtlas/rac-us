@@ -1,0 +1,26 @@
+# 26 USC Section 21(b)(2)(D)(i) tests
+
+meets_dependent_care_center_size_test:
+    - name: "No individuals in care"
+      period: 2024-01
+      inputs:
+        num_non_resident_individuals_in_care: 0
+      expect: false
+
+    - name: "Exactly 6 individuals - does not meet test"
+      period: 2024-01
+      inputs:
+        num_non_resident_individuals_in_care: 6
+      expect: false
+
+    - name: "7 individuals - meets test"
+      period: 2024-01
+      inputs:
+        num_non_resident_individuals_in_care: 7
+      expect: true
+
+    - name: "20 individuals - meets test"
+      period: 2024-01
+      inputs:
+        num_non_resident_individuals_in_care: 20
+      expect: true

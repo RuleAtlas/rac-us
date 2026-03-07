@@ -1,0 +1,31 @@
+# 26 USC Section 21(g)(3) - Increase in applicable percentage (2021)
+
+"""
+(3) Increase in applicable percentage.-- Subsection (a)(2) shall be applied--
+(A) by substituting "50 percent" for "35 percent", and
+(B) by substituting "$125,000" for "$15,000".
+"""
+
+status: encoded
+
+effective_first_reduction_floor:
+    imports:
+        - 26/21/g/3/A#first_reduction_floor_2021
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "Effective first reduction floor (2021)"
+    description: "For 2021, the first reduction floor in (a)(2)(A) is 50% instead of 35% per 26 USC 21(g)(3)(A)"
+    from 2021-01-01:
+        first_reduction_floor_2021
+
+effective_first_reduction_agi_threshold:
+    imports:
+        - 26/21/g/3/B#first_reduction_agi_threshold_2021
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    label: "Effective first reduction AGI threshold (2021)"
+    description: "For 2021, the first reduction AGI threshold in (a)(2) is $125,000 instead of $15,000 per 26 USC 21(g)(3)(B)"
+    from 2021-01-01:
+        first_reduction_agi_threshold_2021

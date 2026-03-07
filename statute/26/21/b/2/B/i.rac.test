@@ -1,0 +1,20 @@
+# 26 USC Section 21(b)(2)(B)(i) tests
+
+outside_household_care_qualifies_under_13:
+    - name: "Child under 13 qualifies"
+      period: 2024-01
+      inputs:
+          is_qualifying_individual_under_13: true
+      expect: true
+
+    - name: "Child 13 or older does not qualify"
+      period: 2024-01
+      inputs:
+          is_qualifying_individual_under_13: false
+      expect: false
+
+    - name: "Non-qualifying individual does not qualify"
+      period: 2003-01
+      inputs:
+          is_qualifying_individual_under_13: false
+      expect: false

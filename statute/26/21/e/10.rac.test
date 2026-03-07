@@ -1,0 +1,19 @@
+# 26 USC Section 21(e)(10) tests
+
+qualifying_individual_meets_tin_requirement:
+    - name: "TIN provided - credit allowed"
+      period: 2024-01
+      inputs:
+        qualifying_individual_tin_provided: true
+      expect: true
+
+    - name: "TIN not provided - no credit allowed"
+      period: 2024-01
+      inputs:
+        qualifying_individual_tin_provided: false
+      expect: false
+
+    - name: "TIN not provided defaults to false"
+      period: 2024-01
+      inputs: {}
+      expect: false

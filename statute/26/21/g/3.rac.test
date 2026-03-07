@@ -1,0 +1,18 @@
+# 26 USC Section 21(g)(3) tests
+
+effective_first_reduction_floor:
+    - name: "2021: floor is 50%"
+      period: 2021-01
+      inputs:
+        first_reduction_floor_2021: 0.50
+      expect: 0.50
+effective_first_reduction_agi_threshold:
+    - name: "2021: threshold is $125,000"
+      period: 2021-01
+      inputs:
+        first_reduction_agi_threshold_2021: 125000
+      expect: 125000
+    - name: "2020: no substitution (pre-2021)"
+      period: 2020-01
+      inputs: {}
+      expect: 0

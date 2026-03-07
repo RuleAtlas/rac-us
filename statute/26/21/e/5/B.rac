@@ -1,0 +1,21 @@
+# 26 USC Section 21(e)(5)(B) - Under 13 or incapable
+
+"""
+(B) such child is under the age of 13 or is physically or mentally
+incapable of caring for himself,
+"""
+
+status: encoded
+
+is_under_13_or_incapable:
+    imports:
+        - 26/21/b/1/A#qualifying_age_limit
+        - 26/21/b/1/A#age
+        - 26/21/b/1/B#is_incapable_of_self_care
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Child is under 13 or incapable of self-care"
+    description: "Whether the child is under the age of 13 or is physically or mentally incapable of caring for himself, per 26 USC 21(e)(5)(B)"
+    from 2002-01-01:
+        age < qualifying_age_limit or is_incapable_of_self_care

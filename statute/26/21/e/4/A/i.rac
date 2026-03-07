@@ -1,0 +1,32 @@
+# 26 USC Section 21(e)(4)(A)(i) - Maintains home
+
+"""
+(A) an individual who is married and who files a separate return--
+  (i) maintains as his home a household which constitutes for more
+  than one-half of the taxable year the principal place of abode of a
+  qualifying individual, and
+"""
+
+status: encoded
+
+half_year_threshold:
+    description: "Fraction of taxable year the household must be qualifying individual's principal place of abode"
+    unit: rate
+    from 1976-01-01: 0.5
+
+maintains_home_for_qualifying_individual:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Maintains home as principal place of abode for qualifying individual"
+    description: "Whether the individual maintains as his home a household which constitutes for more than one-half of the taxable year the principal place of abode of a qualifying individual, per 26 USC 21(e)(4)(A)(i)"
+    from 1976-01-01:
+        fraction_of_year_qualifying_individual_in_home > half_year_threshold
+
+fraction_of_year_qualifying_individual_in_home:
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "Fraction of year qualifying individual resides in home"
+    description: "Fraction of the taxable year during which a qualifying individual has principal place of abode in the taxpayer's home"
+    default: 0

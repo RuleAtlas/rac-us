@@ -1,0 +1,22 @@
+# 26 USC Section 21(g)(4)(A) - In general (phaseout substitution for 2021)
+
+"""
+(A) In general.-- Subsection (a)(2) shall be applied by substituting
+"the phaseout percentage" for "20 percent".
+"""
+
+status: encoded
+
+# For 2021, the 20% floor in (a)(2)(B) is replaced by the phaseout percentage
+# defined in (g)(4)(B). This variable represents the effective floor after substitution.
+
+effective_further_reduction_floor:
+    imports:
+        - 26/21/g/4/B#phaseout_percentage
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "Effective further reduction floor (2021)"
+    description: "For 2021, subsection (a)(2) applied by substituting the phaseout percentage for 20 percent per 26 USC 21(g)(4)(A)"
+    from 2021-01-01:
+        phaseout_percentage

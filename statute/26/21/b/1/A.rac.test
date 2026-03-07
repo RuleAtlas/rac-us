@@ -1,0 +1,37 @@
+# 26 USC Section 21(b)(1)(A) tests
+
+is_qualifying_individual_under_13:
+    - name: "Dependent child age 5 qualifies"
+      period: 2024-01
+      inputs:
+          is_dependent_of_taxpayer: true
+          age: 5
+      expect: true
+
+    - name: "Dependent child age 12 qualifies"
+      period: 2024-01
+      inputs:
+          is_dependent_of_taxpayer: true
+          age: 12
+      expect: true
+
+    - name: "Dependent child age 13 does not qualify"
+      period: 2024-01
+      inputs:
+          is_dependent_of_taxpayer: true
+          age: 13
+      expect: false
+
+    - name: "Non-dependent child age 5 does not qualify"
+      period: 2024-01
+      inputs:
+          is_dependent_of_taxpayer: false
+          age: 5
+      expect: false
+
+    - name: "Dependent newborn qualifies"
+      period: 2024-01
+      inputs:
+          is_dependent_of_taxpayer: true
+          age: 0
+      expect: true

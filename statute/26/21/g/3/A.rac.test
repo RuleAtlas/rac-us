@@ -1,0 +1,15 @@
+# 26 USC Section 21(g)(3)(A) tests
+
+first_reduction_floor_2021:
+    - name: "2021: substituted floor is 50%"
+      period: 2021-01
+      inputs: {}
+      expect: 0.50
+    - name: "2022: reverts to 35%"
+      period: 2022-01
+      inputs: {}
+      expect: 0.35
+    - name: "2023: remains at 35%"
+      period: 2023-01
+      inputs: {}
+      expect: 0.35

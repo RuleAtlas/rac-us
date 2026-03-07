@@ -1,0 +1,19 @@
+# 26 USC Section 21(b)(2)(D)(ii) tests
+
+receives_fee_payment_or_grant:
+    - name: "Default - no fee received"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Facility receives fee"
+      period: 2024-01
+      inputs:
+        receives_fee_payment_or_grant: true
+      expect: true
+
+    - name: "Facility does not receive fee"
+      period: 2024-01
+      inputs:
+        receives_fee_payment_or_grant: false
+      expect: false

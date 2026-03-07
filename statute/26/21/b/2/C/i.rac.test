@@ -1,0 +1,19 @@
+# 26 USC Section 21(b)(2)(C)(i) tests
+
+dependent_care_center_complies_with_state_local_law:
+    - name: "Default is false (non-compliant)"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Center complies with state/local law"
+      period: 2024-01
+      inputs:
+        dependent_care_center_complies_with_state_local_law: true
+      expect: true
+
+    - name: "Center does not comply"
+      period: 2024-01
+      inputs:
+        dependent_care_center_complies_with_state_local_law: false
+      expect: false

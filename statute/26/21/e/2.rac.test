@@ -1,0 +1,23 @@
+# 26 USC Section 21(e)(2) tests
+
+joint_return_required:
+    - name: "Unmarried taxpayer meets requirement"
+      period: 2024-01
+      inputs:
+        is_married: 0
+        files_joint_return: 0
+      expect: 1
+
+    - name: "Married filing jointly meets requirement"
+      period: 2024-01
+      inputs:
+        is_married: 1
+        files_joint_return: 1
+      expect: 1
+
+    - name: "Married not filing jointly fails requirement"
+      period: 2024-01
+      inputs:
+        is_married: 1
+        files_joint_return: 0
+      expect: 0

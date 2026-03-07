@@ -1,0 +1,14 @@
+# 26 USC Section 21(c)(2) tests
+
+expense_limit_two_or_more_qualifying_individuals:
+    - name: "Value in 2024"
+      period: 2024-01
+      expect: 6000
+
+    - name: "Value in 2023"
+      period: 2023-01
+      expect: 6000
+
+    - name: "Value at effective date"
+      period: 2002-01
+      expect: 6000

@@ -1,0 +1,30 @@
+# 26 USC Section 21(b)(2)(D) tests
+
+is_dependent_care_center:
+    - name: "Both conditions met - is a dependent care center"
+      period: 2024-01
+      inputs:
+        meets_dependent_care_center_size_test: true
+        receives_fee_payment_or_grant: true
+      expect: true
+
+    - name: "Size test met but no fee received"
+      period: 2024-01
+      inputs:
+        meets_dependent_care_center_size_test: true
+        receives_fee_payment_or_grant: false
+      expect: false
+
+    - name: "Fee received but size test not met"
+      period: 2024-01
+      inputs:
+        meets_dependent_care_center_size_test: false
+        receives_fee_payment_or_grant: true
+      expect: false
+
+    - name: "Neither condition met"
+      period: 2024-01
+      inputs:
+        meets_dependent_care_center_size_test: false
+        receives_fee_payment_or_grant: false
+      expect: false

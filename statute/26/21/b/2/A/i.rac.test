@@ -1,0 +1,19 @@
+# 26 USC Section 21(b)(2)(A)(i) tests
+
+is_household_service_expense:
+    - name: "Expense is for household services"
+      period: 2024-01
+      inputs:
+          is_household_service_expense: true
+      expect: true
+
+    - name: "Expense is not for household services"
+      period: 2024-01
+      inputs:
+          is_household_service_expense: false
+      expect: false
+
+    - name: "Default is false"
+      period: 2024-01
+      inputs: {}
+      expect: false

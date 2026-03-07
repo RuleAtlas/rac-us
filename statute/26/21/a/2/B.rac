@@ -1,0 +1,54 @@
+# 26 USC Section 21(a)(2)(B) - Further reduction of applicable percentage
+
+"""
+(B) further reduced (but not below 20 percent) by 1 percentage point for each
+$2,000 ($4,000 in the case of a joint return) or fraction thereof by which the
+taxpayer's adjusted gross income for the taxable year exceeds $75,000 ($150,000
+in the case of a joint return).
+"""
+
+status: encoded
+
+further_reduction_agi_threshold:
+    description: "AGI threshold above which further reduction begins (non-joint)"
+    unit: USD
+    from 2002-01-01: 75000
+
+further_reduction_agi_threshold_joint:
+    description: "AGI threshold above which further reduction begins (joint return)"
+    unit: USD
+    from 2002-01-01: 150000
+
+further_reduction_agi_increment:
+    description: "AGI increment per 1 percentage point reduction (non-joint)"
+    unit: USD
+    from 2002-01-01: 2000
+
+further_reduction_agi_increment_joint:
+    description: "AGI increment per 1 percentage point reduction (joint return)"
+    unit: USD
+    from 2002-01-01: 4000
+
+further_reduction_rate_per_increment:
+    description: "Percentage point reduction per AGI increment"
+    unit: rate
+    from 2002-01-01: 0.01
+
+further_reduction_floor:
+    description: "Minimum applicable percentage after further reduction"
+    unit: rate
+    from 2002-01-01: 0.20
+
+further_reduction:
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "Further reduction of applicable percentage"
+    description: "Further reduction in applicable percentage per 26 USC 21(a)(2)(B): 1 percentage point per $2,000 ($4,000 joint) or fraction thereof of AGI exceeding $75,000 ($150,000 joint), not below 20%"
+    from 2002-01-01:
+        threshold = if is_joint_return: further_reduction_agi_threshold_joint else: further_reduction_agi_threshold
+        increment = if is_joint_return: further_reduction_agi_increment_joint else: further_reduction_agi_increment
+        excess_agi = max(0, adjusted_gross_income - threshold)
+        increments = ceil(excess_agi / increment)
+        reduction = increments * further_reduction_rate_per_increment
+        max(0, reduction)

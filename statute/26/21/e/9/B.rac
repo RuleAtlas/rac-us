@@ -1,0 +1,34 @@
+# 26 USC Section 21(e)(9)(B) - 501(c)(3) exception
+
+"""
+(B) if such person is an organization described in section 501(c)(3) and
+exempt from tax under section 501(a), the name and address of such person
+are included on the return claiming the credit.
+"""
+
+status: encoded
+
+provider_is_501c3_exempt:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Service provider is 501(c)(3) exempt organization"
+    description: "Whether the care provider is an organization described in section 501(c)(3) and exempt from tax under section 501(a) per 26 USC 21(e)(9)(B)"
+    default: false
+
+provider_name_address_on_return:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Service provider name and address included on return"
+    description: "Whether the name and address of the care provider are included on the return claiming the credit per 26 USC 21(e)(9)(B)"
+    default: false
+
+meets_501c3_provider_id_requirement:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Meets 501(c)(3) provider identification requirement"
+    description: "For 501(c)(3) exempt organizations, only name and address (not TIN) are required on the return per 26 USC 21(e)(9)(B)"
+    from 1982-01-01:
+        provider_is_501c3_exempt and provider_name_address_on_return

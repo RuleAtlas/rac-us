@@ -1,0 +1,20 @@
+# 26 USC Section 21(g)(4)(A) tests
+
+effective_further_reduction_floor:
+    - name: "2021 - phaseout percentage passes through"
+      period: 2021-01
+      inputs:
+        phaseout_percentage: 0.15
+      expect: 0.15
+
+    - name: "2021 - zero phaseout percentage"
+      period: 2021-01
+      inputs:
+        phaseout_percentage: 0
+      expect: 0
+
+    - name: "2021 - full 20% phaseout (AGI at or below $400k)"
+      period: 2021-01
+      inputs:
+        phaseout_percentage: 0.20
+      expect: 0.20

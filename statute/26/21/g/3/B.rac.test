@@ -1,0 +1,15 @@
+# 26 USC Section 21(g)(3)(B) tests
+
+first_reduction_agi_threshold_2021:
+    - name: "2021: substituted threshold is $125,000"
+      period: 2021-01
+      inputs: {}
+      expect: 125000
+    - name: "2022: reverts to $15,000"
+      period: 2022-01
+      inputs: {}
+      expect: 15000
+    - name: "2023: remains at $15,000"
+      period: 2023-01
+      inputs: {}
+      expect: 15000

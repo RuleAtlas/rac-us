@@ -1,0 +1,30 @@
+# 26 USC Section 21(e)(3) tests
+
+is_married_for_cdctc:
+    - name: "Married and not legally separated"
+      period: 2024-01
+      inputs:
+        is_married: true
+        legally_separated: false
+      expect: true
+
+    - name: "Legally separated - not considered married"
+      period: 2024-01
+      inputs:
+        is_married: true
+        legally_separated: true
+      expect: false
+
+    - name: "Not married and not legally separated"
+      period: 2024-01
+      inputs:
+        is_married: false
+        legally_separated: false
+      expect: false
+
+    - name: "Not married but legally separated (edge case)"
+      period: 2024-01
+      inputs:
+        is_married: false
+        legally_separated: true
+      expect: false

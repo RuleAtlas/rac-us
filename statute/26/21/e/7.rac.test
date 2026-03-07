@@ -1,0 +1,26 @@
+# 26 USC Section 21(e)(7) tests
+
+is_student_for_cdctc:
+    - name: "Full-time student for exactly 5 months qualifies"
+      period: 2024-01
+      inputs:
+        full_time_student_months: 5
+      expect: true
+
+    - name: "Full-time student for more than 5 months qualifies"
+      period: 2024-01
+      inputs:
+        full_time_student_months: 9
+      expect: true
+
+    - name: "Full-time student for 4 months does not qualify"
+      period: 2024-01
+      inputs:
+        full_time_student_months: 4
+      expect: false
+
+    - name: "Zero months does not qualify"
+      period: 2024-01
+      inputs:
+        full_time_student_months: 0
+      expect: false

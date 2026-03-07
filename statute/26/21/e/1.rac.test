@@ -1,0 +1,30 @@
+# 26 USC Section 21(e)(1) tests
+
+has_same_principal_place_of_abode:
+    - name: "Shares abode, no law violation"
+      period: 2024-01
+      inputs:
+        shares_principal_place_of_abode: true
+        relationship_violates_local_law: false
+      expect: true
+
+    - name: "Shares abode but relationship violates local law"
+      period: 2024-01
+      inputs:
+        shares_principal_place_of_abode: true
+        relationship_violates_local_law: true
+      expect: false
+
+    - name: "Violates local law and no shared abode"
+      period: 2024-01
+      inputs:
+        shares_principal_place_of_abode: false
+        relationship_violates_local_law: true
+      expect: false
+
+    - name: "No shared abode, no violation"
+      period: 2024-01
+      inputs:
+        shares_principal_place_of_abode: false
+        relationship_violates_local_law: false
+      expect: false

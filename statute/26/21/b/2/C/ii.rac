@@ -1,0 +1,13 @@
+# 26 USC Section 21(b)(2)(C)(ii) - Subparagraph (B) requirements met
+
+"""
+(ii) the requirements of subparagraph (B) are met.
+"""
+
+meets_subparagraph_b_requirements:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Meets subparagraph (B) requirements"
+    description: "Whether the qualifying individual meets subparagraph (B) requirements for dependent care center expenses per 26 USC 21(b)(2)(C)(ii). Subparagraph (B) requires that the individual be described in paragraph (1)(A) (dependent under age 13), or regularly spend at least 8 hours each day in the taxpayer's household."
+    default: false

@@ -1,0 +1,14 @@
+# 26 USC Section 21(g)(2)(B) tests
+
+expense_limit_two_or_more_qualifying_individuals_2021:
+    - name: "2021 increased limit is $16,000"
+      period: 2021-01
+      expect: 16000
+
+    - name: "2022 reverts to baseline $6,000"
+      period: 2022-01
+      expect: 6000
+
+    - name: "2023 also uses baseline $6,000"
+      period: 2023-01
+      expect: 6000

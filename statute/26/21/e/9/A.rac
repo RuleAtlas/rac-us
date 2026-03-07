@@ -1,0 +1,16 @@
+# 26 USC Section 21(e)(9)(A) - TIN on return
+
+"""
+(A) the name, address, and taxpayer identification number of such person
+are included on the return claiming the credit, or
+"""
+
+status: encoded
+
+provider_tin_included_on_return:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Service provider TIN included on return"
+    description: "Whether the name, address, and taxpayer identification number of the care provider are included on the return claiming the credit per 26 USC 21(e)(9)(A)"
+    default: false

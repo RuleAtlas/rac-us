@@ -1,0 +1,39 @@
+# 26 USC 21(b)(1)(B) tests
+
+is_qualifying_individual_incapable_dependent:
+    - name: "All conditions met - qualifies"
+      period: 2024-01
+      inputs:
+          is_dependent_under_section_152: true
+          is_incapable_of_self_care: true
+          share_of_year_in_taxpayer_abode: 0.75
+      expect: true
+
+    - name: "Not a dependent - does not qualify"
+      period: 2024-01
+      inputs:
+          is_dependent_under_section_152: false
+          is_incapable_of_self_care: true
+          share_of_year_in_taxpayer_abode: 0.75
+      expect: false
+
+    - name: "Capable of self-care - does not qualify"
+      period: 2024-01
+      inputs:
+          is_dependent_under_section_152: true
+          is_incapable_of_self_care: false
+          share_of_year_in_taxpayer_abode: 0.75
+      expect: false
+
+    - name: "Exactly half the year - does not qualify (must exceed one-half)"
+      period: 2024-01
+      inputs:
+          is_dependent_under_section_152: true
+          is_incapable_of_self_care: true
+          share_of_year_in_taxpayer_abode: 0.5
+      expect: false
+
+    - name: "No conditions met - defaults"
+      period: 2024-01
+      inputs: {}
+      expect: false

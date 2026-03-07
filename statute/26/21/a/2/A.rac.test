@@ -1,0 +1,32 @@
+# 26 USC Section 21(a)(2)(A) tests
+
+first_reduction:
+    - name: "AGI below threshold - no reduction"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 10000
+      expect: 0
+
+    - name: "AGI at threshold - no reduction"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 15000
+      expect: 0
+
+    - name: "AGI $1 over threshold - 1 increment due to fraction"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 15001
+      expect: 0.01
+
+    - name: "AGI exactly $2,000 over threshold - 1 increment"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 17000
+      expect: 0.01
+
+    - name: "AGI $30,000 over threshold - 15 increments (max first reduction)"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 45000
+      expect: 0.15

@@ -1,0 +1,15 @@
+# 26 USC Section 21(e)(5)(A) - Section 152(e) applies
+
+"""
+(A) section 152(e) applies to any child with respect to any calendar year,
+"""
+
+status: encoded
+
+section_152e_applies:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Section 152(e) applies to child"
+    description: "Whether section 152(e) (relating to special rule for children of divorced or separated parents) applies to the child with respect to the calendar year"
+    default: false

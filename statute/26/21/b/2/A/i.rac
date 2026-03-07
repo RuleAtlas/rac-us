@@ -1,0 +1,23 @@
+# 26 USC Section 21(b)(2)(A)(i) - Household services
+
+"""
+(i) expenses for household services, and
+"""
+
+household_services_expenses:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Household services expenses"
+    description: "Expenses for household services per 26 USC 21(b)(2)(A)(i)"
+    default: 0
+
+is_household_services_expense:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Is household services expense"
+    description: "Whether expenses include household services, a qualifying category of employment-related expenses under 26 USC 21(b)(2)(A)(i)"
+    from 2002-01-01:
+        household_services_expenses > 0

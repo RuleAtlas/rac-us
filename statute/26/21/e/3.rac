@@ -1,0 +1,26 @@
+# 26 USC Section 21(e)(3) - Marital status
+
+"""
+(3) Marital status.-- An individual legally separated from his spouse
+under a decree of divorce or of separate maintenance shall not be
+considered as married.
+"""
+
+status: encoded
+
+legally_separated:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Legally separated under decree of divorce or separate maintenance"
+    description: "Whether the individual is legally separated from spouse under a decree of divorce or of separate maintenance"
+    default: false
+
+is_married_for_cdctc:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Considered married for CDCTC purposes"
+    description: "Per 26 USC 21(e)(3), an individual legally separated under a decree of divorce or separate maintenance is not considered married"
+    from 1976-01-01:
+        not legally_separated and is_married

@@ -1,0 +1,20 @@
+# 26 USC Section 21(e)(8) tests
+
+is_educational_organization:
+    - name: "Organization qualifies under 170(b)(1)(A)(ii)"
+      period: 2024-01
+      inputs:
+        is_educational_organization_170: true
+      expect: true
+
+    - name: "Organization does not qualify under 170(b)(1)(A)(ii)"
+      period: 2024-01
+      inputs:
+        is_educational_organization_170: false
+      expect: false
+
+    - name: "Default case - not an educational organization"
+      period: 2024-01
+      inputs:
+        is_educational_organization_170: false
+      expect: false

@@ -1,0 +1,14 @@
+# 26 USC Section 21(d)(2)(A) tests
+
+deemed_earned_income_one_qualifying:
+    - name: "Value is $250 for 2024"
+      period: 2024-01
+      expect: 250
+
+    - name: "Value is $250 for 2010"
+      period: 2010-01
+      expect: 250
+
+    - name: "Value is $250 for 2002"
+      period: 2002-01
+      expect: 250
