@@ -1,0 +1,25 @@
+# 26 USC 32(c)(1) - Eligible individual
+
+"""
+(1) Eligible individual.--
+(A) In general [defines eligible individual with/without qualifying child]
+(B) Qualifying child ineligible [qualifying child of another cannot claim]
+(C) Exception for individual claiming benefits under section 911
+(D) Limitation on eligibility of nonresident aliens
+(E) Identification number requirement
+"""
+
+eligible_individual:
+  imports:
+    - 26/32/c/1/A#eitc_eligible_individual
+    - 26/32/c/1/B#qualifying_child_ineligible
+    - 26/32/c/1/C#eligible_individual_section_911_exclusion
+    - 26/32/c/1/D#nonresident_alien_eitc_exclusion
+    - 26/32/c/1/E#eitc_disallowed_missing_tin
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Eligible Individual"
+  description: "Whether the taxpayer is an eligible individual for EITC per 26 USC 32(c)(1), combining the base eligibility test (A), qualifying child ineligibility (B), section 911 exclusion (C), nonresident alien limitation (D), and identification number requirement (E)"
+  from 1975-01-01:
+    eitc_eligible_individual and not qualifying_child_ineligible and not eligible_individual_section_911_exclusion and not nonresident_alien_eitc_exclusion and not eitc_disallowed_missing_tin

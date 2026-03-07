@@ -1,0 +1,17 @@
+# 26 USC 21(b)(2)(C)(ii) - Requirements of (B) met
+
+"""
+(ii) the requirements of subparagraph (B) are met.
+"""
+
+dependent_care_center_meets_subparagraph_B:
+  imports:
+    - 26/21/b/2/B/i#outside_household_care_qualifies_under_1A
+    - 26/21/b/2/B/ii#meets_outside_care_exception_b2Bii
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Dependent care center meets requirements of subparagraph (B)"
+  description: "Whether the requirements of subparagraph (B) are met for dependent care center expenses - qualifying individual is either described in (1)(A) or regularly spends at least 8 hours each day in taxpayer's household"
+  from 1976-01-01:
+    return outside_household_care_qualifies_under_1A or meets_outside_care_exception_b2Bii

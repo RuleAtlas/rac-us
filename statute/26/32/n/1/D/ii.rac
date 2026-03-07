@@ -1,0 +1,35 @@
+# 26 USC 32(n)(1)(D)(ii) - Consent for disclosure
+
+"""
+(ii) provides (in such manner as the Secretary may provide) consent for
+entities which administer a plan under part B or part E of title IV of
+the Social Security Act to disclose to the Secretary information related
+to the status of such individual as a qualified former foster youth.
+"""
+
+status: encoded
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+consents_to_foster_care_disclosure:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Consents to Foster Care Status Disclosure"
+    description: "Whether the individual provides consent for entities administering a plan under part B or part E of title IV of the Social Security Act to disclose to the Secretary information related to the status of such individual as a qualified former foster youth per 26 USC 32(n)(1)(D)(ii)"
+    default: false
+
+# =============================================================================
+# 32(n)(1)(D)(ii) - Consent for disclosure
+# =============================================================================
+
+meets_foster_care_disclosure_consent:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Meets Foster Care Disclosure Consent Requirement"
+    description: "Whether the individual has provided consent for disclosure of foster care status per 26 USC 32(n)(1)(D)(ii)"
+    from 2021-01-01:
+        return consents_to_foster_care_disclosure

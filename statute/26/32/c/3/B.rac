@@ -1,0 +1,35 @@
+# 26 USC 32(c)(3)(B) - Married individual
+
+"""
+(B) Married individual.--
+The term "qualifying child" shall not include an individual who is married
+as of the close of the taxpayer's taxable year unless the taxpayer is entitled
+to a deduction under section 151 for such taxable year with respect to such
+individual (or would be so entitled but for section 152(e)).
+"""
+
+is_married_at_close_of_tax_year:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Married at Close of Tax Year"
+  description: "Whether the individual is married as of the close of the taxpayer's taxable year"
+
+taxpayer_entitled_to_151_deduction:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Taxpayer Entitled to Section 151 Deduction"
+  description: "Whether the taxpayer is entitled to a deduction under section 151 with respect to the individual (or would be so entitled but for section 152(e))"
+
+married_individual_eitc_exclusion:
+  imports:
+    - 26/32/c/3/A#eitc_qualifying_child
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "EITC Qualifying Child Exclusion for Married Individual"
+  description: "Whether the individual is excluded from being a qualifying child for EITC because they are married at year-end and the taxpayer is not entitled to a section 151 deduction, per 26 USC 32(c)(3)(B)"
+  from 1975-01-01:
+    if is_married_at_close_of_tax_year and not taxpayer_entitled_to_151_deduction: 1
+    else: 0

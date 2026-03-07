@@ -1,0 +1,12 @@
+# 26 USC 21(c)(1) - Dollar limit for 1 qualifying individual
+
+"""
+(1) $3,000 if there is 1 qualifying individual with respect to the taxpayer
+for such taxable year, or
+"""
+
+expense_limit_one_qualifying_individual:
+  description: "Maximum employment-related expenses creditable when there is 1 qualifying individual"
+  unit: USD
+  from 1976-01-01: 2400
+  from 2003-01-01: 3000

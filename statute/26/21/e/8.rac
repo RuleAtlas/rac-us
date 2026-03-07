@@ -1,0 +1,23 @@
+# 26 USC 21(e)(8) - Educational organization
+
+"""
+(8) Educational organization.-- The term "educational organization"
+means an educational organization described in section 170(b)(1)(A)(ii).
+"""
+
+is_educational_organization_170b1Aii:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Educational organization described in section 170(b)(1)(A)(ii)"
+  description: "Whether the organization is an educational organization as described in 26 USC 170(b)(1)(A)(ii), for purposes of 26 USC 21(e)(7)-(8)"
+  default: false
+
+is_educational_organization_for_cdctc:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Educational organization for purposes of 26 USC 21"
+  description: "Whether the organization qualifies as an educational organization per 26 USC 21(e)(8), defined by cross-reference to section 170(b)(1)(A)(ii)"
+  from 1976-01-01:
+    return is_educational_organization_170b1Aii

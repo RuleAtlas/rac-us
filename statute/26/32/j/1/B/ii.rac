@@ -1,0 +1,11 @@
+# 26 USC 32(j)(1)(B)(ii) - Subsection (b)(2)(B) base year
+
+"""
+(ii) in the case of the $5,000 amount in subsection (b)(2)(B),
+"calendar year 2008" for "calendar year 2016", and
+"""
+
+joint_return_phaseout_increase_base_year:
+  description: "Base calendar year substituted for 'calendar year 2016' when computing cost-of-living adjustment for the $5,000 joint return phaseout increase in 26 USC 32(b)(2)(B)"
+  unit: Year
+  from 2016-01-01: 2008

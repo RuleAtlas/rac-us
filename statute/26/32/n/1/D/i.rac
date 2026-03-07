@@ -1,0 +1,54 @@
+# 26 USC 32(n)(1)(D)(i) - Foster care at age 14+
+
+"""
+(i) on or after the date that such individual attained age 14, was in
+foster care provided under the supervision or administration of an entity
+administering (or eligible to administer) a plan under part B or part E
+of title IV of the Social Security Act, and
+"""
+
+status: encoded
+
+# =============================================================================
+# Parameters
+# =============================================================================
+
+foster_care_minimum_age:
+    description: "Minimum age at which the individual must have been in foster care to qualify as a former foster youth under 26 USC 32(n)(1)(D)(i)"
+    unit: Year
+    from 2021-01-01: 14
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+was_in_foster_care:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Was in Foster Care"
+    description: "Whether the individual was in foster care provided under the supervision or administration of an entity administering (or eligible to administer) a plan under part B or part E of title IV of the Social Security Act"
+    default: false
+
+age_entered_foster_care:
+    entity: Person
+    period: Year
+    dtype: Integer
+    label: "Age Entered Foster Care"
+    description: "Age at which the individual entered or was in foster care under a qualifying plan"
+    default: 0
+
+# =============================================================================
+# 32(n)(1)(D)(i) - Foster care at age 14+
+# =============================================================================
+
+meets_foster_care_age_requirement:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Meets Foster Care Age Requirement"
+    description: "Whether the individual was in qualifying foster care on or after attaining age 14 per 26 USC 32(n)(1)(D)(i)"
+    from 2021-01-01:
+        if not was_in_foster_care:
+            return false
+        return age_entered_foster_care >= foster_care_minimum_age

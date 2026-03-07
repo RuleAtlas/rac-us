@@ -1,0 +1,19 @@
+# 26 USC 21(e)(4)(B) - Spouse not member last 6 months
+
+"""
+(B) during the last 6 months of such taxable year such individual's
+spouse is not a member of such household,
+"""
+
+last_months_of_year_spouse_absent:
+  description: "Number of months at end of taxable year during which spouse must not be a member of household"
+  unit: month
+  from 1976-01-01: 6
+
+spouse_not_member_of_household_last_6_months:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Spouse not member of household for last 6 months"
+  description: "Whether the individual's spouse is not a member of the household during the last 6 months of the taxable year, per 26 USC 21(e)(4)(B)"
+  default: false

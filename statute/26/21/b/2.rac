@@ -1,0 +1,70 @@
+# 26 USC 21(b)(2) - Employment-related expenses
+
+"""
+(2) Employment-related expenses
+(A) In general
+The term "employment-related expenses" means amounts paid for the following
+expenses, but only if such expenses are incurred to enable the taxpayer to be
+gainfully employed for any period for which there are 1 or more qualifying
+individuals with respect to the taxpayer:
+(i) expenses for household services, and
+(ii) expenses for the care of a qualifying individual.
+Such term shall not include any amount paid for services outside the
+taxpayer's household at a camp where the qualifying individual stays overnight.
+(B) Exception
+Employment-related expenses described in subparagraph (A) which are incurred
+for services outside the taxpayer's household shall be taken into account only
+if incurred for the care of--
+  (i) a qualifying individual described in paragraph (1)(A), or
+  (ii) a qualifying individual (not described in paragraph (1)(A)) who
+  regularly spends at least 8 hours each day in the taxpayer's household.
+(C) Dependent care centers
+Employment-related expenses described in subparagraph (A) which are incurred
+for services provided outside the taxpayer's household by a dependent care
+center (as defined in subparagraph (D)) shall be taken into account only if--
+  (i) such center complies with all applicable laws and regulations of a State
+  or unit of local government, and
+  (ii) the requirements of subparagraph (B) are met.
+(D) Dependent care center defined
+For purposes of this paragraph, the term "dependent care center" means any
+facility which--
+  (i) provides care for more than six individuals (other than individuals
+  who reside at the facility), and
+  (ii) receives a fee, payment, or grant for providing services for any of
+  the individuals (regardless of whether such facility is operated for profit).
+"""
+
+is_outside_household_expense:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Outside household expense"
+  description: "Whether the expense is for services outside the taxpayer's household"
+  default: false
+
+qualified_employment_related_expenses:
+  imports:
+    - 26/21/b/2/A#is_employment_related_expense
+    - 26/21/b/2/A#expense_amount
+    - 26/21/b/2/B#outside_household_expense_qualifies
+    - 26/21/b/2/C#dependent_care_center_expenses_qualify
+    - 26/21/b/2/D#is_dependent_care_center
+    - 26/21/b/2#is_outside_household_expense
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Qualified employment-related expenses"
+  description: "Employment-related expenses that qualify after applying the outside-household exception (B), dependent care center rules (C), and dependent care center definition (D) per 26 USC 21(b)(2)"
+  from 1976-01-01:
+    if not is_employment_related_expense:
+      return 0
+    if not is_outside_household_expense:
+      return expense_amount
+    if is_dependent_care_center:
+      if dependent_care_center_expenses_qualify:
+        return expense_amount
+      return 0
+    if outside_household_expense_qualifies:
+      return expense_amount
+    return 0

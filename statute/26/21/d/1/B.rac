@@ -1,0 +1,17 @@
+# 26 USC 21(d)(1)(B) - Married individual
+
+"""
+(B) in the case of an individual who is married at the close of such year, the
+lesser of such individual's earned income or the earned income of his spouse for
+such year.
+"""
+
+earned_income_limit_married:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Earned income limit for married individual"
+  description: "Employment-related expense limit equals lesser of taxpayer's earned income or spouse's earned income"
+  from 1976-01-01:
+    return min(earned_income, spouse_earned_income)

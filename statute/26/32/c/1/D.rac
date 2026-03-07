@@ -1,0 +1,35 @@
+# 26 USC 32(c)(1)(D) - Limitation on eligibility of nonresident aliens
+
+"""
+(D) Limitation on eligibility of nonresident aliens.--
+The term "eligible individual" shall not include any individual who is a
+nonresident alien individual for any portion of the taxable year unless such
+individual is treated for such taxable year as a resident of the United States
+for purposes of this chapter by reason of an election under subsection (g) or
+(h) of section 6013.
+"""
+
+is_nonresident_alien:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Nonresident Alien"
+  description: "Whether the individual is a nonresident alien for any portion of the taxable year"
+
+elected_resident_status_under_6013:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Elected Resident Status Under Section 6013"
+  description: "Whether the individual is treated as a US resident by reason of an election under section 6013(g) or (h)"
+
+nonresident_alien_eitc_exclusion:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Excluded from Eligible Individual as Nonresident Alien"
+  description: "Individual is excluded from being an eligible individual for EITC as a nonresident alien, unless they elected resident status under section 6013(g) or (h), per 26 USC 32(c)(1)(D)"
+  from 1975-01-01:
+    if is_nonresident_alien and not elected_resident_status_under_6013:
+      return 1
+    return 0

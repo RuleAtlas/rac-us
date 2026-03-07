@@ -1,0 +1,72 @@
+# 26 USC 32(c)(4) - Treatment of military personnel stationed outside the United States
+
+"""
+(4) Treatment of military personnel stationed outside the United States.--
+For purposes of paragraphs (1)(A)(ii)(I) and (3)(C), the principal place of
+abode of a member of the Armed Forces of the United States shall be treated
+as in the United States during any period during which such member is stationed
+outside the United States while serving on extended active duty with the Armed
+Forces of the United States. For purposes of the preceding sentence, the term
+"extended active duty" means any period of active duty pursuant to a call or
+order to such duty for a period in excess of 90 days or for an indefinite period.
+"""
+
+extended_active_duty_min_days:
+  description: "Minimum days of active duty for extended active duty per 26 USC 32(c)(4)"
+  unit: day
+  from 1978-01-01: 90
+
+is_armed_forces_member:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Member of the Armed Forces"
+  description: "Whether the individual is a member of the Armed Forces of the United States"
+  default: 0
+
+is_stationed_outside_us:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Stationed Outside the United States"
+  description: "Whether the individual is stationed outside the United States"
+  default: 0
+
+active_duty_days:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Active Duty Days"
+  description: "Number of days of active duty pursuant to a call or order to such duty"
+  default: 0
+
+is_on_extended_active_duty:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "On Extended Active Duty"
+  description: "Whether the individual is serving on extended active duty (active duty for a period in excess of 90 days or for an indefinite period) per 26 USC 32(c)(4)"
+  from 1978-01-01:
+    return active_duty_days > extended_active_duty_min_days
+
+is_indefinite_active_duty:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "On Indefinite Active Duty"
+  description: "Whether the individual is on active duty for an indefinite period"
+  default: 0
+
+eitc_military_abode_treated_as_us:
+  imports:
+    - 26/32/c/1/A/ii/I#principal_place_of_abode_in_us_fraction
+    - 26/32/c/3/C#principal_place_of_abode_in_us
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Military Abode Treated as in the United States for EITC"
+  description: "Whether a member of the Armed Forces stationed outside the US on extended active duty is treated as having principal place of abode in the US per 26 USC 32(c)(4)"
+  from 1978-01-01:
+    if is_armed_forces_member and is_stationed_outside_us and (is_on_extended_active_duty or is_indefinite_active_duty):
+      return 1
+    return 0

@@ -1,0 +1,20 @@
+# 26 USC 32(d)(2)(A) - In general
+
+"""
+(A) In general.--
+Except as provided in subparagraph (B), marital status shall be determined
+under section 7703(a).
+"""
+
+marital_status_for_eitc:
+  imports:
+    - 26/7703/a#marital_status_under_7703a
+    - 26/32/d/2/B#treated_as_not_married_separated_spouse
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Married for EITC Purposes"
+  description: "Whether the individual is treated as married for purposes of EITC, determined under section 7703(a) except as provided in the separated spouse rule of 26 USC 32(d)(2)(B)"
+  from 1975-01-01:
+    if treated_as_not_married_separated_spouse: 0
+    else: marital_status_under_7703a

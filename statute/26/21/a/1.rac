@@ -1,0 +1,37 @@
+# 26 USC 21(a)(1) - In general
+
+"""
+(1) In general.-- In the case of an individual for which there are 1 or more
+qualifying individuals (as defined in subsection (b)(1)) with respect to such
+individual, there shall be allowed as a credit against the tax imposed by this
+chapter for the taxable year an amount equal to the applicable percentage of the
+employment-related expenses (as defined in subsection (b)(2)) paid by such
+individual during the taxable year.
+"""
+
+employment_related_expenses:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Employment-related expenses paid"
+  description: "Total employment-related expenses paid during the taxable year per 26 USC 21(b)(2)"
+  default: 0
+
+child_and_dependent_care_credit:
+  imports:
+    - 26/21/a/2#applicable_percentage
+    - 26/21/c#dollar_limit_on_amount_creditable
+    - 26/21/c#number_of_qualifying_individuals
+    - 26/21/d#earned_income_limitation
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Child and Dependent Care Credit"
+  description: "Credit for child and dependent care expenses per 26 USC 21(a)(1)"
+  from 1976-01-01:
+    if number_of_qualifying_individuals == 0:
+      return 0
+    creditable_expenses = min(employment_related_expenses, dollar_limit_on_amount_creditable, earned_income_limitation)
+    return applicable_percentage * creditable_expenses

@@ -1,0 +1,15 @@
+# 26 USC 32(i)(2)(C)(ii)(II) - Interest deductions
+
+"""
+(II) interest deductions properly allocable to such gross income.
+"""
+
+status: encoded
+
+interest_deductions_allocable_to_rents_or_royalties:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Interest Deductions Allocable to Rents or Royalties"
+  description: "Interest deductions properly allocable to gross rents or royalties income per 26 USC 32(i)(2)(C)(ii)(II)"

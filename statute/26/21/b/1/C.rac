@@ -1,0 +1,38 @@
+# 26 USC 21(b)(1)(C) - Spouse incapable of self-care
+
+"""
+(C) the spouse of the taxpayer, if the spouse is physically or mentally
+incapable of caring for himself or herself and who has the same principal
+place of abode as the taxpayer for more than one-half of such taxable year.
+"""
+
+# Inputs
+
+spouse_incapable_of_self_care:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Spouse Incapable of Self-Care"
+  description: "Whether the spouse is physically or mentally incapable of caring for himself or herself"
+  default: False
+
+spouse_same_principal_abode_over_half_year:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Spouse Same Principal Abode Over Half Year"
+  description: "Whether the spouse has the same principal place of abode as the taxpayer for more than one-half of the taxable year"
+  default: False
+
+# Variable implementing the qualifying individual definition for spouse
+
+is_qualifying_individual_spouse:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Qualifying Individual - Spouse"
+  description: "Whether the taxpayer's spouse is a qualifying individual per 26 USC 21(b)(1)(C)"
+  from 2002-01-01:
+    if not spouse_incapable_of_self_care: False
+    elif not spouse_same_principal_abode_over_half_year: False
+    else: True

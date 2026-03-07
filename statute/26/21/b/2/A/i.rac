@@ -1,0 +1,13 @@
+# 26 USC 21(b)(2)(A)(i) - Household services
+
+"""
+(i) expenses for household services, and
+"""
+
+is_household_services_expense:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Expense for household services"
+  description: "Whether the expense is for household services per 26 USC 21(b)(2)(A)(i)"
+  default: false

@@ -1,0 +1,14 @@
+# 26 USC 21(e)(4)(A)(ii) - Furnishes over half cost
+
+"""
+(ii) furnishes over half of the cost of maintaining such household
+during the taxable year, and
+"""
+
+furnishes_over_half_household_cost:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Furnishes over half of household cost"
+  description: "Whether the individual furnishes over half of the cost of maintaining the household during the taxable year, per 26 USC 21(e)(4)(A)(ii)"
+  default: false

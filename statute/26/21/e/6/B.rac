@@ -1,0 +1,31 @@
+# 26 USC 21(e)(6)(B) - Child under 19
+
+"""
+(B) who is a child of the taxpayer (within the meaning of section
+152(f)(1)) who has not attained the age of 19 at the close of the
+taxable year.
+"""
+
+e6B_age_limit:
+  description: "Age threshold for child of taxpayer under 26 USC 21(e)(6)(B)"
+  unit: Year
+  from 1976-01-01: 19
+
+is_child_of_taxpayer_under_e6B:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Child of taxpayer under age 19 per 21(e)(6)(B)"
+  description: "Whether the individual is a child of the taxpayer (within the meaning of section 152(f)(1)) who has not attained the age of 19 at the close of the taxable year, per 26 USC 21(e)(6)(B)"
+  from 1976-01-01:
+    if is_child_of_taxpayer and age < e6B_age_limit:
+      return true
+    return false
+
+is_child_of_taxpayer:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Child of the taxpayer per section 152(f)(1)"
+  description: "Whether the individual is a child of the taxpayer within the meaning of section 152(f)(1)"
+  default: false

@@ -1,0 +1,13 @@
+# 26 USC 32(j)(1)(A) - Dollar amount
+
+status: boilerplate
+
+"""
+(A) such dollar amount, multiplied by
+"""
+
+# This subparagraph identifies the first factor in the inflation adjustment
+# formula: the base dollar amount from subsections (b)(2) and (i)(1).
+# The actual multiplication is completed by subparagraph (B), which supplies
+# the cost-of-living adjustment factor. No independent parameters or
+# formulas are defined here.

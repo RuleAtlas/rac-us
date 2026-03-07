@@ -1,0 +1,77 @@
+# 26 USC 21(b)(2)(A) - In general
+
+"""
+(A) In general
+The term "employment-related expenses" means amounts paid for the following
+expenses, but only if such expenses are incurred to enable the taxpayer to be
+gainfully employed for any period for which there are 1 or more qualifying
+individuals with respect to the taxpayer:
+(i) expenses for household services, and
+(ii) expenses for the care of a qualifying individual.
+Such term shall not include any amount paid for services outside the
+taxpayer's household at a camp where the qualifying individual stays overnight.
+"""
+
+is_gainfully_employed:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Taxpayer is gainfully employed"
+  description: "Whether the taxpayer is gainfully employed per 26 USC 21(b)(2)(A)"
+  default: false
+
+has_qualifying_individual:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Has qualifying individual"
+  description: "Whether the taxpayer has 1 or more qualifying individuals per 26 USC 21(b)(1)"
+  default: false
+
+is_overnight_camp_expense:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Overnight camp expense"
+  description: "Whether the expense is for services outside the household at a camp where the qualifying individual stays overnight"
+  default: false
+
+expense_amount:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Amount paid for household or care expenses"
+  description: "Amount paid for expenses described in 26 USC 21(b)(2)(A)(i) or (ii)"
+  default: 0
+
+is_employment_related_expense:
+  imports:
+    - 26/21/b/2/A/i#is_household_services_expense
+    - 26/21/b/2/A/ii#is_qualifying_individual_care_expense
+    - 26/21/b/2/A#is_gainfully_employed
+    - 26/21/b/2/A#has_qualifying_individual
+    - 26/21/b/2/A#is_overnight_camp_expense
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is employment-related expense"
+  description: "Whether an expense qualifies as an employment-related expense per 26 USC 21(b)(2)(A)"
+  from 1976-01-01:
+    is_qualifying_expense = is_household_services_expense or is_qualifying_individual_care_expense
+    return is_qualifying_expense and is_gainfully_employed and has_qualifying_individual and not is_overnight_camp_expense
+
+employment_related_expenses:
+  imports:
+    - 26/21/b/2/A#is_employment_related_expense
+    - 26/21/b/2/A#expense_amount
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Employment-related expenses"
+  description: "Amount of employment-related expenses per 26 USC 21(b)(2)(A)"
+  from 1976-01-01:
+    if is_employment_related_expense:
+      return expense_amount
+    return 0

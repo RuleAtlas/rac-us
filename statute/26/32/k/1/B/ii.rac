@@ -1,0 +1,55 @@
+# 26 USC 32(k)(1)(B)(ii) - Reckless disallowance period
+
+"""
+(ii) the period of 2 taxable years after the most recent taxable year for
+which there was a final determination that the taxpayer's claim of credit
+under this section was due to reckless or intentional disregard of rules
+and regulations (but not due to fraud).
+"""
+
+status: encoded
+
+# =============================================================================
+# Parameters
+# =============================================================================
+
+reckless_disallowance_years:
+  description: "Number of taxable years after final recklessness determination during which credit is disallowed"
+  unit: Year
+  from 1997-01-01: 2
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+most_recent_reckless_determination_year:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "Most Recent Reckless Determination Year"
+  description: "Most recent taxable year for which there was a final determination that the taxpayer's claim of credit under this section was due to reckless or intentional disregard of rules and regulations but not fraud (0 if none)"
+  default: 0
+
+current_tax_year:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "Current Tax Year"
+  description: "The current taxable year"
+  default: 0
+
+# =============================================================================
+# 32(k)(1)(B)(ii) - Reckless disallowance period
+# =============================================================================
+
+in_reckless_disallowance_period:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "In Reckless Disallowance Period"
+  description: "Whether the taxpayer is in the disallowance period due to a prior reckless or intentional disregard claim of credit under 26 USC 32"
+  from 1997-01-01:
+    if most_recent_reckless_determination_year == 0:
+      return false
+    years_since = current_tax_year - most_recent_reckless_determination_year
+    return years_since > 0 and years_since <= reckless_disallowance_years

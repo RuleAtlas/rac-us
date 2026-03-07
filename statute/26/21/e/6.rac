@@ -1,0 +1,27 @@
+# 26 USC 21(e)(6) - Payments to related individuals
+
+"""
+(6) Payments to related individuals.-- No credit shall be allowed
+under subsection (a) for any amount paid by the taxpayer to an
+individual--
+(A) with respect to whom, for the taxable year, a deduction under
+section 151(c) (relating to deduction for personal exemptions for
+dependents) is allowable either to the taxpayer or his spouse, or
+(B) who is a child of the taxpayer (within the meaning of section
+152(f)(1)) who has not attained the age of 19 at the close of the
+taxable year.
+"""
+
+is_related_individual_for_cdctc:
+  imports:
+    - 26/21/e/6/A#dependent_exemption_allowable
+    - 26/21/e/6/B#is_child_of_taxpayer_under_e6B
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Related individual for CDCTC disqualification"
+  description: "Whether the individual is a related individual to whom payments cannot generate a credit under 26 USC 21(a), per 26 USC 21(e)(6)"
+  from 1976-01-01:
+    if dependent_exemption_allowable or is_child_of_taxpayer_under_e6B:
+      return true
+    return false

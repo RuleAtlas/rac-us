@@ -1,0 +1,12 @@
+# 26 USC 21(c)(2) - Dollar limit for 2 or more qualifying individuals
+
+"""
+(2) $6,000 if there are 2 or more qualifying individuals with respect to the
+taxpayer for such taxable year.
+"""
+
+expense_limit_two_or_more_qualifying_individuals:
+  description: "Maximum employment-related expenses creditable when there are 2 or more qualifying individuals"
+  unit: USD
+  from 1976-01-01: 4800
+  from 2003-01-01: 6000

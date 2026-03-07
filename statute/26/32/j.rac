@@ -39,7 +39,7 @@ eitc_inflation_rounding:
 eitc_cola_adjustment:
   entity: TaxUnit
   period: Year
-  dtype: Float
+  dtype: Decimal
   label: "EITC Cost of Living Adjustment"
   description: "COLA per section 1(f)(3) with 2015 base year substitution per 26 USC 32(j)(1)(B)"
   default: 0

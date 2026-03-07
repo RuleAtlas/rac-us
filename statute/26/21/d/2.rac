@@ -1,0 +1,51 @@
+# 26 USC 21(d)(2) - Special rule for spouse who is a student or incapable of caring for himself
+
+"""
+(2) Special rule for spouse who is a student or incapable of caring for
+himself.-- In the case of a spouse who is a student or a qualifying
+individual described in subsection (b)(1)(C), for purposes of paragraph
+(1), such spouse shall be deemed for each month during which such spouse
+is a full-time student at an educational institution, or is such a
+qualifying individual, to be gainfully employed and to have earned income
+of not less than--
+(A) $250 if subsection (c)(1) applies for the taxable year, or
+(B) $500 if subsection (c)(2) applies for the taxable year.
+In the case of any husband and wife, this paragraph shall apply with
+respect to only one spouse for any one month.
+"""
+
+# Inputs
+
+months_as_student_or_incapable_spouse:
+  entity: Person
+  period: Year
+  dtype: Integer
+  unit: Month
+  label: "Months as student or incapable spouse"
+  description: "Number of months during the taxable year in which the spouse is a full-time student at an educational institution or is a qualifying individual described in 26 USC 21(b)(1)(C)"
+  default: 0
+
+has_two_or_more_qualifying_individuals:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Two or more qualifying individuals"
+  description: "Whether there are 2 or more qualifying individuals with respect to the taxpayer for the taxable year, such that subsection (c)(2) applies"
+  default: False
+
+# Variable
+
+deemed_earned_income_student_or_incapable_spouse:
+  imports:
+    - 26/21/d/2/A#deemed_earned_income_one_qualifying_individual
+    - 26/21/d/2/B#deemed_earned_income_two_or_more_qualifying_individuals
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Deemed earned income for student or incapable spouse"
+  description: "Monthly deemed earned income times qualifying months for a spouse who is a student or qualifying individual per 26 USC 21(b)(1)(C), per 26 USC 21(d)(2). Only one spouse per month for married couples."
+  from 2003-01-01:
+    if has_two_or_more_qualifying_individuals:
+      return months_as_student_or_incapable_spouse * deemed_earned_income_two_or_more_qualifying_individuals
+    return months_as_student_or_incapable_spouse * deemed_earned_income_one_qualifying_individual

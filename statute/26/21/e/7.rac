@@ -1,0 +1,35 @@
+# 26 USC 21(e)(7) - Student defined
+
+"""
+(7) Student defined.-- The term "student" means an individual who
+during each of 5 calendar months during the taxable year is a
+full-time student at an educational organization.
+"""
+
+min_months_as_full_time_student:
+  description: "Minimum number of calendar months during the taxable year the individual must be a full-time student"
+  unit: Month
+  from 1976-01-01: 5
+
+months_as_full_time_student_at_educational_org:
+  entity: Person
+  period: Year
+  dtype: Integer
+  unit: Month
+  label: "Months as full-time student at an educational organization"
+  description: "Number of calendar months during the taxable year in which the individual is a full-time student at an educational organization per 26 USC 21(e)(8)"
+  default: 0
+
+is_student_for_cdctc:
+  imports:
+    - 26/21/e/8#is_educational_organization_for_cdctc
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Student for purposes of 26 USC 21"
+  description: "Whether the individual qualifies as a student per 26 USC 21(e)(7), meaning a full-time student at an educational organization for at least 5 calendar months during the taxable year"
+  from 1976-01-01:
+    if months_as_full_time_student_at_educational_org >= min_months_as_full_time_student:
+      return true
+    else:
+      return false

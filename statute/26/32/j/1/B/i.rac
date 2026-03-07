@@ -1,0 +1,13 @@
+# 26 USC 32(j)(1)(B)(i) - Subsection (b)(2)(A) base year
+
+status: encoded
+
+"""
+(i) in the case of amounts in subsection (b)(2)(A), "calendar year 1995"
+for "calendar year 2016",
+"""
+
+b_2_A_base_year:
+    description: "Base calendar year for cost-of-living adjustment of subsection (b)(2)(A) amounts per 26 USC 32(j)(1)(B)(i)"
+    unit: year
+    from 1997-01-01: 1995

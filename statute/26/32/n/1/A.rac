@@ -1,0 +1,23 @@
+# 26 USC 32(n)(1)(A) - In general
+
+"""
+(A) In general
+Subsection (c)(1)(A)(ii)(II) shall be applied by substituting "the
+applicable minimum age" for "age 25".
+"""
+
+status: encoded
+
+# =============================================================================
+# Amendment: substitute applicable_minimum_age for eitc_minimum_age (age 25)
+# =============================================================================
+
+amend 26/32/c/1/A/ii/II#meets_eitc_age_requirement:
+    imports:
+        - 26/32/n/1/B#applicable_minimum_age
+    from 2021-01-01:
+        individual_qualifies = age >= applicable_minimum_age and age < eitc_maximum_age
+        if not is_married:
+            return individual_qualifies
+        spouse_qualifies = spouse_age >= applicable_minimum_age and spouse_age < eitc_maximum_age
+        return individual_qualifies or spouse_qualifies

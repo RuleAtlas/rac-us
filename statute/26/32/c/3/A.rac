@@ -1,0 +1,24 @@
+# 26 USC 32(c)(3)(A) - In general
+
+"""
+(A) In general.--
+The term "qualifying child" means a qualifying child of the taxpayer
+(as defined in section 152(c), determined without regard to paragraph
+(1)(D) thereof and section 152(e)).
+"""
+
+is_qualifying_child_of_taxpayer:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Qualifying Child of Taxpayer (Section 152(c))"
+  description: "Whether the person is a qualifying child of the taxpayer as defined in section 152(c), determined without regard to paragraph (1)(D) thereof and section 152(e)"
+
+eitc_qualifying_child:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "EITC Qualifying Child"
+  description: "Whether the person is a qualifying child for EITC purposes per 26 USC 32(c)(3)(A), referencing section 152(c) without regard to 152(c)(1)(D) and 152(e)"
+  from 1975-01-01:
+    return is_qualifying_child_of_taxpayer

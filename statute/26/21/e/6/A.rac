@@ -1,0 +1,15 @@
+# 26 USC 21(e)(6)(A) - Dependent deduction allowable
+
+"""
+(A) with respect to whom, for the taxable year, a deduction under
+section 151(c) (relating to deduction for personal exemptions for
+dependents) is allowable either to the taxpayer or his spouse, or
+"""
+
+dependent_exemption_allowable:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Dependent exemption deduction allowable"
+  description: "Whether a deduction under section 151(c) for personal exemptions for dependents is allowable with respect to this individual to either the taxpayer or spouse, per 26 USC 21(e)(6)(A)"
+  default: false

@@ -1,0 +1,16 @@
+# 26 USC 32(i)(2)(E)(ii) - Aggregate passive losses
+
+"""
+(ii) the aggregate losses from all passive activities for the taxable year
+(as so determined).
+"""
+
+status: encoded
+
+aggregate_passive_losses:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Aggregate Passive Losses"
+  description: "Aggregate losses from all passive activities for the taxable year, determined without regard to amounts included in earned income under subsection (c)(2) or described in a preceding subparagraph, per 26 USC 32(i)(2)(E)(ii)"

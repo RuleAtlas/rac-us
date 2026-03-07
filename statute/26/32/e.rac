@@ -1,0 +1,41 @@
+# 26 USC 32(e) - Taxable year must be full taxable year
+
+"""
+(e) Taxable year must be full taxable year.--
+Except in the case of a taxable year closed by reason of the death of the
+taxpayer, no credit shall be allowable under this section in the case of a
+taxable year covering a period of less than 12 months.
+"""
+
+full_taxable_year_month_threshold:
+  description: "Minimum number of months for a taxable year to qualify for EITC"
+  unit: months
+  from 1975-01-01: 12
+
+taxable_year_closed_by_death:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Taxable Year Closed by Death"
+  description: "Whether the taxable year was closed by reason of the death of the taxpayer"
+
+taxable_year_months:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  unit: months
+  label: "Taxable Year Length"
+  description: "Number of months covered by the taxable year"
+  default: 12
+
+eitc_full_year_eligible:
+  imports:
+    - 26/32/a#eitc
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "EITC Full Taxable Year Eligible"
+  description: "Whether the taxpayer meets the full taxable year requirement for EITC per 26 USC 32(e)"
+  from 1975-01-01:
+    if taxable_year_closed_by_death: true
+    else: taxable_year_months >= full_taxable_year_month_threshold

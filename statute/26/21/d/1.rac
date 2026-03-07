@@ -1,0 +1,29 @@
+# 26 USC 21(d)(1) - In general
+
+"""
+(1) In general
+Except as otherwise provided in this subsection, the amount of the
+employment-related expenses incurred during any taxable year which may be
+taken into account under subsection (a) shall not exceed--
+(A) in the case of an individual who is not married at the close of such
+year, such individual's earned income for such year, or
+(B) in the case of an individual who is married at the close of such year,
+the lesser of such individual's earned income or the earned income of his
+spouse for such year.
+"""
+
+earned_income_limit:
+  imports:
+    - 26/21/d/1/A#earned_income_limit_unmarried
+    - 26/21/d/1/A#is_married
+    - 26/21/d/1/B#earned_income_limit_married
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Earned income limitation on employment-related expenses"
+  description: "Employment-related expenses may not exceed earned income, per 26 USC 21(d)(1)"
+  from 1976-01-01:
+    if is_married:
+      return earned_income_limit_married
+    return earned_income_limit_unmarried

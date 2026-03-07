@@ -1,0 +1,35 @@
+# 26 USC 21(d)(1)(A) - Unmarried individual
+
+"""
+(A) in the case of an individual who is not married at the close of such year,
+such individual's earned income for such year, or
+"""
+
+earned_income:
+  description: "Earned income of the individual"
+  default: 0
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Earned income"
+
+is_married:
+  description: "Whether the individual is married at the close of the taxable year"
+  default: false
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Married at close of year"
+
+earned_income_limit_unmarried:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Earned income limit on employment-related expenses for unmarried individual"
+  description: "For an unmarried individual, employment-related expenses may not exceed their earned income"
+  from 1976-01-01:
+    if not is_married:
+      return earned_income
+    return 0

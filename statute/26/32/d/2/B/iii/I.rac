@@ -1,0 +1,28 @@
+# 26 USC 32(d)(2)(B)(iii)(I) - 6-month separation
+
+"""
+(I) during the last 6 months of such taxable year, does not have the same
+principal place of abode as the individual's spouse,
+"""
+
+separation_months_threshold:
+  description: "Number of months at end of taxable year during which spouses must not share principal place of abode per 26 USC 32(d)(2)(B)(iii)(I)"
+  unit: month
+  from 1975-01-01: 6
+
+months_not_sharing_abode_end_of_year:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Months Not Sharing Abode at End of Year"
+  description: "Number of months during the last part of the taxable year that the individual does not have the same principal place of abode as their spouse"
+  default: 0
+
+six_month_separation:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "6-Month Separation from Spouse"
+  description: "Whether during the last 6 months of the taxable year the individual does not have the same principal place of abode as their spouse per 26 USC 32(d)(2)(B)(iii)(I)"
+  from 1975-01-01:
+    return months_not_sharing_abode_end_of_year >= separation_months_threshold

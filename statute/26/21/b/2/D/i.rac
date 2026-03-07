@@ -1,0 +1,29 @@
+# 26 USC 21(b)(2)(D)(i) - Care for more than 6 individuals
+
+"""
+(i) provides care for more than six individuals (other than individuals
+who reside at the facility), and
+"""
+
+dependent_care_center_min_individuals:
+  description: "Minimum number of non-resident individuals cared for to qualify as a dependent care center"
+  unit: count
+  from 1976-01-01: 6
+
+is_care_for_more_than_min_individuals:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Facility provides care for more than six non-resident individuals"
+  description: "Whether the facility provides care for more than six individuals (other than individuals who reside at the facility)"
+  from 1976-01-01:
+    return facility_individuals_cared_for > dependent_care_center_min_individuals
+
+facility_individuals_cared_for:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  unit: count
+  label: "Number of non-resident individuals cared for by facility"
+  description: "Number of individuals (other than residents) for whom the facility provides care"
+  default: 0

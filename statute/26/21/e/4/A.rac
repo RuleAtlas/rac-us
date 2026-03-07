@@ -1,0 +1,25 @@
+# 26 USC 21(e)(4)(A) - Filing separate, maintains home
+
+"""
+(A) such individual--
+  (i) maintains as his home a household which constitutes for more
+  than one-half of the taxable year the principal place of abode of a
+  qualifying individual, and
+  (ii) furnishes over half of the cost of maintaining such household
+  during the taxable year, and
+"""
+
+maintains_home_for_qualifying_individual:
+  imports:
+    - 26/21/e/4/A/i#maintains_home_as_abode_of_qualifying_individual
+    - 26/21/e/4/A/ii#furnishes_over_half_household_cost
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Maintains home for qualifying individual"
+  description: "Whether the individual maintains a home as the principal abode of a qualifying individual and furnishes over half the cost, per 26 USC 21(e)(4)(A)"
+  from 1976-01-01:
+    if maintains_home_as_abode_of_qualifying_individual and furnishes_over_half_household_cost:
+      return true
+    else:
+      return false

@@ -1,0 +1,38 @@
+# 26 USC 32(n)(1)(B) - Applicable minimum age
+
+"""
+(B) Applicable minimum age
+For purposes of this paragraph, the term "applicable minimum age" means--
+  (i) except as otherwise provided in this subparagraph, age 19,
+  (ii) in the case of a specified student (other than a qualified former
+  foster youth or a qualified homeless youth), age 24, and
+  (iii) in the case of a qualified former foster youth or a qualified
+  homeless youth, age 18.
+"""
+
+status: encoded
+
+# =============================================================================
+# 32(n)(1)(B) - Applicable minimum age
+# =============================================================================
+
+applicable_minimum_age:
+    imports:
+        - 26/32/n/1/B/i#general_applicable_minimum_age
+        - 26/32/n/1/B/ii#specified_student_applicable_minimum_age
+        - 26/32/n/1/B/iii#foster_or_homeless_youth_minimum_age
+        - 26/32/n/1/B/iii#is_qualified_former_foster_youth
+        - 26/32/n/1/B/iii#is_qualified_homeless_youth
+        - 26/32/n/1/C#is_specified_student
+    entity: Person
+    period: Year
+    dtype: Integer
+    unit: Year
+    label: "Applicable Minimum Age"
+    description: "The applicable minimum age for earned income credit eligibility for individuals without qualifying children per 26 USC 32(n)(1)(B)"
+    from 2021-01-01:
+        if is_qualified_former_foster_youth or is_qualified_homeless_youth:
+            return foster_or_homeless_youth_minimum_age
+        if is_specified_student:
+            return specified_student_applicable_minimum_age
+        return general_applicable_minimum_age

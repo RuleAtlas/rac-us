@@ -1,0 +1,33 @@
+# 26 USC 32(n)(1)(D) - Qualified former foster youth
+
+"""
+(D) Qualified former foster youth.--
+For purposes of this paragraph, the term "qualified former foster youth"
+means an individual who--
+  (i) on or after the date that such individual attained age 14, was in
+      foster care provided under the supervision or administration of an
+      entity administering (or eligible to administer) a plan under part B
+      or part E of title IV of the Social Security Act, and
+  (ii) provides consent for entities which administer a plan under part B
+       or part E of title IV of the Social Security Act to disclose to the
+       Secretary information related to the status of such individual as a
+       qualified former foster youth.
+"""
+
+status: encoded
+
+# =============================================================================
+# 32(n)(1)(D) - Qualified former foster youth
+# =============================================================================
+
+is_qualified_former_foster_youth:
+    imports:
+        - 26/32/n/1/D/i#meets_foster_care_age_requirement
+        - 26/32/n/1/D/ii#meets_foster_care_disclosure_consent
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Qualified Former Foster Youth"
+    description: "Whether the individual is a qualified former foster youth per 26 USC 32(n)(1)(D), requiring both foster care at age 14+ and consent for disclosure"
+    from 2021-01-01:
+        return meets_foster_care_age_requirement and meets_foster_care_disclosure_consent

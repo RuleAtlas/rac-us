@@ -1,0 +1,14 @@
+# 26 USC 32(i)(2)(A) - Interest or dividends
+
+"""
+(A) interest or dividends to the extent includible in gross income for the
+taxable year,
+"""
+
+interest_or_dividends_includible_in_gross_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Interest or Dividends (Disqualified Income)"
+  description: "Interest or dividends to the extent includible in gross income for the taxable year per 26 USC 32(i)(2)(A)"

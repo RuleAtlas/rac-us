@@ -1,0 +1,29 @@
+# 26 USC 21(b)(1) - Qualifying individual
+
+"""
+(1) Qualifying individual
+The term "qualifying individual" means--
+(A) a dependent of the taxpayer (as defined in section 152(a)(1)) who has not
+attained age 13,
+(B) a dependent of the taxpayer (as defined in section 152, determined without
+regard to subsections (b)(1), (b)(2), and (d)(1)(B)) who is physically or
+mentally incapable of caring for himself or herself and who has the same
+principal place of abode as the taxpayer for more than one-half of such
+taxable year, or
+(C) the spouse of the taxpayer, if the spouse is physically or mentally
+incapable of caring for himself or herself and who has the same principal
+place of abode as the taxpayer for more than one-half of such taxable year.
+"""
+
+is_qualifying_individual:
+  imports:
+    - 26/21/b/1/A#is_qualifying_individual_under_age
+    - 26/21/b/1/B#is_qualifying_individual_b1B
+    - 26/21/b/1/C#is_qualifying_individual_spouse
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Qualifying individual"
+  description: "Whether the person is a qualifying individual per 26 USC 21(b)(1)"
+  from 1976-01-01:
+    return is_qualifying_individual_under_age or is_qualifying_individual_b1B or is_qualifying_individual_spouse

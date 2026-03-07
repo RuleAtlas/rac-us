@@ -1,0 +1,23 @@
+# 26 USC 32(n)(1)(E) - Qualified homeless youth
+
+"""
+(E) Qualified homeless youth
+For purposes of this paragraph, the term "qualified homeless youth" means, with respect to any
+taxable year, an individual who certifies, in a manner as provided by the Secretary, that such
+individual is either an unaccompanied youth who is a homeless child or youth, or is
+unaccompanied, at risk of homelessness, and self-supporting.
+"""
+
+status: encoded
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+is_qualified_homeless_youth:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Qualified Homeless Youth"
+  description: "Whether the individual certifies as a qualified homeless youth per 26 USC 32(n)(1)(E) — either an unaccompanied homeless child or youth, or unaccompanied, at risk of homelessness, and self-supporting"
+  default: false

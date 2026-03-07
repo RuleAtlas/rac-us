@@ -1,0 +1,23 @@
+# 26 USC 32(d)(2) - Determination of marital status
+
+"""
+(2) Determination of marital status.--
+For purposes of this section--
+  (A) In general.-- Except as provided in subparagraph (B), marital status
+  shall be determined under section 7703(a).
+  (B) Special rule for separated spouse.-- An individual shall not be treated
+  as married if such individual meets the conditions specified in subparagraph (B).
+"""
+
+status: consolidated
+
+eitc_marital_status:
+  imports:
+    - 26/32/d/2/A#marital_status_for_eitc
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Marital Status for EITC"
+  description: "Whether individual is treated as married for EITC purposes, per 26 USC 32(d)(2)"
+  from 1975-01-01:
+    return marital_status_for_eitc

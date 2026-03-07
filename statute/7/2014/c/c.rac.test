@@ -1,0 +1,67 @@
+snap_gross_income_limit:
+  - name: "4-person household, FY2024 poverty line ($2,313/month)"
+    period: 2024-10
+    inputs:
+      snap_poverty_line: 2313
+    expect: 3006.90
+
+  - name: "1-person household, FY2024 poverty line ($1,255/month)"
+    period: 2024-10
+    inputs:
+      snap_poverty_line: 1255
+    expect: 1631.50
+
+  - name: "Zero poverty line yields zero limit"
+    period: 2024-10
+    inputs:
+      snap_poverty_line: 0
+    expect: 0
+
+snap_gross_income_eligible:
+  - name: "Household below gross income limit is eligible"
+    period: 2024-10
+    inputs:
+      snap_gross_income: 2000
+      snap_poverty_line: 2313
+      snap_has_elderly_or_disabled_member: false
+    expect: true
+
+  - name: "Household at exactly the gross income limit is eligible"
+    period: 2024-10
+    inputs:
+      snap_gross_income: 3006.90
+      snap_poverty_line: 2313
+      snap_has_elderly_or_disabled_member: false
+    expect: true
+
+  - name: "Household above gross income limit is ineligible"
+    period: 2024-10
+    inputs:
+      snap_gross_income: 3007
+      snap_poverty_line: 2313
+      snap_has_elderly_or_disabled_member: false
+    expect: false
+
+  - name: "Household with elderly member is exempt from gross income test even if above 130% FPL"
+    period: 2024-10
+    inputs:
+      snap_gross_income: 5000
+      snap_poverty_line: 2313
+      snap_has_elderly_or_disabled_member: true
+    expect: true
+
+  - name: "Household with disabled member is exempt from gross income test"
+    period: 2024-10
+    inputs:
+      snap_gross_income: 4000
+      snap_poverty_line: 2313
+      snap_has_elderly_or_disabled_member: true
+    expect: true
+
+  - name: "Zero income household without elderly/disabled member is eligible"
+    period: 2024-10
+    inputs:
+      snap_gross_income: 0
+      snap_poverty_line: 2313
+      snap_has_elderly_or_disabled_member: false
+    expect: true

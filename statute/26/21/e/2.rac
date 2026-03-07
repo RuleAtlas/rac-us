@@ -1,0 +1,34 @@
+# 26 USC 21(e)(2) - Married couples must file joint return
+
+"""
+(2) Married couples must file joint return.-- If the taxpayer is married at the
+close of the taxable year, the credit shall be allowed under subsection (a) only
+if the taxpayer and his spouse file a joint return for the taxable year.
+"""
+
+is_married:
+  description: "Whether the taxpayer is married at the close of the taxable year"
+  default: false
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Married at close of year"
+
+files_joint_return:
+  description: "Whether the taxpayer and spouse file a joint return for the taxable year"
+  default: false
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Files joint return"
+
+married_joint_return_eligible:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Meets married joint return requirement for child care credit"
+  description: "Married taxpayers must file joint return to claim credit under 26 USC 21(a)"
+  from 1976-01-01:
+    if not is_married:
+      return true
+    return files_joint_return

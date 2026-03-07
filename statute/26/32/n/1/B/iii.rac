@@ -1,0 +1,60 @@
+# 26 USC 32(n)(1)(B)(iii) - Foster youth or homeless youth minimum age
+
+"""
+(iii) in the case of a qualified former foster youth or a qualified
+homeless youth, age 18.
+"""
+
+status: encoded
+
+# =============================================================================
+# Parameters
+# =============================================================================
+
+foster_or_homeless_youth_minimum_age:
+    description: "Applicable minimum age for qualified former foster youth or qualified homeless youth"
+    unit: Year
+    from 2021-01-01: 18
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+is_qualified_former_foster_youth:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Qualified Former Foster Youth"
+    description: "Whether the individual is a qualified former foster youth as defined in 26 USC 32(n)(1)(D)"
+    default: false
+
+is_qualified_homeless_youth:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Qualified Homeless Youth"
+    description: "Whether the individual is a qualified homeless youth as defined in 26 USC 32(n)(1)(E)"
+    default: false
+
+age:
+    entity: Person
+    period: Year
+    dtype: Integer
+    label: "Age"
+    description: "Age of the individual before the close of the taxable year"
+    default: 0
+
+# =============================================================================
+# 32(n)(1)(B)(iii) - Foster youth or homeless youth minimum age
+# =============================================================================
+
+meets_foster_or_homeless_youth_minimum_age:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Meets Foster/Homeless Youth Minimum Age"
+    description: "Whether a qualified former foster youth or qualified homeless youth meets the applicable minimum age of 18 under 26 USC 32(n)(1)(B)(iii)"
+    from 2021-01-01:
+        if not (is_qualified_former_foster_youth or is_qualified_homeless_youth):
+            return false
+        return age >= foster_or_homeless_youth_minimum_age

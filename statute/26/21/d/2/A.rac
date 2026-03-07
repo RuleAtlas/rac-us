@@ -1,0 +1,12 @@
+# 26 USC 21(d)(2)(A) - Deemed earned income when 1 qualifying individual
+
+"""
+(A) $250 if subsection (c)(1) applies for the taxable year, or
+"""
+
+deemed_earned_income_one_qualifying_individual:
+  description: "Monthly deemed earned income for student/incapable spouse when there is 1 qualifying individual"
+  unit: USD
+  from 1976-01-01: 166
+  from 1982-01-01: 200
+  from 2003-01-01: 250

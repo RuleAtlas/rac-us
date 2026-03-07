@@ -1,0 +1,28 @@
+# 26 USC 21(e)(4) - Certain married individuals living apart
+
+"""
+(4) Certain married individuals living apart.-- If--
+(A) an individual who is married and who files a separate return--
+  (i) maintains as his home a household which constitutes for more
+  than one-half of the taxable year the principal place of abode of a
+  qualifying individual, and
+  (ii) furnishes over half of the cost of maintaining such household
+  during the taxable year, and
+(B) during the last 6 months of such taxable year such individual's
+spouse is not a member of such household,
+such individual shall not be considered as married.
+"""
+
+not_considered_married_e4:
+  imports:
+    - 26/21/e/4/A#maintains_home_for_qualifying_individual
+    - 26/21/e/4/B#spouse_not_member_of_household_last_6_months
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Not considered as married per 21(e)(4)"
+  description: "Whether a married individual filing separately is not considered as married for purposes of section 21, per 26 USC 21(e)(4)"
+  from 1976-01-01:
+    if maintains_home_for_qualifying_individual and spouse_not_member_of_household_last_6_months:
+      return true
+    return false

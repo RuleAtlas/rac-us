@@ -1,0 +1,30 @@
+# 26 USC 21(b)(1)(A) - Dependent under age 13
+
+"""
+(A) a dependent of the taxpayer (as defined in section 152(a)(1)) who has not
+attained age 13,
+"""
+
+qualifying_individual_age_limit:
+  description: "Age below which a dependent qualifies under 26 USC 21(b)(1)(A)"
+  unit: Year
+  from 1976-01-01: 13
+
+is_dependent_under_152a1:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is dependent under section 152(a)(1)"
+  description: "Whether the person is a dependent as defined in section 152(a)(1)"
+
+is_qualifying_individual_under_age:
+  imports:
+    - 26/21/b/1/A#is_dependent_under_152a1
+    - 26/21/b/1/A#qualifying_individual_age_limit
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Qualifying individual - dependent under age 13"
+  description: "Whether the person is a qualifying individual per 26 USC 21(b)(1)(A): a dependent under section 152(a)(1) who has not attained age 13"
+  from 1976-01-01:
+    return is_dependent_under_152a1 and age < qualifying_individual_age_limit

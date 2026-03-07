@@ -1,0 +1,29 @@
+# 26 USC 32(a)(2)(A) - Credit cap
+
+"""
+(A) the credit percentage of the earned income amount, over
+"""
+
+status: encoded
+
+eitc_credit_cap:
+  imports:
+    - 26/32/b/1#eitc_credit_percentage
+    - 26/32/b/2/A#earned_income_amount_no_children
+    - 26/32/b/2/A#earned_income_amount_1_child
+    - 26/32/b/2/A#earned_income_amount_2_plus_children
+    - 26/32/b/1#qualifying_child_count
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "EITC Credit Cap"
+  description: "Credit percentage times earned income amount per 26 USC 32(a)(2)(A)"
+  from 1994-01-01:
+    if qualifying_child_count == 0:
+      earned_income_amount = earned_income_amount_no_children
+    elif qualifying_child_count == 1:
+      earned_income_amount = earned_income_amount_1_child
+    else:
+      earned_income_amount = earned_income_amount_2_plus_children
+    return eitc_credit_percentage * earned_income_amount

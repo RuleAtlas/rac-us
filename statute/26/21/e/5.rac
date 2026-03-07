@@ -1,0 +1,48 @@
+# 26 USC 21(e)(5) - Special dependency test in case of divorced parents, etc.
+
+"""
+(5) Special dependency test in case of divorced parents, etc.
+If--
+(A) section 152(e) applies to any child with respect to any calendar year, and
+(B) such child is under the age of 13 or is physically or mentally incapable
+of caring for himself,
+in the case of any taxable year beginning in such calendar year, such child
+shall be treated as a qualifying individual described in subparagraph (A) or
+(B) of subsection (b)(1) (whichever is appropriate) with respect to the
+custodial parent (as defined in section 152(e)(4)(A)), and shall not be
+treated as a qualifying individual with respect to the noncustodial parent.
+"""
+
+is_custodial_parent:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is custodial parent"
+  description: "Whether the person is the custodial parent as defined in section 152(e)(4)(A)"
+  default: false
+
+qualifies_for_divorced_parent_rule:
+  imports:
+    - 26/21/e/5/A#section_152e_applies
+    - 26/21/e/5/B#meets_e5B_age_or_incapacity
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Qualifies for divorced parent dependency test"
+  description: "Whether the child meets both conditions of 26 USC 21(e)(5): section 152(e) applies and the child is under 13 or incapable of self-care"
+  from 1976-01-01:
+    return section_152e_applies and meets_e5B_age_or_incapacity
+
+is_qualifying_individual_divorced_custodial:
+  imports:
+    - 26/21/e/5#qualifies_for_divorced_parent_rule
+    - 26/21/e/5#is_custodial_parent
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Qualifying individual for custodial parent (divorced)"
+  description: "Under 26 USC 21(e)(5), if the divorced parent rule applies, the child is treated as a qualifying individual with respect to the custodial parent only"
+  from 1976-01-01:
+    if not qualifies_for_divorced_parent_rule:
+      return false
+    return is_custodial_parent

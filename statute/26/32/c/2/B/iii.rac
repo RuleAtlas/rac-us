@@ -1,0 +1,17 @@
+# 26 USC 32(c)(2)(B)(iii) - NRA income excluded
+
+"""
+(iii) no amount to which section 871(a) applies (relating to income of nonresident
+alien individuals not connected with United States business) shall be taken into account,
+"""
+
+status: encoded
+
+exclude_nra_unconnected_income_from_earned_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Exclude NRA Unconnected Income from Earned Income"
+  description: "No amount to which section 871(a) applies (income of nonresident alien individuals not connected with US business) shall be taken into account as earned income per 26 USC 32(c)(2)(B)(iii)"
+  from 1975-01-01:
+    return 1

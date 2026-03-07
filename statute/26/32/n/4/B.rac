@@ -1,0 +1,16 @@
+# 26 USC 32(n)(4)(B) - Coordination with inflation adjustment
+
+"""
+(B) Coordination with inflation adjustment.--
+Subsection (j) shall not apply to any dollar amount specified in this paragraph.
+"""
+
+status: boilerplate
+
+# This subparagraph prevents the inflation adjustment mechanism in
+# subsection (j) from applying to the dollar amounts in paragraph (n)(4)
+# ($9,820 earned income amount and $11,610 phaseout amount for individuals
+# with no qualifying children). These amounts are fixed as specified in
+# subparagraph (A) and not subject to cost-of-living adjustments.
+# No parameters or formulas needed -- the amounts in (n)(4)(A) are already
+# encoded as fixed values without inflation indexing.

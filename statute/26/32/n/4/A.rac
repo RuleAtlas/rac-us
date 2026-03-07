@@ -1,0 +1,14 @@
+# 26 USC 32(n)(4)(A) - In general
+
+"""
+(A) In general.--
+The table contained in subsection (b)(2)(A) shall be applied--
+(i) by substituting "$9,820" for "$4,220", and
+(ii) by substituting "$11,610" for "$5,280".
+"""
+
+status: consolidated
+
+imports:
+    - 26/32/n/4/A/i#earned_income_amount_no_children_childless_increase
+    - 26/32/n/4/A/ii#increased_phaseout_amount_no_children

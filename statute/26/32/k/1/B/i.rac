@@ -1,0 +1,54 @@
+# 26 USC 32(k)(1)(B)(i) - Fraud disallowance period
+
+"""
+(i) the period of 10 taxable years after the most recent taxable year for
+which there was a final determination that the taxpayer's claim of credit
+under this section was due to fraud.
+"""
+
+status: encoded
+
+# =============================================================================
+# Parameters
+# =============================================================================
+
+fraud_disallowance_years:
+  description: "Number of taxable years after final fraud determination during which credit is disallowed"
+  unit: Year
+  from 1997-01-01: 10
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+most_recent_fraud_determination_year:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "Most Recent Fraud Determination Year"
+  description: "Most recent taxable year for which there was a final determination that the taxpayer's claim of credit under this section was due to fraud (0 if none)"
+  default: 0
+
+current_tax_year:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "Current Tax Year"
+  description: "The current taxable year"
+  default: 0
+
+# =============================================================================
+# 32(k)(1)(B)(i) - Fraud disallowance period
+# =============================================================================
+
+in_fraud_disallowance_period:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "In Fraud Disallowance Period"
+  description: "Whether the taxpayer is in the disallowance period due to a prior fraudulent claim of credit under 26 USC 32"
+  from 1997-01-01:
+    if most_recent_fraud_determination_year == 0:
+      return false
+    years_since = current_tax_year - most_recent_fraud_determination_year
+    return years_since > 0 and years_since <= fraud_disallowance_years

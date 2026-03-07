@@ -1,0 +1,20 @@
+# 26 USC 32(n) - Special rules for individuals without qualifying children
+
+"""
+(n) Special rules for individuals without qualifying children.--
+In the case of any taxable year beginning after December 31, 2020,
+and before January 1, 2022--
+(1) Decrease in minimum age for credit
+(2) Elimination of maximum age for credit
+(3) Increase in credit and phaseout percentages
+(4) Increase in earned income and phaseout amounts
+"""
+
+status: consolidated
+
+imports:
+    - 26/32/n/1#applicable_minimum_age
+    - 26/32/n/2#meets_eitc_age_requirement
+    - 26/32/n/3#n3_increased_pct
+    - 26/32/n/4/A/i#earned_income_amount_no_children_childless_increase
+    - 26/32/n/4/A/ii#increased_phaseout_amount_no_children

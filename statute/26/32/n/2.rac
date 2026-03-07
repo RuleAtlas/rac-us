@@ -1,0 +1,21 @@
+# 26 USC 32(n)(2) - Elimination of maximum age for credit
+
+"""
+(2) Elimination of maximum age for credit.--
+Subsection (c)(1)(A)(ii)(II) shall be applied without regard to the
+phrase "but not attained age 65".
+"""
+
+status: encoded
+
+# =============================================================================
+# Amendment
+# =============================================================================
+
+amend 26/32/c/1/A/ii/II#meets_eitc_age_requirement:
+  from 2021-01-01:
+    individual_qualifies = age >= eitc_minimum_age
+    if not is_married:
+      return individual_qualifies
+    spouse_qualifies = spouse_age >= eitc_minimum_age
+    return individual_qualifies or spouse_qualifies

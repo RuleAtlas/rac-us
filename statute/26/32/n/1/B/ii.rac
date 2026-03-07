@@ -1,0 +1,17 @@
+# 26 USC 32(n)(1)(B)(ii) - Specified student applicable minimum age
+
+"""
+(ii) in the case of a specified student (other than a qualified former foster
+youth or a qualified homeless youth), age 24, and
+"""
+
+status: encoded
+
+# =============================================================================
+# Parameters
+# =============================================================================
+
+specified_student_applicable_minimum_age:
+  description: "Applicable minimum age for a specified student (other than a qualified former foster youth or qualified homeless youth) for earned income credit eligibility"
+  unit: Year
+  from 2021-01-01: 24

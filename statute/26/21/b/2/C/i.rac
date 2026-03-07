@@ -1,0 +1,13 @@
+# 26 USC 21(b)(2)(C)(i) - Complies with state/local law
+
+"""
+(i) such center complies with all applicable laws and regulations of a State or unit of local government, and
+"""
+
+dependent_care_center_complies_with_state_local_law:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Dependent care center complies with state and local law"
+  description: "Whether the dependent care center complies with all applicable laws and regulations of a State or unit of local government"
+  default: False

@@ -1,0 +1,16 @@
+# 26 USC 32(i)(2)(D) - Capital gain net income
+
+"""
+(D) the capital gain net income (as defined in section 1222) of the taxpayer
+for such taxable year,
+"""
+
+status: encoded
+
+capital_gain_net_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Capital Gain Net Income"
+  description: "Capital gain net income (as defined in section 1222) of the taxpayer for the taxable year, included in disqualified income per 26 USC 32(i)(2)(D)"

@@ -1,0 +1,14 @@
+# 26 USC 21(b)(2)(D)(ii) - Receives fee, payment, or grant
+
+"""
+(ii) receives a fee, payment, or grant for providing services for any of
+the individuals (regardless of whether such facility is operated for profit).
+"""
+
+facility_receives_fee_payment_or_grant:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Facility receives fee, payment, or grant"
+  description: "Whether the facility receives a fee, payment, or grant for providing services for any of the individuals, regardless of whether operated for profit, per 26 USC 21(b)(2)(D)(ii)"
+  default: false
