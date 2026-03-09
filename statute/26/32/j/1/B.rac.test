@@ -1,0 +1,17 @@
+# 26 USC Section 32(j)(1)(B) tests
+
+eitc_cola_default_base_year:
+    - name: "Default base year for COLA is 2016"
+      period: 2024-01
+      inputs: {}
+      expect: 2016
+
+    - name: "Default base year in initial year 2016"
+      period: 2016-01
+      inputs: {}
+      expect: 2016
+
+    - name: "Default base year in 2020"
+      period: 2020-01
+      inputs: {}
+      expect: 2016

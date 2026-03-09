@@ -1,0 +1,37 @@
+# 26 USC Section 32(n)(1)(B) - Applicable minimum age
+
+"""
+(B) Applicable minimum age.-- For purposes of this paragraph, the term
+"applicable minimum age" means, with respect to any taxable year--
+(i) except as otherwise provided in this subparagraph, age 19,
+(ii) in the case of a specified student (other than a qualified former
+foster youth or a qualified homeless youth), age 24, and
+(iii) in the case of a qualified former foster youth or a qualified
+homeless youth, age 18.
+"""
+
+status: encoded
+
+applicable_minimum_age:
+    imports:
+        - 26/32/n/1/B/i#general_applicable_minimum_age
+        - 26/32/n/1/B/ii#specified_student_minimum_age
+        - 26/32/n/1/B/iii#foster_homeless_youth_minimum_age
+        - 26/32/n/1/C#is_specified_student
+        - 26/32/n/1/D/i#was_in_foster_care_at_or_after_minimum_age
+        - 26/32/n/1/D/ii#foster_care_disclosure_consent
+        - 26/32/n/1/E#is_qualified_homeless_youth
+    entity: Person
+    period: Year
+    dtype: Integer
+    unit: Year
+    label: "Applicable minimum age"
+    description: "Applicable minimum age for EITC eligibility without qualifying child, per 26 USC 32(n)(1)(B)"
+    from 2021-01-01:
+        if (was_in_foster_care_at_or_after_minimum_age and foster_care_disclosure_consent) or is_qualified_homeless_youth:
+            foster_homeless_youth_minimum_age
+        else:
+            if is_specified_student:
+                specified_student_minimum_age
+            else:
+                general_applicable_minimum_age

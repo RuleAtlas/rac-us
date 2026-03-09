@@ -1,0 +1,14 @@
+# 26 USC Section 32(j)(1)(B)(iii) tests
+
+base_year_i_1:
+    - name: "Base year for i/1 disqualified income threshold after 2021"
+      period: 2024-01
+      expect: 2020
+
+    - name: "Base year for i/1 in first applicable year 2022"
+      period: 2022-01
+      expect: 2020
+
+    - name: "Base year for i/1 in 2021"
+      period: 2021-01
+      expect: 2020

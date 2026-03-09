@@ -1,0 +1,39 @@
+# 26 USC Section 32(b)(2) tests
+
+eitc_earned_income_amount:
+    - name: "1 qualifying child"
+      period: 2024-01
+      inputs:
+        earned_income_amount: 6330
+      expect: 6330
+
+    - name: "2 or more qualifying children"
+      period: 2024-01
+      inputs:
+        earned_income_amount: 8890
+      expect: 8890
+
+    - name: "No qualifying children"
+      period: 2024-01
+      inputs:
+        earned_income_amount: 4220
+      expect: 4220
+
+eitc_phaseout_amount_final:
+    - name: "Single filer with 1 child"
+      period: 2024-01
+      inputs:
+        eitc_phaseout_amount: 11610
+      expect: 11610
+
+    - name: "Joint filer with 1 child - includes $5000 increase"
+      period: 2024-01
+      inputs:
+        eitc_phaseout_amount: 16610
+      expect: 16610
+
+    - name: "Single filer with no children"
+      period: 2024-01
+      inputs:
+        eitc_phaseout_amount: 5280
+      expect: 5280

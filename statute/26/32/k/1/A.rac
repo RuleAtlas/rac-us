@@ -1,0 +1,25 @@
+# 26 USC Section 32(k)(1)(A) - In general
+
+"""
+(A) In general.-- No credit shall be allowed under this section for
+any taxable year in the disallowance period.
+"""
+
+status: encoded
+
+in_disallowance_period:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "In EITC disallowance period"
+    description: "Whether the taxpayer is in the disallowance period as defined in 26 USC 32(k)(1)(B)"
+    default: false
+
+eitc_allowed_after_fraud_check:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "EITC allowed after fraud/reckless check"
+    description: "No credit shall be allowed for any taxable year in the disallowance period per 26 USC 32(k)(1)(A)"
+    from 1997-01-01:
+        not in_disallowance_period

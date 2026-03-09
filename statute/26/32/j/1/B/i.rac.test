@@ -1,0 +1,17 @@
+# 26 USC Section 32(j)(1)(B)(i) tests
+
+base_year_b_2_A:
+    - name: "Base year for b/2/A amounts is 1995"
+      period: 2024-01
+      inputs: {}
+      expect: 1995
+
+    - name: "Base year for b/2/A amounts in 2020"
+      period: 2020-01
+      inputs: {}
+      expect: 1995
+
+    - name: "Base year for b/2/A amounts in 2016"
+      period: 2016-01
+      inputs: {}
+      expect: 1995

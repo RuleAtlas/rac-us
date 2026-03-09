@@ -1,0 +1,26 @@
+# 26 USC Section 32(c)(3)(C) - Place of abode
+
+"""
+(C) Place of abode.--
+For purposes of subparagraph (A), the requirements of section 152(c)(1)(B)
+shall be met only if the principal place of abode is in the United States.
+"""
+
+status: encoded
+
+principal_place_of_abode_in_us:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Principal place of abode is in the United States"
+    description: "Whether the individual's principal place of abode is in the United States"
+    default: false
+
+eitc_place_of_abode_requirement_met:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "EITC place of abode requirement met"
+    description: "For purposes of the EITC qualifying child definition, the shared residence requirement of section 152(c)(1)(B) is met only if the principal place of abode is in the United States, per 26 USC 32(c)(3)(C)"
+    from 1975-01-01:
+        principal_place_of_abode_in_us

@@ -1,0 +1,26 @@
+# 26 USC Section 32(i)(2)(D) - Capital gain net income
+
+"""
+(D) the capital gain net income (as defined in section 1222) of the
+taxpayer for such taxable year,
+"""
+
+status: encoded
+
+capital_gain_net_income:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Capital gain net income"
+    description: "Capital gain net income as defined in section 1222, per 26 USC 32(i)(2)(D)"
+    default: 0
+
+eitc_disqualified_income_capital_gains:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Capital gain net income as EITC disqualified income"
+    description: "Capital gain net income included in disqualified income for EITC purposes, per 26 USC 32(i)(2)(D)"
+    from 1975-01-01: capital_gain_net_income

@@ -1,0 +1,31 @@
+# 26 USC Section 32(k) - Restrictions on taxpayers who improperly claimed credit in prior year
+
+"""
+(k) Restrictions on taxpayers who improperly claimed credit in prior year.--
+
+(1) Taxpayers making prior fraudulent or reckless claims.--
+  (A) In general.-- No credit shall be allowed under this section for any
+  taxable year in the disallowance period.
+  (B) Disallowance period.-- [see k/1/B]
+
+(2) Taxpayers making improper prior claims.-- In the case of a taxpayer who
+is denied credit under this section for any taxable year as a result of the
+deficiency procedures under subchapter B of chapter 63, no credit shall be
+allowed under this section for any subsequent taxable year unless the taxpayer
+provides such information as the Secretary may require to demonstrate
+eligibility for such credit.
+"""
+
+status: encoded
+
+meets_improper_claim_restrictions:
+    imports:
+        - 26/32/k/1#meets_fraud_reckless_claim_requirement
+        - 26/32/k/2#meets_improper_prior_claim_requirement
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Meets improper claim restrictions for EITC"
+    description: "Whether the taxpayer satisfies both the fraud/reckless disallowance rules under 32(k)(1) and the deficiency procedures requirement under 32(k)(2)"
+    from 1997-01-01:
+        meets_fraud_reckless_claim_requirement and meets_improper_prior_claim_requirement

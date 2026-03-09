@@ -1,0 +1,37 @@
+# 26 USC Section 32(a) tests
+
+eitc_amount:
+    - name: "Base credit is less than limitation"
+      period: 2024-01
+      inputs:
+        eitc_base_credit: 3000
+        eitc_limitation: 5000
+      expect: 3000
+
+    - name: "Limitation is less than base credit (phaseout applies)"
+      period: 2024-01
+      inputs:
+        eitc_base_credit: 5000
+        eitc_limitation: 2000
+      expect: 2000
+
+    - name: "Zero base credit (not eligible)"
+      period: 2024-01
+      inputs:
+        eitc_base_credit: 0
+        eitc_limitation: 5000
+      expect: 0
+
+    - name: "Zero limitation (fully phased out)"
+      period: 2024-01
+      inputs:
+        eitc_base_credit: 3000
+        eitc_limitation: 0
+      expect: 0
+
+    - name: "Both zero"
+      period: 2024-01
+      inputs:
+        eitc_base_credit: 0
+        eitc_limitation: 0
+      expect: 0

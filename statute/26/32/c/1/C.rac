@@ -1,0 +1,27 @@
+# 26 USC Section 32(c)(1)(C) - Exception for section 911
+
+"""
+(C) Exception for individual claiming benefits under section 911.--
+The term "eligible individual" does not include any individual who claims
+the benefits of section 911 (relating to citizens or residents living abroad)
+for the taxable year.
+"""
+
+status: encoded
+
+claims_section_911_benefits:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Claims benefits under section 911"
+    description: "Whether the individual claims the benefits of section 911 (citizens or residents living abroad) for the taxable year"
+    default: false
+
+eligible_individual_not_claiming_911:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Not excluded by section 911 claim"
+    description: "An individual who claims the benefits of section 911 is not an eligible individual per 26 USC 32(c)(1)(C)"
+    from 1975-01-01:
+        not claims_section_911_benefits

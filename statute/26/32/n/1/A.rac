@@ -1,0 +1,20 @@
+# 26 USC Section 32(n)(1)(A) - In general
+
+"""
+(A) In general.-- Subsection (c)(1)(A)(ii)(II) shall be applied by
+substituting "the applicable minimum age" for "age 25".
+"""
+
+status: encoded
+
+eitc_minimum_age_no_qc:
+    imports:
+        - 26/32/n/1/B#applicable_minimum_age
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    unit: Year
+    label: "EITC minimum age for individuals without qualifying children"
+    description: "Minimum age substituted for age 25 in 26 USC 32(c)(1)(A)(ii)(II) for individuals without qualifying children, per 26 USC 32(n)(1)(A)"
+    from 2021-01-01:
+        applicable_minimum_age

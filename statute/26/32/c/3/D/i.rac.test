@@ -1,0 +1,19 @@
+# 26 USC Section 32(c)(3)(D)(i) tests
+
+eitc_qualifying_child_id_requirement:
+    - name: "Info included on return - meets requirement"
+      period: 2024-01
+      inputs:
+        qualifying_child_info_included_on_return: true
+      expect: true
+
+    - name: "Info not included on return - fails requirement"
+      period: 2024-01
+      inputs:
+        qualifying_child_info_included_on_return: false
+      expect: false
+
+    - name: "Default - no info provided"
+      period: 2024-01
+      inputs: {}
+      expect: false

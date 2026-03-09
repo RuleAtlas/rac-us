@@ -1,0 +1,37 @@
+# 26 USC Section 32(a)(2)(A) tests
+
+credit_pct_of_earned_income_amount:
+    - name: "1 qualifying child: 34% of $6,330"
+      period: 2024-01
+      inputs:
+        credit_percentage: 0.34
+        earned_income_amount: 6330
+      expect: 2152.20
+
+    - name: "2 qualifying children: 40% of $8,890"
+      period: 2024-01
+      inputs:
+        credit_percentage: 0.40
+        earned_income_amount: 8890
+      expect: 3556.00
+
+    - name: "No qualifying children: 7.65% of $4,220"
+      period: 2024-01
+      inputs:
+        credit_percentage: 0.0765
+        earned_income_amount: 4220
+      expect: 322.83
+
+    - name: "3+ qualifying children: 45% of $8,890"
+      period: 2024-01
+      inputs:
+        credit_percentage: 0.45
+        earned_income_amount: 8890
+      expect: 4000.50
+
+    - name: "Zero earned income amount"
+      period: 2024-01
+      inputs:
+        credit_percentage: 0.34
+        earned_income_amount: 0
+      expect: 0

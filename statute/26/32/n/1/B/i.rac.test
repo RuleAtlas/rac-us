@@ -1,0 +1,14 @@
+# 26 USC Section 32(n)(1)(B)(i) tests
+
+general_applicable_minimum_age:
+    - name: "General applicable minimum age for 2021"
+      period: 2021-01
+      expect: 19
+
+    - name: "General applicable minimum age - mid year 2021"
+      period: 2021-06
+      expect: 19
+
+    - name: "General applicable minimum age - end of year 2021"
+      period: 2021-12
+      expect: 19

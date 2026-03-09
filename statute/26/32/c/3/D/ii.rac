@@ -1,0 +1,13 @@
+# 26 USC Section 32(c)(3)(D)(ii) - Other methods
+
+"""
+(ii) Other methods.--
+The Secretary may prescribe other methods for providing the information
+described in clause (i).
+"""
+
+status: deferred
+
+# This clause delegates authority to the Secretary to prescribe alternative
+# methods for providing qualifying child identification information.
+# No computable rules are defined by the statute text itself.

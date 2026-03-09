@@ -1,0 +1,26 @@
+# 26 USC Section 32(i)(2)(B) - Tax-exempt interest
+
+"""
+(B) interest received or accrued during the taxable year which is
+exempt from tax imposed by this chapter,
+"""
+
+status: encoded
+
+tax_exempt_interest:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Tax-exempt interest"
+    description: "Interest received or accrued during the taxable year which is exempt from tax, per 26 USC 32(i)(2)(B)"
+    default: 0
+
+eitc_disqualified_income_tax_exempt_interest:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Tax-exempt interest as EITC disqualified income"
+    description: "Tax-exempt interest included in disqualified income for EITC purposes, per 26 USC 32(i)(2)(B)"
+    from 1996-01-01: tax_exempt_interest

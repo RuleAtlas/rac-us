@@ -1,0 +1,45 @@
+# 26 USC Section 32(j)(2)(A) tests
+
+rounded_b_2_A_amount:
+    - name: "Already a multiple of 10 - no rounding needed"
+      period: 2024-01
+      inputs:
+        earned_income_amount: 7430
+      expect: 7430
+
+    - name: "Rounds up from 5"
+      period: 2024-01
+      inputs:
+        earned_income_amount: 7435
+      expect: 7440
+
+    - name: "Rounds down from 4"
+      period: 2024-01
+      inputs:
+        earned_income_amount: 7434
+      expect: 7430
+
+    - name: "Rounds down from 1"
+      period: 2024-01
+      inputs:
+        earned_income_amount: 7431
+      expect: 7430
+
+rounded_b_2_A_phaseout_amount:
+    - name: "Phaseout already a multiple of 10"
+      period: 2024-01
+      inputs:
+        phaseout_amount: 12880
+      expect: 12880
+
+    - name: "Phaseout rounds up"
+      period: 2024-01
+      inputs:
+        phaseout_amount: 12886
+      expect: 12890
+
+    - name: "Phaseout rounds down"
+      period: 2024-01
+      inputs:
+        phaseout_amount: 12883
+      expect: 12880

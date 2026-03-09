@@ -1,0 +1,19 @@
+# 26 USC Section 32(c)(3)(C) tests
+
+eitc_place_of_abode_requirement_met:
+    - name: "Principal place of abode in the US"
+      period: 2024-01
+      inputs:
+        principal_place_of_abode_in_us: true
+      expect: true
+
+    - name: "Principal place of abode not in the US"
+      period: 2024-01
+      inputs:
+        principal_place_of_abode_in_us: false
+      expect: false
+
+    - name: "Default - no abode specified"
+      period: 2024-01
+      inputs: {}
+      expect: false

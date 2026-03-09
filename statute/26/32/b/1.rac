@@ -1,0 +1,86 @@
+# 26 USC Section 32(b)(1) - Percentages
+
+"""
+(1) Percentages.-- The credit percentage and the phaseout percentage
+shall be determined as follows:
+
+In the case of an eligible individual with:
+  1 qualifying child: credit percentage 34, phaseout percentage 15.98
+  2 qualifying children: credit percentage 40, phaseout percentage 21.06
+  3 or more qualifying children: credit percentage 45, phaseout percentage 21.06
+  No qualifying children: credit percentage 7.65, phaseout percentage 7.65
+"""
+
+status: encoded
+
+credit_pct_no_children:
+    description: "Credit percentage for eligible individual with no qualifying children"
+    unit: rate
+    from 2009-01-01: 0.0765
+
+credit_pct_1_child:
+    description: "Credit percentage for eligible individual with 1 qualifying child"
+    unit: rate
+    from 2009-01-01: 0.34
+
+credit_pct_2_children:
+    description: "Credit percentage for eligible individual with 2 qualifying children"
+    unit: rate
+    from 2009-01-01: 0.40
+
+credit_pct_3_plus_children:
+    description: "Credit percentage for eligible individual with 3 or more qualifying children"
+    unit: rate
+    from 2009-01-01: 0.45
+
+phaseout_pct_no_children:
+    description: "Phaseout percentage for eligible individual with no qualifying children"
+    unit: rate
+    from 2009-01-01: 0.0765
+
+phaseout_pct_1_child:
+    description: "Phaseout percentage for eligible individual with 1 qualifying child"
+    unit: rate
+    from 2009-01-01: 0.1598
+
+phaseout_pct_2_children:
+    description: "Phaseout percentage for eligible individual with 2 qualifying children"
+    unit: rate
+    from 2009-01-01: 0.2106
+
+phaseout_pct_3_plus_children:
+    description: "Phaseout percentage for eligible individual with 3 or more qualifying children"
+    unit: rate
+    from 2009-01-01: 0.2106
+
+qualifying_child_count:
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Number of qualifying children"
+    description: "Number of qualifying children for EITC purposes"
+    default: 0
+
+credit_percentage:
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "EITC credit percentage"
+    description: "Credit percentage per 26 USC 32(b)(1), based on number of qualifying children"
+    from 2009-01-01:
+        if qualifying_child_count >= 3: credit_pct_3_plus_children
+        elif qualifying_child_count == 2: credit_pct_2_children
+        elif qualifying_child_count == 1: credit_pct_1_child
+        else: credit_pct_no_children
+
+phaseout_percentage:
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "EITC phaseout percentage"
+    description: "Phaseout percentage per 26 USC 32(b)(1), based on number of qualifying children"
+    from 2009-01-01:
+        if qualifying_child_count >= 3: phaseout_pct_3_plus_children
+        elif qualifying_child_count == 2: phaseout_pct_2_children
+        elif qualifying_child_count == 1: phaseout_pct_1_child
+        else: phaseout_pct_no_children

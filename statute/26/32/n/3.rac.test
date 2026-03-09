@@ -1,0 +1,33 @@
+# 26 USC Section 32(n)(3) tests - Increase in credit and phaseout percentages
+
+eitc_n3_credit_pct_no_children:
+    - name: "Credit pct increased to 15.3% in 2021"
+      period: 2021-01
+      inputs:
+        credit_pct_no_children: 0.0765
+      expect: 0.153
+
+    - name: "Credit pct reverts to baseline in 2022"
+      period: 2022-01
+      inputs:
+        credit_pct_no_children: 0.0765
+      expect: 0.0765
+
+    - name: "Credit pct reverts to baseline in 2024"
+      period: 2024-01
+      inputs:
+        credit_pct_no_children: 0.0765
+      expect: 0.0765
+
+eitc_n3_phaseout_pct_no_children:
+    - name: "Phaseout pct increased to 15.3% in 2021"
+      period: 2021-01
+      inputs:
+        phaseout_pct_no_children: 0.0765
+      expect: 0.153
+
+    - name: "Phaseout pct reverts to baseline in 2022"
+      period: 2022-01
+      inputs:
+        phaseout_pct_no_children: 0.0765
+      expect: 0.0765

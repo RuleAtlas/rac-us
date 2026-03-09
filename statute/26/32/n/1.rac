@@ -1,0 +1,28 @@
+# 26 USC Section 32(n)(1) - Decrease in minimum age for credit
+
+"""
+(1) Decrease in minimum age for credit.--
+(A) In general
+(B) Applicable minimum age
+(C) Specified student
+(D) Qualified former foster youth
+(E) Qualified homeless youth
+"""
+
+status: encoded
+
+decrease_in_minimum_age:
+    imports:
+        - 26/32/n/1/A#eitc_minimum_age_no_qc
+        - 26/32/n/1/B#applicable_minimum_age
+        - 26/32/n/1/C#is_specified_student
+        - 26/32/n/1/D#is_qualified_former_foster_youth
+        - 26/32/n/1/E#is_qualified_homeless_youth
+    entity: Person
+    period: Year
+    dtype: Integer
+    unit: Year
+    label: "Decreased minimum age for EITC"
+    description: "Minimum age for EITC eligibility without qualifying child, decreased from 25 per 26 USC 32(n)(1)"
+    from 2021-01-01:
+        eitc_minimum_age_no_qc

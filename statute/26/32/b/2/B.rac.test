@@ -1,0 +1,37 @@
+# 26 USC Section 32(b)(2)(B) tests
+
+eitc_phaseout_amount:
+    - name: "Single filer with 1 child - no increase"
+      period: 2024-01
+      inputs:
+        files_joint_return: false
+        phaseout_amount: 11610
+      expect: 11610
+
+    - name: "Joint return with 1 child - increased by $5,000"
+      period: 2024-01
+      inputs:
+        files_joint_return: true
+        phaseout_amount: 11610
+      expect: 16610
+
+    - name: "Joint return with no children - increased by $5,000"
+      period: 2024-01
+      inputs:
+        files_joint_return: true
+        phaseout_amount: 5280
+      expect: 10280
+
+    - name: "Single filer with no children - no increase"
+      period: 2024-01
+      inputs:
+        files_joint_return: false
+        phaseout_amount: 5280
+      expect: 5280
+
+    - name: "Joint return with 2+ children - increased by $5,000"
+      period: 2024-01
+      inputs:
+        files_joint_return: true
+        phaseout_amount: 11610
+      expect: 16610

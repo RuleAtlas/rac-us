@@ -1,0 +1,27 @@
+# 26 USC Section 32(c)(3)(D)(i) - Identification requirements, in general
+
+"""
+(i) In general.--
+A qualifying child shall not be taken into account under subsection (b)
+unless the taxpayer includes the name, age, and TIN of the qualifying
+child on the return of tax for the taxable year.
+"""
+
+status: encoded
+
+qualifying_child_info_included_on_return:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Qualifying child identification info included on return"
+    description: "Whether the taxpayer includes the name, age, and TIN of the qualifying child on the return of tax for the taxable year"
+    default: false
+
+eitc_qualifying_child_id_requirement:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Meets EITC qualifying child identification requirement"
+    description: "A qualifying child shall not be taken into account under subsection (b) unless the taxpayer includes the name, age, and TIN of the qualifying child on the return, per 26 USC 32(c)(3)(D)(i)"
+    from 1975-01-01:
+        qualifying_child_info_included_on_return

@@ -1,0 +1,47 @@
+# 26 USC Section 32(c)(2)(B) tests - Special rules for earned income
+
+earned_income_exclusions:
+    - name: "No exclusions - all inputs zero"
+      period: 2024-01
+      inputs:
+        pension_or_annuity_income: 0
+        income_under_871a: 0
+        inmate_earned_income: 0
+        subsidized_workfare_income: 0
+      expect: 0
+
+    - name: "Only pension/annuity exclusion"
+      period: 2024-01
+      inputs:
+        pension_or_annuity_income: 15000
+        income_under_871a: 0
+        inmate_earned_income: 0
+        subsidized_workfare_income: 0
+      expect: 15000
+
+    - name: "Only inmate earnings exclusion"
+      period: 2024-01
+      inputs:
+        pension_or_annuity_income: 0
+        income_under_871a: 0
+        inmate_earned_income: 5000
+        subsidized_workfare_income: 0
+      expect: 5000
+
+    - name: "All exclusions present"
+      period: 2024-01
+      inputs:
+        pension_or_annuity_income: 10000
+        income_under_871a: 3000
+        inmate_earned_income: 2000
+        subsidized_workfare_income: 1500
+      expect: 16500
+
+    - name: "Only 871(a) and workfare exclusions"
+      period: 2024-01
+      inputs:
+        pension_or_annuity_income: 0
+        income_under_871a: 8000
+        subsidized_workfare_income: 4000
+        inmate_earned_income: 0
+      expect: 12000

@@ -1,0 +1,13 @@
+# 26 USC Section 32(j)(1)(B)(i) - Base year for b/2/A
+
+"""
+(i) in the case of amounts in subsection (b)(2)(A),
+"calendar year 1995" for "calendar year 2016",
+"""
+
+status: encoded
+
+base_year_b_2_A:
+    description: "Base calendar year substituted in section 1(f)(3)(A)(ii) for inflation adjustment of amounts in subsection (b)(2)(A)"
+    unit: Year
+    from 2016-01-01: 1995

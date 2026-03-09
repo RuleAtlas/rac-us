@@ -1,0 +1,37 @@
+# 26 USC Section 32(a)(2) tests
+
+eitc_limitation:
+    - name: "Credit exceeds phaseout reduction"
+      period: 2024-01
+      inputs:
+        credit_pct_of_earned_income_amount: 3000
+        phaseout_reduction: 1000
+      expect: 2000
+
+    - name: "Phaseout reduction exceeds credit - floor at zero"
+      period: 2024-01
+      inputs:
+        credit_pct_of_earned_income_amount: 1000
+        phaseout_reduction: 3000
+      expect: 0
+
+    - name: "Equal amounts - zero credit"
+      period: 2024-01
+      inputs:
+        credit_pct_of_earned_income_amount: 2500
+        phaseout_reduction: 2500
+      expect: 0
+
+    - name: "No phaseout reduction"
+      period: 2024-01
+      inputs:
+        credit_pct_of_earned_income_amount: 4000
+        phaseout_reduction: 0
+      expect: 4000
+
+    - name: "Zero credit and zero phaseout"
+      period: 2024-01
+      inputs:
+        credit_pct_of_earned_income_amount: 0
+        phaseout_reduction: 0
+      expect: 0

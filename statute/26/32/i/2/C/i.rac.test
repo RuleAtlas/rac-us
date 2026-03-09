@@ -1,0 +1,26 @@
+# 26 USC Section 32(i)(2)(C)(i) tests
+
+disqualified_income_gross_rents_royalties:
+    - name: "No rental or royalty income"
+      period: 2024-01
+      inputs:
+        gross_rents_royalties_not_in_trade: 0
+      expect: 0
+
+    - name: "Rental income of 5000"
+      period: 2024-01
+      inputs:
+        gross_rents_royalties_not_in_trade: 5000
+      expect: 5000
+
+    - name: "Large royalty income"
+      period: 2024-01
+      inputs:
+        gross_rents_royalties_not_in_trade: 15000
+      expect: 15000
+
+    - name: "Small rental amount"
+      period: 2024-01
+      inputs:
+        gross_rents_royalties_not_in_trade: 1
+      expect: 1

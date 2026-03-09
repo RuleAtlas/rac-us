@@ -1,0 +1,46 @@
+# 26 USC Section 32(j) - Inflation adjustments tests
+
+eitc_adjusted_earned_income_amount:
+    - name: "Passthrough of rounded earned income amount"
+      period: 2024-01
+      inputs:
+        rounded_earned_income_amount: 7830
+      expect: 7830
+
+    - name: "Zero earned income amount"
+      period: 2024-01
+      inputs:
+        rounded_earned_income_amount: 0
+      expect: 0
+
+    - name: "Large earned income amount"
+      period: 2024-01
+      inputs:
+        rounded_earned_income_amount: 17640
+      expect: 17640
+
+eitc_adjusted_phaseout_amount:
+    - name: "Passthrough of rounded phaseout amount"
+      period: 2024-01
+      inputs:
+        rounded_phaseout_amount: 19520
+      expect: 19520
+
+    - name: "Zero phaseout amount"
+      period: 2024-01
+      inputs:
+        rounded_phaseout_amount: 0
+      expect: 0
+
+eitc_adjusted_disqualified_income_threshold:
+    - name: "Passthrough of rounded disqualified income threshold"
+      period: 2024-01
+      inputs:
+        rounded_disqualified_income_threshold: 11600
+      expect: 11600
+
+    - name: "Zero disqualified income threshold"
+      period: 2024-01
+      inputs:
+        rounded_disqualified_income_threshold: 0
+      expect: 0

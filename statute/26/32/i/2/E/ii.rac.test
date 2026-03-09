@@ -1,0 +1,26 @@
+# 26 USC Section 32(i)(2)(E)(ii) tests
+
+disqualified_income_aggregate_passive_losses:
+    - name: "No passive losses"
+      period: 2024-01
+      inputs:
+        aggregate_passive_losses: 0
+      expect: 0
+
+    - name: "Passive losses of 5000"
+      period: 2024-01
+      inputs:
+        aggregate_passive_losses: 5000
+      expect: 5000
+
+    - name: "Large passive losses"
+      period: 2024-01
+      inputs:
+        aggregate_passive_losses: 25000
+      expect: 25000
+
+    - name: "Small passive loss"
+      period: 2024-01
+      inputs:
+        aggregate_passive_losses: 1
+      expect: 1

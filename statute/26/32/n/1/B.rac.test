@@ -1,0 +1,62 @@
+# 26 USC Section 32(n)(1)(B) - Applicable minimum age tests
+
+applicable_minimum_age:
+    - name: "General case - not a student, foster youth, or homeless youth"
+      period: 2024-01
+      inputs:
+        general_applicable_minimum_age: 19
+        specified_student_minimum_age: 24
+        foster_homeless_youth_minimum_age: 18
+        is_specified_student: false
+        was_in_foster_care_at_or_after_minimum_age: false
+        foster_care_disclosure_consent: false
+        is_qualified_homeless_youth: false
+      expect: 19
+
+    - name: "Specified student (not foster or homeless youth)"
+      period: 2024-01
+      inputs:
+        general_applicable_minimum_age: 19
+        specified_student_minimum_age: 24
+        foster_homeless_youth_minimum_age: 18
+        is_specified_student: true
+        was_in_foster_care_at_or_after_minimum_age: false
+        foster_care_disclosure_consent: false
+        is_qualified_homeless_youth: false
+      expect: 24
+
+    - name: "Qualified former foster youth"
+      period: 2024-01
+      inputs:
+        general_applicable_minimum_age: 19
+        specified_student_minimum_age: 24
+        foster_homeless_youth_minimum_age: 18
+        is_specified_student: false
+        was_in_foster_care_at_or_after_minimum_age: true
+        foster_care_disclosure_consent: true
+        is_qualified_homeless_youth: false
+      expect: 18
+
+    - name: "Qualified homeless youth"
+      period: 2024-01
+      inputs:
+        general_applicable_minimum_age: 19
+        specified_student_minimum_age: 24
+        foster_homeless_youth_minimum_age: 18
+        is_specified_student: false
+        was_in_foster_care_at_or_after_minimum_age: false
+        foster_care_disclosure_consent: false
+        is_qualified_homeless_youth: true
+      expect: 18
+
+    - name: "Specified student who is also a qualified former foster youth - foster youth takes precedence"
+      period: 2024-01
+      inputs:
+        general_applicable_minimum_age: 19
+        specified_student_minimum_age: 24
+        foster_homeless_youth_minimum_age: 18
+        is_specified_student: true
+        was_in_foster_care_at_or_after_minimum_age: true
+        foster_care_disclosure_consent: true
+        is_qualified_homeless_youth: false
+      expect: 18

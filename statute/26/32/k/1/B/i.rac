@@ -1,0 +1,41 @@
+# 26 USC 32(k)(1)(B)(i) - Fraud disallowance period
+
+"""
+(i) the period of 10 taxable years after the most recent taxable year for which
+there was a final determination that the taxpayer's claim of credit under this
+section was due to fraud, and
+"""
+
+status: encoded
+
+fraud_disallowance_years:
+    description: "Number of taxable years of disallowance after final determination of fraud"
+    unit: Year
+    from 1997-01-01: 10
+
+fraud_determination_year:
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Year of fraud determination"
+    description: "Most recent taxable year for which there was a final determination of fraud for EITC claim"
+    default: 0
+
+tax_year:
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Current tax year"
+    description: "The taxable year being evaluated"
+    default: 0
+
+in_fraud_disallowance_period:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "EITC fraud disallowance period"
+    description: "Whether taxpayer is in the disallowance period due to a fraud determination per 26 USC 32(k)(1)(B)(i)"
+    from 1997-01-01:
+        years_since = tax_year - fraud_determination_year
+        if fraud_determination_year > 0: if years_since <= fraud_disallowance_years: 1 else: 0
+        else: 0

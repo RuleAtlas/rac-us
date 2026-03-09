@@ -1,0 +1,26 @@
+# 26 USC Section 32(c)(2)(B)(ii) - No pension or annuity
+
+"""
+(ii) no amount received as a pension or annuity shall be taken into account,
+"""
+
+status: encoded
+
+pension_or_annuity_income:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Pension or annuity income"
+    description: "Amount received as a pension or annuity, excluded from earned income per 26 USC 32(c)(2)(B)(ii)"
+    default: 0
+
+earned_income_pension_annuity_exclusion:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Pension/annuity exclusion from earned income"
+    description: "Amount excluded from earned income because it was received as a pension or annuity, per 26 USC 32(c)(2)(B)(ii)"
+    from 1975-01-01:
+        pension_or_annuity_income

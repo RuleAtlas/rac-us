@@ -1,0 +1,26 @@
+# 26 USC Section 32(i)(2)(D) tests
+
+eitc_disqualified_income_capital_gains:
+    - name: "No capital gains"
+      period: 2024-01
+      inputs:
+        capital_gain_net_income: 0
+      expect: 0
+
+    - name: "Capital gain income of 5000"
+      period: 2024-01
+      inputs:
+        capital_gain_net_income: 5000
+      expect: 5000
+
+    - name: "Large capital gains"
+      period: 2024-01
+      inputs:
+        capital_gain_net_income: 25000
+      expect: 25000
+
+    - name: "Small capital gain amount"
+      period: 2024-01
+      inputs:
+        capital_gain_net_income: 1
+      expect: 1

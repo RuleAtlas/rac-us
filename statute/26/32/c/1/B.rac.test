@@ -1,0 +1,19 @@
+# 26 USC Section 32(c)(1)(B) tests
+
+qualifying_child_not_ineligible:
+    - name: "Individual who is not a qualifying child of another taxpayer is eligible"
+      period: 2024-01
+      inputs:
+        is_qualifying_child_of_another_taxpayer: false
+      expect: true
+
+    - name: "Individual who is a qualifying child of another taxpayer is not eligible"
+      period: 2024-01
+      inputs:
+        is_qualifying_child_of_another_taxpayer: true
+      expect: false
+
+    - name: "Default - not a qualifying child of another taxpayer"
+      period: 2024-01
+      inputs: {}
+      expect: true

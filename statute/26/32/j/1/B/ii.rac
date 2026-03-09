@@ -1,0 +1,13 @@
+# 26 USC Section 32(j)(1)(B)(ii) - Base year for b/2/B
+
+"""
+(ii) in the case of the $5,000 amount in subsection (b)(2)(B),
+"calendar year 2008" for "calendar year 2016", and
+"""
+
+status: encoded
+
+base_year_b_2_B:
+    description: "Base calendar year substituted in section 1(f)(3)(A)(ii) for inflation adjustment of the $5,000 amount in subsection (b)(2)(B)"
+    unit: Year
+    from 2016-01-01: 2008

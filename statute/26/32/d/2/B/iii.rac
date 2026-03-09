@@ -1,0 +1,24 @@
+# 26 USC Section 32(d)(2)(B)(iii) - Separation conditions
+
+"""
+(iii) during the last 6 months of such taxable year, does not have the
+same principal place of abode as the individual's spouse, or has a
+decree, instrument, or agreement (other than a decree of divorce)
+described in section 121(d)(3)(C) with respect to the individual's
+spouse and is not a member of the same household with the individual's
+spouse by the end of the taxable year.
+"""
+
+status: encoded
+
+meets_separation_condition:
+    imports:
+        - 26/32/d/2/B/iii/I#no_same_abode_last_6_months
+        - 26/32/d/2/B/iii/II#decree_of_separation_test
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Meets separation condition for EITC married filing separately"
+    description: "Whether the individual meets the separation condition under 26 USC 32(d)(2)(B)(iii): either (I) does not share principal place of abode with spouse during last 6 months, or (II) has a separation decree and is not in the same household by year-end"
+    from 1975-01-01:
+        no_same_abode_last_6_months or decree_of_separation_test

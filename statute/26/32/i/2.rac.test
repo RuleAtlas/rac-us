@@ -1,0 +1,52 @@
+# 26 USC Section 32(i)(2) tests - Disqualified income
+
+disqualified_income:
+    - name: "All zero inputs"
+      period: 2024-01
+      inputs:
+        disqualified_income_interest_dividends: 0
+        eitc_disqualified_income_tax_exempt_interest: 0
+        disqualified_income_net_rents_royalties: 0
+        eitc_disqualified_income_capital_gains: 0
+        eitc_disqualified_income_net_passive_income: 0
+      expect: 0
+
+    - name: "Only interest and dividends"
+      period: 2024-01
+      inputs:
+        disqualified_income_interest_dividends: 3000
+        eitc_disqualified_income_tax_exempt_interest: 0
+        disqualified_income_net_rents_royalties: 0
+        eitc_disqualified_income_capital_gains: 0
+        eitc_disqualified_income_net_passive_income: 0
+      expect: 3000
+
+    - name: "All components present"
+      period: 2024-01
+      inputs:
+        disqualified_income_interest_dividends: 1000
+        eitc_disqualified_income_tax_exempt_interest: 500
+        disqualified_income_net_rents_royalties: 2000
+        eitc_disqualified_income_capital_gains: 3000
+        eitc_disqualified_income_net_passive_income: 1500
+      expect: 8000
+
+    - name: "Only tax-exempt interest and capital gains"
+      period: 2024-01
+      inputs:
+        disqualified_income_interest_dividends: 0
+        eitc_disqualified_income_tax_exempt_interest: 4000
+        disqualified_income_net_rents_royalties: 0
+        eitc_disqualified_income_capital_gains: 6500
+        eitc_disqualified_income_net_passive_income: 0
+      expect: 10500
+
+    - name: "Single component - passive income"
+      period: 2024-01
+      inputs:
+        disqualified_income_interest_dividends: 0
+        eitc_disqualified_income_tax_exempt_interest: 0
+        disqualified_income_net_rents_royalties: 0
+        eitc_disqualified_income_capital_gains: 0
+        eitc_disqualified_income_net_passive_income: 7500
+      expect: 7500

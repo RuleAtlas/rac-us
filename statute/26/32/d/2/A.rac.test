@@ -1,0 +1,20 @@
+# 26 USC Section 32(d)(2)(A) tests
+
+marital_status_determined_under_7703a:
+    - name: "Married under section 7703(a)"
+      period: 2024-01
+      inputs:
+        marital_status_under_7703a: true
+      expect: true
+
+    - name: "Not married under section 7703(a)"
+      period: 2024-01
+      inputs:
+        marital_status_under_7703a: false
+      expect: false
+
+    - name: "Married under section 7703(a) in earlier year"
+      period: 2000-01
+      inputs:
+        marital_status_under_7703a: true
+      expect: true

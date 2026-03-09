@@ -1,0 +1,30 @@
+# 26 USC Section 32(n)(1)(D) tests
+
+is_qualified_former_foster_youth:
+    - name: "Both conditions met - qualified former foster youth"
+      period: 2024-01
+      inputs:
+        was_in_foster_care_at_or_after_minimum_age: true
+        foster_care_disclosure_consent: true
+      expect: true
+
+    - name: "Foster care condition met but no consent"
+      period: 2024-01
+      inputs:
+        was_in_foster_care_at_or_after_minimum_age: true
+        foster_care_disclosure_consent: false
+      expect: false
+
+    - name: "Consent given but foster care condition not met"
+      period: 2024-01
+      inputs:
+        was_in_foster_care_at_or_after_minimum_age: false
+        foster_care_disclosure_consent: true
+      expect: false
+
+    - name: "Neither condition met"
+      period: 2024-01
+      inputs:
+        was_in_foster_care_at_or_after_minimum_age: false
+        foster_care_disclosure_consent: false
+      expect: false

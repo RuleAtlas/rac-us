@@ -1,0 +1,30 @@
+# 26 USC Section 32(j)(1) - In general
+
+"""
+(j) Inflation adjustments.--
+(1) In general.-- In the case of any taxable year beginning after 2015
+(2021 in the case of the dollar amount in subsection (i)(1)), each of the
+dollar amounts in subsections (b)(2) and (i)(1) shall be increased by an
+amount equal to--
+(A) such dollar amount, multiplied by
+(B) the cost-of-living adjustment determined under section 1(f)(3) for
+the calendar year in which the taxable year begins, determined by
+substituting in subparagraph (A)(ii) thereof...
+"""
+
+status: encoded
+
+eitc_inflation_adjustment:
+    imports:
+        - 26/32/j/1/A#eitc_inflation_base_dollar_amount
+        - 26/32/j/1/B#eitc_cola_default_base_year
+        - 26/1/f/3#cost_of_living_adjustment
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "EITC inflation adjustment amount"
+    description: "Amount by which each EITC dollar amount in subsections (b)(2) and (i)(1) is increased, equal to such dollar amount multiplied by the cost-of-living adjustment per 26 USC 32(j)(1)"
+    from 2016-01-01:
+        adjustment = eitc_inflation_base_dollar_amount * cost_of_living_adjustment
+        adjustment

@@ -1,0 +1,37 @@
+# 26 USC Section 32(c)(2) tests - Earned income
+
+eitc_earned_income:
+    - name: "Wages only, no exclusions"
+      period: 2024-01
+      inputs:
+        earned_income: 30000
+        earned_income_exclusions: 0
+      expect: 30000
+
+    - name: "Wages with pension exclusion"
+      period: 2024-01
+      inputs:
+        earned_income: 40000
+        earned_income_exclusions: 5000
+      expect: 35000
+
+    - name: "Zero earned income"
+      period: 2024-01
+      inputs:
+        earned_income: 0
+        earned_income_exclusions: 0
+      expect: 0
+
+    - name: "Exclusions exceed earned income floors to zero"
+      period: 2024-01
+      inputs:
+        earned_income: 1000
+        earned_income_exclusions: 3000
+      expect: 0
+
+    - name: "SE earnings with inmate and 871a exclusions"
+      period: 2024-01
+      inputs:
+        earned_income: 50000
+        earned_income_exclusions: 12000
+      expect: 38000

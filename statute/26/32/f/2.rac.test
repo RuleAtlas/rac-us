@@ -1,0 +1,30 @@
+# 26 USC Section 32(f)(2) tests
+
+eitc_table_bracket_max:
+    - name: "Bracket max is $50 when both children are $50"
+      period: 2024-01
+      inputs:
+        earned_income_bracket_max: 50
+        agi_bracket_max: 50
+      expect: 50
+
+    - name: "Returns larger of the two bracket widths"
+      period: 2024-01
+      inputs:
+        earned_income_bracket_max: 50
+        agi_bracket_max: 25
+      expect: 50
+
+    - name: "Returns AGI bracket when it is larger"
+      period: 2024-01
+      inputs:
+        earned_income_bracket_max: 25
+        agi_bracket_max: 50
+      expect: 50
+
+    - name: "Zero values"
+      period: 2024-01
+      inputs:
+        earned_income_bracket_max: 0
+        agi_bracket_max: 0
+      expect: 0

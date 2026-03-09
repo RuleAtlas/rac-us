@@ -1,0 +1,30 @@
+# 26 USC Section 32(k) tests
+
+meets_improper_claim_restrictions:
+    - name: "No prior issues - credit allowed"
+      period: 2024-01
+      inputs:
+        meets_fraud_reckless_claim_requirement: true
+        meets_improper_prior_claim_requirement: true
+      expect: true
+
+    - name: "In fraud disallowance period - credit disallowed"
+      period: 2024-01
+      inputs:
+        meets_fraud_reckless_claim_requirement: false
+        meets_improper_prior_claim_requirement: true
+      expect: false
+
+    - name: "Denied by deficiency without providing info - credit disallowed"
+      period: 2024-01
+      inputs:
+        meets_fraud_reckless_claim_requirement: true
+        meets_improper_prior_claim_requirement: false
+      expect: false
+
+    - name: "Both restrictions triggered - credit disallowed"
+      period: 2024-01
+      inputs:
+        meets_fraud_reckless_claim_requirement: false
+        meets_improper_prior_claim_requirement: false
+      expect: false

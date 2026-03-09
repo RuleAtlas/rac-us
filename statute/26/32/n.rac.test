@@ -1,0 +1,47 @@
+# 26 USC Section 32(n) tests - Special rules for individuals without qualifying children
+
+eitc_n_max_age_eliminated:
+    - name: "Max age eliminated in TY 2021"
+      period: 2021-01
+      inputs:
+          eitc_max_age_eliminated: true
+      expect: true
+
+    - name: "Max age not eliminated in TY 2022"
+      period: 2022-01
+      inputs:
+          eitc_max_age_eliminated: false
+      expect: false
+
+eitc_n_credit_pct_no_children:
+    - name: "Credit pct 15.3% in TY 2021"
+      period: 2021-01
+      inputs:
+          eitc_n3_credit_pct_no_children: 0.153
+      expect: 0.153
+
+    - name: "Credit pct reverts after TY 2021"
+      period: 2022-01
+      inputs:
+          eitc_n3_credit_pct_no_children: 0.0765
+      expect: 0.0765
+
+eitc_n_phaseout_pct_no_children:
+    - name: "Phaseout pct 15.3% in TY 2021"
+      period: 2021-01
+      inputs:
+          eitc_n3_phaseout_pct_no_children: 0.153
+      expect: 0.153
+
+eitc_n_amounts_increased:
+    - name: "Increased amounts apply in TY 2021"
+      period: 2021-01
+      inputs:
+          eitc_n4_amounts_increased: true
+      expect: true
+
+    - name: "Increased amounts do not apply in TY 2022"
+      period: 2022-01
+      inputs:
+          eitc_n4_amounts_increased: false
+      expect: false

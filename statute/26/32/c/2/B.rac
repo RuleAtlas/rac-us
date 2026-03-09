@@ -1,0 +1,66 @@
+# 26 USC Section 32(c)(2)(B) - Special rules for earned income
+
+"""
+(B) For purposes of subparagraph (A)--
+(i) the earned income of an individual shall be computed without
+regard to any community property laws,
+(ii) no amount received as a pension or annuity shall be taken into
+account,
+(iii) no amount to which section 871(a) applies (relating to income
+of nonresident alien individuals not connected with United States
+business) shall be taken into account,
+(iv) no amount received for services provided by an individual while
+the individual is an inmate at a penal institution shall be taken
+into account,
+(v) no amount described in subparagraph (A) received for service
+performed in work activities as defined in paragraph (4) or (7) of
+section 407(d) of the Social Security Act to which the taxpayer is
+assigned under any State program under part A of title IV of such
+Act shall be taken into account, but only to the extent such amount
+is subsidized under such State program.
+"""
+
+status: encoded
+
+# --- Inputs for exclusions (iii)-(v) ---
+
+income_under_871a:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Income subject to section 871(a)"
+    description: "Income of nonresident alien individuals not connected with United States business, to which 26 USC 871(a) applies"
+    default: 0
+
+inmate_earned_income:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Inmate earned income"
+    description: "Amount received for services provided while an inmate at a penal institution"
+    default: 0
+
+subsidized_workfare_income:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Subsidized workfare income"
+    description: "Amount received for service in work activities under section 407(d)(4) or (7) of the Social Security Act, to the extent subsidized under a State program under part A of title IV of such Act"
+    default: 0
+
+# --- Aggregated exclusions ---
+
+earned_income_exclusions:
+    imports:
+        - 26/32/c/2/B/ii#pension_or_annuity_income
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Total earned income exclusions"
+    description: "Sum of amounts excluded from earned income per 26 USC 32(c)(2)(B)(ii)-(v): pension/annuity, 871(a) income, inmate earnings, and subsidized workfare income"
+    from 1975-01-01:
+        pension_or_annuity_income + income_under_871a + inmate_earned_income + subsidized_workfare_income

@@ -1,0 +1,23 @@
+# 26 USC Section 32(f)(2)(A) tests
+
+earned_income_bracket_max:
+    - name: "Maximum bracket width is $50"
+      period: 2024-01
+      inputs: {}
+      expect: 50
+
+    - name: "Maximum bracket width applies from 1996"
+      period: 1996-01
+      inputs: {}
+      expect: 50
+
+earned_income_bracket_floor:
+    - name: "Earned income bracket floor is $0"
+      period: 2024-01
+      inputs: {}
+      expect: 0
+
+    - name: "Earned income bracket floor applies from 1996"
+      period: 1996-01
+      inputs: {}
+      expect: 0

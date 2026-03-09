@@ -1,0 +1,33 @@
+# 26 USC Section 32(n)(1)(C) - Specified student
+
+"""
+(C) Specified student.-- For purposes of this paragraph, the term
+"specified student" means, with respect to any taxable year, an individual
+who is an eligible student (as defined in section 25A(b)(3)) during at
+least 5 calendar months during the taxable year.
+"""
+
+status: encoded
+
+specified_student_month_threshold:
+    description: "Minimum number of calendar months an individual must be an eligible student during the taxable year to be a specified student, per 26 USC 32(n)(1)(C)"
+    unit: Month
+    from 2021-01-01: 5
+
+is_eligible_student_25A:
+    entity: Person
+    period: Year
+    dtype: Integer
+    unit: Month
+    label: "Calendar months as eligible student under section 25A(b)(3)"
+    description: "Number of calendar months during the taxable year in which the individual is an eligible student as defined in section 25A(b)(3)"
+    default: 0
+
+is_specified_student:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Is a specified student"
+    description: "Whether the individual is a specified student per 26 USC 32(n)(1)(C): an eligible student (section 25A(b)(3)) during at least 5 calendar months during the taxable year"
+    from 2021-01-01:
+        is_eligible_student_25A >= specified_student_month_threshold

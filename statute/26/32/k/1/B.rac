@@ -1,0 +1,27 @@
+# 26 USC 32(k)(1)(B) - Disallowance period
+
+"""
+(B) Disallowance period.-- For purposes of subparagraph (A), the
+disallowance period is--
+  (i) the period of 10 taxable years after the most recent taxable year
+  for which there was a final determination that the taxpayer's claim of
+  credit under this section was due to fraud, and
+  (ii) the period of 2 taxable years after the most recent taxable year
+  for which there was a final determination that the taxpayer's claim of
+  credit under this section was due to reckless or intentional disregard
+  of rules and regulations.
+"""
+
+status: encoded
+
+in_disallowance_period:
+    imports:
+        - 26/32/k/1/B/i#in_fraud_disallowance_period
+        - 26/32/k/1/B/ii#reckless_disallowance_period
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "In EITC disallowance period"
+    description: "Whether the taxpayer is in the disallowance period per 26 USC 32(k)(1)(B), which is the union of the fraud period (i) and the reckless/intentional disregard period (ii)"
+    from 1997-01-01:
+        in_fraud_disallowance_period or reckless_disallowance_period

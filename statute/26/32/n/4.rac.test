@@ -1,0 +1,30 @@
+# 26 USC Section 32(n)(4) tests
+
+eitc_n4_amounts_increased:
+    - name: "2021 - increased amounts apply"
+      period: 2021-01
+      inputs:
+        eitc_n4a_substitutions_apply: true
+        eitc_n4_inflation_adjustment_applies: false
+      expect: true
+
+    - name: "2022 - increased amounts no longer apply"
+      period: 2022-01
+      inputs:
+        eitc_n4a_substitutions_apply: false
+        eitc_n4_inflation_adjustment_applies: true
+      expect: false
+
+    - name: "2020 - before effective period"
+      period: 2020-01
+      inputs:
+        eitc_n4a_substitutions_apply: false
+        eitc_n4_inflation_adjustment_applies: false
+      expect: false
+
+    - name: "2024 - well after expiration"
+      period: 2024-01
+      inputs:
+        eitc_n4a_substitutions_apply: false
+        eitc_n4_inflation_adjustment_applies: true
+      expect: false

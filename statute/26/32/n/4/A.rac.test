@@ -1,0 +1,14 @@
+# 26 USC Section 32(n)(4)(A) tests
+
+eitc_n4a_substitutions_apply:
+    - name: "Substitutions apply for 2021 taxable year"
+      period: 2021-01
+      expect: true
+
+    - name: "Substitutions do not apply for 2022 taxable year"
+      period: 2022-01
+      expect: false
+
+    - name: "Substitutions do not apply for 2023 taxable year"
+      period: 2023-01
+      expect: false

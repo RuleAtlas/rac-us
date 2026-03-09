@@ -1,0 +1,26 @@
+# 26 USC Section 32(i)(2)(C)(ii)(I) tests
+
+non_interest_deductions_rents_royalties:
+    - name: "No deductions"
+      period: 2024-01
+      inputs:
+        non_interest_deductions_rents_royalties: 0
+      expect: 0
+
+    - name: "Deductions of 3000"
+      period: 2024-01
+      inputs:
+        non_interest_deductions_rents_royalties: 3000
+      expect: 3000
+
+    - name: "Large deductions"
+      period: 2024-01
+      inputs:
+        non_interest_deductions_rents_royalties: 25000
+      expect: 25000
+
+    - name: "Small deduction amount"
+      period: 2024-01
+      inputs:
+        non_interest_deductions_rents_royalties: 1
+      expect: 1

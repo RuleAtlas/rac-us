@@ -1,0 +1,22 @@
+# 26 USC Section 32(f)(2)(A) - Earned income brackets
+
+"""
+(A) for earned income between $0 and the amount of earned income at
+which the credit is phased out under subsection (b),
+
+[Context: The tables prescribed under paragraph (1) shall reflect the
+provisions of subsections (a) and (b) and shall have income brackets
+of not greater than $50 each--]
+"""
+
+status: encoded
+
+earned_income_bracket_max:
+    description: "Maximum width of earned income brackets in EITC tables"
+    unit: USD
+    from 1996-01-01: 50
+
+earned_income_bracket_floor:
+    description: "Floor of earned income range for EITC table brackets"
+    unit: USD
+    from 1996-01-01: 0

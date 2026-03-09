@@ -1,0 +1,25 @@
+# 26 USC Section 32(c)(2)(A)(i) tests
+
+earned_income_employee_comp:
+    - name: "No employee compensation"
+      period: 2024-01
+      inputs:
+          employee_compensation_in_gross_income: 0
+      expect: 0
+
+    - name: "Typical wages"
+      period: 2024-01
+      inputs:
+          employee_compensation_in_gross_income: 50000
+      expect: 50000
+
+    - name: "Default - no input"
+      period: 2024-01
+      inputs: {}
+      expect: 0
+
+    - name: "Small compensation"
+      period: 2024-01
+      inputs:
+          employee_compensation_in_gross_income: 1
+      expect: 1

@@ -1,0 +1,14 @@
+# 26 USC Section 32(j)(1)(B)(ii) tests
+
+base_year_b_2_B:
+    - name: "Base year for b/2/B joint return phaseout increase is 2008"
+      period: 2024-01
+      expect: 2008
+
+    - name: "Base year effective from 2016"
+      period: 2016-01
+      expect: 2008
+
+    - name: "Base year for 2025 tax year"
+      period: 2025-01
+      expect: 2008

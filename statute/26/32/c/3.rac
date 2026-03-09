@@ -1,0 +1,32 @@
+# 26 USC Section 32(c)(3) - Qualifying child
+
+"""
+(3) Qualifying child.--
+(A) In general.-- The term "qualifying child" means a qualifying child of the
+taxpayer (as defined in section 152(c), determined without regard to paragraph
+(1)(D) thereof and section 152(e)).
+(B) Married individual.-- The term "qualifying child" shall not include an
+individual who is married as of the close of the taxpayer's taxable year unless
+the taxpayer is entitled to a deduction under section 151 for such taxable year
+with respect to such individual (or would be so entitled but for section 152(e)).
+(C) Place of abode.-- For purposes of subparagraph (A), the requirements of
+section 152(c)(1)(B) shall be met only if the principal place of abode is in
+the United States.
+(D) Identification requirements.--
+"""
+
+status: encoded
+
+is_eitc_qualifying_child:
+    imports:
+        - 26/32/c/3/A#eitc_qualifying_child
+        - 26/32/c/3/B#eitc_qualifying_child_married_rule
+        - 26/32/c/3/C#eitc_place_of_abode_requirement_met
+        - 26/32/c/3/D#eitc_identification_requirements_met
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "EITC qualifying child"
+    description: "Whether a person is a qualifying child for purposes of the EITC, requiring satisfaction of the general 152(c) definition per (A), the married individual rule per (B), the US place of abode requirement per (C), and identification requirements per (D), per 26 USC 32(c)(3)"
+    from 1975-01-01:
+        eitc_qualifying_child and eitc_qualifying_child_married_rule and eitc_place_of_abode_requirement_met and eitc_identification_requirements_met

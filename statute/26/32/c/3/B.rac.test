@@ -1,0 +1,30 @@
+# 26 USC Section 32(c)(3)(B) tests - Married individual
+
+eitc_qualifying_child_married_rule:
+    - name: "Unmarried individual passes rule"
+      period: 2024-01
+      inputs:
+          is_married_at_close_of_year: false
+          taxpayer_entitled_to_deduction_under_151: false
+      expect: true
+
+    - name: "Married individual with section 151 deduction passes"
+      period: 2024-01
+      inputs:
+          is_married_at_close_of_year: true
+          taxpayer_entitled_to_deduction_under_151: true
+      expect: true
+
+    - name: "Married individual without section 151 deduction fails"
+      period: 2024-01
+      inputs:
+          is_married_at_close_of_year: true
+          taxpayer_entitled_to_deduction_under_151: false
+      expect: false
+
+    - name: "Unmarried individual without deduction still passes"
+      period: 2024-01
+      inputs:
+          is_married_at_close_of_year: false
+          taxpayer_entitled_to_deduction_under_151: true
+      expect: true

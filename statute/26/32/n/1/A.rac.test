@@ -1,0 +1,20 @@
+# 26 USC Section 32(n)(1)(A) tests
+
+eitc_minimum_age_no_qc:
+    - name: "Applicable minimum age for general case (age 19)"
+      period: 2021-01
+      inputs:
+          applicable_minimum_age: 19
+      expect: 19
+
+    - name: "Applicable minimum age for specified student (age 24)"
+      period: 2021-01
+      inputs:
+          applicable_minimum_age: 24
+      expect: 24
+
+    - name: "Applicable minimum age for foster/homeless youth (age 18)"
+      period: 2021-01
+      inputs:
+          applicable_minimum_age: 18
+      expect: 18

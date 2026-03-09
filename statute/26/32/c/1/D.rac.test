@@ -1,0 +1,30 @@
+# 26 USC Section 32(c)(1)(D) tests
+
+eligible_individual_nonresident_alien_limitation:
+    - name: "US citizen or resident - eligible"
+      period: 2024-01
+      inputs:
+          is_nonresident_alien: false
+          elected_resident_status_under_6013: false
+      expect: true
+
+    - name: "Nonresident alien without 6013 election - ineligible"
+      period: 2024-01
+      inputs:
+          is_nonresident_alien: true
+          elected_resident_status_under_6013: false
+      expect: false
+
+    - name: "Nonresident alien with 6013 election - eligible"
+      period: 2024-01
+      inputs:
+          is_nonresident_alien: true
+          elected_resident_status_under_6013: true
+      expect: true
+
+    - name: "US citizen with 6013 election (irrelevant) - eligible"
+      period: 2024-01
+      inputs:
+          is_nonresident_alien: false
+          elected_resident_status_under_6013: true
+      expect: true

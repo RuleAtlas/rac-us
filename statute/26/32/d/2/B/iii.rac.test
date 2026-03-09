@@ -1,0 +1,30 @@
+# 26 USC Section 32(d)(2)(B)(iii) tests
+
+meets_separation_condition:
+    - name: "Neither condition met"
+      period: 2024-01
+      inputs:
+        no_same_abode_last_6_months: false
+        decree_of_separation_test: false
+      expect: false
+
+    - name: "Meets abode separation only (subclause I)"
+      period: 2024-01
+      inputs:
+        no_same_abode_last_6_months: true
+        decree_of_separation_test: false
+      expect: true
+
+    - name: "Meets decree separation only (subclause II)"
+      period: 2024-01
+      inputs:
+        no_same_abode_last_6_months: false
+        decree_of_separation_test: true
+      expect: true
+
+    - name: "Both conditions met"
+      period: 2024-01
+      inputs:
+        no_same_abode_last_6_months: true
+        decree_of_separation_test: true
+      expect: true

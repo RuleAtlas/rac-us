@@ -1,0 +1,14 @@
+# 26 USC Section 32(k)(1) tests
+
+meets_fraud_reckless_claim_requirement:
+    - name: "Not in disallowance period - credit allowed"
+      period: 2024-01
+      inputs:
+        eitc_allowed_after_fraud_check: true
+      expect: true
+
+    - name: "In disallowance period - credit not allowed"
+      period: 2024-01
+      inputs:
+        eitc_allowed_after_fraud_check: false
+      expect: false

@@ -1,0 +1,51 @@
+# 26 USC Section 32(j)(2) - Rounding
+
+"""
+(2) Rounding.--
+(A) In general.-- If any dollar amount in subsection (b)(2)(A) (after being
+increased under subparagraph (B) thereof), after being increased under
+paragraph (1), is not a multiple of $10, such dollar amount shall be rounded
+to the nearest multiple of $10.
+(B) Disqualified income threshold amount.-- If the dollar amount in
+subsection (i)(1), after being increased under paragraph (1), is not a
+multiple of $50, such amount shall be rounded to the next lowest
+multiple of $50.
+"""
+
+status: encoded
+
+rounded_earned_income_amount:
+    imports:
+        - 26/32/j/2/A#rounded_b_2_A_amount
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Rounded earned income amount"
+    description: "Earned income amount rounded to nearest $10 per 26 USC 32(j)(2)(A)"
+    from 2016-01-01:
+        rounded_b_2_A_amount
+
+rounded_phaseout_amount:
+    imports:
+        - 26/32/j/2/A#rounded_b_2_A_phaseout_amount
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Rounded phaseout amount"
+    description: "Phaseout amount rounded to nearest $10 per 26 USC 32(j)(2)(A)"
+    from 2016-01-01:
+        rounded_b_2_A_phaseout_amount
+
+rounded_disqualified_income_threshold:
+    imports:
+        - 26/32/j/2/B#disqualified_income_threshold_rounding
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Rounded disqualified income threshold"
+    description: "Disqualified income threshold rounded down to nearest $50 per 26 USC 32(j)(2)(B)"
+    from 2021-01-01:
+        disqualified_income_threshold_rounding

@@ -1,0 +1,37 @@
+# 26 USC Section 32(c)(1)(E) tests
+
+meets_eitc_identification_number_requirement:
+    - name: "Single filer with TIN included"
+      period: 2024-01
+      inputs:
+          meets_individual_tin_requirement: true
+          meets_spouse_tin_requirement: true
+      expect: true
+
+    - name: "Single filer without TIN"
+      period: 2024-01
+      inputs:
+          meets_individual_tin_requirement: false
+          meets_spouse_tin_requirement: true
+      expect: false
+
+    - name: "Married filer missing spouse TIN"
+      period: 2024-01
+      inputs:
+          meets_individual_tin_requirement: true
+          meets_spouse_tin_requirement: false
+      expect: false
+
+    - name: "Married filer missing both TINs"
+      period: 2024-01
+      inputs:
+          meets_individual_tin_requirement: false
+          meets_spouse_tin_requirement: false
+      expect: false
+
+    - name: "Married filer with both TINs"
+      period: 2024-01
+      inputs:
+          meets_individual_tin_requirement: true
+          meets_spouse_tin_requirement: true
+      expect: true

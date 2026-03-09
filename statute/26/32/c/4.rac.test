@@ -1,0 +1,42 @@
+# 26 USC Section 32(c)(4) tests
+
+military_abode_treated_as_us:
+    - name: "Armed forces member on extended active duty stationed abroad"
+      period: 2024-01
+      inputs:
+          is_armed_forces_member: true
+          is_on_extended_active_duty: true
+          stationed_outside_us: true
+      expect: true
+
+    - name: "Armed forces member NOT on extended active duty stationed abroad"
+      period: 2024-01
+      inputs:
+          is_armed_forces_member: true
+          is_on_extended_active_duty: false
+          stationed_outside_us: true
+      expect: false
+
+    - name: "Civilian not in armed forces"
+      period: 2024-01
+      inputs:
+          is_armed_forces_member: false
+          is_on_extended_active_duty: false
+          stationed_outside_us: false
+      expect: false
+
+    - name: "Armed forces member on extended active duty but stationed in US"
+      period: 2024-01
+      inputs:
+          is_armed_forces_member: true
+          is_on_extended_active_duty: true
+          stationed_outside_us: false
+      expect: false
+
+    - name: "Non-military person stationed outside US"
+      period: 2024-01
+      inputs:
+          is_armed_forces_member: false
+          is_on_extended_active_duty: true
+          stationed_outside_us: true
+      expect: false

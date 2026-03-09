@@ -1,0 +1,30 @@
+# 26 USC Section 32(c)(1)(E)(ii) tests
+
+meets_spouse_tin_requirement:
+    - name: "Unmarried individual - requirement met automatically"
+      period: 2024-01
+      inputs:
+        is_married: false
+        spouse_tin_included_on_return: false
+      expect: true
+
+    - name: "Married individual with spouse TIN included"
+      period: 2024-01
+      inputs:
+        is_married: true
+        spouse_tin_included_on_return: true
+      expect: true
+
+    - name: "Married individual without spouse TIN included"
+      period: 2024-01
+      inputs:
+        is_married: true
+        spouse_tin_included_on_return: false
+      expect: false
+
+    - name: "Unmarried individual with spouse TIN (irrelevant)"
+      period: 2024-01
+      inputs:
+        is_married: false
+        spouse_tin_included_on_return: true
+      expect: true

@@ -1,0 +1,25 @@
+# 26 USC Section 32(c)(1)(A)(i) tests
+
+eligible_individual_has_qualifying_child:
+    - name: "Individual with qualifying child is eligible"
+      period: 2024-01
+      inputs:
+        has_qualifying_child: true
+      expect: true
+
+    - name: "Individual without qualifying child is not eligible under clause (i)"
+      period: 2024-01
+      inputs:
+        has_qualifying_child: false
+      expect: false
+
+    - name: "Default - no qualifying child"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Earlier year - individual with qualifying child"
+      period: 2000-01
+      inputs:
+        has_qualifying_child: true
+      expect: true

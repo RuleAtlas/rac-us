@@ -1,0 +1,30 @@
+# 26 USC Section 32(d)(2) tests
+
+is_married_for_eitc:
+    - name: "Married under 7703(a) and not separated"
+      period: 2024-01
+      inputs:
+        marital_status_determined_under_7703a: true
+        not_treated_as_married: false
+      expect: true
+
+    - name: "Separated spouse meets all conditions - not treated as married"
+      period: 2024-01
+      inputs:
+        marital_status_determined_under_7703a: true
+        not_treated_as_married: true
+      expect: false
+
+    - name: "Not married under 7703(a)"
+      period: 2024-01
+      inputs:
+        marital_status_determined_under_7703a: false
+        not_treated_as_married: false
+      expect: false
+
+    - name: "Not married and separated spouse rule also met"
+      period: 2024-01
+      inputs:
+        marital_status_determined_under_7703a: false
+        not_treated_as_married: true
+      expect: false

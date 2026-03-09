@@ -1,0 +1,29 @@
+# 26 USC Section 32(k)(1) - Taxpayers making prior fraudulent or reckless claims
+
+"""
+(1) Taxpayers making prior fraudulent or reckless claims.--
+(A) In general.-- No credit shall be allowed under this section for
+any taxable year in the disallowance period.
+(B) Disallowance period.-- For purposes of subparagraph (A), the
+disallowance period is--
+  (i) the period of 10 taxable years after the most recent taxable year
+  for which there was a final determination that the taxpayer's claim of
+  credit under this section was due to fraud, and
+  (ii) the period of 2 taxable years after the most recent taxable year
+  for which there was a final determination that the taxpayer's claim of
+  credit under this section was due to reckless or intentional disregard
+  of rules and regulations.
+"""
+
+status: encoded
+
+meets_fraud_reckless_claim_requirement:
+    imports:
+        - 26/32/k/1/A#eitc_allowed_after_fraud_check
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Meets prior fraudulent or reckless claim requirement"
+    description: "No credit shall be allowed for any taxable year in the disallowance period per 26 USC 32(k)(1)"
+    from 1997-01-01:
+        eitc_allowed_after_fraud_check

@@ -1,0 +1,37 @@
+# 26 USC 32(k)(1)(B)(i) tests
+
+in_fraud_disallowance_period:
+    - name: "Within 10-year fraud disallowance period"
+      period: 2024-01
+      inputs:
+          fraud_determination_year: 2020
+          tax_year: 2024
+      expect: 1
+
+    - name: "At boundary of 10-year period"
+      period: 2030-01
+      inputs:
+          fraud_determination_year: 2020
+          tax_year: 2030
+      expect: 1
+
+    - name: "Beyond 10-year fraud disallowance period"
+      period: 2031-01
+      inputs:
+          fraud_determination_year: 2020
+          tax_year: 2031
+      expect: 0
+
+    - name: "No fraud determination"
+      period: 2024-01
+      inputs:
+          fraud_determination_year: 0
+          tax_year: 2024
+      expect: 0
+
+    - name: "First year after fraud determination"
+      period: 2021-01
+      inputs:
+          fraud_determination_year: 2020
+          tax_year: 2021
+      expect: 1

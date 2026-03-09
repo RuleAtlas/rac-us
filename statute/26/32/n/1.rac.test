@@ -1,0 +1,20 @@
+# 26 USC Section 32(n)(1) tests
+
+decrease_in_minimum_age:
+    - name: "General case - minimum age is 19"
+      period: 2024-01
+      inputs:
+        eitc_minimum_age_no_qc: 19
+      expect: 19
+
+    - name: "Specified student - minimum age is 24"
+      period: 2024-01
+      inputs:
+        eitc_minimum_age_no_qc: 24
+      expect: 24
+
+    - name: "Foster youth or homeless youth - minimum age is 18"
+      period: 2024-01
+      inputs:
+        eitc_minimum_age_no_qc: 18
+      expect: 18

@@ -1,0 +1,20 @@
+# 26 USC Section 32(c)(3)(D) tests
+
+eitc_identification_requirements_met:
+    - name: "Child ID info included - meets requirement"
+      period: 2024-01
+      inputs:
+        eitc_qualifying_child_id_requirement: true
+      expect: true
+
+    - name: "Child ID info not included - fails requirement"
+      period: 2024-01
+      inputs:
+        eitc_qualifying_child_id_requirement: false
+      expect: false
+
+    - name: "Default with no imported value"
+      period: 2024-01
+      inputs:
+        eitc_qualifying_child_id_requirement: false
+      expect: false

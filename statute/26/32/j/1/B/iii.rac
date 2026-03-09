@@ -1,0 +1,13 @@
+# 26 USC Section 32(j)(1)(B)(iii) - Base year for i/1
+
+"""
+(iii) in the case of the $10,000 amount in subsection (i)(1),
+"calendar year 2020" for "calendar year 2016".
+"""
+
+status: encoded
+
+base_year_i_1:
+    description: "Base calendar year substituted in section 1(f)(3)(A)(ii) for inflation adjustment of the $10,000 amount in subsection (i)(1)"
+    unit: Year
+    from 2021-01-01: 2020

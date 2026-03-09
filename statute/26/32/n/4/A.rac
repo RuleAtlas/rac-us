@@ -1,0 +1,25 @@
+# 26 USC Section 32(n)(4)(A) - In general
+
+"""
+(A) In general.-- In the case of a taxable year beginning after
+December 31, 2020, and before January 1, 2022, the table contained
+in subsection (b)(2)(A) shall be applied--
+(i) by substituting "$9,820" for "$4,220", and
+(ii) by substituting "$11,610" for "$5,280".
+"""
+
+status: consolidated
+
+eitc_n4a_substitutions_apply:
+    imports:
+        - 26/32/n/4/A/i#eitc_no_qc_earned_income_amount_substitute
+        - 26/32/n/4/A/ii#phaseout_amount_no_children_substituted
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Whether 32(n)(4)(A) earned income and phaseout substitutions apply"
+    description: "For taxable years beginning after 2020 and before 2022, the table in 32(b)(2)(A) uses substituted amounts per 26 USC 32(n)(4)(A)"
+    from 2021-01-01:
+        true
+    from 2022-01-01:
+        false

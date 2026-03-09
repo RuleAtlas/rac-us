@@ -1,0 +1,35 @@
+# 26 USC Section 32(n)(1)(D)(i) tests
+
+was_in_foster_care_at_or_after_minimum_age:
+    - name: "Foster care entered at age 14 - qualifies"
+      period: 2024-01
+      inputs:
+        was_in_qualifying_foster_care: true
+        age_entered_foster_care: 14
+      expect: true
+
+    - name: "Foster care entered at age 16 - qualifies"
+      period: 2024-01
+      inputs:
+        was_in_qualifying_foster_care: true
+        age_entered_foster_care: 16
+      expect: true
+
+    - name: "Foster care entered at age 13 - does not qualify"
+      period: 2024-01
+      inputs:
+        was_in_qualifying_foster_care: true
+        age_entered_foster_care: 13
+      expect: false
+
+    - name: "Not in qualifying foster care - does not qualify"
+      period: 2024-01
+      inputs:
+        was_in_qualifying_foster_care: false
+        age_entered_foster_care: 15
+      expect: false
+
+    - name: "Default values - does not qualify"
+      period: 2024-01
+      inputs: {}
+      expect: false

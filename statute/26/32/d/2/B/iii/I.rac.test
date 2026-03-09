@@ -1,0 +1,17 @@
+# 26 USC Section 32(d)(2)(B)(iii)(I) tests
+
+last_months_threshold:
+    - name: "Threshold is 6 months for 2024"
+      period: 2024-01
+      inputs: {}
+      expect: 6
+
+    - name: "Threshold is 6 months for 2000"
+      period: 2000-01
+      inputs: {}
+      expect: 6
+
+    - name: "Threshold is 6 months at earliest effective date"
+      period: 1975-01
+      inputs: {}
+      expect: 6

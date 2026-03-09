@@ -1,0 +1,5 @@
+# 26 USC Section 32(n)(1)(D)(ii) tests
+#
+# This subsection defines an input (foster_care_disclosure_consent) with no
+# computed variables. Tests will be exercised by the parent D.rac file which
+# combines both (i) and (ii) conditions.

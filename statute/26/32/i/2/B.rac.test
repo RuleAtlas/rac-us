@@ -1,0 +1,26 @@
+# 26 USC Section 32(i)(2)(B) tests
+
+eitc_disqualified_income_tax_exempt_interest:
+    - name: "No tax-exempt interest"
+      period: 2024-01
+      inputs:
+        tax_exempt_interest: 0
+      expect: 0
+
+    - name: "Has tax-exempt interest"
+      period: 2024-01
+      inputs:
+        tax_exempt_interest: 5000
+      expect: 5000
+
+    - name: "Small amount of tax-exempt interest"
+      period: 2024-01
+      inputs:
+        tax_exempt_interest: 100
+      expect: 100
+
+    - name: "Large tax-exempt interest"
+      period: 2024-01
+      inputs:
+        tax_exempt_interest: 50000
+      expect: 50000

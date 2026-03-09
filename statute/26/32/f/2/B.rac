@@ -1,0 +1,18 @@
+# 26 USC Section 32(f)(2)(B) - AGI brackets
+
+"""
+(B) for adjusted gross income between the dollar amount at which the
+phaseout begins under subsection (b) and the amount of adjusted gross
+income at which the credit is phased out under subsection (b).
+
+[Context: The tables prescribed under paragraph (1) shall reflect the
+provisions of subsections (a) and (b) and shall have income brackets
+of not greater than $50 each--]
+"""
+
+status: encoded
+
+agi_bracket_max:
+    description: "Maximum width of AGI brackets in EITC phaseout tables"
+    unit: USD
+    from 1996-01-01: 50

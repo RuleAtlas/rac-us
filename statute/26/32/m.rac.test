@@ -1,0 +1,30 @@
+# 26 USC Section 32(m) tests - Identification numbers
+
+has_qualifying_taxpayer_identification_number:
+    - name: "Has qualifying SSN issued before due date"
+      period: 2024-01
+      inputs:
+        has_ssn_issued_by_ssa: true
+        ssn_issued_by_return_due_date: true
+      expect: true
+
+    - name: "Has SSN but issued after return due date"
+      period: 2024-01
+      inputs:
+        has_ssn_issued_by_ssa: true
+        ssn_issued_by_return_due_date: false
+      expect: false
+
+    - name: "No qualifying SSN (e.g. ITIN holder)"
+      period: 2024-01
+      inputs:
+        has_ssn_issued_by_ssa: false
+        ssn_issued_by_return_due_date: true
+      expect: false
+
+    - name: "Neither SSN nor timely issuance"
+      period: 2024-01
+      inputs:
+        has_ssn_issued_by_ssa: false
+        ssn_issued_by_return_due_date: false
+      expect: false

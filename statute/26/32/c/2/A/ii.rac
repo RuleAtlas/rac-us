@@ -1,0 +1,38 @@
+# 26 USC Section 32(c)(2)(A)(ii) - Net SE earnings
+
+"""
+(ii) the amount of the taxpayer's net earnings from self-employment for the
+taxable year (within the meaning of section 1402(a)), but such net earnings
+shall be determined with regard to the deduction allowed to the taxpayer by
+section 164(f).
+"""
+
+status: encoded
+
+net_earnings_from_self_employment:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Net earnings from self-employment"
+    description: "Net earnings from self-employment within the meaning of 26 USC 1402(a)"
+    default: 0
+
+se_tax_deduction_164f:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Deduction for SE tax under section 164(f)"
+    description: "Deduction allowed to the taxpayer by 26 USC 164(f) for self-employment taxes"
+    default: 0
+
+earned_income_se:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Earned income from self-employment"
+    description: "Net earnings from self-employment determined with regard to the deduction under 26 USC 164(f), per 26 USC 32(c)(2)(A)(ii)"
+    from 1975-01-01:
+        net_earnings_from_self_employment - se_tax_deduction_164f

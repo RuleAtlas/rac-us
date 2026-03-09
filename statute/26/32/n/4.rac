@@ -1,0 +1,30 @@
+# 26 USC Section 32(n)(4) - Increase in earned income and phaseout amounts
+
+"""
+(4) Increase in earned income and phaseout amounts.--
+    (A) In general.-- In the case of a taxable year beginning after
+    December 31, 2020, and before January 1, 2022, the table contained
+    in subsection (b)(2)(A) shall be applied--
+        (i) by substituting "$9,820" for "$4,220", and
+        (ii) by substituting "$11,610" for "$5,280".
+    (B) Coordination with inflation adjustment.-- Subsection (j) shall
+    not apply to any dollar amount specified in this paragraph.
+"""
+
+status: consolidated
+
+eitc_n4_amounts_increased:
+    imports:
+        - 26/32/n/4/A#eitc_n4a_substitutions_apply
+        - 26/32/n/4/B#eitc_n4_inflation_adjustment_applies
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Whether 32(n)(4) increased earned income and phaseout amounts apply"
+    description: "For taxable years beginning after 2020 and before 2022, earned income and phaseout amounts for individuals without qualifying children are increased per 26 USC 32(n)(4)"
+    from 2010-01-01:
+        false
+    from 2021-01-01:
+        eitc_n4a_substitutions_apply
+    from 2022-01-01:
+        false

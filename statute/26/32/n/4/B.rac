@@ -1,0 +1,19 @@
+# 26 USC Section 32(n)(4)(B) - Coordination with inflation adjustment
+
+"""
+(B) Coordination with inflation adjustment.-- Subsection (j) shall not
+apply to any dollar amount specified in this paragraph.
+"""
+
+status: encoded
+
+eitc_n4_inflation_adjustment_applies:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Whether inflation adjustment applies to 32(n)(4) amounts"
+    description: "Subsection (j) inflation adjustments do not apply to dollar amounts in 26 USC 32(n)(4), per 26 USC 32(n)(4)(B)"
+    from 2021-01-01:
+        false
+    from 2022-01-01:
+        true

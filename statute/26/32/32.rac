@@ -1,0 +1,38 @@
+# 26 USC Section 32 - Earned income
+
+"""
+Sec. 32. Earned income.
+
+(a) Allowance of credit.-- Provides the earned income tax credit for
+eligible individuals based on earned income, with a phaseout at higher
+income levels.
+
+(e) Taxable year must be full taxable year.-- No credit is allowable
+for a taxable year covering less than 12 months (except if closed by
+death).
+
+(i) Denial of credit for individuals having excessive investment
+income.-- No credit is allowed if aggregate disqualified income exceeds
+the threshold.
+"""
+
+status: encoded
+
+earned_income_credit:
+    imports:
+        - 26/32/a#eitc_amount
+        - 26/32/e#meets_full_taxable_year_requirement
+        - 26/32/i#eitc_denied_for_excess_investment_income
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Earned income credit under 26 USC 32"
+    description: "Final earned income tax credit after applying the full taxable year requirement per (e) and the investment income denial per (i)"
+    from 1975-01-01:
+        if not meets_full_taxable_year_requirement:
+            0
+        elif eitc_denied_for_excess_investment_income:
+            0
+        else:
+            eitc_amount
