@@ -1,0 +1,35 @@
+# 26 USC Section 32(c)(2)(B)(vi) - Combat pay election
+
+"""
+(vi) a taxpayer may elect to treat amounts excluded from gross income
+by reason of section 112 as earned income.
+"""
+
+status: encoded
+
+combat_zone_compensation_excluded:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Combat zone compensation excluded under section 112"
+    description: "Amount of military compensation excluded from gross income by reason of 26 USC 112 (combat zone compensation)"
+    default: 0
+
+combat_pay_election:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Election to treat combat pay as earned income"
+    description: "Whether the taxpayer elects to treat amounts excluded from gross income by reason of section 112 as earned income, per 26 USC 32(c)(2)(B)(vi)"
+    default: false
+
+earned_income_combat_pay_inclusion:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Combat pay included in earned income by election"
+    description: "Amount of combat zone compensation included in earned income when the taxpayer elects under 26 USC 32(c)(2)(B)(vi)"
+    from 2004-01-01:
+        if combat_pay_election: combat_zone_compensation_excluded else: 0

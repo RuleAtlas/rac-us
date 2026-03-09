@@ -1,0 +1,17 @@
+# 26 USC Section 32(i)(2)(C)(ii)(I) - Non-interest deductions
+
+"""
+(I) the deductions (other than interest) which are clearly and
+directly allocable to such gross income, plus
+"""
+
+status: encoded
+
+non_interest_deductions_rents_royalties:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Non-interest deductions allocable to rents/royalties"
+    description: "Deductions (other than interest) clearly and directly allocable to gross income from rents or royalties, per 26 USC 32(i)(2)(C)(ii)(I)"
+    default: 0

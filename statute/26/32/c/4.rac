@@ -1,0 +1,56 @@
+# 26 USC Section 32(c)(4) - Treatment of military personnel stationed outside the United States
+
+"""
+(4) Treatment of military personnel stationed outside the United States.--
+For purposes of paragraphs (1)(A)(ii)(I) and (3)(C), the principal place of
+abode of a member of the Armed Forces of the United States shall be treated
+as in the United States during any period during which such member is stationed
+outside of the United States while serving on extended active duty with the
+Armed Forces of the United States. For purposes of the preceding sentence,
+the term "extended active duty" means any period of active duty pursuant to
+a call or order to such duty for a period in excess of 90 days or for an
+indefinite period.
+"""
+
+status: encoded
+
+extended_active_duty_minimum_days:
+    description: "Minimum days of active duty to qualify as extended active duty"
+    unit: day
+    from 1975-01-01: 90
+
+is_armed_forces_member:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Member of the Armed Forces of the United States"
+    description: "Whether the individual is a member of the Armed Forces of the United States"
+    default: false
+
+is_on_extended_active_duty:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Serving on extended active duty"
+    description: "Whether the individual is serving on extended active duty, defined as active duty pursuant to a call or order for a period in excess of 90 days or for an indefinite period, per 26 USC 32(c)(4)"
+    default: false
+
+stationed_outside_us:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Stationed outside the United States"
+    description: "Whether the individual is stationed outside of the United States"
+    default: false
+
+military_abode_treated_as_us:
+    imports:
+        - 26/32/c/1/A/ii/I#meets_eitc_us_abode_requirement
+        - 26/32/c/3/C#principal_place_of_abode_in_us
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Military abode treated as in the United States"
+    description: "For EITC purposes, a member of the Armed Forces stationed outside the US while on extended active duty is treated as having a principal place of abode in the United States, per 26 USC 32(c)(4)"
+    from 1975-01-01:
+        is_armed_forces_member and is_on_extended_active_duty and stationed_outside_us

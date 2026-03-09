@@ -1,0 +1,19 @@
+# 26 USC Section 32(c)(1)(E)(i) tests
+
+meets_individual_tin_requirement:
+    - name: "Individual TIN included on return"
+      period: 2024-01
+      inputs:
+        individual_tin_included_on_return: true
+      expect: true
+
+    - name: "Individual TIN not included on return"
+      period: 2024-01
+      inputs:
+        individual_tin_included_on_return: false
+      expect: false
+
+    - name: "Default - TIN included"
+      period: 2024-01
+      inputs: {}
+      expect: true

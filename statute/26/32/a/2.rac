@@ -1,0 +1,26 @@
+# 26 USC Section 32(a)(2) - Limitation
+
+"""
+(2) Limitation.-- The amount of the credit allowable to a taxpayer
+under paragraph (1) for any taxable year shall not exceed the excess
+(if any) of--
+(A) the credit percentage of the earned income amount, over
+(B) the phaseout percentage of so much of the adjusted gross income
+(or, if greater, the earned income) of the taxpayer for the taxable
+year as exceeds the phaseout amount.
+"""
+
+status: encoded
+
+eitc_limitation:
+    imports:
+        - 26/32/a/2/A#credit_pct_of_earned_income_amount
+        - 26/32/a/2/B#phaseout_reduction
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "EITC limitation"
+    description: "Maximum credit is excess (if any) of credit percentage of earned income amount over phaseout reduction per 26 USC 32(a)(2)"
+    from 1996-01-01:
+        max(0, credit_pct_of_earned_income_amount - phaseout_reduction)

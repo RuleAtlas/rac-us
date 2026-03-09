@@ -1,0 +1,21 @@
+# 26 USC Section 32(d)(2)(B)(iii)(I) - No same abode last 6 months
+
+"""
+(I) during the last 6 months of such taxable year, does not have the
+same principal place of abode as the individual's spouse,
+"""
+
+status: encoded
+
+last_months_threshold:
+    description: "Number of last months of taxable year during which spouses must not share abode"
+    unit: months
+    from 1975-01-01: 6
+
+no_same_abode_last_6_months:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "No same principal place of abode as spouse during last 6 months"
+    description: "Whether the individual does not have the same principal place of abode as the individual's spouse during the last 6 months of the taxable year, per 26 USC 32(d)(2)(B)(iii)(I)"
+    default: false

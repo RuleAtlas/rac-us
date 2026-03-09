@@ -1,0 +1,17 @@
+# 26 USC Section 32(d)(2)(B)(ii) tests
+
+residency_threshold:
+    - name: "Residency threshold is one-half"
+      period: 2024-01
+      inputs: {}
+      expect: 0.5
+
+    - name: "Residency threshold applies from 1975"
+      period: 1975-01
+      inputs: {}
+      expect: 0.5
+
+    - name: "Residency threshold applies in 2026"
+      period: 2026-01
+      inputs: {}
+      expect: 0.5

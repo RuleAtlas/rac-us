@@ -1,0 +1,71 @@
+# 26 USC Section 21(a)(1) tests
+
+applicable_percentage:
+    - name: "Low income - full 50% rate (no reductions)"
+      period: 2024-01
+      inputs:
+        first_reduction: 0
+        further_reduction: 0
+      expect: 0.50
+
+    - name: "First reduction applies, no further reduction"
+      period: 2024-01
+      inputs:
+        first_reduction: 0.10
+        further_reduction: 0
+      expect: 0.40
+
+    - name: "Both reductions apply"
+      period: 2024-01
+      inputs:
+        first_reduction: 0.15
+        further_reduction: 0.05
+      expect: 0.30
+
+creditable_expenses:
+    - name: "One qualifying individual, expenses below dollar limit"
+      period: 2024-01
+      inputs:
+        number_of_qualifying_individuals: 1
+        employment_related_expenses: 2000
+        expense_limit_one_qualifying_individual: 3000
+        expense_limit_two_or_more_qualifying_individuals: 6000
+        earned_income_limit: 50000
+      expect: 2000
+
+    - name: "One qualifying individual, expenses exceed dollar limit"
+      period: 2024-01
+      inputs:
+        number_of_qualifying_individuals: 1
+        employment_related_expenses: 5000
+        expense_limit_one_qualifying_individual: 3000
+        expense_limit_two_or_more_qualifying_individuals: 6000
+        earned_income_limit: 50000
+      expect: 3000
+
+    - name: "Two qualifying individuals, earned income limit binds"
+      period: 2024-01
+      inputs:
+        number_of_qualifying_individuals: 2
+        employment_related_expenses: 5000
+        expense_limit_one_qualifying_individual: 3000
+        expense_limit_two_or_more_qualifying_individuals: 6000
+        earned_income_limit: 1000
+      expect: 1000
+
+child_and_dependent_care_credit:
+    - name: "No qualifying individuals - no credit"
+      period: 2024-01
+      inputs:
+        number_of_qualifying_individuals: 0
+        applicable_percentage: 0.35
+        creditable_expenses: 3000
+      expect: 0
+
+    - name: "One qualifying individual with credit"
+      period: 2024-01
+      inputs:
+        number_of_qualifying_individuals: 1
+        applicable_percentage: 0.35
+        creditable_expenses: 3000
+      expect: 1050

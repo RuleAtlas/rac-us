@@ -1,0 +1,37 @@
+# 26 USC Section 32(i)(2)(C) tests
+
+disqualified_income_net_rents_royalties:
+    - name: "Gross exceeds deductions"
+      period: 2024-01
+      inputs:
+        disqualified_income_gross_rents_royalties: 10000
+        disqualified_income_deductions_rents_royalties: 3000
+      expect: 7000
+
+    - name: "Deductions exceed gross - floored at zero"
+      period: 2024-01
+      inputs:
+        disqualified_income_gross_rents_royalties: 2000
+        disqualified_income_deductions_rents_royalties: 5000
+      expect: 0
+
+    - name: "Zero gross income"
+      period: 2024-01
+      inputs:
+        disqualified_income_gross_rents_royalties: 0
+        disqualified_income_deductions_rents_royalties: 1000
+      expect: 0
+
+    - name: "Zero deductions"
+      period: 2024-01
+      inputs:
+        disqualified_income_gross_rents_royalties: 8500
+        disqualified_income_deductions_rents_royalties: 0
+      expect: 8500
+
+    - name: "Equal amounts - net is zero"
+      period: 2024-01
+      inputs:
+        disqualified_income_gross_rents_royalties: 4000
+        disqualified_income_deductions_rents_royalties: 4000
+      expect: 0

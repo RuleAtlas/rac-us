@@ -1,0 +1,37 @@
+# 26 USC Section 32(i)(2)(E) tests
+
+eitc_disqualified_income_net_passive_income:
+    - name: "No passive income or losses"
+      period: 2024-01
+      inputs:
+        eitc_disqualified_income_passive_income: 0
+        disqualified_income_aggregate_passive_losses: 0
+      expect: 0
+
+    - name: "Income exceeds losses"
+      period: 2024-01
+      inputs:
+        eitc_disqualified_income_passive_income: 10000
+        disqualified_income_aggregate_passive_losses: 3000
+      expect: 7000
+
+    - name: "Losses exceed income - excess is zero"
+      period: 2024-01
+      inputs:
+        eitc_disqualified_income_passive_income: 2000
+        disqualified_income_aggregate_passive_losses: 5000
+      expect: 0
+
+    - name: "Income equals losses"
+      period: 2024-01
+      inputs:
+        eitc_disqualified_income_passive_income: 4000
+        disqualified_income_aggregate_passive_losses: 4000
+      expect: 0
+
+    - name: "Income with no losses"
+      period: 2024-01
+      inputs:
+        eitc_disqualified_income_passive_income: 8500
+        disqualified_income_aggregate_passive_losses: 0
+      expect: 8500

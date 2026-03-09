@@ -1,0 +1,27 @@
+# 26 USC Section 32(i)(2)(E)(ii) - Aggregate passive losses
+
+"""
+(ii) the aggregate losses from all passive activities for the taxable
+year (as determined under section 469).
+"""
+
+status: encoded
+
+aggregate_passive_losses:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Aggregate passive losses"
+    description: "The aggregate losses from all passive activities for the taxable year, as determined under section 469, per 26 USC 32(i)(2)(E)(ii)"
+    default: 0
+
+disqualified_income_aggregate_passive_losses:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Aggregate passive losses for EITC disqualified income"
+    description: "Aggregate losses from all passive activities for the taxable year, per 26 USC 32(i)(2)(E)(ii)"
+    from 1996-01-01:
+        aggregate_passive_losses

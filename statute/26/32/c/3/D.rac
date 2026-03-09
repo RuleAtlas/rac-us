@@ -1,0 +1,16 @@
+# 26 USC Section 32(c)(3)(D) - Identification requirements
+
+"""
+(D) Identification requirements.--
+"""
+
+eitc_identification_requirements_met:
+    imports:
+        - 26/32/c/3/D/i#eitc_qualifying_child_id_requirement
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Meets EITC qualifying child identification requirements"
+    description: "Whether the qualifying child meets the identification requirements of 26 USC 32(c)(3)(D), consolidating clause (i) general requirements and clause (ii) other methods"
+    from 1975-01-01:
+        eitc_qualifying_child_id_requirement

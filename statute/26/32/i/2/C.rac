@@ -1,0 +1,26 @@
+# 26 USC Section 32(i)(2)(C) - Net rent/royalty income
+
+"""
+(C) the excess (if any) of—
+  (i) gross income from rents or royalties not derived in the ordinary
+  course of a trade or business, over
+  (ii) the sum of—
+    (I) the deductions (other than interest) which are clearly and
+    directly allocable to such gross income, plus
+    (II) interest deductions properly allocable to such gross income,
+"""
+
+status: encoded
+
+disqualified_income_net_rents_royalties:
+    imports:
+        - 26/32/i/2/C/i#disqualified_income_gross_rents_royalties
+        - 26/32/i/2/C/ii#disqualified_income_deductions_rents_royalties
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Net rent/royalty disqualified income"
+    description: "Excess of gross rents/royalties over allocable deductions, per 26 USC 32(i)(2)(C)"
+    from 1975-01-01:
+        max(0, disqualified_income_gross_rents_royalties - disqualified_income_deductions_rents_royalties)

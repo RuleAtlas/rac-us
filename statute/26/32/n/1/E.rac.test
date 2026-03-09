@@ -1,0 +1,30 @@
+# 26 USC Section 32(n)(1)(E) tests
+
+is_qualified_homeless_youth:
+    - name: "Unaccompanied homeless youth qualifies"
+      period: 2021-01
+      inputs:
+          certifies_unaccompanied_homeless_youth: true
+          certifies_unaccompanied_at_risk_self_supporting: false
+      expect: true
+
+    - name: "Unaccompanied at-risk self-supporting qualifies"
+      period: 2021-01
+      inputs:
+          certifies_unaccompanied_homeless_youth: false
+          certifies_unaccompanied_at_risk_self_supporting: true
+      expect: true
+
+    - name: "Both certifications true qualifies"
+      period: 2021-01
+      inputs:
+          certifies_unaccompanied_homeless_youth: true
+          certifies_unaccompanied_at_risk_self_supporting: true
+      expect: true
+
+    - name: "Neither certification does not qualify"
+      period: 2021-01
+      inputs:
+          certifies_unaccompanied_homeless_youth: false
+          certifies_unaccompanied_at_risk_self_supporting: false
+      expect: false

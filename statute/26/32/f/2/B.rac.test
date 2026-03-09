@@ -1,0 +1,14 @@
+# 26 USC Section 32(f)(2)(B) tests
+
+agi_bracket_max:
+    - name: "AGI bracket max is $50 in 1996"
+      period: 1996-01
+      expect: 50
+
+    - name: "AGI bracket max is $50 in 2024"
+      period: 2024-01
+      expect: 50
+
+    - name: "AGI bracket max is $50 in 2025"
+      period: 2025-01
+      expect: 50

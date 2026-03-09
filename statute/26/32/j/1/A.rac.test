@@ -1,0 +1,25 @@
+# 26 USC Section 32(j)(1)(A) tests - Dollar amount
+
+eitc_inflation_base_dollar_amount:
+    - name: "Default dollar amount is zero"
+      period: 2024-01
+      inputs: {}
+      expect: 0
+
+    - name: "Earned income amount for 1 child as base"
+      period: 2024-01
+      inputs:
+          eitc_dollar_amount_subject_to_adjustment: 6330
+      expect: 6330
+
+    - name: "Phaseout amount as base"
+      period: 2024-01
+      inputs:
+          eitc_dollar_amount_subject_to_adjustment: 11610
+      expect: 11610
+
+    - name: "Zero dollar amount"
+      period: 2024-01
+      inputs:
+          eitc_dollar_amount_subject_to_adjustment: 0
+      expect: 0

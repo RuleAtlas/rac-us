@@ -1,0 +1,26 @@
+# 26 USC Section 32(n)(1)(C) tests
+
+is_specified_student:
+    - name: "Individual enrolled for 5 months qualifies as specified student"
+      period: 2021-01
+      inputs:
+          is_eligible_student_25A: 5
+      expect: true
+
+    - name: "Individual enrolled for all 12 months qualifies"
+      period: 2024-01
+      inputs:
+          is_eligible_student_25A: 12
+      expect: true
+
+    - name: "Individual enrolled for 4 months does not qualify"
+      period: 2023-01
+      inputs:
+          is_eligible_student_25A: 4
+      expect: false
+
+    - name: "Individual with zero months does not qualify"
+      period: 2021-01
+      inputs:
+          is_eligible_student_25A: 0
+      expect: false

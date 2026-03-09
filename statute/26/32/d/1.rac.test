@@ -1,0 +1,30 @@
+# 26 USC Section 32(d)(1) tests
+
+eitc_married_joint_return_requirement:
+    - name: "Unmarried individual satisfies requirement"
+      period: 2024-01
+      inputs:
+        is_married: false
+        files_joint_return: false
+      expect: true
+
+    - name: "Married individual filing jointly satisfies requirement"
+      period: 2024-01
+      inputs:
+        is_married: true
+        files_joint_return: true
+      expect: true
+
+    - name: "Married individual not filing jointly fails requirement"
+      period: 2024-01
+      inputs:
+        is_married: true
+        files_joint_return: false
+      expect: false
+
+    - name: "Unmarried individual with joint return flag still satisfies"
+      period: 2024-01
+      inputs:
+        is_married: false
+        files_joint_return: true
+      expect: true

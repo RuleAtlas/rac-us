@@ -1,0 +1,31 @@
+# 26 USC Section 32(d)(2)(B) - Special rule for separated spouse
+
+"""
+(B) Special rule for separated spouse.--
+An individual shall not be treated as married if such individual--
+(i) is married (as determined under section 7703(a)) and does not file
+a joint return for the taxable year,
+(ii) resides with a qualifying child of the individual for more than
+one-half of such taxable year, and
+(iii) during the last 6 months of such taxable year, does not have the
+same principal place of abode as the individual's spouse, or has a
+decree, instrument, or agreement (other than a decree of divorce)
+described in section 121(d)(3)(C) with respect to the individual's
+spouse and is not a member of the same household with the individual's
+spouse by the end of the taxable year.
+"""
+
+status: encoded
+
+not_treated_as_married:
+    imports:
+        - 26/32/d/2/B/i#married_no_joint_return
+        - 26/32/d/2/B/ii#resides_with_qualifying_child_over_half_year
+        - 26/32/d/2/B/iii#meets_separation_condition
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Not treated as married for EITC purposes"
+    description: "Individual is not treated as married if all three conditions are met: (i) married and does not file jointly, (ii) resides with qualifying child for more than half the year, and (iii) meets separation condition, per 26 USC 32(d)(2)(B)"
+    from 1975-01-01:
+        married_no_joint_return and resides_with_qualifying_child_over_half_year and meets_separation_condition

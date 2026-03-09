@@ -1,0 +1,30 @@
+# 26 USC Section 32(c)(2)(B)(vi) tests
+
+earned_income_combat_pay_inclusion:
+    - name: "No election - combat pay not included"
+      period: 2024-01
+      inputs:
+        combat_zone_compensation_excluded: 30000
+        combat_pay_election: false
+      expect: 0
+
+    - name: "Election made - combat pay included"
+      period: 2024-01
+      inputs:
+        combat_zone_compensation_excluded: 30000
+        combat_pay_election: true
+      expect: 30000
+
+    - name: "Election made but zero combat pay"
+      period: 2024-01
+      inputs:
+        combat_zone_compensation_excluded: 0
+        combat_pay_election: true
+      expect: 0
+
+    - name: "No election and no combat pay"
+      period: 2024-01
+      inputs:
+        combat_zone_compensation_excluded: 0
+        combat_pay_election: false
+      expect: 0

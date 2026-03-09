@@ -1,0 +1,21 @@
+# 26 USC Section 32(d)(2)(B)(ii) - Resides with QC
+
+"""
+(ii) resides with a qualifying child of the individual for more than
+one-half of such taxable year,
+"""
+
+status: encoded
+
+residency_threshold:
+    description: "Fraction of taxable year qualifying child must reside with individual"
+    unit: rate
+    from 1975-01-01: 0.5
+
+resides_with_qualifying_child_over_half_year:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Resides with qualifying child for more than half the taxable year"
+    description: "Whether the individual resides with a qualifying child for more than one-half of the taxable year, per 26 USC 32(d)(2)(B)(ii)"
+    default: false

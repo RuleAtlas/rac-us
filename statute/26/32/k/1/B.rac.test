@@ -1,0 +1,37 @@
+# 26 USC 32(k)(1)(B) tests
+
+in_disallowance_period:
+    - name: "No fraud or reckless determination"
+      period: 2024-01
+      inputs:
+          in_fraud_disallowance_period: false
+          reckless_disallowance_period: false
+      expect: false
+
+    - name: "In fraud disallowance period only"
+      period: 2024-01
+      inputs:
+          in_fraud_disallowance_period: true
+          reckless_disallowance_period: false
+      expect: true
+
+    - name: "In reckless disallowance period only"
+      period: 2024-01
+      inputs:
+          in_fraud_disallowance_period: false
+          reckless_disallowance_period: true
+      expect: true
+
+    - name: "In both fraud and reckless disallowance periods"
+      period: 2024-01
+      inputs:
+          in_fraud_disallowance_period: true
+          reckless_disallowance_period: true
+      expect: true
+
+    - name: "Neither period active"
+      period: 2024-01
+      inputs:
+          in_fraud_disallowance_period: false
+          reckless_disallowance_period: false
+      expect: false

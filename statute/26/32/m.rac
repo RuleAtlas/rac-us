@@ -1,0 +1,38 @@
+# 26 USC Section 32(m) - Identification numbers
+
+"""
+(m) Identification numbers.-- Solely for purposes of subsections
+(c)(1)(E) and (c)(3)(D), a taxpayer identification number means a
+social security number issued to an individual by the Social Security
+Administration (other than a social security number issued pursuant to
+clause (II) (or that portion of clause (III) that relates to clause
+(II)) of section 205(c)(2)(B)(i) of the Social Security Act) on or
+before the due date for filing the return for the taxable year.
+"""
+
+status: encoded
+
+has_ssn_issued_by_ssa:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Has SSN issued by SSA"
+    description: "Whether the individual has a social security number issued by the Social Security Administration (not an ITIN or non-work SSN issued under section 205(c)(2)(B)(i)(II) or related portion of clause (III) of the Social Security Act)"
+    default: false
+
+ssn_issued_by_return_due_date:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "SSN issued by return due date"
+    description: "Whether the individual's SSN was issued on or before the due date for filing the return for the taxable year"
+    default: false
+
+has_qualifying_taxpayer_identification_number:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Has qualifying taxpayer identification number for EITC"
+    description: "For purposes of 26 USC 32(c)(1)(E) and (c)(3)(D), a taxpayer identification number means a qualifying SSN issued by SSA (excluding non-work SSNs under section 205(c)(2)(B)(i)(II) of the Social Security Act) on or before the return due date"
+    from 1996-08-22:
+        has_ssn_issued_by_ssa and ssn_issued_by_return_due_date

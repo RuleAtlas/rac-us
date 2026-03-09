@@ -1,0 +1,24 @@
+# 26 USC Section 32(c)(1)(E)(i) - Individual TIN
+
+"""
+(i) such individual's taxpayer identification number, and
+"""
+
+status: encoded
+
+individual_tin_included_on_return:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Individual's TIN included on return"
+    description: "Whether the eligible individual includes their own taxpayer identification number on the return of tax for the taxable year"
+    default: true
+
+meets_individual_tin_requirement:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Meets individual TIN requirement"
+    description: "The individual must include their own taxpayer identification number on the return per 26 USC 32(c)(1)(E)(i)"
+    from 1997-01-01:
+        individual_tin_included_on_return

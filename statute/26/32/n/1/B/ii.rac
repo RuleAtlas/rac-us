@@ -1,0 +1,13 @@
+# 26 USC Section 32(n)(1)(B)(ii) - Specified student applicable minimum age
+
+"""
+(ii) in the case of a specified student (other than a qualified former
+foster youth or a qualified homeless youth), age 24,
+"""
+
+status: encoded
+
+specified_student_minimum_age:
+    description: "Applicable minimum age for a specified student for EITC eligibility without qualifying child, per 26 USC 32(n)(1)(B)(ii)"
+    unit: Year
+    from 2021-01-01: 24

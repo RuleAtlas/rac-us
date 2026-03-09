@@ -1,0 +1,42 @@
+# 26 USC Section 32(n)(1)(D)(i) - Age 14 foster care
+
+"""
+(i) on or after the date that such individual attained age 14, was in
+foster care provided under the supervision or administration of an entity
+administering (or eligible to administer) a plan under part B or part E
+of title IV of the Social Security Act (without regard to whether Federal
+assistance was provided with respect to such child under such part E),
+"""
+
+status: encoded
+
+foster_care_minimum_age:
+    description: "Minimum age at which foster care placement qualifies individual as a qualified former foster youth, per 26 USC 32(n)(1)(D)(i)"
+    unit: Year
+    from 2021-01-01: 14
+
+was_in_foster_care_at_or_after_minimum_age:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Was in foster care at or after age 14"
+    description: "Whether individual was in foster care on or after attaining minimum age, under supervision of entity administering a plan under part B or E of title IV of the Social Security Act, per 26 USC 32(n)(1)(D)(i)"
+    from 2021-01-01:
+        was_in_qualifying_foster_care and (age_entered_foster_care >= foster_care_minimum_age)
+
+was_in_qualifying_foster_care:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Was in qualifying foster care"
+    description: "Whether individual was in foster care under supervision or administration of an entity administering (or eligible to administer) a plan under part B or part E of title IV of the Social Security Act"
+    default: false
+
+age_entered_foster_care:
+    entity: Person
+    period: Year
+    dtype: Integer
+    unit: Year
+    label: "Age when entered foster care"
+    description: "Age at which the individual entered or was placed in foster care"
+    default: 0

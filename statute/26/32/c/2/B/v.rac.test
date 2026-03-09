@@ -1,0 +1,20 @@
+# 26 USC Section 32(c)(2)(B)(v) tests
+
+earned_income_subsidized_work_exclusion:
+    - name: "No subsidized work income"
+      period: 2024-01
+      inputs:
+        subsidized_work_activity_income: 0
+      expect: 0
+
+    - name: "Has subsidized work income"
+      period: 2024-01
+      inputs:
+        subsidized_work_activity_income: 5000
+      expect: 5000
+
+    - name: "Large subsidized work income"
+      period: 2024-01
+      inputs:
+        subsidized_work_activity_income: 15000
+      expect: 15000

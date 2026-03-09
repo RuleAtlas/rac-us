@@ -1,0 +1,26 @@
+# 26 USC Section 32(k)(1)(A) tests
+
+eitc_allowed_after_fraud_check:
+    - name: "Not in disallowance period - credit allowed"
+      period: 2024-01
+      inputs:
+        in_disallowance_period: false
+      expect: true
+
+    - name: "In disallowance period - credit not allowed"
+      period: 2024-01
+      inputs:
+        in_disallowance_period: true
+      expect: false
+
+    - name: "Not in disallowance period - older year"
+      period: 2000-01
+      inputs:
+        in_disallowance_period: false
+      expect: true
+
+    - name: "In disallowance period - boundary year 1997"
+      period: 1997-01
+      inputs:
+        in_disallowance_period: true
+      expect: false

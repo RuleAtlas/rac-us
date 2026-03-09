@@ -1,0 +1,30 @@
+# 26 USC Section 32(c)(1)(A)(ii)(I) - Principal place of abode in United States
+
+"""
+(I) such individual's principal place of abode is in the United States
+for more than one-half of such taxable year,
+"""
+
+status: encoded
+
+us_abode_fraction_threshold:
+    description: "Minimum fraction of taxable year individual must have principal place of abode in US"
+    unit: rate
+    from 1975-01-01: 0.5
+
+fraction_of_year_with_us_abode:
+    entity: Person
+    period: Year
+    dtype: Rate
+    label: "Fraction of taxable year with principal place of abode in the United States"
+    description: "Share of the taxable year during which the individual's principal place of abode is in the United States"
+    default: 0
+
+meets_eitc_us_abode_requirement:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Principal place of abode in US for more than half the taxable year"
+    description: "Whether the individual's principal place of abode is in the United States for more than one-half of the taxable year, per 26 USC 32(c)(1)(A)(ii)(I)"
+    from 1975-01-01:
+        fraction_of_year_with_us_abode > us_abode_fraction_threshold

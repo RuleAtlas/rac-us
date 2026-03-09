@@ -1,0 +1,33 @@
+# 26 USC Section 32(c)(1)(E)(ii) - Spouse TIN
+
+"""
+(ii) if the individual is married, the taxpayer identification number of such
+individual's spouse.
+"""
+
+status: encoded
+
+is_married:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Is married"
+    description: "Whether the individual is married for the taxable year"
+    default: false
+
+spouse_tin_included_on_return:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Spouse TIN included on return"
+    description: "Whether the taxpayer identification number of the individual's spouse is included on the return of tax"
+    default: false
+
+meets_spouse_tin_requirement:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Meets spouse TIN requirement"
+    description: "If the individual is married, the spouse's TIN must be included on the return per 26 USC 32(c)(1)(E)(ii)"
+    from 1997-01-01:
+        not is_married or spouse_tin_included_on_return

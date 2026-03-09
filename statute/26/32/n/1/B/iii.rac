@@ -1,0 +1,13 @@
+# 26 USC Section 32(n)(1)(B)(iii) - Foster/homeless youth applicable minimum age
+
+"""
+(iii) in the case of a qualified former foster youth or a qualified
+homeless youth, age 18.
+"""
+
+status: encoded
+
+foster_homeless_youth_minimum_age:
+    description: "Applicable minimum age for a qualified former foster youth or qualified homeless youth for EITC eligibility without qualifying child, per 26 USC 32(n)(1)(B)(iii)"
+    unit: Year
+    from 2021-01-01: 18

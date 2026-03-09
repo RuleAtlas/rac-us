@@ -1,0 +1,37 @@
+# 26 USC Section 32(k)(2) - Taxpayers making improper prior claims
+
+"""
+(2) Taxpayers making improper prior claims.-- In the case of a taxpayer
+who is denied credit under this section for any taxable year as a result
+of the deficiency procedures under subchapter B of chapter 63, no credit
+shall be allowed under this section for any subsequent taxable year unless
+the taxpayer provides such information as the Secretary may require to
+demonstrate eligibility for such credit.
+"""
+
+status: encoded
+
+previously_denied_eitc_via_deficiency:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Previously denied EITC via deficiency procedures"
+    description: "Whether the taxpayer was denied credit under section 32 for any prior taxable year as a result of deficiency procedures under subchapter B of chapter 63"
+    default: false
+
+provided_required_eligibility_info:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Provided required eligibility information"
+    description: "Whether the taxpayer has provided such information as the Secretary may require to demonstrate eligibility for the earned income credit"
+    default: false
+
+meets_improper_prior_claim_requirement:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Meets improper prior claim requirement for EITC"
+    description: "Credit is not allowed if taxpayer was previously denied via deficiency procedures unless required eligibility information is provided per 26 USC 32(k)(2)"
+    from 1997-01-01:
+        not previously_denied_eitc_via_deficiency or provided_required_eligibility_info

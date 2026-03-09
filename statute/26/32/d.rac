@@ -1,0 +1,28 @@
+# 26 USC Section 32(d) - Married individuals
+
+"""
+(d) Married individuals.--
+(1) In general.-- In the case of an individual who is married, this
+section shall apply only if a joint return is filed for the taxable year
+under section 6013.
+(2) Determination of marital status.-- For purposes of this section--
+(A) In general.-- Except as provided in subparagraph (B), marital status
+shall be determined under section 7703(a).
+(B) Special rule for separated spouse.-- An individual shall not be
+treated as married if such individual meets the conditions of
+subparagraph (B).
+"""
+
+status: encoded
+
+eitc_married_individual_eligible:
+    imports:
+        - 26/32/d/1#eitc_married_joint_return_requirement
+        - 26/32/d/2#is_married_for_eitc
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Meets married individual requirements for EITC"
+    description: "Whether the taxpayer satisfies the married individual requirements of 26 USC 32(d). Married individuals (as determined under paragraph (2)) must file a joint return per paragraph (1). Unmarried individuals automatically satisfy this requirement."
+    from 1975-01-01:
+        not is_married_for_eitc or eitc_married_joint_return_requirement

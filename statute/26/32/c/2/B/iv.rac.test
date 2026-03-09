@@ -1,0 +1,26 @@
+# 26 USC Section 32(c)(2)(B)(iv) tests
+
+earned_income_inmate_exclusion:
+    - name: "No inmate income"
+      period: 2024-01
+      inputs:
+        inmate_income: 0
+      expect: 0
+
+    - name: "Inmate earns income in penal institution"
+      period: 2024-01
+      inputs:
+        inmate_income: 5000
+      expect: 5000
+
+    - name: "Large inmate income excluded"
+      period: 2024-01
+      inputs:
+        inmate_income: 25000
+      expect: 25000
+
+    - name: "Small inmate income excluded"
+      period: 2024-01
+      inputs:
+        inmate_income: 1
+      expect: 1

@@ -1,0 +1,33 @@
+# 26 USC Section 32(d)(2)(B)(i) - Married no joint return
+
+"""
+(i) is married (as determined under section 7703(a)) and does not file
+a joint return for the taxable year,
+"""
+
+status: encoded
+
+is_married_under_7703a:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Is married as determined under section 7703(a)"
+    description: "Whether the individual is married as determined under section 7703(a)"
+    default: false
+
+files_joint_return:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Files joint return for the taxable year"
+    description: "Whether the individual files a joint return for the taxable year"
+    default: false
+
+married_no_joint_return:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Married and does not file joint return"
+    description: "Individual is married per section 7703(a) and does not file a joint return for the taxable year, per 26 USC 32(d)(2)(B)(i)"
+    from 1975-01-01:
+        is_married_under_7703a and not files_joint_return

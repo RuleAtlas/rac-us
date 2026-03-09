@@ -1,0 +1,59 @@
+# 26 USC Section 32(b) - Percentages and amounts tests
+
+eitc_credit_percentage:
+    - name: "No qualifying children - credit percentage 7.65%"
+      period: 2024-01
+      inputs:
+          credit_percentage: 0.0765
+      expect: 0.0765
+
+    - name: "1 qualifying child - credit percentage 34%"
+      period: 2024-01
+      inputs:
+          credit_percentage: 0.34
+      expect: 0.34
+
+    - name: "3 or more qualifying children - credit percentage 45%"
+      period: 2024-01
+      inputs:
+          credit_percentage: 0.45
+      expect: 0.45
+
+eitc_phaseout_percentage:
+    - name: "No qualifying children - phaseout percentage 7.65%"
+      period: 2024-01
+      inputs:
+          phaseout_percentage: 0.0765
+      expect: 0.0765
+
+    - name: "2 qualifying children - phaseout percentage 21.06%"
+      period: 2024-01
+      inputs:
+          phaseout_percentage: 0.2106
+      expect: 0.2106
+
+eitc_earned_income_amount:
+    - name: "No qualifying children - earned income amount $4,220"
+      period: 2024-01
+      inputs:
+          eitc_earned_income_amount: 4220
+      expect: 4220
+
+    - name: "1 qualifying child - earned income amount $6,330"
+      period: 2024-01
+      inputs:
+          eitc_earned_income_amount: 6330
+      expect: 6330
+
+eitc_phaseout_amount:
+    - name: "Single filer, no children - phaseout amount $5,280"
+      period: 2024-01
+      inputs:
+          eitc_phaseout_amount_final: 5280
+      expect: 5280
+
+    - name: "Joint filer, 1 child - phaseout amount $16,610"
+      period: 2024-01
+      inputs:
+          eitc_phaseout_amount_final: 16610
+      expect: 16610

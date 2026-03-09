@@ -1,0 +1,30 @@
+# 26 USC Section 32(c)(2)(A)(ii) tests
+
+earned_income_se:
+    - name: "No SE income"
+      period: 2024-01
+      inputs:
+        net_earnings_from_self_employment: 0
+        se_tax_deduction_164f: 0
+      expect: 0
+
+    - name: "SE income with 164(f) deduction"
+      period: 2024-01
+      inputs:
+        net_earnings_from_self_employment: 50000
+        se_tax_deduction_164f: 3532
+      expect: 46468
+
+    - name: "SE income with no deduction"
+      period: 2024-01
+      inputs:
+        net_earnings_from_self_employment: 30000
+        se_tax_deduction_164f: 0
+      expect: 30000
+
+    - name: "Deduction exceeds SE income"
+      period: 2024-01
+      inputs:
+        net_earnings_from_self_employment: 1000
+        se_tax_deduction_164f: 1500
+      expect: -500

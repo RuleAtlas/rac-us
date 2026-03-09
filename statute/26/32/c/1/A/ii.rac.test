@@ -1,0 +1,47 @@
+# 26 USC Section 32(c)(1)(A)(ii) tests
+
+eligible_individual_no_qualifying_child:
+    - name: "Meets all conditions - eligible without qualifying child"
+      period: 2024-01
+      inputs:
+        has_qualifying_child: false
+        meets_eitc_us_abode_requirement: true
+        meets_eitc_age_requirement: true
+        meets_eitc_not_dependent_requirement: true
+      expect: true
+
+    - name: "Has qualifying child - not eligible under this clause"
+      period: 2024-01
+      inputs:
+        has_qualifying_child: true
+        meets_eitc_us_abode_requirement: true
+        meets_eitc_age_requirement: true
+        meets_eitc_not_dependent_requirement: true
+      expect: false
+
+    - name: "Does not meet US abode requirement"
+      period: 2024-01
+      inputs:
+        has_qualifying_child: false
+        meets_eitc_us_abode_requirement: false
+        meets_eitc_age_requirement: true
+        meets_eitc_not_dependent_requirement: true
+      expect: false
+
+    - name: "Does not meet age requirement"
+      period: 2024-01
+      inputs:
+        has_qualifying_child: false
+        meets_eitc_us_abode_requirement: true
+        meets_eitc_age_requirement: false
+        meets_eitc_not_dependent_requirement: true
+      expect: false
+
+    - name: "Is a dependent of another taxpayer"
+      period: 2024-01
+      inputs:
+        has_qualifying_child: false
+        meets_eitc_us_abode_requirement: true
+        meets_eitc_age_requirement: true
+        meets_eitc_not_dependent_requirement: false
+      expect: false

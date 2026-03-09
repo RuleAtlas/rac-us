@@ -1,0 +1,30 @@
+# 26 USC Section 32(k)(2) tests - Improper prior claims
+
+meets_improper_prior_claim_requirement:
+    - name: "No prior denial - credit allowed"
+      period: 2024-01
+      inputs:
+        previously_denied_eitc_via_deficiency: false
+        provided_required_eligibility_info: false
+      expect: true
+
+    - name: "Prior denial with required info provided - credit allowed"
+      period: 2024-01
+      inputs:
+        previously_denied_eitc_via_deficiency: true
+        provided_required_eligibility_info: true
+      expect: true
+
+    - name: "Prior denial without required info - credit denied"
+      period: 2024-01
+      inputs:
+        previously_denied_eitc_via_deficiency: true
+        provided_required_eligibility_info: false
+      expect: false
+
+    - name: "No prior denial with info provided anyway - credit allowed"
+      period: 2024-01
+      inputs:
+        previously_denied_eitc_via_deficiency: false
+        provided_required_eligibility_info: true
+      expect: true

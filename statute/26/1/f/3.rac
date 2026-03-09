@@ -1,0 +1,24 @@
+# 26 USC 1(f)(3)
+
+"""
+(3) Cost-of-living adjustment.-- For purposes of this subsection--
+(A) In general.-- The cost-of-living adjustment for any calendar year is
+the percentage (if any) by which--
+(i) the C-CPI-U for the preceding calendar year, exceeds
+(ii) the C-CPI-U for the calendar year 2016.
+(B) C-CPI-U.-- For purposes of this paragraph, the term "C-CPI-U" means
+the Chained Consumer Price Index for All Urban Consumers (as published by
+the Bureau of Labor Statistics of the Department of Labor).
+(C) Rounding.-- If any increase under subparagraph (A), after application
+of subparagraph (B), is not a multiple of 1 percent, such increase shall
+be rounded to the nearest multiple of 1 percent.
+"""
+
+status: stub
+
+cost_of_living_adjustment:
+    entity: TaxUnit
+    period: Year
+    dtype: Float
+    label: "Cost-of-living adjustment"
+    description: "The cost-of-living adjustment for any calendar year is the percentage (if any) by which the C-CPI-U for the preceding calendar year exceeds the C-CPI-U for calendar year 2016, per 26 USC 1(f)(3)"

@@ -1,0 +1,17 @@
+# 26 USC Section 32(n)(2) tests - Elimination of maximum age for credit
+
+eitc_max_age_eliminated:
+    - name: "Max age eliminated in 2021"
+      period: 2021-01
+      inputs: {}
+      expect: true
+
+    - name: "Max age not eliminated in 2022 (after sunset)"
+      period: 2022-01
+      inputs: {}
+      expect: false
+
+    - name: "Max age not eliminated in 2024 (well after sunset)"
+      period: 2024-01
+      inputs: {}
+      expect: false

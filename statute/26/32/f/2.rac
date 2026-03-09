@@ -1,0 +1,27 @@
+# 26 USC Section 32(f)(2) - Requirements for tables
+
+"""
+(2) Requirements for tables.-- The tables prescribed under paragraph (1)
+shall reflect the provisions of subsections (a) and (b) and shall have
+income brackets of not greater than $50 each--
+    (A) for earned income between $0 and the amount of earned income at
+    which the credit is phased out under subsection (b), and
+    (B) for adjusted gross income between the dollar amount at which the
+    phaseout begins under subsection (b) and the amount of adjusted gross
+    income at which the credit is phased out under subsection (b).
+"""
+
+status: consolidated
+
+eitc_table_bracket_max:
+    imports:
+        - 26/32/f/2/A#earned_income_bracket_max
+        - 26/32/f/2/B#agi_bracket_max
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Maximum EITC table bracket width"
+    description: "The tables shall have income brackets of not greater than $50 each for both earned income and AGI ranges, per 26 USC 32(f)(2)"
+    from 1996-01-01:
+        max(earned_income_bracket_max, agi_bracket_max)

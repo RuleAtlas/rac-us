@@ -1,0 +1,26 @@
+# 26 USC Section 32(i)(2)(A) tests
+
+disqualified_income_interest_dividends:
+    - name: "No interest or dividends"
+      period: 2024-01
+      inputs:
+        interest_or_dividends_in_gross_income: 0
+      expect: 0
+
+    - name: "Interest income of 5000"
+      period: 2024-01
+      inputs:
+        interest_or_dividends_in_gross_income: 5000
+      expect: 5000
+
+    - name: "Large dividend income"
+      period: 2024-01
+      inputs:
+        interest_or_dividends_in_gross_income: 15000
+      expect: 15000
+
+    - name: "Small interest amount"
+      period: 2024-01
+      inputs:
+        interest_or_dividends_in_gross_income: 1
+      expect: 1

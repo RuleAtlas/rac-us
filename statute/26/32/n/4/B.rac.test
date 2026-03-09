@@ -1,0 +1,17 @@
+# 26 USC Section 32(n)(4)(B) tests
+
+eitc_n4_inflation_adjustment_applies:
+    - name: "2021 - inflation adjustment does not apply per 32(n)(4)(B)"
+      period: 2021-01
+      inputs: {}
+      expect: false
+
+    - name: "2022 - inflation adjustment applies (provision expired)"
+      period: 2022-01
+      inputs: {}
+      expect: true
+
+    - name: "2024 - inflation adjustment applies (provision expired)"
+      period: 2024-01
+      inputs: {}
+      expect: true

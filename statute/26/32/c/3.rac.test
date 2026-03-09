@@ -1,0 +1,47 @@
+# 26 USC Section 32(c)(3) - Qualifying child tests
+
+is_eitc_qualifying_child:
+    - name: "All requirements met - is qualifying child"
+      period: 2024-01
+      inputs:
+        eitc_qualifying_child: true
+        eitc_qualifying_child_married_rule: true
+        eitc_place_of_abode_requirement_met: true
+        eitc_identification_requirements_met: true
+      expect: true
+
+    - name: "Not a qualifying child under 152(c)"
+      period: 2024-01
+      inputs:
+        eitc_qualifying_child: false
+        eitc_qualifying_child_married_rule: true
+        eitc_place_of_abode_requirement_met: true
+        eitc_identification_requirements_met: true
+      expect: false
+
+    - name: "Married individual rule not satisfied"
+      period: 2024-01
+      inputs:
+        eitc_qualifying_child: true
+        eitc_qualifying_child_married_rule: false
+        eitc_place_of_abode_requirement_met: true
+        eitc_identification_requirements_met: true
+      expect: false
+
+    - name: "Place of abode not in US"
+      period: 2024-01
+      inputs:
+        eitc_qualifying_child: true
+        eitc_qualifying_child_married_rule: true
+        eitc_place_of_abode_requirement_met: false
+        eitc_identification_requirements_met: true
+      expect: false
+
+    - name: "Identification requirements not met"
+      period: 2024-01
+      inputs:
+        eitc_qualifying_child: true
+        eitc_qualifying_child_married_rule: true
+        eitc_place_of_abode_requirement_met: true
+        eitc_identification_requirements_met: false
+      expect: false

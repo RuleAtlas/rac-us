@@ -1,0 +1,26 @@
+# 26 USC Section 32(c)(2)(B)(i) - Community property disregard
+
+"""
+(i) the earned income of an individual shall be computed without
+regard to any community property laws,
+"""
+
+status: encoded
+
+community_property_earned_income:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Community property earned income allocation"
+    description: "Amount of earned income reallocated to individual under community property laws (disregarded for EITC)"
+    default: 0
+
+eitc_community_property_disregard:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Community property disregard for EITC"
+    description: "Amount of community property earned income to subtract, per 26 USC 32(c)(2)(B)(i)"
+    from 1975-01-01: community_property_earned_income

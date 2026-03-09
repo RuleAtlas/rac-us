@@ -1,0 +1,14 @@
+# 26 USC Section 32(n)(1)(B)(ii) tests
+
+specified_student_minimum_age:
+    - name: "Specified student minimum age in 2021"
+      period: 2021-01
+      expect: 24
+
+    - name: "Specified student minimum age in 2022"
+      period: 2022-01
+      expect: 24
+
+    - name: "Specified student minimum age in 2025"
+      period: 2025-01
+      expect: 24

@@ -1,0 +1,30 @@
+# 26 USC Section 32(c)(1)(A) tests
+
+eligible_individual_in_general:
+    - name: "Individual with qualifying child is eligible"
+      period: 2024-01
+      inputs:
+        eligible_individual_has_qualifying_child: true
+        eligible_individual_no_qualifying_child: false
+      expect: true
+
+    - name: "Individual without qualifying child meeting all conditions is eligible"
+      period: 2024-01
+      inputs:
+        eligible_individual_has_qualifying_child: false
+        eligible_individual_no_qualifying_child: true
+      expect: true
+
+    - name: "Individual meeting neither path is not eligible"
+      period: 2024-01
+      inputs:
+        eligible_individual_has_qualifying_child: false
+        eligible_individual_no_qualifying_child: false
+      expect: false
+
+    - name: "Individual meeting both paths is eligible"
+      period: 2024-01
+      inputs:
+        eligible_individual_has_qualifying_child: true
+        eligible_individual_no_qualifying_child: true
+      expect: true

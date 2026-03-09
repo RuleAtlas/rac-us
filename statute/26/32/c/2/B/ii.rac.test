@@ -1,0 +1,26 @@
+# 26 USC Section 32(c)(2)(B)(ii) tests
+
+earned_income_pension_annuity_exclusion:
+    - name: "No pension income - exclusion is zero"
+      period: 2024-01
+      inputs:
+          pension_or_annuity_income: 0
+      expect: 0
+
+    - name: "Pension income excluded from earned income"
+      period: 2024-01
+      inputs:
+          pension_or_annuity_income: 15000
+      expect: 15000
+
+    - name: "Large annuity excluded"
+      period: 2024-01
+      inputs:
+          pension_or_annuity_income: 75000
+      expect: 75000
+
+    - name: "Small pension amount"
+      period: 2024-01
+      inputs:
+          pension_or_annuity_income: 500
+      expect: 500

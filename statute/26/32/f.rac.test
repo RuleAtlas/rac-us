@@ -1,0 +1,20 @@
+# 26 USC Section 32(f) tests
+
+eitc_credit_determined_under_tables:
+    - name: "Credit determined under tables when bracket max is positive"
+      period: 2024-01
+      inputs:
+          eitc_table_bracket_max: 50
+      expect: true
+
+    - name: "Credit determined under tables for 1996"
+      period: 1996-01
+      inputs:
+          eitc_table_bracket_max: 50
+      expect: true
+
+    - name: "Not determined under tables when bracket max is zero"
+      period: 2024-01
+      inputs:
+          eitc_table_bracket_max: 0
+      expect: false

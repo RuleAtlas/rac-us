@@ -1,0 +1,32 @@
+# 26 USC Section 32(i)(1) tests
+
+eitc_excess_investment_income_denial:
+    - name: "Disqualified income below threshold - no denial"
+      period: 2024-01
+      inputs:
+        disqualified_income: 5000
+      expect: false
+
+    - name: "Disqualified income exactly at threshold - no denial"
+      period: 2024-01
+      inputs:
+        disqualified_income: 10000
+      expect: false
+
+    - name: "Disqualified income above threshold - denied"
+      period: 2024-01
+      inputs:
+        disqualified_income: 10001
+      expect: true
+
+    - name: "Zero disqualified income - no denial"
+      period: 2024-01
+      inputs:
+        disqualified_income: 0
+      expect: false
+
+    - name: "Pre-ARPA threshold - $2200 limit"
+      period: 2020-01
+      inputs:
+        disqualified_income: 2201
+      expect: true

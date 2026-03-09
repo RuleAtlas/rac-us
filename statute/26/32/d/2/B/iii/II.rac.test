@@ -1,0 +1,30 @@
+# 26 USC Section 32(d)(2)(B)(iii)(II) tests
+
+decree_of_separation_test:
+    - name: "Has decree and not same household - meets test"
+      period: 2024-01
+      inputs:
+        has_separation_decree_under_121d3C: true
+        not_same_household_end_of_year: true
+      expect: true
+
+    - name: "Has decree but same household - fails test"
+      period: 2024-01
+      inputs:
+        has_separation_decree_under_121d3C: true
+        not_same_household_end_of_year: false
+      expect: false
+
+    - name: "No decree but not same household - fails test"
+      period: 2024-01
+      inputs:
+        has_separation_decree_under_121d3C: false
+        not_same_household_end_of_year: true
+      expect: false
+
+    - name: "No decree and same household - fails test"
+      period: 2024-01
+      inputs:
+        has_separation_decree_under_121d3C: false
+        not_same_household_end_of_year: false
+      expect: false

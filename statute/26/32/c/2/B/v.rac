@@ -1,0 +1,29 @@
+# 26 USC Section 32(c)(2)(B)(v) - No subsidized work activity
+
+"""
+(v) no amount described in subparagraph (A) received for service
+performed in work activities as defined in paragraph (4) or (7) of
+section 407(d) of the Social Security Act to which the taxpayer is
+assigned under any State program under part A of title IV of such Act
+shall be taken into account,
+"""
+
+status: encoded
+
+subsidized_work_activity_income:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Subsidized work activity income"
+    description: "Amount received for service performed in work activities as defined in paragraph (4) or (7) of section 407(d) of the Social Security Act, assigned under a State program under part A of title IV of such Act, excluded from earned income per 26 USC 32(c)(2)(B)(v)"
+    default: 0
+
+earned_income_subsidized_work_exclusion:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Subsidized work activity exclusion from earned income"
+    description: "Amount excluded from earned income because it was received for subsidized work activities under TANF, per 26 USC 32(c)(2)(B)(v)"
+    from 1997-01-01: subsidized_work_activity_income

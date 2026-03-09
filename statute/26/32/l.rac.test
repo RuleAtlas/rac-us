@@ -1,0 +1,28 @@
+# 26 USC Section 32(l) tests
+
+eitc_refund_excluded_from_means_tested_income:
+    - name: "EITC refund is excluded from means-tested program income"
+      period: 2024-01
+      inputs: {}
+      expect: true
+
+    - name: "Exclusion applies in current tax year"
+      period: 2025-06
+      inputs: {}
+      expect: true
+
+    - name: "Exclusion applies from effective date"
+      period: 1991-01
+      inputs: {}
+      expect: true
+
+eitc_refund_resource_exclusion_months:
+    - name: "Resource exclusion covers 2 months"
+      period: 2024-01
+      inputs: {}
+      expect: 2
+
+    - name: "Resource exclusion period unchanged in later year"
+      period: 2025-01
+      inputs: {}
+      expect: 2

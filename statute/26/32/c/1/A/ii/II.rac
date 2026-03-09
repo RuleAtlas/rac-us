@@ -1,0 +1,30 @@
+# 26 USC Section 32(c)(1)(A)(ii)(II) - Age requirement
+
+"""
+(II) such individual (or, if the individual is married, either the individual
+or the individual's spouse) has attained age 25 but not attained age 65
+before the close of the taxable year,
+"""
+
+status: encoded
+
+eitc_minimum_age:
+    description: "Minimum age to be eligible for EITC without qualifying child"
+    unit: Year
+    from 1975-01-01: 25
+
+eitc_maximum_age:
+    description: "Maximum age (exclusive) to be eligible for EITC without qualifying child"
+    unit: Year
+    from 1975-01-01: 65
+
+meets_eitc_age_requirement:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Meets EITC age requirement"
+    description: "Whether individual (or spouse if married) has attained age 25 but not 65 before close of taxable year, per 26 USC 32(c)(1)(A)(ii)(II)"
+    from 1975-01-01:
+        individual_meets = taxpayer_age >= eitc_minimum_age and taxpayer_age < eitc_maximum_age
+        spouse_meets = is_married and spouse_age >= eitc_minimum_age and spouse_age < eitc_maximum_age
+        individual_meets or spouse_meets

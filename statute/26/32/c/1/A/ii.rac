@@ -1,0 +1,30 @@
+# 26 USC Section 32(c)(1)(A)(ii) - No qualifying child conditions
+
+"""
+(ii) any other individual who does not have a qualifying child for the
+taxable year, if—
+    (I) such individual's principal place of abode is in the United States
+    for more than one-half of such taxable year,
+    (II) such individual (or, if the individual is married, either the
+    individual or the individual's spouse) has attained age 25 but not
+    attained age 65 before the close of the taxable year, and
+    (III) such individual is not a dependent for whom a deduction is
+    allowable under section 151 to another taxpayer for any taxable year
+    beginning in the same calendar year as such taxable year.
+"""
+
+status: encoded
+
+eligible_individual_no_qualifying_child:
+    imports:
+        - 26/32/c/1/A/ii/I#meets_eitc_us_abode_requirement
+        - 26/32/c/1/A/ii/II#meets_eitc_age_requirement
+        - 26/32/c/1/A/ii/III#meets_eitc_not_dependent_requirement
+        - 26/32/c/1/A/i#has_qualifying_child
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Eligible individual without qualifying child"
+    description: "An individual without a qualifying child is an eligible individual if all three conditions are met: US abode for more than half the year, age 25-64, and not a dependent of another taxpayer, per 26 USC 32(c)(1)(A)(ii)"
+    from 1975-01-01:
+        not has_qualifying_child and meets_eitc_us_abode_requirement and meets_eitc_age_requirement and meets_eitc_not_dependent_requirement

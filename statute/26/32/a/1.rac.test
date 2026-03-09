@@ -1,0 +1,47 @@
+# 26 USC Section 32(a)(1) tests
+
+eitc_base_credit:
+    - name: "Eligible individual with 1 child, earned income below earned income amount"
+      period: 2024-01
+      inputs:
+        eligible_individual: true
+        credit_percentage: 0.34
+        eitc_earned_income: 5000
+        earned_income_amount: 6330
+      expect: 1700
+
+    - name: "Eligible individual with 1 child, earned income exceeds earned income amount"
+      period: 2024-01
+      inputs:
+        eligible_individual: true
+        credit_percentage: 0.34
+        eitc_earned_income: 10000
+        earned_income_amount: 6330
+      expect: 2152.2
+
+    - name: "Not eligible individual, zero credit"
+      period: 2024-01
+      inputs:
+        eligible_individual: false
+        credit_percentage: 0.34
+        eitc_earned_income: 5000
+        earned_income_amount: 6330
+      expect: 0
+
+    - name: "Eligible individual with no children, earned income at zero"
+      period: 2024-01
+      inputs:
+        eligible_individual: true
+        credit_percentage: 0.0765
+        eitc_earned_income: 0
+        earned_income_amount: 4220
+      expect: 0
+
+    - name: "Eligible individual with 2 children, earned income equals earned income amount"
+      period: 2024-01
+      inputs:
+        eligible_individual: true
+        credit_percentage: 0.40
+        eitc_earned_income: 8890
+        earned_income_amount: 8890
+      expect: 3556

@@ -1,0 +1,62 @@
+# 26 USC Section 32(c)(1) tests
+
+eligible_individual:
+    - name: "All conditions met - eligible"
+      period: 2024-01
+      inputs:
+        eligible_individual_in_general: true
+        qualifying_child_not_ineligible: true
+        eligible_individual_not_claiming_911: true
+        eligible_individual_nonresident_alien_limitation: true
+        meets_eitc_identification_number_requirement: true
+      expect: true
+
+    - name: "Not eligible per general definition"
+      period: 2024-01
+      inputs:
+        eligible_individual_in_general: false
+        qualifying_child_not_ineligible: true
+        eligible_individual_not_claiming_911: true
+        eligible_individual_nonresident_alien_limitation: true
+        meets_eitc_identification_number_requirement: true
+      expect: false
+
+    - name: "Ineligible as qualifying child of another taxpayer"
+      period: 2024-01
+      inputs:
+        eligible_individual_in_general: true
+        qualifying_child_not_ineligible: false
+        eligible_individual_not_claiming_911: true
+        eligible_individual_nonresident_alien_limitation: true
+        meets_eitc_identification_number_requirement: true
+      expect: false
+
+    - name: "Claims section 911 benefits - ineligible"
+      period: 2024-01
+      inputs:
+        eligible_individual_in_general: true
+        qualifying_child_not_ineligible: true
+        eligible_individual_not_claiming_911: false
+        eligible_individual_nonresident_alien_limitation: true
+        meets_eitc_identification_number_requirement: true
+      expect: false
+
+    - name: "Nonresident alien without 6013 election - ineligible"
+      period: 2024-01
+      inputs:
+        eligible_individual_in_general: true
+        qualifying_child_not_ineligible: true
+        eligible_individual_not_claiming_911: true
+        eligible_individual_nonresident_alien_limitation: false
+        meets_eitc_identification_number_requirement: true
+      expect: false
+
+    - name: "Missing identification numbers - no credit"
+      period: 2024-01
+      inputs:
+        eligible_individual_in_general: true
+        qualifying_child_not_ineligible: true
+        eligible_individual_not_claiming_911: true
+        eligible_individual_nonresident_alien_limitation: true
+        meets_eitc_identification_number_requirement: false
+      expect: false

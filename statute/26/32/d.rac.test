@@ -1,0 +1,30 @@
+# 26 USC Section 32(d) tests - Married individuals
+
+eitc_married_individual_eligible:
+    - name: "Unmarried individual is eligible"
+      period: 2024-01
+      inputs:
+        is_married_for_eitc: false
+        eitc_married_joint_return_requirement: false
+      expect: true
+
+    - name: "Married individual filing jointly is eligible"
+      period: 2024-01
+      inputs:
+        is_married_for_eitc: true
+        eitc_married_joint_return_requirement: true
+      expect: true
+
+    - name: "Married individual not filing jointly is ineligible"
+      period: 2024-01
+      inputs:
+        is_married_for_eitc: true
+        eitc_married_joint_return_requirement: false
+      expect: false
+
+    - name: "Unmarried individual regardless of joint return status"
+      period: 2024-01
+      inputs:
+        is_married_for_eitc: false
+        eitc_married_joint_return_requirement: true
+      expect: true

@@ -1,0 +1,19 @@
+# 26 USC Section 32(c)(1)(C) tests
+
+eligible_individual_not_claiming_911:
+    - name: "Individual not claiming section 911 benefits is eligible"
+      period: 2024-01
+      inputs:
+        claims_section_911_benefits: false
+      expect: true
+
+    - name: "Individual claiming section 911 benefits is not eligible"
+      period: 2024-01
+      inputs:
+        claims_section_911_benefits: true
+      expect: false
+
+    - name: "Default - no section 911 claim"
+      period: 2024-01
+      inputs: {}
+      expect: true

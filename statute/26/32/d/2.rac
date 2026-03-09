@@ -1,0 +1,33 @@
+# 26 USC Section 32(d)(2) - Determination of marital status
+
+"""
+(2) Determination of marital status.-- For purposes of this section--
+(A) In general.-- Except as provided in subparagraph (B), marital status
+shall be determined under section 7703(a).
+(B) Special rule for separated spouse.-- An individual shall not be
+treated as married if such individual--
+(i) is married (as determined under section 7703(a)) and does not file
+a joint return for the taxable year,
+(ii) resides with a qualifying child of the individual for more than
+one-half of such taxable year, and
+(iii) during the last 6 months of such taxable year, does not have the
+same principal place of abode as the individual's spouse, or has a
+decree, instrument, or agreement (other than a decree of divorce)
+described in section 121(d)(3)(C) with respect to the individual's
+spouse and is not a member of the same household with the individual's
+spouse by the end of the taxable year.
+"""
+
+status: encoded
+
+is_married_for_eitc:
+    imports:
+        - 26/32/d/2/A#marital_status_determined_under_7703a
+        - 26/32/d/2/B#not_treated_as_married
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Married for EITC purposes"
+    description: "Determination of marital status for purposes of the earned income credit per 26 USC 32(d)(2). Generally determined under section 7703(a), except that a separated spouse meeting the conditions of subparagraph (B) is not treated as married."
+    from 1975-01-01:
+        marital_status_determined_under_7703a and not not_treated_as_married

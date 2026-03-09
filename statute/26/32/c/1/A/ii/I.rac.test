@@ -1,0 +1,31 @@
+# 26 USC Section 32(c)(1)(A)(ii)(I) tests
+
+meets_eitc_us_abode_requirement:
+    - name: "No US abode (default) does not meet requirement"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Full year in US meets requirement"
+      period: 2024-01
+      inputs:
+        fraction_of_year_with_us_abode: 1.0
+      expect: true
+
+    - name: "Exactly half year does not meet requirement (must be more than half)"
+      period: 2024-01
+      inputs:
+        fraction_of_year_with_us_abode: 0.5
+      expect: false
+
+    - name: "Just over half year meets requirement"
+      period: 2024-01
+      inputs:
+        fraction_of_year_with_us_abode: 0.51
+      expect: true
+
+    - name: "Less than half year does not meet requirement"
+      period: 2024-01
+      inputs:
+        fraction_of_year_with_us_abode: 0.3
+      expect: false

@@ -1,0 +1,12 @@
+# 26 USC Section 32(n)(4)(A)(ii) - Phaseout amount substitution
+
+"""
+(ii) by substituting "$11,610" for "$5,280".
+"""
+
+status: encoded
+
+phaseout_amount_no_children_substituted:
+    description: "Substituted phaseout amount for no qualifying children per 32(n)(4)(A)(ii), replacing the $5,280 amount in 32(b)(2)(A)"
+    unit: USD
+    from 2021-01-01: 11610

@@ -1,0 +1,53 @@
+# 26 USC Section 32(c) tests
+
+eitc_eligible_individual:
+    - name: "Eligible individual - all conditions met"
+      period: 2024-01
+      inputs:
+        eligible_individual: true
+      expect: true
+
+    - name: "Not eligible individual"
+      period: 2024-01
+      inputs:
+        eligible_individual: false
+      expect: false
+
+eitc_earned_income:
+    - name: "Earned income passthrough"
+      period: 2024-01
+      inputs:
+        eitc_earned_income: 30000
+      expect: 30000
+
+    - name: "Zero earned income"
+      period: 2024-01
+      inputs:
+        eitc_earned_income: 0
+      expect: 0
+
+eitc_qualifying_child:
+    - name: "Is qualifying child"
+      period: 2024-01
+      inputs:
+        is_eitc_qualifying_child: true
+      expect: true
+
+    - name: "Not qualifying child"
+      period: 2024-01
+      inputs:
+        is_eitc_qualifying_child: false
+      expect: false
+
+eitc_military_abode_treated_as_us:
+    - name: "Military abode treated as US"
+      period: 2024-01
+      inputs:
+        military_abode_treated_as_us: true
+      expect: true
+
+    - name: "Military abode not treated as US"
+      period: 2024-01
+      inputs:
+        military_abode_treated_as_us: false
+      expect: false

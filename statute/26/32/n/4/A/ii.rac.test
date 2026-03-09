@@ -1,0 +1,17 @@
+# 26 USC Section 32(n)(4)(A)(ii) tests
+
+phaseout_amount_no_children_substituted:
+    - name: "Substituted phaseout amount for 2021"
+      period: 2021-01
+      inputs: {}
+      expect: 11610
+
+    - name: "Substituted phaseout amount at effective date"
+      period: 2021-06
+      inputs: {}
+      expect: 11610
+
+    - name: "Substituted phaseout amount end of year"
+      period: 2021-12
+      inputs: {}
+      expect: 11610

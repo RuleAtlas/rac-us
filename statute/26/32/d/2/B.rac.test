@@ -1,0 +1,42 @@
+# 26 USC Section 32(d)(2)(B) tests
+
+not_treated_as_married:
+    - name: "All three conditions met - not treated as married"
+      period: 2024-01
+      inputs:
+        married_no_joint_return: true
+        resides_with_qualifying_child_over_half_year: true
+        meets_separation_condition: true
+      expect: true
+
+    - name: "Not married or files jointly - treated as married"
+      period: 2024-01
+      inputs:
+        married_no_joint_return: false
+        resides_with_qualifying_child_over_half_year: true
+        meets_separation_condition: true
+      expect: false
+
+    - name: "Does not reside with qualifying child - treated as married"
+      period: 2024-01
+      inputs:
+        married_no_joint_return: true
+        resides_with_qualifying_child_over_half_year: false
+        meets_separation_condition: true
+      expect: false
+
+    - name: "Does not meet separation condition - treated as married"
+      period: 2024-01
+      inputs:
+        married_no_joint_return: true
+        resides_with_qualifying_child_over_half_year: true
+        meets_separation_condition: false
+      expect: false
+
+    - name: "No conditions met - treated as married"
+      period: 2024-01
+      inputs:
+        married_no_joint_return: false
+        resides_with_qualifying_child_over_half_year: false
+        meets_separation_condition: false
+      expect: false

@@ -1,0 +1,25 @@
+# 26 USC Section 32(i)(2)(E) - Net passive income
+
+"""
+(E) the excess (if any) of—
+    (i) the aggregate income from all passive activities for the taxable
+    year (determined without regard to any amount included in earned income
+    under subsection (c)(2) or described in a preceding subparagraph), over
+    (ii) the aggregate losses from all passive activities for the taxable
+    year (as so determined).
+"""
+
+status: encoded
+
+eitc_disqualified_income_net_passive_income:
+    imports:
+        - 26/32/i/2/E/i#eitc_disqualified_income_passive_income
+        - 26/32/i/2/E/ii#disqualified_income_aggregate_passive_losses
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Net passive income for EITC disqualified income"
+    description: "The excess (if any) of aggregate passive income over aggregate passive losses, per 26 USC 32(i)(2)(E)"
+    from 1996-01-01:
+        max(0, eitc_disqualified_income_passive_income - disqualified_income_aggregate_passive_losses)

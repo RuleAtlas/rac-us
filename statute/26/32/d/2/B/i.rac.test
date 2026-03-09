@@ -1,0 +1,30 @@
+# 26 USC Section 32(d)(2)(B)(i) tests
+
+married_no_joint_return:
+    - name: "Married, no joint return - condition met"
+      period: 2024-01
+      inputs:
+        is_married_under_7703a: true
+        files_joint_return: false
+      expect: true
+
+    - name: "Married, files joint return - condition not met"
+      period: 2024-01
+      inputs:
+        is_married_under_7703a: true
+        files_joint_return: true
+      expect: false
+
+    - name: "Not married, no joint return - condition not met"
+      period: 2024-01
+      inputs:
+        is_married_under_7703a: false
+        files_joint_return: false
+      expect: false
+
+    - name: "Not married, files joint return - condition not met"
+      period: 2024-01
+      inputs:
+        is_married_under_7703a: false
+        files_joint_return: true
+      expect: false

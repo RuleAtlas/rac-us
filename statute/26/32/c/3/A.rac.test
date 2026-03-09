@@ -1,0 +1,26 @@
+# 26 USC Section 32(c)(3)(A) tests - Qualifying child, in general
+
+eitc_qualifying_child:
+    - name: "Individual is qualifying child under 152(c)"
+      period: 2024-01
+      inputs:
+        is_qualifying_child_under_152c: true
+      expect: true
+
+    - name: "Individual is not qualifying child under 152(c)"
+      period: 2024-01
+      inputs:
+        is_qualifying_child_under_152c: false
+      expect: false
+
+    - name: "Qualifying child in earlier year"
+      period: 2000-01
+      inputs:
+        is_qualifying_child_under_152c: true
+      expect: true
+
+    - name: "Default - no qualifying child status"
+      period: 2024-01
+      inputs:
+        is_qualifying_child_under_152c: false
+      expect: false

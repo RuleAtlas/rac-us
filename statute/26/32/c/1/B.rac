@@ -1,0 +1,28 @@
+# 26 USC Section 32(c)(1)(B) - Qualifying child ineligible
+
+"""
+(B) Qualifying child ineligible.--
+If an individual is the qualifying child of a taxpayer for any taxable year
+of such taxpayer beginning in a calendar year, such individual shall not be
+treated as an eligible individual for any taxable year of such individual
+beginning in such calendar year.
+"""
+
+status: encoded
+
+is_qualifying_child_of_another_taxpayer:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Is qualifying child of another taxpayer"
+    description: "Whether the individual is the qualifying child of a taxpayer for any taxable year beginning in the same calendar year"
+    default: false
+
+qualifying_child_not_ineligible:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Not ineligible as qualifying child"
+    description: "A qualifying child of another taxpayer is not treated as an eligible individual per 26 USC 32(c)(1)(B)"
+    from 1975-01-01:
+        not is_qualifying_child_of_another_taxpayer

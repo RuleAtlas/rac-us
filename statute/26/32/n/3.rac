@@ -1,0 +1,40 @@
+# 26 USC Section 32(n)(3) - Increase in credit and phaseout percentages
+
+"""
+(3) Increase in credit and phaseout percentages.-- The table contained
+in subsection (b)(1) shall be applied by substituting "15.3" for "7.65"
+each place it appears therein.
+"""
+
+status: encoded
+
+substituted_pct:
+    description: "Substituted percentage for no qualifying children, replacing 7.65 with 15.3 per 32(n)(3)"
+    unit: rate
+    from 2021-01-01: 0.153
+
+eitc_n3_credit_pct_no_children:
+    imports:
+        - 26/32/b/1#credit_pct_no_children
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "EITC credit percentage for no qualifying children (with n(3) increase)"
+    description: "Credit percentage for no qualifying children, substituting 15.3 for 7.65 per 26 USC 32(n)(3) for TY 2021"
+    from 2021-01-01:
+        substituted_pct
+    from 2022-01-01:
+        credit_pct_no_children
+
+eitc_n3_phaseout_pct_no_children:
+    imports:
+        - 26/32/b/1#phaseout_pct_no_children
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "EITC phaseout percentage for no qualifying children (with n(3) increase)"
+    description: "Phaseout percentage for no qualifying children, substituting 15.3 for 7.65 per 26 USC 32(n)(3) for TY 2021"
+    from 2021-01-01:
+        substituted_pct
+    from 2022-01-01:
+        phaseout_pct_no_children

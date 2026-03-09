@@ -1,0 +1,35 @@
+# 26 USC Section 32(d)(2)(B)(iii)(II) - Decree of separation
+
+"""
+(II) has a decree, instrument, or agreement (other than a decree of
+divorce) described in section 121(d)(3)(C) with respect to the
+individual's spouse and is not a member of the same household with the
+individual's spouse by the end of the taxable year.
+"""
+
+status: encoded
+
+has_separation_decree_under_121d3C:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Has decree, instrument, or agreement described in section 121(d)(3)(C)"
+    description: "Whether the individual has a decree, instrument, or agreement (other than a decree of divorce) described in section 121(d)(3)(C) with respect to the individual's spouse"
+    default: false
+
+not_same_household_end_of_year:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Not member of same household as spouse by end of taxable year"
+    description: "Whether the individual is not a member of the same household with the individual's spouse by the end of the taxable year"
+    default: false
+
+decree_of_separation_test:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Meets decree of separation test"
+    description: "Individual has a separation decree/instrument/agreement per section 121(d)(3)(C) and is not in the same household as spouse by year-end, per 26 USC 32(d)(2)(B)(iii)(II)"
+    from 1975-01-01:
+        has_separation_decree_under_121d3C and not_same_household_end_of_year

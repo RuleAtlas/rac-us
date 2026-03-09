@@ -1,0 +1,30 @@
+# 26 USC Section 32(i)(2)(C)(ii) tests
+
+disqualified_income_deductions_rents_royalties:
+    - name: "Both deduction types present"
+      period: 2024-01
+      inputs:
+        non_interest_deductions_rents_royalties: 3000
+        interest_deductions_rents_royalties: 2000
+      expect: 5000
+
+    - name: "No deductions"
+      period: 2024-01
+      inputs:
+        non_interest_deductions_rents_royalties: 0
+        interest_deductions_rents_royalties: 0
+      expect: 0
+
+    - name: "Only non-interest deductions"
+      period: 2024-01
+      inputs:
+        non_interest_deductions_rents_royalties: 1500
+        interest_deductions_rents_royalties: 0
+      expect: 1500
+
+    - name: "Only interest deductions"
+      period: 2024-01
+      inputs:
+        non_interest_deductions_rents_royalties: 0
+        interest_deductions_rents_royalties: 750
+      expect: 750

@@ -1,0 +1,21 @@
+# 26 USC 32(k)(1)(B)(ii) - Reckless disallowance period
+
+"""
+(ii) the period of 2 taxable years after the most recent taxable year for which
+there was a final determination that the taxpayer's claim of credit under this
+section was due to reckless or intentional disregard of rules and regulations.
+"""
+
+reckless_disallowance_years:
+    description: "Number of taxable years of disallowance after final determination of reckless or intentional disregard"
+    unit: Year
+    from 1997-01-01: 2
+
+reckless_disallowance_period:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "EITC reckless disallowance period"
+    description: "Whether taxpayer is in the disallowance period due to reckless or intentional disregard per 26 USC 32(k)(1)(B)(ii)"
+    from 1997-01-01:
+        reckless_determination_year > 0 and (tax_year - reckless_determination_year) <= reckless_disallowance_years

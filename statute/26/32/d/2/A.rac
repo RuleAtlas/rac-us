@@ -1,0 +1,19 @@
+# 26 USC Section 32(d)(2)(A) - In general
+
+"""
+(A) In general.-- Except as provided in subparagraph (B), marital status
+shall be determined under section 7703(a).
+"""
+
+status: encoded
+
+marital_status_determined_under_7703a:
+    imports:
+        - 26/7703/a#marital_status_under_7703a
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Marital status determined under section 7703(a)"
+    description: "Except as provided in subparagraph (B), marital status for purposes of this section shall be determined under section 7703(a)"
+    from 1975-01-01:
+        marital_status_under_7703a

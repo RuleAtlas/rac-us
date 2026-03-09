@@ -1,0 +1,34 @@
+# 26 USC Section 32(j)(2) - Rounding tests
+
+rounded_earned_income_amount:
+    - name: "Passthrough of rounded earned income amount"
+      period: 2024-01
+      inputs:
+        rounded_b_2_A_amount: 7830
+      expect: 7830
+
+    - name: "Zero earned income amount"
+      period: 2024-01
+      inputs:
+        rounded_b_2_A_amount: 0
+      expect: 0
+
+rounded_phaseout_amount:
+    - name: "Passthrough of rounded phaseout amount"
+      period: 2024-01
+      inputs:
+        rounded_b_2_A_phaseout_amount: 19520
+      expect: 19520
+
+    - name: "Zero phaseout amount"
+      period: 2024-01
+      inputs:
+        rounded_b_2_A_phaseout_amount: 0
+      expect: 0
+
+rounded_disqualified_income_threshold:
+    - name: "Passthrough of rounded disqualified income threshold"
+      period: 2024-01
+      inputs:
+        disqualified_income_threshold_rounding: 11600
+      expect: 11600

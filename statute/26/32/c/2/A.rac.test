@@ -1,0 +1,30 @@
+# 26 USC Section 32(c)(2)(A) tests
+
+earned_income:
+    - name: "Employee compensation only"
+      period: 2024-01
+      inputs:
+        earned_income_employee_comp: 30000
+        earned_income_se: 0
+      expect: 30000
+
+    - name: "Self-employment earnings only"
+      period: 2024-01
+      inputs:
+        earned_income_employee_comp: 0
+        earned_income_se: 15000
+      expect: 15000
+
+    - name: "Both employee and SE income"
+      period: 2024-01
+      inputs:
+        earned_income_employee_comp: 25000
+        earned_income_se: 10000
+      expect: 35000
+
+    - name: "Zero income"
+      period: 2024-01
+      inputs:
+        earned_income_employee_comp: 0
+        earned_income_se: 0
+      expect: 0

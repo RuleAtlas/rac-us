@@ -1,0 +1,21 @@
+# 26 USC Section 21 - Expenses for household and dependent care services necessary for gainful employment
+
+"""
+Section 21 allows a credit against tax for a percentage of employment-related
+expenses paid for household services and care of qualifying individuals,
+subject to dollar limits and earned income limitations.
+"""
+
+status: encoded
+
+section_21_credit:
+    imports:
+        - 26/21/a/1#child_and_dependent_care_credit
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Child and Dependent Care Credit"
+    description: "Credit for expenses for household and dependent care services per 26 USC 21"
+    from 2002-01-01:
+        child_and_dependent_care_credit

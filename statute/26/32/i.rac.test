@@ -1,0 +1,20 @@
+# 26 USC Section 32(i) tests
+
+eitc_denied_for_excess_investment_income:
+    - name: "Disqualified income below threshold - credit not denied"
+      period: 2024-01
+      inputs:
+        eitc_excess_investment_income_denial: false
+      expect: false
+
+    - name: "Disqualified income above threshold - credit denied"
+      period: 2024-01
+      inputs:
+        eitc_excess_investment_income_denial: true
+      expect: true
+
+    - name: "Zero disqualified income - credit not denied"
+      period: 2024-01
+      inputs:
+        eitc_excess_investment_income_denial: false
+      expect: false

@@ -1,0 +1,58 @@
+# 26 USC Section 32(c) - Definitions and special rules
+
+"""
+(c) Definitions and special rules.-- For purposes of this section--
+
+(1) Eligible individual.-- Defined in subsection (c)(1).
+(2) Earned income.-- Defined in subsection (c)(2).
+(3) Qualifying child.-- Defined in subsection (c)(3).
+(4) Treatment of military personnel stationed outside the United States.--
+    Defined in subsection (c)(4).
+"""
+
+status: encoded
+
+eitc_eligible_individual:
+    imports:
+        - 26/32/c/1#eligible_individual
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "EITC eligible individual"
+    description: "Whether an individual is an eligible individual for purposes of the EITC per 26 USC 32(c)(1)"
+    from 1975-01-01:
+        eligible_individual
+
+eitc_earned_income:
+    imports:
+        - 26/32/c/2#eitc_earned_income
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "EITC earned income"
+    description: "Earned income for purposes of the EITC per 26 USC 32(c)(2)"
+    from 1975-01-01:
+        eitc_earned_income
+
+eitc_qualifying_child:
+    imports:
+        - 26/32/c/3#is_eitc_qualifying_child
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "EITC qualifying child"
+    description: "Whether a person is a qualifying child for purposes of the EITC per 26 USC 32(c)(3)"
+    from 1975-01-01:
+        is_eitc_qualifying_child
+
+eitc_military_abode_treated_as_us:
+    imports:
+        - 26/32/c/4#military_abode_treated_as_us
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Military abode treated as in the United States"
+    description: "Whether military personnel stationed outside the US are treated as having a principal place of abode in the US per 26 USC 32(c)(4)"
+    from 1975-01-01:
+        military_abode_treated_as_us

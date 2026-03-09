@@ -1,0 +1,40 @@
+# 26 USC Section 32(c)(1) - Eligible individual
+
+"""
+(1) Eligible individual.--
+(A) In general.-- The term "eligible individual" means--
+    (i) any individual who has a qualifying child for the taxable year, or
+    (ii) any other individual who does not have a qualifying child for the
+    taxable year, if certain conditions are met.
+(B) Qualifying child ineligible.-- If an individual is the qualifying child
+of a taxpayer for any taxable year of such taxpayer beginning in a calendar
+year, such individual shall not be treated as an eligible individual for any
+taxable year of such individual beginning in such calendar year.
+(C) Exception for individual claiming benefits under section 911.--
+The term "eligible individual" does not include any individual who claims
+the benefits of section 911 for the taxable year.
+(D) Limitation on eligibility of nonresident aliens.-- The term "eligible
+individual" shall not include any individual who is a nonresident alien
+individual for any portion of the taxable year unless treated as a resident
+under section 6013(g) or (h).
+(E) Identification number requirement.-- No credit shall be allowed under
+this section to an eligible individual who does not include on the return
+the required taxpayer identification numbers.
+"""
+
+status: encoded
+
+eligible_individual:
+    imports:
+        - 26/32/c/1/A#eligible_individual_in_general
+        - 26/32/c/1/B#qualifying_child_not_ineligible
+        - 26/32/c/1/C#eligible_individual_not_claiming_911
+        - 26/32/c/1/D#eligible_individual_nonresident_alien_limitation
+        - 26/32/c/1/E#meets_eitc_identification_number_requirement
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Eligible individual"
+    description: "An individual is an eligible individual for EITC purposes if they meet the general definition per (A), are not a qualifying child of another taxpayer per (B), do not claim section 911 benefits per (C), are not an excluded nonresident alien per (D), and meet the identification number requirement per (E), per 26 USC 32(c)(1)"
+    from 1975-01-01:
+        eligible_individual_in_general and qualifying_child_not_ineligible and eligible_individual_not_claiming_911 and eligible_individual_nonresident_alien_limitation and meets_eitc_identification_number_requirement

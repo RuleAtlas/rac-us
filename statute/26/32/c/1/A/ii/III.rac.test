@@ -1,0 +1,19 @@
+# 26 USC Section 32(c)(1)(A)(ii)(III) tests
+
+meets_eitc_not_dependent_requirement:
+    - name: "Individual who is not a dependent meets requirement"
+      period: 2024-01
+      inputs:
+        is_dependent_of_another_taxpayer: false
+      expect: true
+
+    - name: "Individual who is a dependent does not meet requirement"
+      period: 2024-01
+      inputs:
+        is_dependent_of_another_taxpayer: true
+      expect: false
+
+    - name: "Default (not claimed as dependent) meets requirement"
+      period: 2024-01
+      inputs: {}
+      expect: true

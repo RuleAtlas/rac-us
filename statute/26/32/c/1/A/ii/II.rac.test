@@ -1,0 +1,58 @@
+# 26 USC Section 32(c)(1)(A)(ii)(II) - Age requirement tests
+
+meets_eitc_age_requirement:
+    - name: "Individual age 30, unmarried - eligible"
+      period: 2024-01
+      inputs:
+          taxpayer_age: 30
+          is_married: false
+          spouse_age: 0
+      expect: true
+
+    - name: "Individual age 24, unmarried - too young"
+      period: 2024-01
+      inputs:
+          taxpayer_age: 24
+          is_married: false
+          spouse_age: 0
+      expect: false
+
+    - name: "Individual age 65, unmarried - too old"
+      period: 2024-01
+      inputs:
+          taxpayer_age: 65
+          is_married: false
+          spouse_age: 0
+      expect: false
+
+    - name: "Individual age 25, unmarried - boundary minimum"
+      period: 2024-01
+      inputs:
+          taxpayer_age: 25
+          is_married: false
+          spouse_age: 0
+      expect: true
+
+    - name: "Individual age 64, unmarried - boundary maximum"
+      period: 2024-01
+      inputs:
+          taxpayer_age: 64
+          is_married: false
+          spouse_age: 0
+      expect: true
+
+    - name: "Individual age 20, married to spouse age 30 - spouse qualifies"
+      period: 2024-01
+      inputs:
+          taxpayer_age: 20
+          is_married: true
+          spouse_age: 30
+      expect: true
+
+    - name: "Individual age 70, married to spouse age 70 - both too old"
+      period: 2024-01
+      inputs:
+          taxpayer_age: 70
+          is_married: true
+          spouse_age: 70
+      expect: false

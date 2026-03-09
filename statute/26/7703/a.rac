@@ -1,4 +1,4 @@
-# 26 USC Section 7703(a) - Determination of marital status
+# 26 USC 7703(a)
 
 """
 (a) General rule.-- For purposes of part V of subchapter B of chapter 1
@@ -13,23 +13,9 @@ divorce or of separate maintenance shall not be considered as married.
 
 status: stub
 
-is_married:
+marital_status_under_7703a:
     entity: TaxUnit
     period: Year
     dtype: Boolean
-    label: "Is married"
-    description: "Whether the individual is married as determined under 26 USC 7703(a) - determined as of close of taxable year, or time of spouse's death"
-
-is_joint_return:
-    entity: TaxUnit
-    period: Year
-    dtype: Boolean
-    label: "Files joint return"
-    description: "Whether the taxpayer files a joint return with spouse under 26 USC 6013"
-
-files_joint_return:
-    entity: TaxUnit
-    period: Year
-    dtype: Boolean
-    label: "Files joint return"
-    description: "Alias for is_joint_return - whether the taxpayer files a joint return"
+    label: "Married under 7703(a)"
+    description: "Whether the individual is considered married under 26 USC 7703(a) - determined as of close of taxable year (or time of spouse's death if spouse died during year), excluding individuals legally separated under a decree of divorce or separate maintenance"

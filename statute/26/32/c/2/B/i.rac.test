@@ -1,0 +1,20 @@
+# 26 USC Section 32(c)(2)(B)(i) tests - Community property disregard
+
+eitc_community_property_disregard:
+    - name: "No community property income to disregard"
+      period: 2024-01
+      inputs:
+        community_property_earned_income: 0
+      expect: 0
+
+    - name: "Community property income is fully disregarded"
+      period: 2024-01
+      inputs:
+        community_property_earned_income: 15000
+      expect: 15000
+
+    - name: "Large community property allocation disregarded"
+      period: 2024-01
+      inputs:
+        community_property_earned_income: 50000
+      expect: 50000

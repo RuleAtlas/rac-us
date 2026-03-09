@@ -1,0 +1,30 @@
+# 26 USC Section 32(j)(1) tests
+
+eitc_inflation_adjustment:
+    - name: "Positive COLA increases dollar amount"
+      period: 2024-01
+      inputs:
+        eitc_inflation_base_dollar_amount: 6330
+        cost_of_living_adjustment: 0.05
+      expect: 316.50
+
+    - name: "Zero COLA yields zero adjustment"
+      period: 2024-01
+      inputs:
+        eitc_inflation_base_dollar_amount: 8890
+        cost_of_living_adjustment: 0
+      expect: 0
+
+    - name: "Zero base dollar amount yields zero adjustment"
+      period: 2024-01
+      inputs:
+        eitc_inflation_base_dollar_amount: 0
+        cost_of_living_adjustment: 0.03
+      expect: 0
+
+    - name: "Large COLA on earned income amount"
+      period: 2024-01
+      inputs:
+        eitc_inflation_base_dollar_amount: 11610
+        cost_of_living_adjustment: 0.10
+      expect: 1161

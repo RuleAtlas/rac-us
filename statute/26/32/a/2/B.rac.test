@@ -1,0 +1,47 @@
+# 26 USC Section 32(a)(2)(B) tests
+
+phaseout_reduction:
+    - name: "Income below phaseout amount - no reduction"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 10000
+        earned_income: 10000
+        phaseout_percentage: 0.1598
+        eitc_phaseout_amount: 11610
+      expect: 0
+
+    - name: "AGI exceeds phaseout amount, AGI greater than earned income"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 21610
+        earned_income: 15000
+        phaseout_percentage: 0.1598
+        eitc_phaseout_amount: 11610
+      expect: 1598.00
+
+    - name: "Earned income greater than AGI, earned income exceeds phaseout"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 12000
+        earned_income: 16610
+        phaseout_percentage: 0.2106
+        eitc_phaseout_amount: 11610
+      expect: 1053.00
+
+    - name: "Both incomes at exactly phaseout amount - zero reduction"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 11610
+        earned_income: 11610
+        phaseout_percentage: 0.34
+        eitc_phaseout_amount: 11610
+      expect: 0
+
+    - name: "No qualifying children, AGI above phaseout"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 10280
+        earned_income: 8000
+        phaseout_percentage: 0.0765
+        eitc_phaseout_amount: 5280
+      expect: 382.50

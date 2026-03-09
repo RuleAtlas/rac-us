@@ -1,0 +1,17 @@
+# 26 USC Section 32(n)(4)(A)(i) tests
+
+eitc_no_qc_earned_income_amount_substitute:
+    - name: "2021 - substituted amount in effect"
+      period: 2021-01
+      inputs: {}
+      expect: 9820
+
+    - name: "2022 - reverts to original amount"
+      period: 2022-01
+      inputs: {}
+      expect: 4220
+
+    - name: "2024 - still original amount"
+      period: 2024-01
+      inputs: {}
+      expect: 4220

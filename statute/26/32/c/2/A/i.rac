@@ -1,0 +1,27 @@
+# 26 USC Section 32(c)(2)(A)(i) - Employee compensation
+
+"""
+(i) wages, salaries, tips, and other employee compensation, but only
+if such amounts are includible in gross income for the taxable year,
+"""
+
+status: encoded
+
+employee_compensation_in_gross_income:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Employee compensation includible in gross income"
+    description: "Wages, salaries, tips, and other employee compensation that are includible in gross income for the taxable year"
+    default: 0
+
+earned_income_employee_comp:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Earned income from employee compensation"
+    description: "Wages, salaries, tips, and other employee compensation includible in gross income, per 26 USC 32(c)(2)(A)(i)"
+    from 1975-01-01:
+        employee_compensation_in_gross_income

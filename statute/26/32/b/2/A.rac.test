@@ -1,0 +1,45 @@
+# 26 USC Section 32(b)(2)(A) tests
+
+earned_income_amount:
+    - name: "1 qualifying child"
+      period: 2024-01
+      inputs:
+        number_of_qualifying_children: 1
+      expect: 6330
+
+    - name: "2 qualifying children"
+      period: 2024-01
+      inputs:
+        number_of_qualifying_children: 2
+      expect: 8890
+
+    - name: "3 qualifying children (2 or more)"
+      period: 2024-01
+      inputs:
+        number_of_qualifying_children: 3
+      expect: 8890
+
+    - name: "No qualifying children"
+      period: 2024-01
+      inputs:
+        number_of_qualifying_children: 0
+      expect: 4220
+
+phaseout_amount:
+    - name: "1 qualifying child"
+      period: 2024-01
+      inputs:
+        number_of_qualifying_children: 1
+      expect: 11610
+
+    - name: "2 or more qualifying children"
+      period: 2024-01
+      inputs:
+        number_of_qualifying_children: 2
+      expect: 11610
+
+    - name: "No qualifying children"
+      period: 2024-01
+      inputs:
+        number_of_qualifying_children: 0
+      expect: 5280

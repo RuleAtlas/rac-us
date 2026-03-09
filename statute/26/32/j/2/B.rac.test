@@ -1,0 +1,32 @@
+# 26 USC Section 32(j)(2)(B) tests
+
+disqualified_income_threshold_rounding:
+    - name: "Already a multiple of 50 - no rounding needed"
+      period: 2024-01
+      inputs:
+        disqualified_income_threshold: 11250
+      expect: 11250
+
+    - name: "Rounds down to nearest 50"
+      period: 2024-01
+      inputs:
+        disqualified_income_threshold: 11273
+      expect: 11250
+
+    - name: "Just below next multiple rounds down"
+      period: 2024-01
+      inputs:
+        disqualified_income_threshold: 11299
+      expect: 11250
+
+    - name: "One dollar above a multiple rounds down"
+      period: 2024-01
+      inputs:
+        disqualified_income_threshold: 11301
+      expect: 11300
+
+    - name: "Zero threshold"
+      period: 2024-01
+      inputs:
+        disqualified_income_threshold: 0
+      expect: 0

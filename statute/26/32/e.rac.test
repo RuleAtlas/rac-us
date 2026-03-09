@@ -1,0 +1,37 @@
+# 26 USC Section 32(e) tests
+
+meets_full_taxable_year_requirement:
+    - name: "Full 12-month taxable year qualifies"
+      period: 2024-01
+      inputs:
+        taxable_year_months: 12
+        taxable_year_closed_by_death: false
+      expect: true
+
+    - name: "Short taxable year (6 months) does not qualify"
+      period: 2024-01
+      inputs:
+        taxable_year_months: 6
+        taxable_year_closed_by_death: false
+      expect: false
+
+    - name: "Short taxable year closed by death qualifies"
+      period: 2024-01
+      inputs:
+        taxable_year_months: 6
+        taxable_year_closed_by_death: true
+      expect: true
+
+    - name: "1-month taxable year does not qualify"
+      period: 2024-01
+      inputs:
+        taxable_year_months: 1
+        taxable_year_closed_by_death: false
+      expect: false
+
+    - name: "11-month taxable year does not qualify"
+      period: 2024-01
+      inputs:
+        taxable_year_months: 11
+        taxable_year_closed_by_death: false
+      expect: false

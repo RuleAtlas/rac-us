@@ -1,0 +1,85 @@
+# 26 USC Section 32(b)(2)(A) - In general
+
+"""
+(A) In general.-- Subject to subparagraph (B), the earned income amount
+and the phaseout amount shall be determined as follows:
+
+In the case of an eligible individual with:
+  1 qualifying child: earned income amount $6,330; phaseout amount $11,610
+  2 or more qualifying children: earned income amount $8,890; phaseout amount $11,610
+  No qualifying children: earned income amount $4,220; phaseout amount $5,280
+"""
+
+status: encoded
+
+number_of_qualifying_children:
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Number of qualifying children"
+    description: "Number of qualifying children of the eligible individual"
+    default: 0
+
+# Earned income amounts by number of qualifying children
+
+earned_income_amount_1_child:
+    description: "Earned income amount for 1 qualifying child"
+    unit: USD
+    from 1996-01-01: 6330
+
+earned_income_amount_2_or_more_children:
+    description: "Earned income amount for 2 or more qualifying children"
+    unit: USD
+    from 1996-01-01: 8890
+
+earned_income_amount_no_children:
+    description: "Earned income amount for no qualifying children"
+    unit: USD
+    from 1996-01-01: 4220
+
+earned_income_amount:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Earned income amount"
+    description: "Earned income amount determined under 26 USC 32(b)(2)(A) based on number of qualifying children"
+    from 1996-01-01:
+        if number_of_qualifying_children >= 2:
+            earned_income_amount_2_or_more_children
+        elif number_of_qualifying_children == 1:
+            earned_income_amount_1_child
+        else:
+            earned_income_amount_no_children
+
+# Phaseout amounts by number of qualifying children
+
+phaseout_amount_1_child:
+    description: "Phaseout amount for 1 qualifying child"
+    unit: USD
+    from 1996-01-01: 11610
+
+phaseout_amount_2_or_more_children:
+    description: "Phaseout amount for 2 or more qualifying children"
+    unit: USD
+    from 1996-01-01: 11610
+
+phaseout_amount_no_children:
+    description: "Phaseout amount for no qualifying children"
+    unit: USD
+    from 1996-01-01: 5280
+
+phaseout_amount:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Phaseout amount"
+    description: "Phaseout amount determined under 26 USC 32(b)(2)(A) based on number of qualifying children, subject to increase under subparagraph (B) for joint returns"
+    from 1996-01-01:
+        if number_of_qualifying_children >= 2:
+            phaseout_amount_2_or_more_children
+        elif number_of_qualifying_children == 1:
+            phaseout_amount_1_child
+        else:
+            phaseout_amount_no_children

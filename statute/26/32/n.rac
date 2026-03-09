@@ -1,0 +1,69 @@
+# 26 USC Section 32(n) - Special rules for individuals without qualifying children
+
+"""
+(n) Special rules for individuals without qualifying children.--
+In the case of any taxable year beginning after December 31, 2020,
+and before January 1, 2022--
+(1) Decrease in minimum age for credit
+(2) Elimination of maximum age for credit
+(3) Increase in credit and phaseout percentages
+(4) Increase in earned income and phaseout amounts
+"""
+
+status: consolidated
+
+eitc_n_decrease_minimum_age:
+    imports:
+        - 26/32/n/1#decrease_in_minimum_age
+    entity: Person
+    period: Year
+    dtype: Integer
+    unit: Year
+    label: "Decreased minimum age for EITC without qualifying children"
+    description: "Minimum age for EITC eligibility without qualifying children, decreased per 26 USC 32(n)(1) for TY 2021"
+    from 2021-01-01:
+        decrease_in_minimum_age
+
+eitc_n_max_age_eliminated:
+    imports:
+        - 26/32/n/2#eitc_max_age_eliminated
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "EITC maximum age requirement eliminated"
+    description: "Whether the maximum age limitation is disregarded per 26 USC 32(n)(2) for TY 2021"
+    from 2021-01-01:
+        eitc_max_age_eliminated
+
+eitc_n_credit_pct_no_children:
+    imports:
+        - 26/32/n/3#eitc_n3_credit_pct_no_children
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "EITC credit percentage for no qualifying children (with n(3) increase)"
+    description: "Credit percentage for no qualifying children, with 15.3 substitution per 26 USC 32(n)(3) for TY 2021"
+    from 2021-01-01:
+        eitc_n3_credit_pct_no_children
+
+eitc_n_phaseout_pct_no_children:
+    imports:
+        - 26/32/n/3#eitc_n3_phaseout_pct_no_children
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "EITC phaseout percentage for no qualifying children (with n(3) increase)"
+    description: "Phaseout percentage for no qualifying children, with 15.3 substitution per 26 USC 32(n)(3) for TY 2021"
+    from 2021-01-01:
+        eitc_n3_phaseout_pct_no_children
+
+eitc_n_amounts_increased:
+    imports:
+        - 26/32/n/4#eitc_n4_amounts_increased
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Whether 32(n)(4) increased amounts apply"
+    description: "Whether increased earned income and phaseout amounts apply per 26 USC 32(n)(4) for TY 2021"
+    from 2021-01-01:
+        eitc_n4_amounts_increased

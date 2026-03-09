@@ -1,0 +1,20 @@
+# 26 USC Section 32(n)(2) - Elimination of maximum age for credit
+
+"""
+(2) Elimination of maximum age for credit.-- Subsection (c)(1)(A)(ii)(II)
+shall be applied without regard to the phrase "but not attained age 65".
+"""
+
+status: encoded
+
+eitc_max_age_eliminated:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "EITC maximum age requirement eliminated"
+    description: "Whether the maximum age limitation is disregarded for EITC eligibility without qualifying children, per 26 USC 32(n)(2)"
+    default: false
+    from 2021-01-01:
+        true
+    from 2022-01-01:
+        false
