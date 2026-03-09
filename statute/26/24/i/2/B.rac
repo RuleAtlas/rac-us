@@ -1,0 +1,25 @@
+# 26 USC Section 24(i)(2)(B) - COLA determination
+
+"""
+(B) the cost-of-living adjustment determined under section 1(f)(3)
+for the calendar year in which the taxable year begins, determined
+by substituting "2024" for "2016" in subparagraph (A)(ii) thereof.
+"""
+
+status: encoded
+
+ctc_credit_amount_cola_base_year:
+    description: "Base calendar year substituted for '2016' in section 1(f)(3)(A)(ii) for the CTC credit amount inflation adjustment per 26 USC 24(i)(2)(B)"
+    unit: Year
+    from 2026-01-01: 2024
+
+ctc_credit_amount_cola:
+    imports:
+        - 26/1/f/3#cost_of_living_adjustment
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "CTC credit amount COLA"
+    description: "Cost-of-living adjustment for the CTC credit amount, determined under section 1(f)(3) with base year 2024 per 26 USC 24(i)(2)(B)"
+    from 2026-01-01:
+        cost_of_living_adjustment

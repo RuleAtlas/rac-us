@@ -19,3 +19,21 @@ marital_status_under_7703a:
     dtype: Boolean
     label: "Married under 7703(a)"
     description: "Whether the individual is considered married under 26 USC 7703(a) - determined as of close of taxable year (or time of spouse's death if spouse died during year), excluding individuals legally separated under a decree of divorce or separate maintenance"
+
+is_married:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    status: input
+    label: "Is married"
+    description: "Whether the individual is married as of the close of the taxable year per 26 USC 7703(a)(1), excluding individuals legally separated under a decree of divorce or separate maintenance per 7703(a)(2)"
+    default: false
+
+is_joint_return:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    status: input
+    label: "Files a joint return"
+    description: "Whether the individual files a joint return with their spouse for the taxable year"
+    default: false

@@ -1,0 +1,27 @@
+# 26 USC Section 24(j)(2)(B)(ii) - Phase out of safe harbor
+
+"""
+(ii) Phase out of safe harbor.-- In the case of a taxpayer whose modified adjusted
+gross income (as defined in subsection (b)) for the taxable year exceeds the applicable
+income threshold, the safe harbor amount otherwise in effect under clause (i) shall be
+reduced by the amount which bears the same ratio to such amount as such excess bears to
+the applicable income threshold.
+"""
+
+status: encoded
+
+phased_out_safe_harbor_amount:
+    imports:
+        - 26/24/j/2/B/iv#safe_harbor_amount
+        - 26/24/j/2/B/i#applicable_income_threshold
+        - 26/24/b/1#ctc_modified_agi
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Phased-out safe harbor amount"
+    description: "Safe harbor amount reduced proportionally when MAGI exceeds applicable income threshold per 26 USC 24(j)(2)(B)(ii)"
+    from 2021-01-01:
+        excess = max(0, ctc_modified_agi - applicable_income_threshold)
+        reduction = safe_harbor_amount * excess / max(1, applicable_income_threshold)
+        max(0, safe_harbor_amount - reduction)

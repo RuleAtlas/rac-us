@@ -1,0 +1,28 @@
+# 26 USC Section 24(h)(5) - Maximum amount of refundable credit
+
+"""
+(5) Maximum amount of refundable credit.—
+The amount determined under subsection (d)(1)(A) with respect to any
+qualifying child shall not exceed $1,400, and such subsection shall be
+applied without regard to paragraph (4) of this subsection.
+"""
+
+status: encoded
+
+max_refundable_credit_per_child:
+    description: "Maximum refundable credit per qualifying child per 26 USC 24(h)(5)"
+    unit: USD
+    from 2018-01-01: 1400
+
+max_refundable_credit_amount:
+    imports:
+        - 26/24/d/1/A#ctc_without_limitations
+        - 26/24/a#qualifying_child_count
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Maximum refundable credit amount"
+    description: "Cap on refundable portion of CTC: lesser of credit under (d)(1)(A) (without regard to (h)(4)) and $1,400 per qualifying child"
+    from 2018-01-01:
+        min(ctc_without_limitations, max_refundable_credit_per_child * qualifying_child_count)

@@ -1,0 +1,34 @@
+# 26 USC Section 24(h)(4)(A) - Other dependents credit - In general
+
+"""
+(A) In general.--
+The credit determined under subsection (a) (after the application of
+paragraph (2)) shall be increased by $500 for each dependent of the
+taxpayer (as defined in section 152) other than a qualifying child
+described in subsection (c).
+"""
+
+status: encoded
+
+other_dependent_credit_amount:
+    description: "Credit amount per other dependent (non-qualifying-child) per 26 USC 24(h)(4)(A)"
+    unit: USD
+    from 2018-01-01: 500
+
+other_dependent_count:
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Number of other dependents"
+    description: "Number of dependents (as defined in section 152) other than qualifying children described in subsection (c)"
+    default: 0
+
+other_dependents_credit:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Other dependents credit"
+    description: "Credit increase for dependents who are not qualifying children, per 26 USC 24(h)(4)(A)"
+    from 2018-01-01:
+        other_dependent_credit_amount * other_dependent_count

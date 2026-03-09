@@ -1,0 +1,96 @@
+# 26 USC 3101
+
+"""
+§ 3101. Rate of tax
+(a) Old-age, survivors, and disability insurance.-- In addition to other
+taxes, there is hereby imposed on the income of every individual a tax equal
+to 6.2 percent of the wages (as defined in section 3121(a)) received by the
+individual with respect to employment (as defined in section 3121(b)).
+
+(b) Hospital insurance.--
+(1) In general.-- In addition to the tax imposed by the preceding
+subsection, there is hereby imposed on the income of every individual a tax
+equal to 1.45 percent of the wages (as defined in section 3121(a)) received
+by him with respect to employment (as defined in section 3121(b)).
+
+(2) Additional tax.-- In addition to the tax imposed by paragraph (1) and
+the preceding subsection, there is hereby imposed on every taxpayer (other
+than a corporation, estate, or trust) a tax equal to 0.9 percent of wages
+which are received with respect to employment (as defined in section 3121(b))
+during any taxable year beginning after December 31, 2012, and which are in
+excess of--
+  (A) in the case of a joint return, $250,000,
+  (B) in the case of a married taxpayer (as defined in section 7703) filing
+      a separate return, 1/2 of the dollar amount determined under
+      subparagraph (A), and
+  (C) in any other case, $200,000.
+
+(c) Relief from taxes in cases covered by certain international agreements.--
+During any period in which there is in effect an agreement entered into
+pursuant to section 233 of the Social Security Act with any foreign country,
+wages received by or paid to an individual shall be exempt from the taxes
+imposed by this section to the extent that such wages are subject under such
+agreement exclusively to the laws applicable to the social security system of
+such foreign country.
+"""
+
+status: encoded
+
+# (a) OASDI rate
+oasdi_rate:
+    description: "Old-age, survivors, and disability insurance tax rate per 26 USC 3101(a)"
+    unit: rate
+    from 2014-01-01: 0.062
+
+# (b)(1) HI rate
+hi_rate:
+    description: "Hospital insurance tax rate per 26 USC 3101(b)(1)"
+    unit: rate
+    from 2010-01-01: 0.0145
+
+# (b)(2) Additional Medicare tax rate
+additional_medicare_tax_rate:
+    description: "Additional hospital insurance tax rate per 26 USC 3101(b)(2)"
+    unit: rate
+    from 2013-01-01: 0.009
+
+# (b)(2)(A) Threshold for joint return
+additional_medicare_tax_threshold_joint:
+    description: "Wage threshold for additional Medicare tax on a joint return per 26 USC 3101(b)(2)(A)"
+    unit: USD
+    from 2013-01-01: 250000
+
+# (b)(2)(B) Threshold for married filing separately (half of joint)
+additional_medicare_tax_threshold_separate:
+    description: "Wage threshold for additional Medicare tax for married filing separately per 26 USC 3101(b)(2)(B)"
+    unit: USD
+    from 2013-01-01: 125000
+
+# (b)(2)(C) Threshold for all other filers
+additional_medicare_tax_threshold_other:
+    description: "Wage threshold for additional Medicare tax for filers other than joint or married separate per 26 USC 3101(b)(2)(C)"
+    unit: USD
+    from 2013-01-01: 200000
+
+fica_employee_tax:
+    imports:
+        - 26/3121/a#wages_under_3121a
+        - 26/7703/a#is_joint_return
+        - 26/7703/a#is_married
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "FICA employee tax"
+    description: "Total employee portion of FICA taxes imposed by 26 USC 3101: OASDI tax (subsection a) plus hospital insurance tax (subsection b(1)) plus additional Medicare tax (subsection b(2))"
+    from 2013-01-01:
+        oasdi_tax = oasdi_rate * wages_under_3121a
+        hi_tax = hi_rate * wages_under_3121a
+        additional_medicare_threshold = (
+            if is_joint_return: additional_medicare_tax_threshold_joint
+            elif is_married: additional_medicare_tax_threshold_separate
+            else: additional_medicare_tax_threshold_other
+        )
+        excess_wages = max(wages_under_3121a - additional_medicare_threshold, 0)
+        additional_medicare_tax = additional_medicare_tax_rate * excess_wages
+        oasdi_tax + hi_tax + additional_medicare_tax

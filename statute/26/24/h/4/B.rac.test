@@ -1,0 +1,20 @@
+# 26 USC Section 24(h)(4)(B) tests
+
+other_dependent_meets_citizenship_requirement:
+    - name: "US citizen meets requirement"
+      period: 2024-01
+      inputs:
+        is_us_citizen_national_or_resident: true
+      expect: true
+
+    - name: "Non-US-citizen/resident does not meet requirement"
+      period: 2024-01
+      inputs:
+        is_us_citizen_national_or_resident: false
+      expect: false
+
+    - name: "Effective date - applies from 2018"
+      period: 2018-01
+      inputs:
+        is_us_citizen_national_or_resident: true
+      expect: true

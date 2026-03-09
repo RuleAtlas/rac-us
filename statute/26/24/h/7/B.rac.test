@@ -1,0 +1,42 @@
+# 26 USC 24(h)(7)(B) tests - Social security number definition
+
+has_valid_social_security_number:
+    - name: "All conditions met - valid SSN"
+      period: 2024-01
+      inputs:
+        ssn_issued_by_ssa: true
+        ssn_issued_to_citizen_or_qualified: true
+        ssn_issued_before_return_due_date: true
+      expect: true
+
+    - name: "SSN not issued by SSA (e.g. ITIN)"
+      period: 2024-01
+      inputs:
+        ssn_issued_by_ssa: false
+        ssn_issued_to_citizen_or_qualified: true
+        ssn_issued_before_return_due_date: true
+      expect: false
+
+    - name: "SSN not issued to citizen or qualified individual"
+      period: 2024-01
+      inputs:
+        ssn_issued_by_ssa: true
+        ssn_issued_to_citizen_or_qualified: false
+        ssn_issued_before_return_due_date: true
+      expect: false
+
+    - name: "SSN issued after return due date"
+      period: 2024-01
+      inputs:
+        ssn_issued_by_ssa: true
+        ssn_issued_to_citizen_or_qualified: true
+        ssn_issued_before_return_due_date: false
+      expect: false
+
+    - name: "No conditions met"
+      period: 2024-01
+      inputs:
+        ssn_issued_by_ssa: false
+        ssn_issued_to_citizen_or_qualified: false
+        ssn_issued_before_return_due_date: false
+      expect: false

@@ -1,0 +1,14 @@
+# 26 USC Section 24(j)(2)(B)(iii)(I) tests
+
+applicable_income_threshold_joint:
+    - name: "Joint return threshold for 2021"
+      period: 2021-01
+      expect: 60000
+
+    - name: "Joint return threshold for 2024"
+      period: 2024-01
+      expect: 60000
+
+    - name: "Joint return threshold for 2025"
+      period: 2025-01
+      expect: 60000

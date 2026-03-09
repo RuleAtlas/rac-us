@@ -1,0 +1,23 @@
+# 26 USC 24(i)(3) - Rounding
+
+"""
+(3) Rounding.-- If any increase under this subsection is not a multiple
+of $100, such increase shall be rounded to the next lowest multiple of $100.
+"""
+
+status: encoded
+
+rounding_multiple:
+    description: "Rounding multiple for inflation increases under 26 USC 24(i)"
+    unit: USD
+    from 2025-01-01: 100
+
+rounded_increase:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Rounded inflation increase"
+    description: "Inflation increase under 26 USC 24(i), rounded down to the next lowest multiple of $100 per 26 USC 24(i)(3)"
+    from 2025-01-01:
+        floor(increase / rounding_multiple) * rounding_multiple

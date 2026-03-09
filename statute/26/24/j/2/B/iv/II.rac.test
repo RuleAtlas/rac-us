@@ -1,0 +1,37 @@
+# 26 USC Section 24(j)(2)(B)(iv)(II) tests
+
+excess_children:
+    - name: "No excess - same number of children"
+      period: 2021-01
+      inputs:
+        advance_qualified_children: 2
+        credit_qualified_children: 2
+      expect: 0
+
+    - name: "Excess children - advance exceeds credit"
+      period: 2021-01
+      inputs:
+        advance_qualified_children: 3
+        credit_qualified_children: 1
+      expect: 2
+
+    - name: "No excess - credit exceeds advance"
+      period: 2021-01
+      inputs:
+        advance_qualified_children: 1
+        credit_qualified_children: 3
+      expect: 0
+
+    - name: "Zero advance children"
+      period: 2021-01
+      inputs:
+        advance_qualified_children: 0
+        credit_qualified_children: 2
+      expect: 0
+
+    - name: "Zero both"
+      period: 2021-01
+      inputs:
+        advance_qualified_children: 0
+        credit_qualified_children: 0
+      expect: 0

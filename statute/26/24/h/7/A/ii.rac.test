@@ -1,0 +1,37 @@
+# 26 USC Section 24(h)(7)(A)(ii) tests
+
+ctc_child_ssn_requirement_met:
+    - name: "Child has valid SSN included on return"
+      period: 2024-01
+      inputs:
+          child_ssn_included_on_return: true
+          has_valid_social_security_number: true
+      expect: true
+
+    - name: "Child SSN not included on return"
+      period: 2024-01
+      inputs:
+          child_ssn_included_on_return: false
+          has_valid_social_security_number: true
+      expect: false
+
+    - name: "Child does not have valid SSN"
+      period: 2024-01
+      inputs:
+          child_ssn_included_on_return: true
+          has_valid_social_security_number: false
+      expect: false
+
+    - name: "Neither SSN included nor valid"
+      period: 2024-01
+      inputs:
+          child_ssn_included_on_return: false
+          has_valid_social_security_number: false
+      expect: false
+
+    - name: "First applicable year (2018)"
+      period: 2018-01
+      inputs:
+          child_ssn_included_on_return: true
+          has_valid_social_security_number: true
+      expect: true

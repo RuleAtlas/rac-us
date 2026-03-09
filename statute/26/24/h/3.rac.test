@@ -1,0 +1,26 @@
+# 26 USC Section 24(h)(3) tests
+
+ctc_h3_threshold_amount:
+    - name: "Joint return threshold is $400,000"
+      period: 2024-01
+      inputs:
+        is_joint_return: true
+      expect: 400000
+
+    - name: "Non-joint return threshold is $200,000"
+      period: 2024-01
+      inputs:
+        is_joint_return: false
+      expect: 200000
+
+    - name: "Joint return threshold in first applicable year"
+      period: 2018-01
+      inputs:
+        is_joint_return: true
+      expect: 400000
+
+    - name: "Single filer threshold in 2025"
+      period: 2025-01
+      inputs:
+        is_joint_return: false
+      expect: 200000

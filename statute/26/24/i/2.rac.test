@@ -1,0 +1,49 @@
+# 26 USC 24(i)(2) - Special rule for adjustment of credit amount tests
+
+credit_amount_increase:
+    - name: "5% COLA on $2,200 base, rounded down"
+      period: 2026-01
+      inputs:
+        credit_amount_base: 2200
+        ctc_credit_amount_cola: 0.05
+        rounding_multiple: 100
+      expect: 100
+
+    - name: "10% COLA on $2,200 base, exact multiple"
+      period: 2026-01
+      inputs:
+        credit_amount_base: 2200
+        ctc_credit_amount_cola: 0.10
+        rounding_multiple: 100
+      expect: 200
+
+    - name: "Zero COLA"
+      period: 2026-01
+      inputs:
+        credit_amount_base: 2200
+        ctc_credit_amount_cola: 0
+        rounding_multiple: 100
+      expect: 0
+
+    - name: "Small COLA rounds to zero"
+      period: 2026-01
+      inputs:
+        credit_amount_base: 2200
+        ctc_credit_amount_cola: 0.03
+        rounding_multiple: 100
+      expect: 0
+
+adjusted_credit_amount:
+    - name: "Base amount plus rounded increase"
+      period: 2026-01
+      inputs:
+        ctc_h2_credit_amount: 2200
+        credit_amount_increase: 100
+      expect: 2300
+
+    - name: "No inflation increase"
+      period: 2026-01
+      inputs:
+        ctc_h2_credit_amount: 2200
+        credit_amount_increase: 0
+      expect: 2200

@@ -1,0 +1,10 @@
+# 26 USC 24(b)(2)(C) - Married filing separate threshold
+
+"""
+(C) $55,000 in the case of a married individual filing a separate return.
+"""
+
+ctc_threshold_married_separate:
+    description: "CTC phase-out threshold for married filing separately"
+    unit: USD
+    from 2001-01-01: 55000

@@ -1,0 +1,37 @@
+# 26 USC Section 24(c)(1) tests
+
+ctc_qualifying_child:
+    - name: "Child under 17 who is qualifying child"
+      period: 2024-01
+      inputs:
+        qualifying_child_of_taxpayer: true
+        age: 10
+      expect: true
+
+    - name: "Child exactly 17 is not qualifying"
+      period: 2024-01
+      inputs:
+        qualifying_child_of_taxpayer: true
+        age: 17
+      expect: false
+
+    - name: "Child under 17 but not qualifying child per 152(c)"
+      period: 2024-01
+      inputs:
+        qualifying_child_of_taxpayer: false
+        age: 10
+      expect: false
+
+    - name: "Newborn qualifying child"
+      period: 2024-01
+      inputs:
+        qualifying_child_of_taxpayer: true
+        age: 0
+      expect: true
+
+    - name: "16-year-old qualifying child (boundary)"
+      period: 2024-01
+      inputs:
+        qualifying_child_of_taxpayer: true
+        age: 16
+      expect: true

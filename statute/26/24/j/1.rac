@@ -1,0 +1,33 @@
+# 26 USC Section 24(j)(1) - In general
+
+"""
+(1) In general.-- The amount of the credit allowed under this section to any
+taxpayer for any taxable year shall be reduced (but not below zero) by the
+aggregate amount of payments made under section 7527A to such taxpayer during
+such taxable year. Any failure to so reduce the credit shall be treated as
+arising out of a mathematical or clerical error and assessed according to
+section 6213(b)(1).
+"""
+
+status: encoded
+
+advance_ctc_payments:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Advance child tax credit payments"
+    description: "Aggregate amount of payments made under section 7527A to the taxpayer during the taxable year"
+    default: 0
+
+ctc_after_advance_payment_reduction:
+    imports:
+        - 26/24/a#ctc_allowance
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Child tax credit after advance payment reduction"
+    description: "CTC reduced (but not below zero) by aggregate advance payments under section 7527A, per 26 USC 24(j)(1)"
+    from 2021-01-01:
+        max(0, ctc_allowance - advance_ctc_payments)

@@ -1,0 +1,22 @@
+# 26 USC Section 24(h)(4)(B) - Exception for certain noncitizens
+
+"""
+(B) Exception for certain noncitizens.--
+Subparagraph (A) shall not apply with respect to any individual who
+would not be a dependent if subparagraph (A) of section 152(b)(3)
+were applied without regard to all that follows "resident of the
+United States".
+"""
+
+status: encoded
+
+other_dependent_meets_citizenship_requirement:
+    imports:
+        - 26/24/c/2#is_us_citizen_national_or_resident
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Other dependent meets citizenship requirement"
+    description: "Whether the individual meets the citizenship/residency requirement for the other dependents credit under 26 USC 24(h)(4)(B). Same noncitizen exception as 24(c)(2) — section 152(b)(3)(A) is applied without regard to the exception for residents of Canada or Mexico."
+    from 2018-01-01:
+        is_us_citizen_national_or_resident

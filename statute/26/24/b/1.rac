@@ -1,0 +1,95 @@
+# 26 USC Section 24(b)(1) - Limitation based on adjusted gross income
+
+"""
+(1) Limitation based on adjusted gross income.-- The amount of the credit
+allowable under subsection (a) shall be reduced (but not below zero) by $50
+for each $1,000 (or fraction thereof) by which the taxpayer's modified
+adjusted gross income exceeds the threshold amount. For purposes of the
+preceding sentence, the term "modified adjusted gross income" means adjusted
+gross income increased by any amount excluded from gross income under
+section 911, 931, or 933.
+"""
+
+status: encoded
+
+ctc_phaseout_reduction_per_increment:
+    description: "Reduction amount per income increment over threshold"
+    unit: USD
+    from 2001-01-01: 50
+
+ctc_phaseout_income_increment:
+    description: "Income increment for phase-out calculation"
+    unit: USD
+    from 2001-01-01: 1000
+
+adjusted_gross_income:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Adjusted gross income"
+    description: "Adjusted gross income of the taxpayer"
+    default: 0
+
+sec_911_exclusion:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Section 911 exclusion"
+    description: "Amount excluded from gross income under section 911"
+    default: 0
+
+sec_931_exclusion:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Section 931 exclusion"
+    description: "Amount excluded from gross income under section 931"
+    default: 0
+
+sec_933_exclusion:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Section 933 exclusion"
+    description: "Amount excluded from gross income under section 933"
+    default: 0
+
+ctc_modified_agi:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Modified adjusted gross income for CTC"
+    description: "AGI increased by amounts excluded under sections 911, 931, or 933, per 26 USC 24(b)(1)"
+    from 2001-01-01:
+        adjusted_gross_income + sec_911_exclusion + sec_931_exclusion + sec_933_exclusion
+
+ctc_phaseout_reduction:
+    imports:
+        - 26/24/b/2#threshold_amount
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "CTC phase-out reduction"
+    description: "Reduction in CTC based on modified AGI exceeding threshold, per 26 USC 24(b)(1): $50 for each $1,000 (or fraction thereof) of excess income"
+    from 2001-01-01:
+        excess = max(0, ctc_modified_agi - threshold_amount)
+        increments = ceil(excess / ctc_phaseout_income_increment)
+        increments * ctc_phaseout_reduction_per_increment
+
+ctc_after_phaseout:
+    imports:
+        - 26/24/a#ctc_allowance
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Child tax credit after phase-out"
+    description: "CTC allowance reduced (but not below zero) by income-based phase-out per 26 USC 24(b)(1)"
+    from 2001-01-01:
+        max(0, ctc_allowance - ctc_phaseout_reduction)

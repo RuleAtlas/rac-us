@@ -1,0 +1,113 @@
+# 26 USC 1401
+
+"""
+§ 1401. Rate of tax
+(a) Old-age, survivors, and disability insurance.-- In addition to other
+taxes, there shall be imposed for each taxable year, on the self-employment
+income of every individual, a tax equal to 12.4 percent of the amount of the
+self-employment income for such taxable year.
+
+(b) Hospital insurance.--
+(1) In general.-- In addition to the tax imposed by the preceding
+subsection, there shall be imposed for each taxable year, on the
+self-employment income of every individual, a tax equal to 2.9 percent of the
+amount of the self-employment income for such taxable year.
+
+(2) Additional tax.--
+(A) In general.-- In addition to the tax imposed by paragraph (1) and the
+preceding subsection, there is hereby imposed on every taxpayer (other than a
+corporation, estate, or trust) for each taxable year beginning after
+December 31, 2012, a tax equal to 0.9 percent of the self-employment income
+for such taxable year which is in excess of--
+  (i) in the case of a joint return, $250,000,
+  (ii) in the case of a married taxpayer (as defined in section 7703) filing
+      a separate return, 1/2 of the dollar amount determined under clause (i),
+      and
+  (iii) in any other case, $200,000.
+
+(B) Coordination with FICA.-- The amounts under clause (i), (ii), or (iii)
+(whichever is applicable) of subparagraph (A) shall be reduced (but not below
+zero) by the amount of wages taken into account in determining the tax imposed
+under section 3121(b)(2) with respect to the taxpayer.
+
+(c) Relief from taxes in cases covered by certain international agreements.--
+During any period in which there is in effect an agreement entered into
+pursuant to section 233 of the Social Security Act with any foreign country,
+the self-employment income of an individual shall be exempt from the taxes
+imposed by this section to the extent that such self-employment income is
+subject under such agreement exclusively to the laws applicable to the social
+security system of such foreign country.
+"""
+
+status: encoded
+
+# Self-employment income (from 26 USC 1402, not yet encoded)
+self_employment_income:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    status: input
+    label: "Self-employment income"
+    description: "Self-employment income as defined in 26 USC 1402"
+    default: 0
+
+# (a) OASDI rate for self-employment
+se_oasdi_rate:
+    description: "Old-age, survivors, and disability insurance tax rate on self-employment income per 26 USC 1401(a)"
+    unit: rate
+    from 2014-01-01: 0.124
+
+# (b)(1) HI rate for self-employment
+se_hi_rate:
+    description: "Hospital insurance tax rate on self-employment income per 26 USC 1401(b)(1)"
+    unit: rate
+    from 2010-01-01: 0.029
+
+# (b)(2) Additional Medicare tax rate on self-employment
+se_additional_medicare_tax_rate:
+    description: "Additional hospital insurance tax rate on self-employment income per 26 USC 1401(b)(2)"
+    unit: rate
+    from 2013-01-01: 0.009
+
+# (b)(2)(A)(i) Threshold for joint return
+se_additional_medicare_threshold_joint:
+    description: "Self-employment income threshold for additional Medicare tax on a joint return per 26 USC 1401(b)(2)(A)(i)"
+    unit: USD
+    from 2013-01-01: 250000
+
+# (b)(2)(A)(ii) Threshold for married filing separately (half of joint)
+se_additional_medicare_threshold_separate:
+    description: "Self-employment income threshold for additional Medicare tax for married filing separately per 26 USC 1401(b)(2)(A)(ii)"
+    unit: USD
+    from 2013-01-01: 125000
+
+# (b)(2)(A)(iii) Threshold for all other filers
+se_additional_medicare_threshold_other:
+    description: "Self-employment income threshold for additional Medicare tax for filers other than joint or married separate per 26 USC 1401(b)(2)(A)(iii)"
+    unit: USD
+    from 2013-01-01: 200000
+
+# Total self-employment tax under section 1401
+self_employment_tax:
+    imports:
+        - 26/7703/a#is_joint_return
+        - 26/7703/a#is_married
+        - 26/3121/a#wages_under_3121a
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Self-employment tax"
+    description: "Total self-employment tax imposed by 26 USC 1401: OASDI tax (subsection a) plus hospital insurance tax (subsection b(1)) plus additional Medicare tax on self-employment income in excess of applicable threshold (subsection b(2)), with threshold reduced by wages subject to FICA additional Medicare tax (subsection b(2)(B))"
+    from 2013-01-01:
+        oasdi_tax = se_oasdi_rate * self_employment_income
+        hi_tax = se_hi_rate * self_employment_income
+        base_threshold = (
+            if is_joint_return: se_additional_medicare_threshold_joint
+            elif is_married: se_additional_medicare_threshold_separate
+            else: se_additional_medicare_threshold_other
+        )
+        adjusted_threshold = max(base_threshold - wages_under_3121a, 0)
+        excess_se_income = max(self_employment_income - adjusted_threshold, 0)
+        additional_medicare_tax = se_additional_medicare_tax_rate * excess_se_income
+        oasdi_tax + hi_tax + additional_medicare_tax

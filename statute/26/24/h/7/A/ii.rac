@@ -1,0 +1,26 @@
+# 26 USC Section 24(h)(7)(A)(ii) - Child SSN requirement
+
+"""
+(ii) the social security number of such qualifying child.
+"""
+
+status: encoded
+
+child_ssn_included_on_return:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Child SSN included on return"
+    description: "Whether the social security number of the qualifying child is included on the taxpayer's return, per 26 USC 24(h)(7)(A)(ii)"
+    default: true
+
+ctc_child_ssn_requirement_met:
+    imports:
+        - 26/24/h/7/B#has_valid_social_security_number
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "CTC child SSN requirement met"
+    description: "The qualifying child's social security number must be included on the return per 26 USC 24(h)(7)(A)(ii)"
+    from 2018-01-01:
+        child_ssn_included_on_return and has_valid_social_security_number

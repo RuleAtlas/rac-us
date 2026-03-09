@@ -1,0 +1,23 @@
+# 26 USC Section 24(j)(2)(B)(iv) tests
+
+safe_harbor_amount:
+    - name: "No excess children"
+      period: 2021-01
+      inputs:
+        safe_harbor_base_amount: 2000
+        excess_children: 0
+      expect: 0
+
+    - name: "One excess child"
+      period: 2021-01
+      inputs:
+        safe_harbor_base_amount: 2000
+        excess_children: 1
+      expect: 2000
+
+    - name: "Three excess children"
+      period: 2021-01
+      inputs:
+        safe_harbor_base_amount: 2000
+        excess_children: 3
+      expect: 6000

@@ -1,0 +1,14 @@
+# 26 USC Section 24(b)(2)(A) tests
+
+ctc_threshold_joint:
+    - name: "Joint return threshold for 2024"
+      period: 2024-01
+      expect: 110000
+
+    - name: "Joint return threshold for 2001"
+      period: 2001-01
+      expect: 110000
+
+    - name: "Joint return threshold for 2010"
+      period: 2010-01
+      expect: 110000

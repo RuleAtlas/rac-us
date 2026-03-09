@@ -1,0 +1,29 @@
+# 26 USC Section 24(i)(2)(B) tests
+
+ctc_credit_amount_cola_base_year:
+    - name: "Base year is 2024 for credit amount COLA"
+      period: 2026-01
+      expect: 2024
+
+    - name: "Base year is 2024 for later year"
+      period: 2030-01
+      expect: 2024
+
+ctc_credit_amount_cola:
+    - name: "COLA equals cost-of-living adjustment"
+      period: 2026-01
+      inputs:
+          cost_of_living_adjustment: 0.05
+      expect: 0.05
+
+    - name: "Zero COLA when no cost-of-living increase"
+      period: 2026-01
+      inputs:
+          cost_of_living_adjustment: 0
+      expect: 0
+
+    - name: "COLA passes through larger adjustment"
+      period: 2028-01
+      inputs:
+          cost_of_living_adjustment: 0.12
+      expect: 0.12

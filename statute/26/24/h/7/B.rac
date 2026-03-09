@@ -1,0 +1,47 @@
+# 26 USC 24(h)(7)(B) - Social security number
+
+"""
+(B) Social security number.--
+For purposes of this paragraph, the term "social security number" means
+a social security number issued to an individual by the Social Security
+Administration, but only if the social security number is issued--
+  (i) to a citizen of the United States or pursuant to subclause (I)
+  (or that portion of subclause (III) that relates to subclause (I)) of
+  section 205(c)(2)(B)(i) of the Social Security Act, and
+  (ii) before the due date for such return.
+"""
+
+status: encoded
+
+ssn_issued_by_ssa:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "SSN issued by Social Security Administration"
+    description: "Whether the individual's social security number was issued by the Social Security Administration"
+    default: false
+
+ssn_issued_to_citizen_or_qualified:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "SSN issued to citizen or qualified individual"
+    description: "Whether the SSN was issued to a citizen of the United States or pursuant to subclause (I) (or that portion of subclause (III) that relates to subclause (I)) of section 205(c)(2)(B)(i) of the Social Security Act"
+    default: false
+
+ssn_issued_before_return_due_date:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "SSN issued before return due date"
+    description: "Whether the social security number was issued before the due date for the return"
+    default: false
+
+has_valid_social_security_number:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Has valid social security number for CTC"
+    description: "Whether the individual has a valid social security number as defined in 26 USC 24(h)(7)(B): issued by SSA, to a citizen or qualified individual under the Social Security Act, and before the return due date"
+    from 2018-01-01:
+        ssn_issued_by_ssa and ssn_issued_to_citizen_or_qualified and ssn_issued_before_return_due_date

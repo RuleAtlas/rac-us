@@ -1,0 +1,42 @@
+# 26 USC Section 24(j)(2)(B)(ii) tests
+
+phased_out_safe_harbor_amount:
+    - name: "MAGI at applicable income threshold - no phase out"
+      period: 2021-01
+      inputs:
+        safe_harbor_amount: 2000
+        applicable_income_threshold: 60000
+        ctc_modified_agi: 60000
+      expect: 2000
+
+    - name: "MAGI at midpoint - 50% phase out"
+      period: 2021-01
+      inputs:
+        safe_harbor_amount: 2000
+        applicable_income_threshold: 60000
+        ctc_modified_agi: 90000
+      expect: 1000
+
+    - name: "MAGI at 200% of threshold - full phase out"
+      period: 2021-01
+      inputs:
+        safe_harbor_amount: 2000
+        applicable_income_threshold: 60000
+        ctc_modified_agi: 120000
+      expect: 0
+
+    - name: "MAGI below threshold - no reduction"
+      period: 2021-01
+      inputs:
+        safe_harbor_amount: 4000
+        applicable_income_threshold: 40000
+        ctc_modified_agi: 30000
+      expect: 4000
+
+    - name: "Zero safe harbor amount - no reduction possible"
+      period: 2021-01
+      inputs:
+        safe_harbor_amount: 0
+        applicable_income_threshold: 50000
+        ctc_modified_agi: 75000
+      expect: 0

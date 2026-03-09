@@ -1,0 +1,36 @@
+# 26 USC Section 24(j)(2)(A) - In general (Excess advance payments)
+
+"""
+(A) In general.-- If the aggregate amount of payments under section 7527A to
+the taxpayer during the taxable year exceeds the amount of the credit allowed
+under this section to such taxpayer for such taxable year (determined without
+regard to paragraph (1)), the tax imposed by this chapter for such taxable year
+shall be increased by the amount of such excess. Any failure to so increase the
+tax shall be treated as arising out of a mathematical or clerical error and
+assessed according to section 6213(b)(1).
+"""
+
+status: encoded
+
+excess_advance_ctc_payments:
+    imports:
+        - 26/24/j/1#advance_ctc_payments
+        - 26/24/a#ctc_allowance
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Excess advance child tax credit payments"
+    description: "Amount by which advance CTC payments exceed the credit allowed (without regard to paragraph (1) reduction), per 26 USC 24(j)(2)(A)"
+    from 2021-01-01:
+        max(0, advance_ctc_payments - ctc_allowance)
+
+ctc_excess_advance_tax_increase:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Tax increase for excess advance CTC payments"
+    description: "Tax increase equal to excess advance CTC payments per 26 USC 24(j)(2)(A)"
+    from 2021-01-01:
+        excess_advance_ctc_payments

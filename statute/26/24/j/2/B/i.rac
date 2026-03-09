@@ -1,0 +1,47 @@
+# 26 USC Section 24(j)(2)(B)(i) - In general (Safe harbor)
+
+"""
+(i) In general.-- In the case of a taxpayer whose modified adjusted gross income
+(as defined in subsection (b)) for the taxable year does not exceed 200 percent
+of the applicable income threshold, the amount of the increase determined under
+subparagraph (A) with respect to such taxpayer for such taxable year shall be
+reduced (but not below zero) by the safe harbor amount.
+"""
+
+status: encoded
+
+applicable_income_threshold:
+    imports:
+        - 26/24/j/2/B/iii#applicable_income_threshold_joint
+        - 26/24/j/2/B/iii#applicable_income_threshold_head_of_household
+        - 26/24/j/2/B/iii#applicable_income_threshold_other
+        - 26/7703/a#is_joint_return
+        - 26/2/a#is_surviving_spouse
+        - 26/63/c/2/B#is_head_of_household
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Applicable income threshold"
+    description: "Applicable income threshold based on filing status per 26 USC 24(j)(2)(B)(iii)"
+    from 2021-01-01:
+        if is_joint_return or is_surviving_spouse: applicable_income_threshold_joint
+        elif is_head_of_household: applicable_income_threshold_head_of_household
+        else: applicable_income_threshold_other
+
+safe_harbor_reduction:
+    imports:
+        - 26/24/j/2/A#ctc_excess_advance_tax_increase
+        - 26/24/j/2/B/iv#safe_harbor_amount
+        - 26/24/b/1#ctc_modified_agi
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Safe harbor reduction of excess advance CTC repayment"
+    description: "Reduction of excess advance CTC repayment by safe harbor amount when MAGI does not exceed 200% of applicable income threshold, per 26 USC 24(j)(2)(B)(i)"
+    from 2021-01-01:
+        magi_cap = 2 * applicable_income_threshold
+        if ctc_modified_agi <= magi_cap:
+            max(0, ctc_excess_advance_tax_increase - safe_harbor_amount)
+        else: ctc_excess_advance_tax_increase

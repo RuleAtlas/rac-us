@@ -1,0 +1,33 @@
+# 26 USC Section 24(a) - Allowance of credit
+
+"""
+(a) Allowance of credit.-- There shall be allowed as a credit against the tax
+imposed by this chapter for the taxable year with respect to each qualifying
+child of the taxpayer for which the taxpayer is allowed a deduction under
+section 151 an amount equal to $1,000.
+"""
+
+status: encoded
+
+ctc_per_child_amount:
+    description: "Credit amount per qualifying child under 26 USC 24(a)"
+    unit: USD
+    from 1998-01-01: 1000
+
+qualifying_child_count:
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Number of qualifying children"
+    description: "Number of qualifying children for CTC purposes"
+    default: 0
+
+ctc_allowance:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Child tax credit allowance"
+    description: "Credit allowed under 26 USC 24(a): per-child amount times number of qualifying children"
+    from 1998-01-01:
+        ctc_per_child_amount * qualifying_child_count

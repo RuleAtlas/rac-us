@@ -1,0 +1,52 @@
+# 26 USC Section 24(j)(2)(A) tests
+
+excess_advance_ctc_payments:
+    - name: "No excess when advance payments equal credit"
+      period: 2024-01
+      inputs:
+        advance_ctc_payments: 2000
+        ctc_allowance: 2000
+      expect: 0
+
+    - name: "No excess when advance payments less than credit"
+      period: 2024-01
+      inputs:
+        advance_ctc_payments: 1000
+        ctc_allowance: 2000
+      expect: 0
+
+    - name: "Excess when advance payments exceed credit"
+      period: 2024-01
+      inputs:
+        advance_ctc_payments: 5000
+        ctc_allowance: 2000
+      expect: 3000
+
+    - name: "No advance payments"
+      period: 2024-01
+      inputs:
+        advance_ctc_payments: 0
+        ctc_allowance: 2000
+      expect: 0
+
+    - name: "No credit and advance payments received"
+      period: 2024-01
+      inputs:
+        advance_ctc_payments: 3000
+        ctc_allowance: 0
+      expect: 3000
+
+ctc_excess_advance_tax_increase:
+    - name: "Tax increase equals excess advance payments"
+      period: 2024-01
+      inputs:
+        advance_ctc_payments: 5000
+        ctc_allowance: 2000
+      expect: 3000
+
+    - name: "No tax increase when no excess"
+      period: 2024-01
+      inputs:
+        advance_ctc_payments: 1000
+        ctc_allowance: 2000
+      expect: 0

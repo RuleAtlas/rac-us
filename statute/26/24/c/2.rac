@@ -1,0 +1,27 @@
+# 26 USC Section 24(c)(2) - Exception for certain noncitizens
+
+"""
+(2) Exception for certain noncitizens.-- The term "qualifying child" shall
+not include any individual who would not be a dependent if subparagraph (A)
+of section 152(b)(3) were applied without regard to all that follows
+"resident of the United States".
+"""
+
+status: encoded
+
+is_us_citizen_national_or_resident:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "US citizen, national, or resident"
+    description: "Whether the individual is a citizen or national of the United States, or a resident of the United States. For CTC purposes, section 152(b)(3)(A) is applied without regard to the exception for residents of Canada or Mexico."
+    default: false
+
+ctc_meets_citizenship_requirement:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Meets CTC citizenship requirement"
+    description: "Whether the individual meets the citizenship/residency requirement for CTC qualifying child status. Under 26 USC 24(c)(2), the child must be a US citizen, national, or resident — the usual 152(b)(3)(A) exception for residents of Canada or Mexico does not apply."
+    from 1998-01-01:
+        is_us_citizen_national_or_resident

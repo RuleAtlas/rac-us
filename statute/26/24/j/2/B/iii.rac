@@ -1,0 +1,26 @@
+# 26 USC Section 24(j)(2)(B)(iii) - Applicable income threshold
+
+"""
+(iii) Applicable income threshold
+For purposes of this subparagraph, the term "applicable income threshold" means—
+(I) $60,000 in the case of a joint return or surviving spouse (as defined in section 2(a)),
+(II) $50,000 in the case of a head of household, and
+(III) $40,000 in any other case.
+"""
+
+status: encoded
+
+applicable_income_threshold_joint:
+    description: "Applicable income threshold for joint returns or surviving spouses per 26 USC 24(j)(2)(B)(iii)(I)"
+    unit: USD
+    from 2021-01-01: 60000
+
+applicable_income_threshold_head_of_household:
+    description: "Applicable income threshold for head of household per 26 USC 24(j)(2)(B)(iii)(II)"
+    unit: USD
+    from 2021-01-01: 50000
+
+applicable_income_threshold_other:
+    description: "Applicable income threshold for all other filing statuses per 26 USC 24(j)(2)(B)(iii)(III)"
+    unit: USD
+    from 2021-01-01: 40000

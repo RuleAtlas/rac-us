@@ -1,0 +1,42 @@
+# 26 USC 24(h)(7)(A)(i) - Taxpayer SSN requirement
+
+"""
+(i) the taxpayer's social security number (or, in the case of a
+joint return, the social security number of at least 1 spouse),
+"""
+
+status: encoded
+
+taxpayer_has_ssn:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Taxpayer has valid SSN"
+    description: "Whether the taxpayer has a social security number as defined in 26 USC 24(h)(7)(B)"
+    default: false
+
+is_joint_return:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Joint return filed"
+    description: "Whether the taxpayer files a joint return"
+    default: false
+
+spouse_has_ssn:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Spouse has valid SSN"
+    description: "Whether the spouse has a social security number as defined in 26 USC 24(h)(7)(B)"
+    default: false
+
+ctc_taxpayer_ssn_requirement_met:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "CTC taxpayer SSN requirement met"
+    description: "Whether the taxpayer meets the SSN requirement: taxpayer must include their SSN, or for joint returns, at least 1 spouse's SSN, per 26 USC 24(h)(7)(A)(i)"
+    from 2018-01-01:
+        if is_joint_return: taxpayer_has_ssn or spouse_has_ssn
+        else: taxpayer_has_ssn

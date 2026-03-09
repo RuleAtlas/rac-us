@@ -1,0 +1,14 @@
+# 26 USC Section 24(j)(2)(B)(iv)(I) tests
+
+safe_harbor_base_amount:
+    - name: "Base amount for 2021"
+      period: 2021-01
+      expect: 2000
+
+    - name: "Base amount for 2024"
+      period: 2024-01
+      expect: 2000
+
+    - name: "Base amount for 2025"
+      period: 2025-01
+      expect: 2000

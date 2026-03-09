@@ -1,0 +1,16 @@
+# 26 USC Section 24(j)(2)(B)(iii) tests
+
+applicable_income_threshold_joint:
+    - name: "Joint return threshold is $60,000"
+      period: 2021-01
+      expect: 60000
+
+applicable_income_threshold_head_of_household:
+    - name: "Head of household threshold is $50,000"
+      period: 2021-01
+      expect: 50000
+
+applicable_income_threshold_other:
+    - name: "Other filing status threshold is $40,000"
+      period: 2021-01
+      expect: 40000

@@ -1,0 +1,43 @@
+# 26 USC 7527A - Advance payment of child tax credit
+
+"""
+§ 7527A. Advance payment of child tax credit
+(a) In general.-- The Secretary shall establish a program for making periodic
+payments to taxpayers which, in the aggregate during any calendar year, equal
+the annual advance amount determined with respect to such taxpayer for such
+calendar year.
+
+(b) Annual advance amount.-- For purposes of this section—
+(1) In general.-- The term "annual advance amount" means, with respect to any
+taxpayer for any calendar year, the amount (if any) which is estimated by the
+Secretary as being equal to 50 percent of the amount which would be treated as
+allowed under subpart C of part IV of subchapter A of chapter 1 by reason of
+section 24(i)(1) for the taxpayer's taxable year beginning in such calendar
+year if—
+  (A) the status of the taxpayer as a taxpayer described in section 24(i)(1) is
+  determined with respect to the reference taxable year,
+  (B) the taxpayer's modified adjusted gross income for such taxable year is
+  equal to the taxpayer's modified adjusted gross income for the reference
+  taxable year,
+  (C) the only children of such taxpayer for such taxable year are qualifying
+  children properly claimed on the taxpayer's return of tax for the reference
+  taxable year, and
+  (D) the ages of such children (and the status of such children as qualifying
+  children) are determined for such taxable year by taking into account the
+  passage of time since the reference taxable year.
+"""
+
+status: stub
+
+# The number of qualifying children used by the Secretary to determine
+# advance CTC payments per 26 USC 7527A(b)(1)(C). This is an
+# administrative determination based on the taxpayer's reference year
+# return, not directly computable from a single formula.
+advance_qualified_children:
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    status: input
+    label: "Advance qualifying children"
+    description: "Number of qualifying children used by the Secretary in determining advance child tax credit payments per 26 USC 7527A(b)(1)(C), based on children properly claimed on the taxpayer's return for the reference taxable year"
+    default: 0

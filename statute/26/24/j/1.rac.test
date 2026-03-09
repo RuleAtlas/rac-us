@@ -1,0 +1,37 @@
+# 26 USC Section 24(j)(1) tests
+
+ctc_after_advance_payment_reduction:
+    - name: "No advance payments - full credit preserved"
+      period: 2021-01
+      inputs:
+        ctc_allowance: 6000
+        advance_ctc_payments: 0
+      expect: 6000
+
+    - name: "Partial advance payments - credit reduced"
+      period: 2021-01
+      inputs:
+        ctc_allowance: 6000
+        advance_ctc_payments: 3000
+      expect: 3000
+
+    - name: "Advance payments equal credit - zero result"
+      period: 2021-01
+      inputs:
+        ctc_allowance: 4000
+        advance_ctc_payments: 4000
+      expect: 0
+
+    - name: "Advance payments exceed credit - floored at zero"
+      period: 2021-01
+      inputs:
+        ctc_allowance: 2000
+        advance_ctc_payments: 5000
+      expect: 0
+
+    - name: "No credit and no payments"
+      period: 2021-01
+      inputs:
+        ctc_allowance: 0
+        advance_ctc_payments: 0
+      expect: 0

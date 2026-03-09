@@ -1,0 +1,15 @@
+# 26 USC 24(h)(7)(B)(ii) - SSN issued before due date
+
+"""
+(ii) before the due date for such return.
+"""
+
+status: encoded
+
+ssn_issued_before_due_date:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "SSN issued before return due date"
+    description: "Whether the social security number was issued before the due date for the taxpayer's return, per 26 USC 24(h)(7)(B)(ii)"
+    default: true

@@ -1,0 +1,33 @@
+# 26 USC 24(b) - Limitation based on adjusted gross income
+
+"""
+(b) Limitation based on adjusted gross income.--
+(1) Limitation based on adjusted gross income.-- The amount of the credit
+allowable under subsection (a) shall be reduced (but not below zero) by $50
+for each $1,000 (or fraction thereof) by which the taxpayer's modified
+adjusted gross income exceeds the threshold amount. For purposes of the
+preceding sentence, the term "modified adjusted gross income" means adjusted
+gross income increased by any amount excluded from gross income under
+section 911, 931, or 933.
+(2) Threshold amount.-- For purposes of paragraph (1), the term
+"threshold amount" means--
+(A) $110,000 in the case of a joint return,
+(B) $75,000 in the case of an individual who is not married, and
+(C) $55,000 in the case of a married individual filing a separate return.
+For purposes of this paragraph, marital status shall be determined under
+section 7703.
+"""
+
+status: encoded
+
+ctc_phaseout_reduction:
+    imports:
+        - 26/24/b/1#ctc_phaseout_reduction as b1_ctc_phaseout_reduction
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "CTC phase-out reduction"
+    description: "Reduction in CTC based on modified AGI exceeding threshold, per 26 USC 24(b)"
+    from 2001-01-01:
+        b1_ctc_phaseout_reduction

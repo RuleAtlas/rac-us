@@ -1,0 +1,26 @@
+# 26 USC Section 24(h)(4)(A) tests
+
+other_dependents_credit:
+    - name: "No other dependents"
+      period: 2024-01
+      inputs:
+        other_dependent_count: 0
+      expect: 0
+
+    - name: "One other dependent"
+      period: 2024-01
+      inputs:
+        other_dependent_count: 1
+      expect: 500
+
+    - name: "Two other dependents"
+      period: 2024-01
+      inputs:
+        other_dependent_count: 2
+      expect: 1000
+
+    - name: "Three other dependents"
+      period: 2024-01
+      inputs:
+        other_dependent_count: 3
+      expect: 1500

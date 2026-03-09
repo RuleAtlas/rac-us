@@ -1,0 +1,13 @@
+# 26 USC Section 24(h)(6) - Earned income threshold for refundable credit
+
+"""
+(6) Earned income threshold for refundable credit.—
+Subsection (d)(1)(B)(i) shall be applied by substituting "$2,500" for "$3,000".
+"""
+
+status: encoded
+
+ctc_h6_earned_income_threshold:
+    description: "Earned income threshold substituted for $3,000 in subsection (d)(1)(B)(i) per 26 USC 24(h)(6)"
+    unit: USD
+    from 2018-01-01: 2500

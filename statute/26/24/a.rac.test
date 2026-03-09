@@ -1,0 +1,26 @@
+# 26 USC Section 24(a) tests
+
+ctc_allowance:
+    - name: "No qualifying children"
+      period: 2024-01
+      inputs:
+        qualifying_child_count: 0
+      expect: 0
+
+    - name: "One qualifying child"
+      period: 2024-01
+      inputs:
+        qualifying_child_count: 1
+      expect: 1000
+
+    - name: "Two qualifying children"
+      period: 2024-01
+      inputs:
+        qualifying_child_count: 2
+      expect: 2000
+
+    - name: "Three qualifying children"
+      period: 2024-01
+      inputs:
+        qualifying_child_count: 3
+      expect: 3000

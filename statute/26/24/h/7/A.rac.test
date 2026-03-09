@@ -1,0 +1,30 @@
+# 26 USC 24(h)(7)(A) tests
+
+ctc_ssn_requirement_met:
+    - name: "Both taxpayer and child SSN requirements met"
+      period: 2024-01
+      inputs:
+        ctc_taxpayer_ssn_requirement_met: true
+        ctc_child_ssn_requirement_met: true
+      expect: true
+
+    - name: "Taxpayer SSN requirement not met"
+      period: 2024-01
+      inputs:
+        ctc_taxpayer_ssn_requirement_met: false
+        ctc_child_ssn_requirement_met: true
+      expect: false
+
+    - name: "Child SSN requirement not met"
+      period: 2024-01
+      inputs:
+        ctc_taxpayer_ssn_requirement_met: true
+        ctc_child_ssn_requirement_met: false
+      expect: false
+
+    - name: "Neither requirement met"
+      period: 2024-01
+      inputs:
+        ctc_taxpayer_ssn_requirement_met: false
+        ctc_child_ssn_requirement_met: false
+      expect: false

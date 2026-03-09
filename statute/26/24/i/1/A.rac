@@ -1,0 +1,22 @@
+# 26 USC 24(i)(1)(A) - Dollar amount multiplier
+
+"""
+(A) such dollar amount, multiplied by
+"""
+
+status: encoded
+
+refundable_credit_base_amount:
+    description: "The $1,400 dollar amount in subsection (h)(5) used as the base for inflation adjustment per 26 USC 24(i)(1)"
+    unit: USD
+    from 2025-01-01: 1400
+
+dollar_amount_multiplier:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Dollar amount multiplier"
+    description: "The base dollar amount component of the inflation adjustment for the maximum refundable credit per 26 USC 24(i)(1)(A)"
+    from 2025-01-01:
+        refundable_credit_base_amount

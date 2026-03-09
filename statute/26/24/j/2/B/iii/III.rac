@@ -1,0 +1,12 @@
+# 26 USC Section 24(j)(2)(B)(iii)(III) - Other threshold
+
+"""
+(III) $40,000 in any other case.
+"""
+
+status: encoded
+
+applicable_income_threshold_other:
+    description: "Applicable income threshold for all other filing statuses for advance CTC safe harbor"
+    unit: USD
+    from 2021-01-01: 40000

@@ -1,0 +1,12 @@
+# 26 USC 24(b)(2)(B) - Unmarried threshold
+
+"""
+(B) $75,000 in the case of an individual who is not married, and
+"""
+
+status: encoded
+
+ctc_threshold_unmarried:
+    description: "CTC phase-out threshold for unmarried individuals"
+    unit: USD
+    from 1998-01-01: 75000

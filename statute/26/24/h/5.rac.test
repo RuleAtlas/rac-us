@@ -1,0 +1,48 @@
+# 26 USC Section 24(h)(5) tests
+
+max_refundable_credit_per_child:
+    - name: "Base refundable cap amount"
+      period: 2024-01
+      inputs: {}
+      expect: 1400
+
+    - name: "First year of TCJA applicability"
+      period: 2018-01
+      inputs: {}
+      expect: 1400
+
+max_refundable_credit_amount:
+    - name: "Credit below cap - credit is the limit"
+      period: 2024-01
+      inputs:
+          ctc_without_limitations: 1000
+          qualifying_child_count: 1
+      expect: 1000
+
+    - name: "Credit above cap - capped at $1,400 per child"
+      period: 2024-01
+      inputs:
+          ctc_without_limitations: 2000
+          qualifying_child_count: 1
+      expect: 1400
+
+    - name: "Two qualifying children, credit above total cap"
+      period: 2024-01
+      inputs:
+          ctc_without_limitations: 4000
+          qualifying_child_count: 2
+      expect: 2800
+
+    - name: "Zero qualifying children"
+      period: 2024-01
+      inputs:
+          ctc_without_limitations: 2000
+          qualifying_child_count: 0
+      expect: 0
+
+    - name: "Zero credit amount"
+      period: 2024-01
+      inputs:
+          ctc_without_limitations: 0
+          qualifying_child_count: 2
+      expect: 0

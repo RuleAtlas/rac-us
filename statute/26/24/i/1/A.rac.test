@@ -1,0 +1,17 @@
+# 26 USC 24(i)(1)(A) tests
+
+dollar_amount_multiplier:
+    - name: "Base dollar amount for inflation adjustment"
+      period: 2025-01
+      inputs: {}
+      expect: 1400
+
+    - name: "Base dollar amount for 2026"
+      period: 2026-01
+      inputs: {}
+      expect: 1400
+
+    - name: "Base dollar amount for 2030"
+      period: 2030-01
+      inputs: {}
+      expect: 1400

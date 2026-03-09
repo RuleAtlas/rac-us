@@ -1,0 +1,41 @@
+# 26 USC 24(i)(1) tests
+
+refundable_credit_increase:
+    - name: "No COLA means no increase"
+      period: 2025-01
+      inputs:
+        refundable_credit_base_amount: 1400
+        ctc_refundable_cola: 0
+        rounding_multiple: 100
+      expect: 0
+
+    - name: "10% COLA yields $100 increase (1400 * 0.10 = 140, rounded down to 100)"
+      period: 2025-01
+      inputs:
+        refundable_credit_base_amount: 1400
+        ctc_refundable_cola: 0.10
+        rounding_multiple: 100
+      expect: 100
+
+    - name: "20% COLA yields $200 increase (1400 * 0.20 = 280, rounded down to 200)"
+      period: 2025-01
+      inputs:
+        refundable_credit_base_amount: 1400
+        ctc_refundable_cola: 0.20
+        rounding_multiple: 100
+      expect: 200
+
+adjusted_refundable_credit_max:
+    - name: "No increase means base amount"
+      period: 2025-01
+      inputs:
+        refundable_credit_base_amount: 1400
+        refundable_credit_increase: 0
+      expect: 1400
+
+    - name: "With $200 increase"
+      period: 2025-01
+      inputs:
+        refundable_credit_base_amount: 1400
+        refundable_credit_increase: 200
+      expect: 1600

@@ -1,0 +1,17 @@
+# 26 USC Section 24(h)(2) tests
+
+ctc_h2_credit_amount:
+    - name: "Post-TCJA credit amount (2018-2024)"
+      period: 2024-01
+      inputs: {}
+      expect: 2000
+
+    - name: "Post-2025 amendment credit amount"
+      period: 2025-01
+      inputs: {}
+      expect: 2200
+
+    - name: "First year of TCJA applicability"
+      period: 2018-01
+      inputs: {}
+      expect: 2000

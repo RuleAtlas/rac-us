@@ -1,0 +1,32 @@
+# 26 USC 24(i)(3) - Rounding tests
+
+rounded_increase:
+    - name: "Increase already a multiple of $100"
+      period: 2025-01
+      inputs:
+        increase: 300
+      expect: 300
+
+    - name: "Increase not a multiple - rounds down"
+      period: 2025-01
+      inputs:
+        increase: 350
+      expect: 300
+
+    - name: "Increase just under next multiple"
+      period: 2025-01
+      inputs:
+        increase: 199
+      expect: 100
+
+    - name: "Zero increase"
+      period: 2025-01
+      inputs:
+        increase: 0
+      expect: 0
+
+    - name: "Small increase below rounding multiple"
+      period: 2025-01
+      inputs:
+        increase: 99
+      expect: 0

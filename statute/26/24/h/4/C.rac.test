@@ -1,0 +1,26 @@
+# 26 USC Section 24(h)(4)(C) tests
+
+ctc_h4c_child_treated_as_other_dependent:
+    - name: "Child without SSN - treated as other dependent"
+      period: 2024-01
+      inputs:
+        ctc_ssn_requirement_met: false
+      expect: true
+
+    - name: "Child with SSN - not treated as other dependent"
+      period: 2024-01
+      inputs:
+        ctc_ssn_requirement_met: true
+      expect: false
+
+    - name: "Child without SSN in first year of provision"
+      period: 2018-01
+      inputs:
+        ctc_ssn_requirement_met: false
+      expect: true
+
+    - name: "Child with SSN in 2025"
+      period: 2025-01
+      inputs:
+        ctc_ssn_requirement_met: true
+      expect: false

@@ -1,0 +1,27 @@
+# 26 USC Section 24(j)(2)(B)(iv) - Safe harbor amount
+
+"""
+(iv) Safe harbor amount
+For purposes of this subparagraph, the term "safe harbor amount" means, with respect to
+any taxable year, the product of—
+(I) $2,000, multiplied by
+(II) the excess (if any) of the number of qualified children taken into account in
+determining the annual advance amount with respect to the taxpayer under section 7527A
+with respect to months beginning in such taxable year, over the number of qualified
+children taken into account in determining the credit allowed under this section for
+such taxable year.
+"""
+
+status: encoded
+
+safe_harbor_amount:
+    imports:
+        - 26/24/j/2/B/iv/I#safe_harbor_base_amount
+        - 26/24/j/2/B/iv/II#excess_children
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    label: "Safe harbor amount"
+    description: "Product of base amount and excess children per 26 USC 24(j)(2)(B)(iv)"
+    from 2021-01-01:
+        safe_harbor_base_amount * excess_children

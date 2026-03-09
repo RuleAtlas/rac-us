@@ -1,0 +1,57 @@
+# 26 USC Section 24 - Child tax credit
+
+"""
+Sec. 24. Child tax credit.
+
+(a) Allowance of credit.-- Credit against tax for each qualifying child.
+(b) Limitations.-- Phase-out based on modified AGI exceeding threshold amount.
+(c) Qualifying child.-- As defined in section 152(c), under age 17.
+(d) Portion of credit refundable.-- Additional child tax credit.
+(h) Special rules for taxable years 2018 through 2025.-- Modifies credit
+    amount, thresholds, adds other dependents credit, SSN requirements.
+(i) Cost-of-living adjustments.-- Inflation adjustments for credit amounts.
+(j) Reconciliation of credit and advance credit.-- Reduces credit by advance
+    payments under section 7527A.
+"""
+
+status: encoded
+
+child_tax_credit:
+    imports:
+        - 26/24/a#ctc_per_child_amount
+        - 26/24/a#qualifying_child_count
+        - 26/24/b/1#ctc_after_phaseout
+        - 26/24/b/1#ctc_modified_agi
+        - 26/24/b/1#ctc_phaseout_reduction_per_increment
+        - 26/24/b/1#ctc_phaseout_income_increment
+        - 26/24/h/1#post_2017_ctc_rules_apply
+        - 26/24/h/2#ctc_h2_credit_amount
+        - 26/24/h/3#ctc_h3_threshold_amount
+        - 26/24/h/4/A#other_dependents_credit
+        - 26/24/j/1#advance_ctc_payments
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Child tax credit"
+    description: "Final child tax credit under 26 USC 24, combining base rules from (a)-(b) with post-2017 modifications from (h) and advance payment reconciliation from (j)"
+    from 1998-01-01:
+        ctc_after_phaseout
+    from 2018-01-01:
+        credit = ctc_h2_credit_amount * qualifying_child_count + other_dependents_credit
+        excess = max(0, ctc_modified_agi - ctc_h3_threshold_amount)
+        increments = ceil(excess / ctc_phaseout_income_increment)
+        phaseout = increments * ctc_phaseout_reduction_per_increment
+        before_advance = max(0, credit - phaseout)
+        max(0, before_advance - advance_ctc_payments)
+
+credit_qualified_children:
+    imports:
+        - 26/24/c#qualifying_child_count
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Number of qualified children for credit"
+    description: "Number of qualified children taken into account in determining the credit allowed under 26 USC 24 for the taxable year, per 24(j)(2)(B)(iv)(II)"
+    from 1998-01-01:
+        qualifying_child_count

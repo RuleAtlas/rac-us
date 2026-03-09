@@ -1,0 +1,13 @@
+# 26 USC Section 24(j)(2)(B)(iii)(I) - Joint return threshold
+
+"""
+(I) $60,000 in the case of a joint return or surviving spouse
+(as defined in section 2(a)),
+"""
+
+status: encoded
+
+applicable_income_threshold_joint:
+    description: "Applicable income threshold for joint returns or surviving spouses for advance CTC safe harbor"
+    unit: USD
+    from 2021-01-01: 60000

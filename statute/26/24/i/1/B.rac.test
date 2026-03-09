@@ -1,0 +1,12 @@
+# 26 USC Section 24(i)(1)(B) tests
+
+ctc_refundable_cola_base_year:
+    - name: "Base year is 2017 for tax year 2025"
+      period: 2025-01
+      inputs: {}
+      expect: 2017
+
+    - name: "Base year is 2017 for tax year 2026"
+      period: 2026-01
+      inputs: {}
+      expect: 2017

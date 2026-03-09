@@ -1,0 +1,40 @@
+# 26 USC 24(i)(2) - Special rule for adjustment of credit amount
+
+"""
+(2) Special rule for adjustment of credit amount.--
+In the case of a taxable year beginning after 2025, the $2,200 amount
+in subsection (h)(2) shall be increased by an amount equal to--
+(A) such dollar amount, multiplied by
+(B) the cost-of-living adjustment determined under section 1(f)(3)
+for the calendar year in which the taxable year begins, determined
+by substituting "2024" for "2016" in subparagraph (A)(ii) thereof.
+"""
+
+status: encoded
+
+credit_amount_increase:
+    imports:
+        - 26/24/i/2/A#credit_amount_base
+        - 26/24/i/2/B#ctc_credit_amount_cola
+        - 26/24/i/3#rounding_multiple
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Credit amount inflation increase"
+    description: "Inflation increase to the $2,200 credit amount per 26 USC 24(i)(2), equal to the base dollar amount multiplied by the COLA, rounded down per (i)(3)"
+    from 2026-01-01:
+        raw_increase = credit_amount_base * ctc_credit_amount_cola
+        floor(raw_increase / rounding_multiple) * rounding_multiple
+
+adjusted_credit_amount:
+    imports:
+        - 26/24/h/2#ctc_h2_credit_amount
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Inflation-adjusted credit amount"
+    description: "The credit amount per qualifying child after inflation adjustment per 26 USC 24(i)(2)"
+    from 2026-01-01:
+        ctc_h2_credit_amount + credit_amount_increase

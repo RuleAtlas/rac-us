@@ -1,0 +1,24 @@
+# 26 USC Section 24(c)(1) - Qualifying child - In general
+
+"""
+(1) In general.-- The term "qualifying child" means a qualifying child of
+the taxpayer (as defined in section 152(c)) who has not attained age 17.
+"""
+
+status: encoded
+
+ctc_qualifying_child_age_limit:
+    description: "Maximum age (exclusive) for a qualifying child for CTC purposes"
+    unit: years
+    from 1998-01-01: 17
+
+ctc_qualifying_child:
+    imports:
+        - 26/152/c#qualifying_child_of_taxpayer
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "CTC qualifying child"
+    description: "A qualifying child for CTC purposes is a qualifying child of the taxpayer (per section 152(c)) who has not attained age 17, per 26 USC 24(c)(1)"
+    from 1998-01-01:
+        qualifying_child_of_taxpayer and age < ctc_qualifying_child_age_limit

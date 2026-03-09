@@ -1,0 +1,14 @@
+# 26 USC 24(b)(2)(B) tests
+
+ctc_threshold_unmarried:
+    - name: "Unmarried threshold is $75,000"
+      period: 2024-01
+      expect: 75000
+
+    - name: "Unmarried threshold in 2010"
+      period: 2010-01
+      expect: 75000
+
+    - name: "Unmarried threshold at effective date"
+      period: 1998-01
+      expect: 75000

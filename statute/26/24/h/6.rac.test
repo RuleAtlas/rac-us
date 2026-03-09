@@ -1,0 +1,17 @@
+# 26 USC Section 24(h)(6) tests
+
+ctc_h6_earned_income_threshold:
+    - name: "Threshold is $2,500 for post-2017 years"
+      period: 2024-01
+      inputs: {}
+      expect: 2500
+
+    - name: "Threshold is $2,500 in first applicable year"
+      period: 2018-01
+      inputs: {}
+      expect: 2500
+
+    - name: "Threshold is $2,500 for 2025"
+      period: 2025-01
+      inputs: {}
+      expect: 2500

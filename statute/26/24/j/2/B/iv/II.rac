@@ -1,0 +1,23 @@
+# 26 USC Section 24(j)(2)(B)(iv)(II) - Excess children
+
+"""
+(II) the excess (if any) of the number of qualified children taken into
+account in determining the annual advance amount with respect to the
+taxpayer under section 7527A with respect to months beginning in such
+taxable year, over the number of qualified children taken into account
+in determining the credit allowed under this section for such taxable year.
+"""
+
+status: encoded
+
+excess_children:
+    imports:
+        - 26/7527A#advance_qualified_children
+        - 26/24#credit_qualified_children
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Excess children"
+    description: "Excess of qualified children used for advance payments over those used for actual credit per 26 USC 24(j)(2)(B)(iv)(II)"
+    from 2021-01-01:
+        max(0, advance_qualified_children - credit_qualified_children)

@@ -1,0 +1,14 @@
+# 26 USC Section 24(j)(2)(B)(iii)(III) tests
+
+applicable_income_threshold_other:
+    - name: "Other threshold for 2021"
+      period: 2021-01
+      expect: 40000
+
+    - name: "Other threshold for 2024"
+      period: 2024-01
+      expect: 40000
+
+    - name: "Other threshold for 2025"
+      period: 2025-01
+      expect: 40000

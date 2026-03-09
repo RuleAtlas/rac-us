@@ -1,0 +1,31 @@
+# 26 USC Section 24(b)(2) - Threshold amount
+
+"""
+(2) Threshold amount.-- For purposes of paragraph (1), the term
+"threshold amount" means--
+(A) $110,000 in the case of a joint return,
+(B) $75,000 in the case of an individual who is not married, and
+(C) $55,000 in the case of a married individual filing a separate return.
+For purposes of this paragraph, marital status shall be determined under
+section 7703.
+"""
+
+status: encoded
+
+threshold_amount:
+    imports:
+        - 26/24/b/2/A#ctc_threshold_joint
+        - 26/24/b/2/B#ctc_threshold_unmarried
+        - 26/24/b/2/C#ctc_threshold_married_separate
+        - 26/7703/a#is_joint_return
+        - 26/7703/a#is_married
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "CTC phase-out threshold amount"
+    description: "Threshold amount for CTC phase-out per 26 USC 24(b)(2): $110,000 for joint returns, $75,000 for unmarried, $55,000 for married filing separately. Marital status determined under section 7703."
+    from 2001-01-01:
+        if is_joint_return: ctc_threshold_joint
+        elif not is_married: ctc_threshold_unmarried
+        else: ctc_threshold_married_separate

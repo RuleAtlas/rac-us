@@ -1,0 +1,34 @@
+# 26 USC 2(a) - Surviving spouse
+
+"""
+(a) Definition of surviving spouse.--
+(1) In general.-- For purposes of section 1, the term "surviving spouse"
+means a taxpayer--
+  (A) whose spouse died during either of his two preceding taxable years, and
+  (B) who maintains as his home a household which constitutes for the taxable
+  year the principal place of abode (as a member of such household) of a
+  dependent (i) who (within the meaning of section 152, determined without
+  regard to subsections (b)(1), (b)(2), and (d)(1)(B) thereof) is a son,
+  stepdaughter, or daughter of the taxpayer, and (ii) with respect to whom
+  the taxpayer is entitled to a deduction for the taxable year under section
+  151.
+For purposes of this paragraph, an individual shall be considered as
+maintaining a household only if over half of the cost of maintaining the
+household during the taxable year is furnished by such individual.
+(2) Limitations.-- Notwithstanding paragraph (1), for purposes of this
+subtitle a taxpayer shall not be considered to be a surviving spouse--
+  (A) if the taxpayer has remarried at any time before the close of the
+  taxable year, or
+  (B) unless, for the taxpayer's taxable year during which his spouse died,
+  a joint return could have been made under the provisions of section 6013
+  (without regard to subsection (a)(3) thereof).
+"""
+
+status: stub
+
+is_surviving_spouse:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Surviving spouse filing status"
+    description: "Whether the taxpayer qualifies as a surviving spouse per 26 USC 2(a) - spouse died in one of two preceding taxable years, taxpayer maintains household for qualifying dependent child, and has not remarried"

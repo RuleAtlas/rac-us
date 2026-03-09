@@ -1,0 +1,117 @@
+# 26 USC Section 24(j)(2)(B)(i) tests
+
+applicable_income_threshold:
+    - name: "Joint return gets joint threshold"
+      period: 2021-01
+      inputs:
+        applicable_income_threshold_joint: 60000
+        applicable_income_threshold_head_of_household: 50000
+        applicable_income_threshold_other: 40000
+        is_joint_return: true
+        is_surviving_spouse: false
+        is_head_of_household: false
+      expect: 60000
+
+    - name: "Surviving spouse gets joint threshold"
+      period: 2021-01
+      inputs:
+        applicable_income_threshold_joint: 60000
+        applicable_income_threshold_head_of_household: 50000
+        applicable_income_threshold_other: 40000
+        is_joint_return: false
+        is_surviving_spouse: true
+        is_head_of_household: false
+      expect: 60000
+
+    - name: "Head of household gets HOH threshold"
+      period: 2021-01
+      inputs:
+        applicable_income_threshold_joint: 60000
+        applicable_income_threshold_head_of_household: 50000
+        applicable_income_threshold_other: 40000
+        is_joint_return: false
+        is_surviving_spouse: false
+        is_head_of_household: true
+      expect: 50000
+
+    - name: "Other filer gets other threshold"
+      period: 2021-01
+      inputs:
+        applicable_income_threshold_joint: 60000
+        applicable_income_threshold_head_of_household: 50000
+        applicable_income_threshold_other: 40000
+        is_joint_return: false
+        is_surviving_spouse: false
+        is_head_of_household: false
+      expect: 40000
+
+safe_harbor_reduction:
+    - name: "MAGI below cap - full safe harbor reduces excess to zero"
+      period: 2021-01
+      inputs:
+        ctc_excess_advance_tax_increase: 2000
+        safe_harbor_amount: 2000
+        ctc_modified_agi: 50000
+        applicable_income_threshold_joint: 60000
+        applicable_income_threshold_head_of_household: 50000
+        applicable_income_threshold_other: 40000
+        is_joint_return: false
+        is_surviving_spouse: false
+        is_head_of_household: false
+      expect: 0
+
+    - name: "MAGI below cap - safe harbor partially reduces excess"
+      period: 2021-01
+      inputs:
+        ctc_excess_advance_tax_increase: 5000
+        safe_harbor_amount: 2000
+        ctc_modified_agi: 50000
+        applicable_income_threshold_joint: 60000
+        applicable_income_threshold_head_of_household: 50000
+        applicable_income_threshold_other: 40000
+        is_joint_return: false
+        is_surviving_spouse: false
+        is_head_of_household: false
+      expect: 3000
+
+    - name: "MAGI exceeds 200% cap - no safe harbor reduction"
+      period: 2021-01
+      inputs:
+        ctc_excess_advance_tax_increase: 5000
+        safe_harbor_amount: 2000
+        ctc_modified_agi: 90000
+        applicable_income_threshold_joint: 60000
+        applicable_income_threshold_head_of_household: 50000
+        applicable_income_threshold_other: 40000
+        is_joint_return: false
+        is_surviving_spouse: false
+        is_head_of_household: false
+      expect: 5000
+
+    - name: "MAGI at exactly 200% cap - safe harbor applies"
+      period: 2021-01
+      inputs:
+        ctc_excess_advance_tax_increase: 4000
+        safe_harbor_amount: 2000
+        ctc_modified_agi: 80000
+        applicable_income_threshold_joint: 60000
+        applicable_income_threshold_head_of_household: 50000
+        applicable_income_threshold_other: 40000
+        is_joint_return: false
+        is_surviving_spouse: false
+        is_head_of_household: false
+      expect: 2000
+
+    - name: "Safe harbor exceeds excess - floor at zero"
+      period: 2021-01
+      inputs:
+        ctc_excess_advance_tax_increase: 1000
+        safe_harbor_amount: 4000
+        ctc_modified_agi: 30000
+        applicable_income_threshold_joint: 60000
+        applicable_income_threshold_head_of_household: 50000
+        applicable_income_threshold_other: 40000
+        is_joint_return: false
+        is_surviving_spouse: false
+        is_head_of_household: false
+      expect: 0

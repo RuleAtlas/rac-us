@@ -1,0 +1,25 @@
+# 26 USC 6413(c)
+
+"""
+(c) Special refunds.--
+(1) In general.-- If by reason of an employee receiving wages from
+more than one employer during a calendar year the wages received by
+him during such year exceed the contribution and benefit base (as
+determined under section 230 of the Social Security Act) which is
+effective with respect to such year, the employee shall be entitled
+to a credit or refund of any amount of tax imposed by section
+3101(a) or section 3201(a) with respect to such wages which is
+deducted and withheld (whether or not paid to the Secretary) from
+the excess. The term "wages" as used in this paragraph shall, for
+purposes of this paragraph, include "compensation" as defined in
+section 3231(e).
+"""
+
+status: stub
+
+special_refund_of_social_security_taxes:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    label: "Special refund of social security taxes"
+    description: "Credit or refund of social security tax (section 3101(a) or 3201(a)) withheld on wages exceeding the contribution and benefit base, when an employee receives wages from more than one employer during a calendar year, per 26 USC 6413(c)(1)"

@@ -1,0 +1,25 @@
+# 26 USC 24(h)(7)(A) - SSN required: in general
+
+"""
+(A) In general.--
+No credit shall be allowed under this section to a taxpayer with respect
+to any qualifying child unless the taxpayer includes on the return of tax
+for the taxable year--
+  (i) the taxpayer's social security number (or, in the case of a joint
+  return, the social security number of at least 1 spouse), and
+  (ii) the social security number of such qualifying child.
+"""
+
+status: encoded
+
+ctc_ssn_requirement_met:
+    imports:
+        - 26/24/h/7/A/i#ctc_taxpayer_ssn_requirement_met
+        - 26/24/h/7/A/ii#ctc_child_ssn_requirement_met
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "CTC SSN requirement met"
+    description: "No credit allowed unless taxpayer includes on return: (i) taxpayer's SSN (or at least 1 spouse's SSN for joint returns), and (ii) the qualifying child's SSN, per 26 USC 24(h)(7)(A)"
+    from 2018-01-01:
+        ctc_taxpayer_ssn_requirement_met and ctc_child_ssn_requirement_met

@@ -1,0 +1,12 @@
+# 26 USC Section 24(b)(2)(A) - Joint return threshold
+
+"""
+(A) $110,000 in the case of a joint return,
+"""
+
+status: encoded
+
+ctc_threshold_joint:
+    description: "CTC phase-out threshold amount for joint returns"
+    unit: USD
+    from 2001-01-01: 110000

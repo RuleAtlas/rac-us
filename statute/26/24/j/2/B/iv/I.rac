@@ -1,0 +1,12 @@
+# 26 USC Section 24(j)(2)(B)(iv)(I) - Base amount
+
+"""
+(I) $2,000, multiplied by
+"""
+
+status: encoded
+
+safe_harbor_base_amount:
+    description: "Base amount per child for safe harbor calculation under advance CTC reconciliation"
+    unit: USD
+    from 2021-01-01: 2000

@@ -1,0 +1,17 @@
+# 26 USC 24(h)(7)(B)(i) - SSN issued to citizen or eligible noncitizen
+
+"""
+(i) to a citizen of the United States or pursuant to subclause (I)
+(or that portion of subclause (III) that relates to subclause (I))
+of section 205(c)(2)(B)(i) of the Social Security Act, and
+"""
+
+status: encoded
+
+ssn_issued_to_citizen_or_eligible_noncitizen:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "SSN issued to citizen or eligible noncitizen"
+    description: "Whether the social security number was issued to a citizen of the United States or pursuant to subclause (I) (or that portion of subclause (III) that relates to subclause (I)) of section 205(c)(2)(B)(i) of the Social Security Act, per 26 USC 24(h)(7)(B)(i)"
+    default: true

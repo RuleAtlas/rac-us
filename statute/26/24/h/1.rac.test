@@ -1,0 +1,26 @@
+# 26 USC 24(h)(1) tests
+
+post_2017_ctc_rules_apply:
+    - name: "Tax year 2017 - rules do not apply"
+      period: 2018-01
+      inputs:
+          tax_year: 2017
+      expect: false
+
+    - name: "Tax year 2018 - rules apply"
+      period: 2018-01
+      inputs:
+          tax_year: 2018
+      expect: true
+
+    - name: "Tax year 2024 - rules apply"
+      period: 2024-01
+      inputs:
+          tax_year: 2024
+      expect: true
+
+    - name: "Tax year 2016 - rules do not apply"
+      period: 2018-01
+      inputs:
+          tax_year: 2016
+      expect: false

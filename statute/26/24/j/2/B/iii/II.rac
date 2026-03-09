@@ -1,0 +1,12 @@
+# 26 USC Section 24(j)(2)(B)(iii)(II) - Head of household threshold
+
+"""
+(II) $50,000 in the case of a head of household,
+"""
+
+status: encoded
+
+applicable_income_threshold_head_of_household:
+    description: "Applicable income threshold for head of household for advance CTC safe harbor"
+    unit: USD
+    from 2021-01-01: 50000

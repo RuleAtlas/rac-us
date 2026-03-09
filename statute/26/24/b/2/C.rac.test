@@ -1,0 +1,14 @@
+# 26 USC 24(b)(2)(C) tests
+
+ctc_threshold_married_separate:
+    - name: "Threshold value in 2024"
+      period: 2024-01
+      expect: 55000
+
+    - name: "Threshold value in 2001"
+      period: 2001-01
+      expect: 55000
+
+    - name: "Threshold value in 2025"
+      period: 2025-01
+      expect: 55000

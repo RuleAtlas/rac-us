@@ -1,0 +1,78 @@
+# 26 USC Section 24(b)(1) tests
+
+ctc_modified_agi:
+    - name: "AGI only, no exclusions"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 100000
+        sec_911_exclusion: 0
+        sec_931_exclusion: 0
+        sec_933_exclusion: 0
+      expect: 100000
+
+    - name: "AGI with section 911 exclusion"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 80000
+        sec_911_exclusion: 20000
+        sec_931_exclusion: 0
+        sec_933_exclusion: 0
+      expect: 100000
+
+ctc_phaseout_reduction:
+    - name: "Income below threshold - no reduction"
+      period: 2024-01
+      inputs:
+        ctc_modified_agi: 100000
+        threshold_amount: 110000
+      expect: 0
+
+    - name: "Income exactly at threshold"
+      period: 2024-01
+      inputs:
+        ctc_modified_agi: 110000
+        threshold_amount: 110000
+      expect: 0
+
+    - name: "Income $1000 over threshold - one increment"
+      period: 2024-01
+      inputs:
+        ctc_modified_agi: 111000
+        threshold_amount: 110000
+      expect: 50
+
+    - name: "Income $1500 over threshold - fraction rounds up"
+      period: 2024-01
+      inputs:
+        ctc_modified_agi: 111500
+        threshold_amount: 110000
+      expect: 100
+
+    - name: "Income $10000 over threshold"
+      period: 2024-01
+      inputs:
+        ctc_modified_agi: 120000
+        threshold_amount: 110000
+      expect: 500
+
+ctc_after_phaseout:
+    - name: "No phase-out needed"
+      period: 2024-01
+      inputs:
+        ctc_allowance: 2000
+        ctc_phaseout_reduction: 0
+      expect: 2000
+
+    - name: "Partial phase-out"
+      period: 2024-01
+      inputs:
+        ctc_allowance: 2000
+        ctc_phaseout_reduction: 500
+      expect: 1500
+
+    - name: "Full phase-out - not below zero"
+      period: 2024-01
+      inputs:
+        ctc_allowance: 2000
+        ctc_phaseout_reduction: 3000
+      expect: 0

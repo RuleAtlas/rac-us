@@ -1,0 +1,52 @@
+# 26 USC Section 24(b)(2) tests
+
+threshold_amount:
+    - name: "Joint return threshold"
+      period: 2024-01
+      inputs:
+        is_joint_return: true
+        is_married: true
+        ctc_threshold_joint: 110000
+        ctc_threshold_unmarried: 75000
+        ctc_threshold_married_separate: 55000
+      expect: 110000
+
+    - name: "Unmarried individual threshold"
+      period: 2024-01
+      inputs:
+        is_joint_return: false
+        is_married: false
+        ctc_threshold_joint: 110000
+        ctc_threshold_unmarried: 75000
+        ctc_threshold_married_separate: 55000
+      expect: 75000
+
+    - name: "Married filing separately threshold"
+      period: 2024-01
+      inputs:
+        is_joint_return: false
+        is_married: true
+        ctc_threshold_joint: 110000
+        ctc_threshold_unmarried: 75000
+        ctc_threshold_married_separate: 55000
+      expect: 55000
+
+    - name: "Joint return threshold (earlier year)"
+      period: 2010-01
+      inputs:
+        is_joint_return: true
+        is_married: true
+        ctc_threshold_joint: 110000
+        ctc_threshold_unmarried: 75000
+        ctc_threshold_married_separate: 55000
+      expect: 110000
+
+    - name: "Unmarried individual threshold (earlier year)"
+      period: 2005-01
+      inputs:
+        is_joint_return: false
+        is_married: false
+        ctc_threshold_joint: 110000
+        ctc_threshold_unmarried: 75000
+        ctc_threshold_married_separate: 55000
+      expect: 75000

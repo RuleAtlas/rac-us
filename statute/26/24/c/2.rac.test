@@ -1,0 +1,19 @@
+# 26 USC Section 24(c)(2) tests
+
+ctc_meets_citizenship_requirement:
+    - name: "US citizen meets requirement"
+      period: 2024-01
+      inputs:
+        is_us_citizen_national_or_resident: true
+      expect: true
+
+    - name: "Non-US citizen/national/resident does not meet requirement"
+      period: 2024-01
+      inputs:
+        is_us_citizen_national_or_resident: false
+      expect: false
+
+    - name: "Default (no citizenship info) does not meet requirement"
+      period: 2024-01
+      inputs: {}
+      expect: false

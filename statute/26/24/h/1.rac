@@ -1,0 +1,29 @@
+# 26 USC 24(h)(1) - In general
+
+"""
+(1) In general.—
+In the case of a taxable year beginning after December 31, 2017,
+this section shall be applied as provided in paragraphs (2) through (7).
+"""
+
+post_2017_applicability_start_year:
+    description: "Year after which the special rules in paragraphs (2) through (7) apply"
+    unit: Year
+    from 2017-12-22: 2017
+
+post_2017_ctc_rules_apply:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Post-2017 CTC rules apply"
+    description: "Whether the taxable year begins after December 31, 2017, triggering application of paragraphs (2) through (7)"
+    from 2017-12-22:
+        tax_year > post_2017_applicability_start_year
+
+tax_year:
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Tax year"
+    description: "The taxable year for which the return is filed"
+    default: 0

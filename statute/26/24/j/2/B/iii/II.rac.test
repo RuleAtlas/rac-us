@@ -1,0 +1,14 @@
+# 26 USC Section 24(j)(2)(B)(iii)(II) tests
+
+applicable_income_threshold_head_of_household:
+    - name: "Head of household threshold is $50,000"
+      period: 2021-01
+      expect: 50000
+
+    - name: "Head of household threshold in 2023"
+      period: 2023-01
+      expect: 50000
+
+    - name: "Head of household threshold in 2024"
+      period: 2024-01
+      expect: 50000

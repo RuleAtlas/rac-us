@@ -1,0 +1,33 @@
+# 26 USC Section 24(h)(3) - Limitation
+
+"""
+(3) Limitation.—
+In lieu of the amount determined under subsection (b)(2), the threshold
+amount shall be $400,000 in the case of a joint return ($200,000 in any
+other case).
+"""
+
+status: encoded
+
+ctc_h3_threshold_joint:
+    description: "CTC phase-out threshold for joint returns per 26 USC 24(h)(3), replacing (b)(2) amount"
+    unit: USD
+    from 2018-01-01: 400000
+
+ctc_h3_threshold_other:
+    description: "CTC phase-out threshold for all other filers per 26 USC 24(h)(3), replacing (b)(2) amount"
+    unit: USD
+    from 2018-01-01: 200000
+
+ctc_h3_threshold_amount:
+    imports:
+        - 26/7703/a#is_joint_return
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "CTC phase-out threshold (post-2017)"
+    description: "Threshold amount for CTC phase-out for taxable years beginning after 2017: $400,000 for joint returns, $200,000 in any other case, per 26 USC 24(h)(3)"
+    from 2018-01-01:
+        if is_joint_return: ctc_h3_threshold_joint
+        else: ctc_h3_threshold_other

@@ -1,0 +1,22 @@
+# 26 USC 24(i)(2)(A) - Dollar amount multiplier
+
+"""
+(A) such dollar amount, multiplied by
+"""
+
+status: encoded
+
+credit_amount_base:
+    description: "The $2,200 dollar amount in subsection (h)(2) used as the base for inflation adjustment per 26 USC 24(i)(2)"
+    unit: USD
+    from 2026-01-01: 2200
+
+dollar_amount_multiplier:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Dollar amount multiplier"
+    description: "The base dollar amount component of the inflation adjustment for the credit amount per 26 USC 24(i)(2)(A)"
+    from 2026-01-01:
+        credit_amount_base

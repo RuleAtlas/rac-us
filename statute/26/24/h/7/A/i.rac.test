@@ -1,0 +1,40 @@
+# 26 USC 24(h)(7)(A)(i) tests - Taxpayer SSN requirement
+
+ctc_taxpayer_ssn_requirement_met:
+    - name: "Single filer with SSN meets requirement"
+      period: 2024-01
+      inputs:
+        taxpayer_has_ssn: true
+        is_joint_return: false
+      expect: true
+
+    - name: "Single filer without SSN fails requirement"
+      period: 2024-01
+      inputs:
+        taxpayer_has_ssn: false
+        is_joint_return: false
+      expect: false
+
+    - name: "Joint return where taxpayer has SSN meets requirement"
+      period: 2024-01
+      inputs:
+        taxpayer_has_ssn: true
+        is_joint_return: true
+        spouse_has_ssn: false
+      expect: true
+
+    - name: "Joint return where spouse has SSN meets requirement"
+      period: 2024-01
+      inputs:
+        taxpayer_has_ssn: false
+        is_joint_return: true
+        spouse_has_ssn: true
+      expect: true
+
+    - name: "Joint return where neither has SSN fails requirement"
+      period: 2024-01
+      inputs:
+        taxpayer_has_ssn: false
+        is_joint_return: true
+        spouse_has_ssn: false
+      expect: false

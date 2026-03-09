@@ -1,0 +1,21 @@
+# 26 USC Section 24(h)(4)(C) - Certain qualifying children
+
+"""
+(C) Certain qualifying children.--
+In the case of any qualifying child with respect to whom a credit is
+not allowed under this section by reason of paragraph (7), such child
+shall be treated as a dependent to whom subparagraph (A) applies.
+"""
+
+status: encoded
+
+ctc_h4c_child_treated_as_other_dependent:
+    imports:
+        - 26/24/h/7/A#ctc_ssn_requirement_met
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Qualifying child treated as other dependent"
+    description: "A qualifying child for whom CTC is disallowed by reason of the SSN requirement in paragraph (7) is treated as a dependent eligible for the $500 other dependents credit under subparagraph (A), per 26 USC 24(h)(4)(C)"
+    from 2018-01-01:
+        not ctc_ssn_requirement_met
