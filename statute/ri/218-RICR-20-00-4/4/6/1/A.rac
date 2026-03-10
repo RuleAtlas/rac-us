@@ -1,0 +1,68 @@
+# 218 RICR 20-00-4.6.1.A - Financial Determination
+
+"""
+4.6.1.A Financial Determination
+
+a. Income limits: Financial unit countable income at or below one hundred
+   eighty percent (180%) Federal Poverty Level (FPL) based on family size.
+
+   Transitional Child Care: Families currently child-care-eligible may
+   continue receiving care after income exceeds 180% FPL, as long as income
+   remains below two hundred twenty-five percent (225%) FPL.
+   - Above 225% FPL: No longer eligible
+   - New applicants exceeding 180% FPL ineligible for Transitional Child Care
+
+b. Self-employment income calculation: Per RIW Rules Section 2.15.4
+
+c. Prospective budgeting: Weekly income converted to monthly using 4.3333
+   weeks/month conversion.
+"""
+
+status: encoded
+
+ccap_initial_fpl_threshold:
+    description: "Maximum income as percentage of FPL for initial CCAP eligibility"
+    unit: rate
+    from 1998-01-01: 1.80
+
+ccap_transitional_fpl_threshold:
+    description: "Maximum income as percentage of FPL for transitional child care"
+    unit: rate
+    from 1998-01-01: 2.25
+
+ccap_weekly_to_monthly_conversion:
+    description: "Factor to convert weekly income to monthly (weeks per month)"
+    unit: rate
+    from 1998-01-01: 4.3333
+
+# Inputs
+ccap_income_as_pct_fpl:
+    entity: Family
+    period: Month
+    dtype: Rate
+    label: "Income as percentage of FPL"
+    description: "Financial unit countable income expressed as ratio of Federal Poverty Level"
+    default: 0
+
+ccap_is_currently_eligible:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Currently CCAP eligible"
+    description: "Whether family is currently receiving CCAP services (for transitional care)"
+    default: false
+
+# Computed
+ccap_income_eligible:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "CCAP income eligible"
+    description: "Whether family meets income eligibility for CCAP per 218 RICR 20-00-4.6.1.A"
+    from 1998-01-01:
+        if ccap_income_as_pct_fpl <= ccap_initial_fpl_threshold:
+            true
+        elif ccap_is_currently_eligible and ccap_income_as_pct_fpl <= ccap_transitional_fpl_threshold:
+            true
+        else:
+            false

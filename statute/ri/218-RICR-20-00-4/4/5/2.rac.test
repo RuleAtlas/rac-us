@@ -1,0 +1,67 @@
+# 218 RICR 20-00-4.5.2 - Limitations (Categorical) tests
+
+ccap_passes_categorical_limitations:
+    - name: "No limitations apply - family passes"
+      period: 2024-01
+      inputs:
+          ccap_is_two_parent_home: false
+          ccap_parent_failed_employment_plan: false
+          ccap_one_parent_lacks_employment_plan: false
+          ccap_one_parent_barred_from_riw_not_working: false
+          ccap_parent_self_employed_childcare_requesting_payment: false
+          ccap_eligible_child_parent_provides_care: false
+          ccap_same_residence_person_provides_care: false
+          ccap_full_family_sanction: false
+      expect: true
+
+    - name: "One-parent home - parent failed employment plan"
+      period: 2024-01
+      inputs:
+          ccap_is_two_parent_home: false
+          ccap_parent_failed_employment_plan: true
+          ccap_one_parent_lacks_employment_plan: false
+          ccap_one_parent_barred_from_riw_not_working: false
+          ccap_parent_self_employed_childcare_requesting_payment: false
+          ccap_eligible_child_parent_provides_care: false
+          ccap_same_residence_person_provides_care: false
+          ccap_full_family_sanction: false
+      expect: false
+
+    - name: "Two-parent home - one parent lacks employment plan"
+      period: 2024-01
+      inputs:
+          ccap_is_two_parent_home: true
+          ccap_parent_failed_employment_plan: false
+          ccap_one_parent_lacks_employment_plan: true
+          ccap_one_parent_barred_from_riw_not_working: false
+          ccap_parent_self_employed_childcare_requesting_payment: false
+          ccap_eligible_child_parent_provides_care: false
+          ccap_same_residence_person_provides_care: false
+          ccap_full_family_sanction: false
+      expect: false
+
+    - name: "Full family sanction bars authorization"
+      period: 2024-01
+      inputs:
+          ccap_is_two_parent_home: false
+          ccap_parent_failed_employment_plan: false
+          ccap_one_parent_lacks_employment_plan: false
+          ccap_one_parent_barred_from_riw_not_working: false
+          ccap_parent_self_employed_childcare_requesting_payment: false
+          ccap_eligible_child_parent_provides_care: false
+          ccap_same_residence_person_provides_care: false
+          ccap_full_family_sanction: true
+      expect: false
+
+    - name: "Two-parent home - failed employment plan does not trigger one-parent limitation"
+      period: 2024-01
+      inputs:
+          ccap_is_two_parent_home: true
+          ccap_parent_failed_employment_plan: true
+          ccap_one_parent_lacks_employment_plan: false
+          ccap_one_parent_barred_from_riw_not_working: false
+          ccap_parent_self_employed_childcare_requesting_payment: false
+          ccap_eligible_child_parent_provides_care: false
+          ccap_same_residence_person_provides_care: false
+          ccap_full_family_sanction: false
+      expect: true

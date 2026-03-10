@@ -1,0 +1,44 @@
+# 218 RICR 20-00-4.6.1.A - Financial Determination tests
+
+ccap_income_eligible:
+    - name: "Income below 180% FPL - new applicant eligible"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 1.50
+          ccap_is_currently_eligible: false
+      expect: true
+
+    - name: "Income at exactly 180% FPL - eligible"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 1.80
+          ccap_is_currently_eligible: false
+      expect: true
+
+    - name: "New applicant above 180% FPL - ineligible"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 2.00
+          ccap_is_currently_eligible: false
+      expect: false
+
+    - name: "Current recipient at 200% FPL - transitional eligible"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 2.00
+          ccap_is_currently_eligible: true
+      expect: true
+
+    - name: "Current recipient above 225% FPL - ineligible"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 2.30
+          ccap_is_currently_eligible: true
+      expect: false
+
+    - name: "Current recipient at exactly 225% FPL - transitional eligible"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 2.25
+          ccap_is_currently_eligible: true
+      expect: true

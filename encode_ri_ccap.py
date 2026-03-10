@@ -2,7 +2,7 @@
 
 import asyncio
 from pathlib import Path
-from autorac.harness.orchestrator import Orchestrator
+from autorac.harness.orchestrator import Orchestrator, Phase
 
 CITATION = "RI RICR 218-20-00-4"
 OUTPUT_PATH = Path.cwd() / "statute" / "ri" / "218-RICR-20-00-4"

@@ -1,0 +1,67 @@
+# 218 RICR 20-00-4.6.3 - Limitations (Income Eligibility)
+
+"""
+4.6.3 Limitations
+CCAP not authorized for otherwise income-eligible children when:
+1. Parent self-employed as child care provider
+2. Parent providing child care
+3. Household-resident person providing child care
+4. Applicant parent's sole income from rental/room-board
+5. Applicant parent's need based wholly on volunteer work (unpaid work doesn't
+   count toward minimum hours)
+"""
+
+status: encoded
+
+# --- Inputs ---
+
+ccap_parent_selfemployed_child_care_provider:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Parent self-employed as child care provider"
+    description: "Whether parent derives self-employment income as a child care provider"
+    default: false
+
+ccap_parent_providing_child_care:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Parent providing child care"
+    description: "Whether the applicant parent provides child care for the eligible child"
+    default: false
+
+ccap_household_resident_providing_care:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Household resident providing child care"
+    description: "Whether a person residing in the same household provides child care"
+    default: false
+
+ccap_sole_income_from_rental:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Sole income from rental/room-board"
+    description: "Whether applicant parent's sole income is from rental or room and board"
+    default: false
+
+ccap_need_based_wholly_on_volunteer_work:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Need based wholly on volunteer work"
+    description: "Whether applicant parent's need is based wholly on volunteer work (unpaid work does not count toward minimum hours)"
+    default: false
+
+# --- Computed ---
+
+ccap_income_limitation_disqualified:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "CCAP income limitation disqualified"
+    description: "Whether family is disqualified under income eligibility limitations per 218 RICR 20-00-4.6.3"
+    from 1998-01-01:
+        ccap_parent_selfemployed_child_care_provider or ccap_parent_providing_child_care or ccap_household_resident_providing_care or ccap_sole_income_from_rental or ccap_need_based_wholly_on_volunteer_work

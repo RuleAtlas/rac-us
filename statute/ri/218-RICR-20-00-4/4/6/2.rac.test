@@ -1,0 +1,51 @@
+# 218 RICR 20-00-4.6.2 - Need for Services tests
+
+ccap_employment_need_met:
+    - name: "Single parent meets employment criteria"
+      period: 2024-01
+      inputs:
+          ccap_is_two_parent_home: false
+          ccap_parent1_avg_weekly_hours: 25
+          ccap_parent1_hourly_wage: 15
+          ccap_state_minimum_wage: 13
+          ccap_federal_minimum_wage: 7.25
+      expect: true
+
+    - name: "Single parent below minimum wage"
+      period: 2024-01
+      inputs:
+          ccap_is_two_parent_home: false
+          ccap_parent1_avg_weekly_hours: 25
+          ccap_parent1_hourly_wage: 6
+          ccap_state_minimum_wage: 13
+          ccap_federal_minimum_wage: 7.25
+      expect: false
+
+    - name: "Two-parent home, second parent insufficient hours"
+      period: 2024-01
+      inputs:
+          ccap_is_two_parent_home: true
+          ccap_parent1_avg_weekly_hours: 25
+          ccap_parent1_hourly_wage: 15
+          ccap_parent2_avg_weekly_hours: 10
+          ccap_parent2_hourly_wage: 15
+          ccap_state_minimum_wage: 13
+          ccap_federal_minimum_wage: 7.25
+      expect: false
+
+ccap_need_for_services:
+    - name: "YS participant meets need criteria"
+      period: 2024-01
+      inputs:
+          ccap_is_ys_participant: true
+          ccap_ys_parent_age: 18
+          ccap_ys_parent_has_hs_diploma: false
+          ccap_ys_parent_weekly_hours: 20
+      expect: true
+
+    - name: "College student meets need criteria"
+      period: 2024-01
+      inputs:
+          ccap_enrolled_ri_public_higher_ed: true
+          ccap_credit_hours_enrolled: 7
+      expect: true

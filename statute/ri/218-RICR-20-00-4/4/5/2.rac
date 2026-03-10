@@ -1,0 +1,103 @@
+# 218 RICR 20-00-4.5.2 - Limitations (Categorical)
+
+"""
+4.5.2 Limitations
+Child care services not authorized for otherwise categorically eligible
+families when:
+1. One-parent home: Parent failed completing RIW employment plan
+2. Two-parent home: One parent lacks approved employment plan
+3. Two-parent home: One parent statutorily barred from RIW and not working
+4. Parent self-employed as child care provider requesting payment during
+   employment hours
+5. Eligible child parent providing child care
+6. Same legal residence person providing child care
+7. Full family sanction in place per RIW Rules Part 2
+"""
+
+status: encoded
+
+# --- Inputs ---
+
+ccap_parent_failed_employment_plan:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Parent failed RIW employment plan"
+    description: "Whether parent failed completing RIW employment plan (one-parent home)"
+    default: false
+
+ccap_one_parent_lacks_employment_plan:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "One parent lacks employment plan"
+    description: "Whether one parent in a two-parent home lacks an approved employment plan"
+    default: false
+
+ccap_one_parent_barred_from_riw_not_working:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "One parent barred from RIW and not working"
+    description: "Whether one parent in a two-parent home is statutorily barred from RIW and not working"
+    default: false
+
+ccap_parent_self_employed_childcare_requesting_payment:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Self-employed childcare parent requesting payment"
+    description: "Whether parent is self-employed as child care provider and requesting payment during employment hours"
+    default: false
+
+ccap_eligible_child_parent_provides_care:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Eligible child's parent provides care"
+    description: "Whether the eligible child's parent is providing the child care"
+    default: false
+
+ccap_same_residence_person_provides_care:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Same residence person provides care"
+    description: "Whether a person in the same legal residence is providing the child care"
+    default: false
+
+ccap_full_family_sanction:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Full family sanction in place"
+    description: "Whether a full family sanction is in place per RIW Rules Part 2"
+    default: false
+
+# --- Computed ---
+
+ccap_passes_categorical_limitations:
+    imports:
+        - ri/218-RICR-20-00-4/4/5/1#ccap_is_two_parent_home
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Passes categorical CCAP limitations"
+    description: "Whether family is not barred by any limitation per 218 RICR 20-00-4.5.2"
+    from 1998-01-01:
+        if not ccap_is_two_parent_home and ccap_parent_failed_employment_plan:
+            false
+        elif ccap_is_two_parent_home and ccap_one_parent_lacks_employment_plan:
+            false
+        elif ccap_is_two_parent_home and ccap_one_parent_barred_from_riw_not_working:
+            false
+        elif ccap_parent_self_employed_childcare_requesting_payment:
+            false
+        elif ccap_eligible_child_parent_provides_care:
+            false
+        elif ccap_same_residence_person_provides_care:
+            false
+        elif ccap_full_family_sanction:
+            false
+        else:
+            true

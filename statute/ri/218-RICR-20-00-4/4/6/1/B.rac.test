@@ -1,0 +1,26 @@
+# 218 RICR 20-00-4.6.1.B - Treatment of Resources tests
+
+ccap_resource_eligible:
+    - name: "Zero resources - eligible"
+      period: 2024-01
+      inputs:
+          ccap_liquid_resources: 0
+      expect: true
+
+    - name: "Below limit - eligible"
+      period: 2024-01
+      inputs:
+          ccap_liquid_resources: 500000
+      expect: true
+
+    - name: "At limit - eligible"
+      period: 2024-01
+      inputs:
+          ccap_liquid_resources: 1000000
+      expect: true
+
+    - name: "Above limit - ineligible"
+      period: 2024-01
+      inputs:
+          ccap_liquid_resources: 1000001
+      expect: false

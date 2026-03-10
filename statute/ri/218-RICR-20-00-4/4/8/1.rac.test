@@ -1,0 +1,68 @@
+# 218 RICR 20-00-4.8.1 - Authorization Levels tests
+
+ccap_authorization_level:
+    - name: "Full-time: 35 hours per week"
+      period: 2024-01
+      inputs:
+          ccap_weekly_child_care_hours: 35
+      expect: FULL_TIME
+
+    - name: "Full-time: exactly 30 hours"
+      period: 2024-01
+      inputs:
+          ccap_weekly_child_care_hours: 30
+      expect: FULL_TIME
+
+    - name: "Three-quarter time: 25 hours"
+      period: 2024-01
+      inputs:
+          ccap_weekly_child_care_hours: 25
+      expect: THREE_QUARTER_TIME
+
+    - name: "Half-time: 15 hours"
+      period: 2024-01
+      inputs:
+          ccap_weekly_child_care_hours: 15
+      expect: HALF_TIME
+
+    - name: "Boundary: 29 hours is three-quarter time (not full-time)"
+      period: 2024-01
+      inputs:
+          ccap_weekly_child_care_hours: 29
+      expect: THREE_QUARTER_TIME
+
+    - name: "Boundary: exactly 20 hours is three-quarter time"
+      period: 2024-01
+      inputs:
+          ccap_weekly_child_care_hours: 20
+      expect: THREE_QUARTER_TIME
+
+    - name: "Boundary: 19 hours is half-time (not three-quarter)"
+      period: 2024-01
+      inputs:
+          ccap_weekly_child_care_hours: 19
+      expect: HALF_TIME
+
+    - name: "Boundary: exactly 10 hours is half-time"
+      period: 2024-01
+      inputs:
+          ccap_weekly_child_care_hours: 10
+      expect: HALF_TIME
+
+    - name: "Boundary: 9 hours is quarter-time"
+      period: 2024-01
+      inputs:
+          ccap_weekly_child_care_hours: 9
+      expect: QUARTER_TIME
+
+    - name: "Quarter-time: 5 hours"
+      period: 2024-01
+      inputs:
+          ccap_weekly_child_care_hours: 5
+      expect: QUARTER_TIME
+
+    - name: "Zero hours defaults to quarter-time"
+      period: 2024-01
+      inputs:
+          ccap_weekly_child_care_hours: 0
+      expect: QUARTER_TIME

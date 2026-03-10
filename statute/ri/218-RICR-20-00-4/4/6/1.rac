@@ -1,0 +1,25 @@
+# 218 RICR 20-00-4.6.1 - General Requirements and Criteria (Income Eligibility)
+
+"""
+4.6.1 General Requirements and Criteria
+
+1. Financial Determination (A): Income limits at 180% FPL, with transitional
+   care up to 225% FPL for current recipients.
+B. Treatment of Resources: Liquid resources limit of $1,000,000.
+C. Family Cost Sharing Requirement: Graduated cost sharing based on income
+   as percentage of FPL.
+"""
+
+status: encoded
+
+ccap_income_and_resource_eligible:
+    imports:
+        - ri/218-RICR-20-00-4/4/6/1/A#ccap_income_eligible
+        - ri/218-RICR-20-00-4/4/6/1/B#ccap_resource_eligible
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "CCAP income and resource eligible"
+    description: "Whether family meets both income and resource eligibility per 218 RICR 20-00-4.6.1"
+    from 1998-01-01:
+        ccap_income_eligible and ccap_resource_eligible

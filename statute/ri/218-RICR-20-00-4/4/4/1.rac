@@ -1,0 +1,19 @@
+# 218 RICR 20-00-4.4.1 - Application
+
+"""
+4.4.1 Application
+Application period: Thirty (30) days from application date.
+Homeless applicants have up to ninety (90) days providing required documentation.
+"""
+
+status: encoded
+
+ccap_application_period_days:
+    description: "Standard number of days to complete CCAP application"
+    unit: days
+    from 1998-01-01: 30
+
+ccap_homeless_application_period_days:
+    description: "Extended number of days for homeless applicants to complete CCAP application"
+    unit: days
+    from 1998-01-01: 90

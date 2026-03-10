@@ -1,0 +1,160 @@
+# 218 RICR 20-00-4.5.1 - General Requirements and Criteria (Categorical) tests
+
+ccap_riw_need_met:
+    - name: "One-parent home with employment plan and activities - need met"
+      period: 2024-01
+      inputs:
+          ccap_is_two_parent_home: false
+          ccap_has_employment_plan: true
+          ccap_meets_riw_component_activities: true
+          ccap_both_parents_have_employment_plan: false
+      expect: true
+
+    - name: "One-parent home without employment plan - need not met"
+      period: 2024-01
+      inputs:
+          ccap_is_two_parent_home: false
+          ccap_has_employment_plan: false
+          ccap_meets_riw_component_activities: true
+          ccap_both_parents_have_employment_plan: false
+      expect: false
+
+    - name: "Two-parent home with both plans and activities - need met"
+      period: 2024-01
+      inputs:
+          ccap_is_two_parent_home: true
+          ccap_has_employment_plan: true
+          ccap_meets_riw_component_activities: true
+          ccap_both_parents_have_employment_plan: true
+      expect: true
+
+    - name: "Two-parent home without both plans - need not met"
+      period: 2024-01
+      inputs:
+          ccap_is_two_parent_home: true
+          ccap_has_employment_plan: true
+          ccap_meets_riw_component_activities: true
+          ccap_both_parents_have_employment_plan: false
+      expect: false
+
+ccap_ys_eligible:
+    - name: "YS participant under 20 meeting all criteria - eligible"
+      period: 2024-01
+      inputs:
+          ccap_is_ys_participant: true
+          ccap_ys_parent_age: 18
+          ccap_ys_parent_has_hs_diploma: false
+          ccap_ys_parent_in_home_visiting: true
+          ccap_ys_parent_in_approved_education: true
+      expect: true
+
+    - name: "YS participant age 20 - not eligible"
+      period: 2024-01
+      inputs:
+          ccap_is_ys_participant: true
+          ccap_ys_parent_age: 20
+          ccap_ys_parent_has_hs_diploma: false
+          ccap_ys_parent_in_home_visiting: true
+          ccap_ys_parent_in_approved_education: true
+      expect: false
+
+    - name: "YS participant with HS diploma - not eligible"
+      period: 2024-01
+      inputs:
+          ccap_is_ys_participant: true
+          ccap_ys_parent_age: 19
+          ccap_ys_parent_has_hs_diploma: true
+          ccap_ys_parent_in_home_visiting: true
+          ccap_ys_parent_in_approved_education: true
+      expect: false
+
+    - name: "Not a YS participant - not eligible"
+      period: 2024-01
+      inputs:
+          ccap_is_ys_participant: false
+          ccap_ys_parent_age: 18
+          ccap_ys_parent_has_hs_diploma: false
+          ccap_ys_parent_in_home_visiting: true
+          ccap_ys_parent_in_approved_education: true
+      expect: false
+
+ccap_categorically_eligible:
+    - name: "RIW recipient meeting general and need requirements - eligible"
+      period: 2024-01
+      inputs:
+          ccap_general_eligible: true
+          ccap_is_riw_recipient: true
+          ccap_is_two_parent_home: false
+          ccap_has_employment_plan: true
+          ccap_meets_riw_component_activities: true
+          ccap_both_parents_have_employment_plan: false
+          ccap_is_ys_participant: false
+          ccap_ys_parent_age: 0
+          ccap_ys_parent_has_hs_diploma: false
+          ccap_ys_parent_in_home_visiting: false
+          ccap_ys_parent_in_approved_education: false
+      expect: true
+
+    - name: "Not general eligible - not categorically eligible"
+      period: 2024-01
+      inputs:
+          ccap_general_eligible: false
+          ccap_is_riw_recipient: true
+          ccap_is_two_parent_home: false
+          ccap_has_employment_plan: true
+          ccap_meets_riw_component_activities: true
+          ccap_both_parents_have_employment_plan: false
+          ccap_is_ys_participant: false
+          ccap_ys_parent_age: 0
+          ccap_ys_parent_has_hs_diploma: false
+          ccap_ys_parent_in_home_visiting: false
+          ccap_ys_parent_in_approved_education: false
+      expect: false
+
+    - name: "YS participant meeting all criteria - categorically eligible"
+      period: 2024-01
+      inputs:
+          ccap_general_eligible: true
+          ccap_is_riw_recipient: false
+          ccap_is_two_parent_home: false
+          ccap_has_employment_plan: false
+          ccap_meets_riw_component_activities: false
+          ccap_both_parents_have_employment_plan: false
+          ccap_is_ys_participant: true
+          ccap_ys_parent_age: 18
+          ccap_ys_parent_has_hs_diploma: false
+          ccap_ys_parent_in_home_visiting: true
+          ccap_ys_parent_in_approved_education: true
+      expect: true
+
+    - name: "RIW recipient without employment plan - not eligible"
+      period: 2024-01
+      inputs:
+          ccap_general_eligible: true
+          ccap_is_riw_recipient: true
+          ccap_is_two_parent_home: false
+          ccap_has_employment_plan: false
+          ccap_meets_riw_component_activities: true
+          ccap_both_parents_have_employment_plan: false
+          ccap_is_ys_participant: false
+          ccap_ys_parent_age: 0
+          ccap_ys_parent_has_hs_diploma: false
+          ccap_ys_parent_in_home_visiting: false
+          ccap_ys_parent_in_approved_education: false
+      expect: false
+
+    - name: "Neither RIW nor YS - not categorically eligible"
+      period: 2024-01
+      inputs:
+          ccap_general_eligible: true
+          ccap_is_riw_recipient: false
+          ccap_is_two_parent_home: false
+          ccap_has_employment_plan: false
+          ccap_meets_riw_component_activities: false
+          ccap_both_parents_have_employment_plan: false
+          ccap_is_ys_participant: false
+          ccap_ys_parent_age: 0
+          ccap_ys_parent_has_hs_diploma: false
+          ccap_ys_parent_in_home_visiting: false
+          ccap_ys_parent_in_approved_education: false
+      expect: false

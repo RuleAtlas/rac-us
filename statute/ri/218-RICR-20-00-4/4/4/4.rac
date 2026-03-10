@@ -1,0 +1,13 @@
+# 218 RICR 20-00-4.4.4 - Redetermination
+
+"""
+4.4.4 Redetermination
+CCAP eligibility period: No less than twelve (12) months.
+"""
+
+status: encoded
+
+ccap_min_eligibility_period_months:
+    description: "Minimum CCAP eligibility period before redetermination"
+    unit: months
+    from 1998-01-01: 12

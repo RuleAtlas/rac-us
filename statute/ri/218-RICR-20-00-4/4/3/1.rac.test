@@ -1,0 +1,136 @@
+# 218 RICR 20-00-4.3.1 - General Eligibility Requirements tests
+
+ccap_age_eligible:
+    - name: "Child under 13 and over 1 week - age eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 5
+          ccap_child_age_weeks: 260
+          ccap_child_is_disabled: false
+          ccap_child_turns_thirteen_during_cert: false
+      expect: true
+
+    - name: "Newborn under 1 week - not age eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 0
+          ccap_child_age_weeks: 0
+          ccap_child_is_disabled: false
+          ccap_child_turns_thirteen_during_cert: false
+      expect: false
+
+    - name: "Child exactly 13 not disabled - not age eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 13
+          ccap_child_age_weeks: 676
+          ccap_child_is_disabled: false
+          ccap_child_turns_thirteen_during_cert: false
+      expect: false
+
+    - name: "Disabled child age 15 - age eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 15
+          ccap_child_age_weeks: 780
+          ccap_child_is_disabled: true
+          ccap_child_turns_thirteen_during_cert: false
+      expect: true
+
+    - name: "Disabled child age 18 - age eligible (inclusive upper bound)"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 18
+          ccap_child_age_weeks: 936
+          ccap_child_is_disabled: true
+          ccap_child_turns_thirteen_during_cert: false
+      expect: true
+
+    - name: "Disabled child age 19 - not age eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 19
+          ccap_child_age_weeks: 988
+          ccap_child_is_disabled: true
+          ccap_child_turns_thirteen_during_cert: false
+      expect: false
+
+    - name: "Child turns 13 during cert period - age eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 13
+          ccap_child_age_weeks: 676
+          ccap_child_is_disabled: false
+          ccap_child_turns_thirteen_during_cert: true
+      expect: true
+
+ccap_general_eligible:
+    - name: "Child meets all general requirements - eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 5
+          ccap_child_age_weeks: 260
+          ccap_child_is_disabled: false
+          ccap_child_turns_thirteen_during_cert: false
+          ccap_child_lives_with_parent: true
+          ccap_is_ri_resident: true
+          ccap_is_us_citizen_or_qualified_immigrant: true
+          ccap_meets_need_for_services: true
+          ccap_cooperates_with_ocss: true
+      expect: true
+
+    - name: "Child not RI resident - not eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 5
+          ccap_child_age_weeks: 260
+          ccap_child_is_disabled: false
+          ccap_child_turns_thirteen_during_cert: false
+          ccap_child_lives_with_parent: true
+          ccap_is_ri_resident: false
+          ccap_is_us_citizen_or_qualified_immigrant: true
+          ccap_meets_need_for_services: true
+          ccap_cooperates_with_ocss: true
+      expect: false
+
+    - name: "Child does not live with parent - not eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 5
+          ccap_child_age_weeks: 260
+          ccap_child_is_disabled: false
+          ccap_child_turns_thirteen_during_cert: false
+          ccap_child_lives_with_parent: false
+          ccap_is_ri_resident: true
+          ccap_is_us_citizen_or_qualified_immigrant: true
+          ccap_meets_need_for_services: true
+          ccap_cooperates_with_ocss: true
+      expect: false
+
+    - name: "Age ineligible child (too young) - not eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 0
+          ccap_child_age_weeks: 0
+          ccap_child_is_disabled: false
+          ccap_child_turns_thirteen_during_cert: false
+          ccap_child_lives_with_parent: true
+          ccap_is_ri_resident: true
+          ccap_is_us_citizen_or_qualified_immigrant: true
+          ccap_meets_need_for_services: true
+          ccap_cooperates_with_ocss: true
+      expect: false
+
+    - name: "Parent does not meet need for services - not eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 5
+          ccap_child_age_weeks: 260
+          ccap_child_is_disabled: false
+          ccap_child_turns_thirteen_during_cert: false
+          ccap_child_lives_with_parent: true
+          ccap_is_ri_resident: true
+          ccap_is_us_citizen_or_qualified_immigrant: true
+          ccap_meets_need_for_services: false
+          ccap_cooperates_with_ocss: true
+      expect: false
