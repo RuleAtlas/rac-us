@@ -1,0 +1,25 @@
+# 42 USC Section 607(d)(9) tests
+
+job_skills_training_is_work_activity:
+    - name: "Engaged in job skills training - qualifies as work activity"
+      period: 2024-01
+      inputs:
+          is_engaged_in_job_skills_training: true
+      expect: true
+
+    - name: "Not engaged in job skills training - does not qualify"
+      period: 2024-01
+      inputs:
+          is_engaged_in_job_skills_training: false
+      expect: false
+
+    - name: "Engaged in job skills training in FY1997 - qualifies"
+      period: 1997-01
+      inputs:
+          is_engaged_in_job_skills_training: true
+      expect: true
+
+    - name: "Default - not engaged (default false)"
+      period: 2024-01
+      inputs: {}
+      expect: false

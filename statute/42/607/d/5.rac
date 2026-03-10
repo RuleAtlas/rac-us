@@ -1,0 +1,24 @@
+# 42 USC Section 607(d)(5) - On-the-job training
+
+"""
+(5) on-the-job training;
+"""
+
+status: encoded
+
+is_engaged_in_on_the_job_training:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Engaged in on-the-job training"
+    description: "Whether the individual is engaged in on-the-job training per 42 USC 607(d)(5)"
+    default: false
+
+on_the_job_training_is_work_activity:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "On-the-job training counts as work activity"
+    description: "On-the-job training qualifies as a work activity per 42 USC 607(d)(5)"
+    from 1996-10-01:
+        is_engaged_in_on_the_job_training

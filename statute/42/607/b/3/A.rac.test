@@ -1,0 +1,61 @@
+# 42 USC Section 607(b)(3)(A) tests
+
+caseload_reduction_credit:
+    - name: "No caseload decline - preceding equals baseline"
+      period: 2024
+      inputs:
+        preceding_fy_avg_monthly_caseload: 10000
+        baseline_avg_monthly_caseload: 10000
+      expect: 0
+
+    - name: "No caseload decline - preceding exceeds baseline"
+      period: 2024
+      inputs:
+        preceding_fy_avg_monthly_caseload: 12000
+        baseline_avg_monthly_caseload: 10000
+      expect: 0
+
+    - name: "20 percent caseload decline"
+      period: 2024
+      inputs:
+        preceding_fy_avg_monthly_caseload: 8000
+        baseline_avg_monthly_caseload: 10000
+      expect: 0.20
+
+    - name: "Full caseload decline - preceding is zero"
+      period: 2024
+      inputs:
+        preceding_fy_avg_monthly_caseload: 0
+        baseline_avg_monthly_caseload: 10000
+      expect: 1.0
+
+    - name: "Zero baseline caseload returns zero"
+      period: 2024
+      inputs:
+        preceding_fy_avg_monthly_caseload: 5000
+        baseline_avg_monthly_caseload: 0
+      expect: 0
+
+    - name: "Decline partially offset by federally required reduction"
+      period: 2024
+      inputs:
+        preceding_fy_avg_monthly_caseload: 7000
+        baseline_avg_monthly_caseload: 10000
+        caseload_reduction_required_by_federal_law: 1000
+      expect: 0.20
+
+    - name: "Decline fully offset by federally required reduction"
+      period: 2024
+      inputs:
+        preceding_fy_avg_monthly_caseload: 8000
+        baseline_avg_monthly_caseload: 10000
+        caseload_reduction_required_by_federal_law: 2000
+      expect: 0
+
+    - name: "Federally required reduction exceeds total decline"
+      period: 2024
+      inputs:
+        preceding_fy_avg_monthly_caseload: 9000
+        baseline_avg_monthly_caseload: 10000
+        caseload_reduction_required_by_federal_law: 5000
+      expect: 0

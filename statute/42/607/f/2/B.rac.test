@@ -1,0 +1,35 @@
+# 42 USC Section 607(f)(2)(B) tests
+
+violates_workforce_reduction_restriction:
+    - name: "Employer terminated regular employee to create vacancy - violates restriction"
+      period: 2024-01
+      inputs:
+          has_employer_terminated_regular_employee_to_create_vacancy: true
+          has_employer_caused_involuntary_workforce_reduction_to_create_vacancy: false
+      expect: true
+
+    - name: "Employer caused involuntary workforce reduction - violates restriction"
+      period: 2024-01
+      inputs:
+          has_employer_terminated_regular_employee_to_create_vacancy: false
+          has_employer_caused_involuntary_workforce_reduction_to_create_vacancy: true
+      expect: true
+
+    - name: "Both termination and involuntary reduction - violates restriction"
+      period: 2024-01
+      inputs:
+          has_employer_terminated_regular_employee_to_create_vacancy: true
+          has_employer_caused_involuntary_workforce_reduction_to_create_vacancy: true
+      expect: true
+
+    - name: "Neither termination nor involuntary reduction - no violation"
+      period: 2024-01
+      inputs:
+          has_employer_terminated_regular_employee_to_create_vacancy: false
+          has_employer_caused_involuntary_workforce_reduction_to_create_vacancy: false
+      expect: false
+
+    - name: "Default - no violation"
+      period: 2024-01
+      inputs: {}
+      expect: false

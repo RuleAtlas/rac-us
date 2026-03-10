@@ -1,0 +1,25 @@
+# 42 USC Section 607(e)(2)(C) - Unavailability of appropriate and affordable formal child care
+
+"""
+(C) Unavailability of appropriate and affordable formal child care
+arrangements.
+"""
+
+status: encoded
+
+appropriate_and_affordable_formal_child_care_unavailable:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Appropriate and affordable formal child care unavailable"
+    description: "Whether appropriate and affordable formal child care arrangements are unavailable per 42 USC 607(e)(2)(C)"
+    default: false
+
+formal_child_care_exception_applies:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Formal child care exception applies"
+    description: "The work penalty exception applies due to unavailability of appropriate and affordable formal child care arrangements per 42 USC 607(e)(2)(C)"
+    from 1997-07-01:
+        appropriate_and_affordable_formal_child_care_unavailable

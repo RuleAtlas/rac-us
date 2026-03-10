@@ -1,0 +1,35 @@
+# 42 USC Section 607(b)(1)(B)(i) tests
+
+tanf_work_participation_numerator_family:
+    - name: "Family receiving assistance with working adult counts in numerator"
+      period: 2024-01
+      inputs:
+        is_receiving_tanf_assistance: true
+        includes_working_adult_or_minor_hoh: true
+      expect: true
+
+    - name: "Family receiving assistance without working adult does not count"
+      period: 2024-01
+      inputs:
+        is_receiving_tanf_assistance: true
+        includes_working_adult_or_minor_hoh: false
+      expect: false
+
+    - name: "Family not receiving assistance with working adult does not count"
+      period: 2024-01
+      inputs:
+        is_receiving_tanf_assistance: false
+        includes_working_adult_or_minor_hoh: true
+      expect: false
+
+    - name: "Family not receiving assistance without working adult does not count"
+      period: 2024-01
+      inputs:
+        is_receiving_tanf_assistance: false
+        includes_working_adult_or_minor_hoh: false
+      expect: false
+
+    - name: "Default inputs - no assistance, no working adult"
+      period: 2024-01
+      inputs: {}
+      expect: false

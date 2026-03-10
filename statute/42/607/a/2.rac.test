@@ -1,0 +1,18 @@
+# 42 USC Section 607(a)(2) tests
+
+two_parent_min_participation_rate:
+    - name: "FY1997 - first year rate"
+      period: 1997-01
+      expect: 0.75
+
+    - name: "FY1998 - same rate as FY1997"
+      period: 1998-01
+      expect: 0.75
+
+    - name: "FY1999 - rate increases to 90%"
+      period: 1999-01
+      expect: 0.90
+
+    - name: "FY2024 - rate unchanged since 1999"
+      period: 2024-01
+      expect: 0.90

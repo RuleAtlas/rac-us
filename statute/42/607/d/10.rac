@@ -1,0 +1,34 @@
+# 42 USC Section 607(d)(10) - Education directly related to employment
+
+"""
+(10) education directly related to employment, in the case of a
+recipient who has not received a high school diploma or a certificate
+of high school equivalency;
+"""
+
+status: encoded
+
+is_engaged_in_education_related_to_employment:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Engaged in education directly related to employment"
+    description: "Whether the individual is engaged in education directly related to employment per 42 USC 607(d)(10)"
+    default: false
+
+has_high_school_diploma_or_equivalency:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Has high school diploma or equivalency certificate"
+    description: "Whether the individual has received a high school diploma or a certificate of high school equivalency per 42 USC 607(d)(10)"
+    default: false
+
+education_related_to_employment_is_work_activity:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Education related to employment counts as work activity"
+    description: "Education directly related to employment qualifies as a work activity only for recipients who have not received a high school diploma or equivalency certificate per 42 USC 607(d)(10)"
+    from 1996-10-01:
+        is_engaged_in_education_related_to_employment and not has_high_school_diploma_or_equivalency

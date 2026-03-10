@@ -1,0 +1,34 @@
+# 42 USC Section 607(f)(2)(B) - Workforce reduction restriction
+
+"""
+(B) the employer has terminated the employment of any regular employee
+or otherwise caused an involuntary reduction of its workforce in order
+to fill the vacancy so created with an adult described in paragraph (1).
+"""
+
+status: encoded
+
+has_employer_terminated_regular_employee_to_create_vacancy:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Employer terminated regular employee to create vacancy"
+    description: "Whether the employer has terminated the employment of any regular employee in order to fill the vacancy so created with a TANF adult per 42 USC 607(f)(2)(B)"
+    default: false
+
+has_employer_caused_involuntary_workforce_reduction_to_create_vacancy:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Employer caused involuntary workforce reduction to create vacancy"
+    description: "Whether the employer has otherwise caused an involuntary reduction of its workforce in order to fill the vacancy so created with a TANF adult per 42 USC 607(f)(2)(B)"
+    default: false
+
+violates_workforce_reduction_restriction:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Violates workforce reduction restriction"
+    description: "Whether the workforce reduction restriction of 42 USC 607(f)(2)(B) is triggered because the employer terminated a regular employee or caused an involuntary workforce reduction to create the vacancy"
+    from 1996-10-01:
+        has_employer_terminated_regular_employee_to_create_vacancy or has_employer_caused_involuntary_workforce_reduction_to_create_vacancy

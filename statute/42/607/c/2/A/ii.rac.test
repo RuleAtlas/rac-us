@@ -1,0 +1,37 @@
+# 42 USC Section 607(c)(2)(A)(ii) tests
+
+partial_week_counts_as_full_week:
+    - name: "3 days in a week, no prior occasions used - counts"
+      period: 2024-01
+      inputs:
+          job_search_days_in_week: 3
+          partial_week_occasions_used: 0
+      expect: true
+
+    - name: "4 days in a week, no prior occasions used - counts"
+      period: 2024-01
+      inputs:
+          job_search_days_in_week: 4
+          partial_week_occasions_used: 0
+      expect: true
+
+    - name: "3 days in a week, occasion already used - does not count"
+      period: 2024-01
+      inputs:
+          job_search_days_in_week: 3
+          partial_week_occasions_used: 1
+      expect: false
+
+    - name: "2 days in a week - too few days, does not count"
+      period: 2024-01
+      inputs:
+          job_search_days_in_week: 2
+          partial_week_occasions_used: 0
+      expect: false
+
+    - name: "5 days in a week - full week, partial rule not applicable"
+      period: 2024-01
+      inputs:
+          job_search_days_in_week: 5
+          partial_week_occasions_used: 0
+      expect: false

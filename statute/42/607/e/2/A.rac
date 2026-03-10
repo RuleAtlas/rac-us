@@ -1,0 +1,25 @@
+# 42 USC Section 607(e)(2)(A) - Unavailability of appropriate child care within reasonable distance
+
+"""
+(A) Unavailability of appropriate child care within a reasonable
+distance from the individual's home or work site.
+"""
+
+status: encoded
+
+appropriate_child_care_unavailable_within_reasonable_distance:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Appropriate child care unavailable within reasonable distance"
+    description: "Whether appropriate child care is unavailable within a reasonable distance from the individual's home or work site per 42 USC 607(e)(2)(A)"
+    default: false
+
+child_care_distance_exception_applies:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Child care distance/unavailability exception applies"
+    description: "The work penalty exception applies due to unavailability of appropriate child care within a reasonable distance from home or work site per 42 USC 607(e)(2)(A)"
+    from 1997-07-01:
+        appropriate_child_care_unavailable_within_reasonable_distance

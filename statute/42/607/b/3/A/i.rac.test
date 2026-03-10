@@ -1,0 +1,31 @@
+# 42 USC Section 607(b)(3)(A)(i) tests
+
+is_caseload_family_preceding_fy:
+    - name: "Family receiving TANF assistance is counted in caseload"
+      period: 2024-01
+      inputs:
+        is_receiving_tanf_assistance: true
+      expect: true
+
+    - name: "Family not receiving TANF assistance is not counted"
+      period: 2024-01
+      inputs:
+        is_receiving_tanf_assistance: false
+      expect: false
+
+    - name: "Default - family not counted (default is false)"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Family receiving assistance in FY1997"
+      period: 1997-01
+      inputs:
+        is_receiving_tanf_assistance: true
+      expect: true
+
+    - name: "Family not receiving assistance before effective date"
+      period: 1996-09
+      inputs:
+        is_receiving_tanf_assistance: true
+      expect: null

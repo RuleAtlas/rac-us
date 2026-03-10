@@ -1,0 +1,48 @@
+# 42 USC Section 607(b)(1)(B) - Monthly participation rates - all families
+
+"""
+(B) Monthly participation rates.-- The participation rate of a State
+for all families of the State for a month, expressed as a percentage,
+is--
+(i) the number of families receiving assistance under the State program
+funded under this part or any other State program funded with qualified
+State expenditures (as defined in section 609(a)(7)(B)(i) of this title)
+that include an adult or a minor child head of household who is engaged
+in work for the month; divided by
+(ii) the amount by which--
+(I) the number of families receiving such assistance during the month
+that include an adult or a minor child head of household receiving such
+assistance; exceeds
+(II) the number of families receiving such assistance that are subject
+in such month to a penalty described in subsection (e)(1) but have not
+been subject to such penalty for more than 3 months within the preceding
+12-month period (whether or not consecutive).
+"""
+
+status: encoded
+
+tanf_families_in_numerator:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Number of families in participation rate numerator"
+    description: "State-level count of families counted in the numerator per 42 USC 607(b)(1)(B)(i): families receiving TANF assistance that include an adult or minor child head of household engaged in work"
+    default: 0
+
+tanf_families_in_denominator:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Number of families in participation rate denominator"
+    description: "State-level count of families counted in the denominator per 42 USC 607(b)(1)(B)(ii): total denominator families (clause I) minus penalty-excluded families (clause II)"
+    default: 0
+
+tanf_monthly_participation_rate_all_families:
+    entity: Family
+    period: Month
+    dtype: Rate
+    label: "Monthly TANF work participation rate - all families"
+    description: "The participation rate of a State for all families for a month, expressed as a percentage (stored as a rate), per 42 USC 607(b)(1)(B): numerator (clause i) divided by denominator (clause ii)"
+    from 1996-10-01:
+        if tanf_families_in_denominator == 0: 0
+        else: tanf_families_in_numerator / tanf_families_in_denominator

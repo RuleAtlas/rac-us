@@ -1,0 +1,53 @@
+# 42 USC Section 607(b)(3)(A) - Caseload reduction credit - in general
+
+"""
+(A) In general.-- The Secretary shall prescribe regulations for reducing
+the minimum participation rate otherwise required by this section for a
+fiscal year by the number of percentage points equal to the number of
+percentage points (if any) by which--
+
+(i) the average monthly number of families receiving assistance during
+the immediately preceding fiscal year under the State program funded under
+this part or any other State program funded with qualified State
+expenditures (as defined in section 609(a)(7)(B)(i) of this title)
+is less than
+
+(ii) the average monthly number of families that received assistance
+under any State program referred to in clause (i) during fiscal year 2015.
+
+The minimum participation rate shall not be reduced to the extent that
+the Secretary determines that the reduction in the number of families
+receiving such assistance is required by Federal law.
+"""
+
+status: encoded
+
+preceding_fy_avg_monthly_caseload:
+    entity: Family
+    period: Year
+    dtype: Integer
+    label: "Preceding fiscal year average monthly caseload"
+    description: "The average monthly number of families receiving assistance during the immediately preceding fiscal year under the State TANF program or any other State program funded with qualified State expenditures, per 42 USC 607(b)(3)(A)(i). State-level aggregate provided as exogenous data."
+    default: 0
+
+caseload_reduction_required_by_federal_law:
+    entity: Family
+    period: Year
+    dtype: Integer
+    label: "Caseload reduction required by Federal law"
+    description: "The number of families whose reduction from the caseload is determined by the Secretary to be required by Federal law, per the proviso in 42 USC 607(b)(3)(A). State-level aggregate provided as exogenous data."
+    default: 0
+
+caseload_reduction_credit:
+    imports:
+        - 42/607/b/3/A/ii#baseline_avg_monthly_caseload
+    entity: Family
+    period: Year
+    dtype: Rate
+    label: "Caseload reduction credit"
+    description: "Pro rata reduction of the minimum participation rate due to caseload reductions not required by Federal law and not resulting from changes in State eligibility criteria, per 42 USC 607(b)(3)(A). Expressed as a rate (e.g. 0.20 = 20 percentage points)."
+    from 1996-10-01:
+        if baseline_avg_monthly_caseload == 0: 0
+        total_decline = max(0, baseline_avg_monthly_caseload - preceding_fy_avg_monthly_caseload)
+        eligible_decline = max(0, total_decline - caseload_reduction_required_by_federal_law)
+        eligible_decline / baseline_avg_monthly_caseload

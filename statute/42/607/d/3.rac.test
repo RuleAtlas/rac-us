@@ -1,0 +1,25 @@
+# 42 USC Section 607(d)(3) tests
+
+subsidized_public_sector_employment_is_work_activity:
+    - name: "Engaged in subsidized public sector employment - qualifies as work activity"
+      period: 2024-01
+      inputs:
+          is_engaged_in_subsidized_public_sector_employment: true
+      expect: true
+
+    - name: "Not engaged in subsidized public sector employment - does not qualify"
+      period: 2024-01
+      inputs:
+          is_engaged_in_subsidized_public_sector_employment: false
+      expect: false
+
+    - name: "Engaged in subsidized public sector employment in FY1997 - qualifies"
+      period: 1997-01
+      inputs:
+          is_engaged_in_subsidized_public_sector_employment: true
+      expect: true
+
+    - name: "Default - not engaged (default false)"
+      period: 2024-01
+      inputs: {}
+      expect: false

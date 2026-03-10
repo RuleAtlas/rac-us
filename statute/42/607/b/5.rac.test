@@ -1,0 +1,39 @@
+# 42 USC Section 607(b)(5) tests
+
+infant_care_exempt:
+    - name: "Single custodial parent with infant when state elects exemption"
+      period: 2024-01
+      inputs:
+        state_elects_infant_care_exemption: true
+        is_single_custodial_parent: true
+        youngest_child_age_months: 6
+      expect: true
+
+    - name: "State does not elect exemption"
+      period: 2024-01
+      inputs:
+        state_elects_infant_care_exemption: false
+        is_single_custodial_parent: true
+        youngest_child_age_months: 6
+      expect: false
+
+    - name: "Not a single custodial parent"
+      period: 2024-01
+      inputs:
+        state_elects_infant_care_exemption: true
+        is_single_custodial_parent: false
+        youngest_child_age_months: 6
+      expect: false
+
+    - name: "Child at exactly 12 months - not eligible"
+      period: 2024-01
+      inputs:
+        state_elects_infant_care_exemption: true
+        is_single_custodial_parent: true
+        youngest_child_age_months: 12
+      expect: false
+
+    - name: "Defaults - no conditions met"
+      period: 2024-01
+      inputs: {}
+      expect: false

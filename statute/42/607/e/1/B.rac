@@ -1,0 +1,42 @@
+# 42 USC Section 607(e)(1)(B) - Termination of assistance
+
+"""
+(B) terminate such assistance,
+
+subject to such good cause and other exceptions as the State may establish.
+"""
+
+status: encoded
+
+state_elects_assistance_termination:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "State elects termination for work refusal"
+    description: "Whether the State elects to terminate assistance rather than reduce it pro rata per 42 USC 607(e)(1)(B)"
+    default: false
+
+refuses_to_engage_in_work:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Refuses to engage in required work"
+    description: "Whether the individual refuses to engage in work required in accordance with 42 USC 607"
+    default: false
+
+has_good_cause_exception:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Has good cause exception"
+    description: "Whether the individual has a good cause or other exception as established by the State per 42 USC 607(e)(1)"
+    default: false
+
+assistance_terminated_for_work_refusal:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Assistance terminated for work refusal"
+    description: "Whether assistance is terminated because individual refused to engage in required work per 42 USC 607(e)(1)(B)"
+    from 1996-10-01:
+        state_elects_assistance_termination and refuses_to_engage_in_work and not has_good_cause_exception

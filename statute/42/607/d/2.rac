@@ -1,0 +1,15 @@
+# 42 USC Section 607(d)(2) - Subsidized private sector employment
+
+"""
+(2) subsidized private sector employment;
+"""
+
+status: encoded
+
+is_engaged_in_subsidized_private_sector_employment:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Engaged in subsidized private sector employment"
+    description: "Whether the individual is engaged in subsidized private sector employment, a qualifying work activity per 42 USC 607(d)(2)"
+    default: false

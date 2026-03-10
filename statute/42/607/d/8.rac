@@ -1,0 +1,38 @@
+# 42 USC Section 607(d)(8) - Vocational educational training (12-month limit)
+
+"""
+(8) vocational educational training (not to exceed 12 months with
+respect to any individual);
+"""
+
+status: encoded
+
+vocational_educational_training_month_limit:
+    description: "Maximum months of vocational educational training that count as a work activity per 42 USC 607(d)(8)"
+    unit: months
+    from 1996-10-01: 12
+
+is_engaged_in_vocational_educational_training:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Engaged in vocational educational training"
+    description: "Whether the individual is engaged in vocational educational training per 42 USC 607(d)(8)"
+    default: false
+
+vocational_educational_training_months_used:
+    entity: Person
+    period: Month
+    dtype: Integer
+    label: "Months of vocational educational training used"
+    description: "Cumulative months of vocational educational training already counted as a work activity for this individual per 42 USC 607(d)(8)"
+    default: 0
+
+vocational_educational_training_is_work_activity:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Vocational educational training counts as work activity"
+    description: "Vocational educational training qualifies as a work activity only if the individual has not exceeded 12 months, per 42 USC 607(d)(8)"
+    from 1996-10-01:
+        is_engaged_in_vocational_educational_training and vocational_educational_training_months_used < vocational_educational_training_month_limit

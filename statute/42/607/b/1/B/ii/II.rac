@@ -1,0 +1,39 @@
+# 42 USC Section 607(b)(1)(B)(ii)(II) - Monthly rate denominator - penalty exclusion
+
+"""
+(II) the number of families receiving such assistance that are subject
+in such month to a penalty described in subsection (e)(1) but have not
+been subject to such penalty for more than 3 months within the
+preceding 12-month period (whether or not consecutive).
+"""
+
+status: encoded
+
+penalty_exclusion_max_months:
+    description: "Maximum months subject to e(1) penalty in lookback period for denominator exclusion"
+    from 1996-10-01: 3
+
+penalty_exclusion_lookback_months:
+    description: "Preceding period in months over which penalty months are counted"
+    from 1996-10-01: 12
+
+months_subject_to_e1_penalty_in_lookback:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Months subject to e(1) penalty in preceding period"
+    description: "Number of months the family has been subject to a penalty under 42 USC 607(e)(1) within the preceding 12-month period (whether or not consecutive)"
+    default: 0
+
+is_penalty_exclusion_family:
+    imports:
+        - 42/607/e/1#work_refusal_penalty
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Family excluded from denominator due to recent penalty"
+    description: "Whether the family qualifies for exclusion from the participation rate denominator per 42 USC 607(b)(1)(B)(ii)(II) - subject to e(1) penalty this month but not for more than 3 months in the preceding 12"
+    from 1996-10-01:
+        is_subject_this_month = work_refusal_penalty > 0
+        within_exclusion_limit = months_subject_to_e1_penalty_in_lookback <= penalty_exclusion_max_months
+        is_subject_this_month and within_exclusion_limit

@@ -1,0 +1,51 @@
+# 42 USC Section 607(c)(1)(A) tests
+
+is_engaged_in_work_all_families:
+    - name: "FY1997 - meets both minimums (20 total, 20 core)"
+      period: 1997-01
+      inputs:
+          total_work_activity_hours_per_week: 20
+          core_work_activity_hours_per_week: 20
+      expect: true
+
+    - name: "FY1997 - total hours met but core hours not met"
+      period: 1997-01
+      inputs:
+          total_work_activity_hours_per_week: 20
+          core_work_activity_hours_per_week: 15
+      expect: false
+
+    - name: "FY1999 - needs 25 total, has only 20"
+      period: 1999-01
+      inputs:
+          total_work_activity_hours_per_week: 20
+          core_work_activity_hours_per_week: 20
+      expect: false
+
+    - name: "FY1999 - meets 25 total and 20 core"
+      period: 1999-01
+      inputs:
+          total_work_activity_hours_per_week: 25
+          core_work_activity_hours_per_week: 20
+      expect: true
+
+    - name: "FY2000+ - needs 30 total, has 30 total and 20 core"
+      period: 2000-01
+      inputs:
+          total_work_activity_hours_per_week: 30
+          core_work_activity_hours_per_week: 20
+      expect: true
+
+    - name: "FY2000+ - has 30 total but only 19 core"
+      period: 2000-01
+      inputs:
+          total_work_activity_hours_per_week: 30
+          core_work_activity_hours_per_week: 19
+      expect: false
+
+    - name: "Zero hours - not engaged"
+      period: 2024-01
+      inputs:
+          total_work_activity_hours_per_week: 0
+          core_work_activity_hours_per_week: 0
+      expect: false

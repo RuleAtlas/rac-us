@@ -1,0 +1,31 @@
+# 42 USC Section 607(e)(2)(C) tests
+
+formal_child_care_exception_applies:
+    - name: "Exception applies when formal child care is unavailable"
+      period: 2024-01
+      inputs:
+        appropriate_and_affordable_formal_child_care_unavailable: true
+      expect: true
+
+    - name: "Exception does not apply when formal child care is available"
+      period: 2024-01
+      inputs:
+        appropriate_and_affordable_formal_child_care_unavailable: false
+      expect: false
+
+    - name: "Default is false when no input provided"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Exception applies in recent fiscal year"
+      period: 2025-10
+      inputs:
+        appropriate_and_affordable_formal_child_care_unavailable: true
+      expect: true
+
+    - name: "Exception does not apply before effective date"
+      period: 1996-01
+      inputs:
+        appropriate_and_affordable_formal_child_care_unavailable: true
+      expect: 0

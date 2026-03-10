@@ -1,0 +1,25 @@
+# 42 USC Section 607(c)(2)(C)(i) tests
+
+teen_hoh_meets_school_attendance:
+    - name: "Maintains satisfactory secondary school attendance"
+      period: 2024-01
+      inputs:
+          maintains_satisfactory_secondary_school_attendance: true
+      expect: true
+
+    - name: "Does not maintain satisfactory school attendance"
+      period: 2024-01
+      inputs:
+          maintains_satisfactory_secondary_school_attendance: false
+      expect: false
+
+    - name: "Default - no attendance declared"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Effective date - FY1997 with attendance"
+      period: 1997-01
+      inputs:
+          maintains_satisfactory_secondary_school_attendance: true
+      expect: true

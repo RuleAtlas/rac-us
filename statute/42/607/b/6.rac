@@ -1,0 +1,41 @@
+# 42 USC Section 607(b)(6) - De minimis threshold
+
+"""
+(6) The Secretary shall determine participation rates under this section
+without regard to any individual engaged in work in a family that
+receives no assistance under this part and less than $35 in assistance
+funded with qualified State expenditures (as defined in section
+609(a)(7)(B)(i) of this title).
+"""
+
+status: encoded
+
+de_minimis_assistance_threshold:
+    description: "De minimis threshold for qualified State expenditure assistance below which families are excluded from participation rate calculations per 42 USC 607(b)(6)"
+    unit: USD
+    from 2025-10-01: 35
+
+tanf_part_a_assistance_amount:
+    entity: Family
+    period: Month
+    dtype: Money
+    label: "TANF Part A assistance amount"
+    description: "Amount of assistance received by the family under Part A of Title IV (TANF)"
+    default: 0
+
+qualified_state_expenditure_assistance_amount:
+    entity: Family
+    period: Month
+    dtype: Money
+    label: "Qualified State expenditure assistance amount"
+    description: "Amount of assistance received by the family funded with qualified State expenditures as defined in 42 USC 609(a)(7)(B)(i)"
+    default: 0
+
+excluded_from_participation_rate_de_minimis:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Excluded from participation rate under de minimis threshold"
+    description: "Whether the family is excluded from participation rate calculations because it receives no TANF Part A assistance and less than $35 in qualified State expenditure assistance per 42 USC 607(b)(6)"
+    from 2025-10-01:
+        tanf_part_a_assistance_amount == 0 and qualified_state_expenditure_assistance_amount < de_minimis_assistance_threshold

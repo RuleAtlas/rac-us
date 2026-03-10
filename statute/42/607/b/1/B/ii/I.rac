@@ -1,0 +1,34 @@
+# 42 USC Section 607(b)(1)(B)(ii)(I) - Total families in denominator
+
+"""
+(I) the number of families receiving such assistance during the
+month that include an adult or a minor child head of household
+receiving such assistance;
+"""
+
+status: encoded
+
+is_receiving_tanf_assistance:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Receiving TANF assistance"
+    description: "Whether the family is receiving assistance under the State TANF program or any other State program funded with qualified State expenditures"
+    default: false
+
+has_adult_or_minor_child_hoh:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Includes adult or minor child head of household"
+    description: "Whether the family includes an adult or a minor child head of household receiving such assistance"
+    default: false
+
+is_tanf_denominator_family:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Family counted in participation rate denominator total"
+    description: "Whether the family is counted in the total families for the monthly participation rate denominator per 42 USC 607(b)(1)(B)(ii)(I)"
+    from 1996-10-01:
+        is_receiving_tanf_assistance and has_adult_or_minor_child_hoh

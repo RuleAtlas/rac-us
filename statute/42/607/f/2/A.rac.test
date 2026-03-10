@@ -1,0 +1,19 @@
+# 42 USC Section 607(f)(2)(A) tests
+
+violates_layoff_restriction:
+    - name: "Other individual on layoff - violates restriction"
+      period: 2024-01
+      inputs:
+          is_other_individual_on_layoff_from_same_or_equivalent_position: true
+      expect: true
+
+    - name: "No individual on layoff - no violation"
+      period: 2024-01
+      inputs:
+          is_other_individual_on_layoff_from_same_or_equivalent_position: false
+      expect: false
+
+    - name: "Default - no layoff, no violation"
+      period: 2024-01
+      inputs: {}
+      expect: false

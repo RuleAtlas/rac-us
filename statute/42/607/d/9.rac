@@ -1,0 +1,24 @@
+# 42 USC Section 607(d)(9) - Job skills training directly related to employment
+
+"""
+(9) job skills training directly related to employment;
+"""
+
+status: encoded
+
+is_engaged_in_job_skills_training:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Engaged in job skills training directly related to employment"
+    description: "Whether the individual is engaged in job skills training directly related to employment per 42 USC 607(d)(9)"
+    default: false
+
+job_skills_training_is_work_activity:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Job skills training counts as work activity"
+    description: "Job skills training directly related to employment qualifies as a work activity per 42 USC 607(d)(9)"
+    from 1996-10-01:
+        is_engaged_in_job_skills_training

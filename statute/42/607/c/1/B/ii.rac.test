@@ -1,0 +1,46 @@
+# 42 USC Section 607(c)(1)(B)(ii) tests
+
+two_parent_child_care_work_requirement_met:
+    - name: "No child care - requirement automatically met"
+      period: 2024-01
+      inputs:
+        receives_federally_funded_child_care: false
+        two_parent_total_weekly_work_hours: 0
+        two_parent_core_weekly_work_hours: 0
+      expect: true
+
+    - name: "Child care with disabled adult exemption - requirement met"
+      period: 2024-01
+      inputs:
+        receives_federally_funded_child_care: true
+        has_disabled_adult_or_caring_for_severely_disabled_child: true
+        two_parent_total_weekly_work_hours: 0
+        two_parent_core_weekly_work_hours: 0
+      expect: true
+
+    - name: "Child care with sufficient hours - requirement met"
+      period: 2024-01
+      inputs:
+        receives_federally_funded_child_care: true
+        has_disabled_adult_or_caring_for_severely_disabled_child: false
+        two_parent_total_weekly_work_hours: 55
+        two_parent_core_weekly_work_hours: 50
+      expect: true
+
+    - name: "Child care with insufficient total hours - requirement not met"
+      period: 2024-01
+      inputs:
+        receives_federally_funded_child_care: true
+        has_disabled_adult_or_caring_for_severely_disabled_child: false
+        two_parent_total_weekly_work_hours: 54
+        two_parent_core_weekly_work_hours: 50
+      expect: false
+
+    - name: "Child care with insufficient core hours - requirement not met"
+      period: 2024-01
+      inputs:
+        receives_federally_funded_child_care: true
+        has_disabled_adult_or_caring_for_severely_disabled_child: false
+        two_parent_total_weekly_work_hours: 55
+        two_parent_core_weekly_work_hours: 49
+      expect: false

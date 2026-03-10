@@ -1,0 +1,35 @@
+# 42 USC Section 607(b)(6) tests
+
+excluded_from_participation_rate_de_minimis:
+    - name: "No Part A assistance and QSE below threshold - excluded"
+      period: 2026-01
+      inputs:
+        tanf_part_a_assistance_amount: 0
+        qualified_state_expenditure_assistance_amount: 20
+      expect: true
+
+    - name: "No Part A assistance and zero QSE - excluded"
+      period: 2026-01
+      inputs:
+        tanf_part_a_assistance_amount: 0
+        qualified_state_expenditure_assistance_amount: 0
+      expect: true
+
+    - name: "No Part A assistance but QSE at threshold - not excluded"
+      period: 2026-01
+      inputs:
+        tanf_part_a_assistance_amount: 0
+        qualified_state_expenditure_assistance_amount: 35
+      expect: false
+
+    - name: "Receives Part A assistance with low QSE - not excluded"
+      period: 2026-01
+      inputs:
+        tanf_part_a_assistance_amount: 100
+        qualified_state_expenditure_assistance_amount: 10
+      expect: false
+
+    - name: "Default inputs - no assistance at all - excluded"
+      period: 2026-01
+      inputs: {}
+      expect: true

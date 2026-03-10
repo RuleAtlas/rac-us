@@ -1,0 +1,54 @@
+# 42 USC Section 607(b)(5) - State option - infant care exemption
+
+"""
+(5) For any fiscal year, a State may, at its option, not require an
+individual who is a single custodial parent caring for a child who has
+not attained 12 months of age to engage in work, and may disregard such
+an individual in determining the participation rates under subsection (a)
+for not more than 12 months.
+"""
+
+status: encoded
+
+infant_age_threshold_months:
+    description: "Maximum age in months below which a child qualifies the custodial parent for the infant care exemption"
+    unit: Month
+    from 1997-07-01: 12
+
+max_infant_care_disregard_months:
+    description: "Maximum months a State may disregard an individual under the infant care exemption in participation rate calculations"
+    unit: Month
+    from 1997-07-01: 12
+
+state_elects_infant_care_exemption:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "State elects infant care exemption"
+    description: "Whether the State has elected the option under 42 USC 607(b)(5) to exempt single custodial parents caring for infants from work requirements"
+    default: false
+
+is_single_custodial_parent:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Single custodial parent"
+    description: "Whether the family includes an individual who is a single custodial parent"
+    default: false
+
+youngest_child_age_months:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Age of youngest child in months"
+    description: "Age in months of the youngest child in the care of the custodial parent"
+    default: 0
+
+infant_care_exempt:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Infant care exemption applies"
+    description: "Whether the family is exempt from work requirements and may be disregarded in participation rate calculations as a single custodial parent caring for a child under 12 months of age, per State election under 42 USC 607(b)(5)"
+    from 1997-07-01:
+        state_elects_infant_care_exemption and is_single_custodial_parent and youngest_child_age_months < infant_age_threshold_months

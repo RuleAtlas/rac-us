@@ -1,0 +1,66 @@
+# 42 USC Section 607(c)(1)(B)(ii) - 2-parent families with child care: enhanced work requirement
+
+"""
+(ii) if the family of the individual receives federally-funded child care
+assistance and an adult in the family is not disabled or caring for a
+severely disabled child, the individual and the other parent in the family
+are participating in work activities for a total of at least 55 hours per
+week during the month, not fewer than 50 hours per week of which are
+attributable to an activity described in paragraph (1), (2), (3), (4), (5),
+(6), (7), (8), or (12) of subsection (d).
+"""
+
+status: encoded
+
+two_parent_child_care_total_hours_per_week:
+    description: "Minimum total weekly work hours for 2-parent families receiving federally-funded child care per 42 USC 607(c)(1)(B)(ii)"
+    unit: hours_per_week
+    from 1996-10-01: 55
+
+two_parent_child_care_core_hours_per_week:
+    description: "Minimum core activity weekly work hours for 2-parent families receiving federally-funded child care per 42 USC 607(c)(1)(B)(ii)"
+    unit: hours_per_week
+    from 1996-10-01: 50
+
+receives_federally_funded_child_care:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Receives federally-funded child care assistance"
+    description: "Whether the family receives federally-funded child care assistance per 42 USC 607(c)(1)(B)(ii)"
+    default: false
+
+has_disabled_adult_or_caring_for_severely_disabled_child:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Family has disabled adult or adult caring for severely disabled child"
+    description: "Whether an adult in the family is disabled or caring for a severely disabled child per 42 USC 607(c)(1)(B)(ii)"
+    default: false
+
+two_parent_total_weekly_work_hours:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Total weekly work hours for both parents"
+    description: "Average weekly hours that the individual and the other parent are participating in work activities during the month"
+    default: 0
+
+two_parent_core_weekly_work_hours:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Core activity weekly work hours for both parents"
+    description: "Average weekly hours that the individual and the other parent participate in core work activities (d)(1)-(8),(12) during the month"
+    default: 0
+
+two_parent_child_care_work_requirement_met:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "2-parent child care enhanced work requirement met"
+    description: "Whether the 2-parent family meets the enhanced work participation requirement of 42 USC 607(c)(1)(B)(ii): 55 total hours and 50 core hours per week, applicable only when the family receives federally-funded child care and no adult is disabled or caring for a severely disabled child"
+    from 1996-10-01:
+        if not receives_federally_funded_child_care: true
+        elif has_disabled_adult_or_caring_for_severely_disabled_child: true
+        else: two_parent_total_weekly_work_hours >= two_parent_child_care_total_hours_per_week and two_parent_core_weekly_work_hours >= two_parent_child_care_core_hours_per_week

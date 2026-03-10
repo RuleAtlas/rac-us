@@ -1,0 +1,35 @@
+# 42 USC Section 607(b)(4) tests
+
+tribal_family_included_in_participation_rate:
+    - name: "Tribal family included when state elects and family receives tribal assistance"
+      period: 2024-01
+      inputs:
+        state_elects_tribal_family_inclusion: true
+        is_receiving_tribal_assistance: true
+      expect: true
+
+    - name: "Tribal family NOT included when state does not elect even if receiving tribal assistance"
+      period: 2024-01
+      inputs:
+        state_elects_tribal_family_inclusion: false
+        is_receiving_tribal_assistance: true
+      expect: false
+
+    - name: "Non-tribal family NOT included even when state elects"
+      period: 2024-01
+      inputs:
+        state_elects_tribal_family_inclusion: true
+        is_receiving_tribal_assistance: false
+      expect: false
+
+    - name: "Neither election nor tribal assistance"
+      period: 2024-01
+      inputs:
+        state_elects_tribal_family_inclusion: false
+        is_receiving_tribal_assistance: false
+      expect: false
+
+    - name: "Defaults - no election, no tribal assistance"
+      period: 2024-01
+      inputs: {}
+      expect: false

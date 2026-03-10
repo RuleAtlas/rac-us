@@ -1,0 +1,37 @@
+# 42 USC Section 607(b)(3)(B) - Eligibility changes not counted
+
+"""
+(B) Eligibility changes not counted.-- The regulations required by
+subparagraph (A) shall not take into account families that are diverted
+from a State program funded under this part as a result of differences
+in eligibility criteria under a State program funded under this part and
+the eligibility criteria in effect during fiscal year 2005. Such
+regulations shall place the burden on the Secretary to prove that such
+families were diverted as a direct result of differences in such
+eligibility criteria.
+"""
+
+status: encoded
+
+eligibility_criteria_baseline_fiscal_year:
+    description: "Baseline fiscal year for eligibility criteria comparison per 42 USC 607(b)(3)(B)"
+    from 2006-02-08: 2005
+
+families_diverted_by_eligibility_changes:
+    entity: Family
+    period: Year
+    dtype: Integer
+    label: "Families diverted by eligibility changes"
+    description: "The number of families diverted from the State TANF program as a direct result of differences between current eligibility criteria and those in effect during FY2005, as determined by the Secretary per 42 USC 607(b)(3)(B). State-level aggregate provided as exogenous data."
+    default: 0
+
+eligibility_change_caseload_adjustment:
+    imports:
+        - 42/607/b/3/A#preceding_fy_avg_monthly_caseload
+    entity: Family
+    period: Year
+    dtype: Integer
+    label: "Caseload adjusted for eligibility changes"
+    description: "Adjusted preceding FY average monthly caseload, adding back families diverted due to eligibility criteria changes since FY2005 per 42 USC 607(b)(3)(B). This adjusted count should be used in place of the raw preceding FY caseload when computing the caseload reduction credit under 42 USC 607(b)(3)(A)."
+    from 2006-02-08:
+        preceding_fy_avg_monthly_caseload + families_diverted_by_eligibility_changes

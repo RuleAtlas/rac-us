@@ -1,0 +1,60 @@
+# 42 USC Section 607(c)(2)(A)(ii) - Job search partial week counting
+
+"""
+(ii) Limited authority to count less than full week of participation.--
+For purposes of clause (i) of this subparagraph, on not more than 1
+occasion per individual, the State shall consider participation of the
+individual in an activity described in subsection (d)(6) for 3 or 4 days
+during a week as a week of participation in the activity by the
+individual.
+"""
+
+status: encoded
+
+# Parameters
+
+partial_week_max_occasions:
+    description: "Maximum number of occasions per individual that a partial week of job search may be counted as a full week per 42 USC 607(c)(2)(A)(ii)"
+    unit: count
+    from 1996-10-01: 1
+
+partial_week_min_days:
+    description: "Minimum number of days of participation in a week for the partial week to count as a full week per 42 USC 607(c)(2)(A)(ii)"
+    unit: days
+    from 1996-10-01: 3
+
+partial_week_max_days:
+    description: "Maximum number of days of participation in a week below a full week that still qualifies for partial week counting per 42 USC 607(c)(2)(A)(ii)"
+    unit: days
+    from 1996-10-01: 4
+
+# Inputs
+
+job_search_days_in_week:
+    entity: Person
+    period: Month
+    dtype: Integer
+    label: "Job search days in current week"
+    description: "Number of days of participation in job search activity (d)(6) during the current week"
+    default: 0
+
+partial_week_occasions_used:
+    entity: Person
+    period: Year
+    dtype: Integer
+    label: "Partial week occasions already used"
+    description: "Number of times the individual has already had a partial week counted as a full week of job search participation"
+    default: 0
+
+# Computed values
+
+partial_week_counts_as_full_week:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Partial week counts as full week of job search"
+    description: "Whether the individual's partial week of job search participation (3 or 4 days) counts as a full week for purposes of 42 USC 607(c)(2)(A)(i), limited to 1 occasion per individual per 42 USC 607(c)(2)(A)(ii)"
+    from 1996-10-01:
+        if partial_week_occasions_used >= partial_week_max_occasions: false
+        elif job_search_days_in_week >= partial_week_min_days and job_search_days_in_week <= partial_week_max_days: true
+        else: false

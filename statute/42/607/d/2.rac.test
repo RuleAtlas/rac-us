@@ -1,0 +1,19 @@
+# 42 USC Section 607(d)(2) - Subsidized private sector employment tests
+
+is_engaged_in_subsidized_private_sector_employment:
+    - name: "Default - not engaged in subsidized private sector employment"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Engaged in subsidized private sector employment"
+      period: 2024-01
+      inputs:
+        is_engaged_in_subsidized_private_sector_employment: true
+      expect: true
+
+    - name: "Not engaged in subsidized private sector employment"
+      period: 2024-01
+      inputs:
+        is_engaged_in_subsidized_private_sector_employment: false
+      expect: false

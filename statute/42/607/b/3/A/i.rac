@@ -1,0 +1,28 @@
+# 42 USC Section 607(b)(3)(A)(i) - Current year average monthly caseload
+
+"""
+(i) the average monthly number of families receiving assistance during
+the immediately preceding fiscal year under the State program funded
+under this part or any other State program funded with qualified State
+expenditures (as defined in section 609(a)(7)(B)(i) of this title)
+is less than
+"""
+
+status: encoded
+
+is_receiving_tanf_assistance:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Receiving TANF assistance"
+    description: "Whether the family is receiving assistance under the State TANF program or any other State program funded with qualified State expenditures as defined in 42 USC 609(a)(7)(B)(i)"
+    default: false
+
+is_caseload_family_preceding_fy:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Family counted in preceding fiscal year caseload"
+    description: "Whether this family is counted toward the average monthly caseload for the immediately preceding fiscal year for purposes of the caseload reduction credit per 42 USC 607(b)(3)(A)(i)"
+    from 1996-10-01:
+        is_receiving_tanf_assistance

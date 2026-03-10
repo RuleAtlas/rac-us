@@ -1,0 +1,51 @@
+# 42 USC Section 607(f)(1) - Vacant position rule
+
+"""
+(1) In general.-- Subject to paragraph (2), an adult in a family receiving
+assistance under a State program funded under this part attributable to funds
+provided by the Federal Government may fill a vacant employment position in
+order to engage in a work activity described in subsection (d).
+"""
+
+status: encoded
+
+is_tanf_adult_receiving_federal_assistance:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Adult in TANF family receiving federally funded assistance"
+    description: "Whether the individual is an adult in a family receiving assistance under a State TANF program attributable to funds provided by the Federal Government per 42 USC 607(f)(1)"
+    default: false
+
+is_position_vacant:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Position is a vacant employment position"
+    description: "Whether the employment position is a vacant position per 42 USC 607(f)(1)"
+    default: false
+
+is_for_work_activity_described_in_d:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Work activity described in subsection (d)"
+    description: "Whether the work activity is one described in 42 USC 607(d) per 42 USC 607(f)(1)"
+    default: false
+
+is_nondisplacement_compliant:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Compliant with nondisplacement restrictions"
+    description: "Whether the placement meets the nondisplacement restrictions of 42 USC 607(f)(2), as referenced by 'subject to paragraph (2)'"
+    default: true
+
+may_fill_vacant_employment_position:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "May fill vacant employment position"
+    description: "Whether an adult in a TANF family may fill a vacant employment position to engage in a work activity described in subsection (d), subject to nondisplacement restrictions per 42 USC 607(f)(1)"
+    from 1996-10-01:
+        is_tanf_adult_receiving_federal_assistance and is_position_vacant and is_for_work_activity_described_in_d and is_nondisplacement_compliant

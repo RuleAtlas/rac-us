@@ -1,0 +1,24 @@
+# 42 USC Section 607(d)(6) - Job search and job readiness assistance
+
+"""
+(6) job search and job readiness assistance;
+"""
+
+status: encoded
+
+is_engaged_in_job_search_and_job_readiness:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Engaged in job search and job readiness assistance"
+    description: "Whether the individual is engaged in job search and job readiness assistance per 42 USC 607(d)(6)"
+    default: false
+
+job_search_and_job_readiness_is_work_activity:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Job search and job readiness assistance counts as work activity"
+    description: "Job search and job readiness assistance qualifies as a work activity per 42 USC 607(d)(6)"
+    from 1996-10-01:
+        is_engaged_in_job_search_and_job_readiness

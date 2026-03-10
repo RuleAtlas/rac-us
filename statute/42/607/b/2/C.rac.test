@@ -1,0 +1,35 @@
+# 42 USC Section 607(b)(2)(C) tests
+
+is_two_parent_family_for_participation:
+    - name: "Two-parent family with no disabled parent is treated as 2-parent"
+      period: 2024-01
+      inputs:
+        is_two_parent_family: true
+        has_disabled_parent: false
+      expect: true
+
+    - name: "Two-parent family with disabled parent is NOT treated as 2-parent"
+      period: 2024-01
+      inputs:
+        is_two_parent_family: true
+        has_disabled_parent: true
+      expect: false
+
+    - name: "Single-parent family is not treated as 2-parent"
+      period: 2024-01
+      inputs:
+        is_two_parent_family: false
+        has_disabled_parent: false
+      expect: false
+
+    - name: "Single-parent family with disabled parent is not treated as 2-parent"
+      period: 2024-01
+      inputs:
+        is_two_parent_family: false
+        has_disabled_parent: true
+      expect: false
+
+    - name: "Defaults - no parents flagged"
+      period: 2024-01
+      inputs: {}
+      expect: false

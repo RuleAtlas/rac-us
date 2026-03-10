@@ -1,0 +1,25 @@
+# 42 USC Section 607(d)(12) tests
+
+child_care_for_community_service_participant_is_work_activity:
+    - name: "Providing child care to community service participant - qualifies as work activity"
+      period: 2024-01
+      inputs:
+          is_providing_child_care_to_community_service_participant: true
+      expect: true
+
+    - name: "Not providing child care to community service participant - does not qualify"
+      period: 2024-01
+      inputs:
+          is_providing_child_care_to_community_service_participant: false
+      expect: false
+
+    - name: "Providing child care in FY1997 - qualifies"
+      period: 1997-01
+      inputs:
+          is_providing_child_care_to_community_service_participant: true
+      expect: true
+
+    - name: "Default - not providing child care (default false)"
+      period: 2024-01
+      inputs: {}
+      expect: false

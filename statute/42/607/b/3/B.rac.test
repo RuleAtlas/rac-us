@@ -1,0 +1,37 @@
+# 42 USC Section 607(b)(3)(B) tests
+
+eligibility_change_caseload_adjustment:
+    - name: "No families diverted - caseload unchanged"
+      period: 2024
+      inputs:
+        preceding_fy_avg_monthly_caseload: 8000
+        families_diverted_by_eligibility_changes: 0
+      expect: 8000
+
+    - name: "500 families diverted - caseload adjusted upward"
+      period: 2024
+      inputs:
+        preceding_fy_avg_monthly_caseload: 7500
+        families_diverted_by_eligibility_changes: 500
+      expect: 8000
+
+    - name: "Zero preceding caseload with diversions"
+      period: 2024
+      inputs:
+        preceding_fy_avg_monthly_caseload: 0
+        families_diverted_by_eligibility_changes: 200
+      expect: 200
+
+    - name: "Both inputs zero"
+      period: 2024
+      inputs:
+        preceding_fy_avg_monthly_caseload: 0
+        families_diverted_by_eligibility_changes: 0
+      expect: 0
+
+    - name: "Large diversion relative to caseload"
+      period: 2024
+      inputs:
+        preceding_fy_avg_monthly_caseload: 3000
+        families_diverted_by_eligibility_changes: 2000
+      expect: 5000

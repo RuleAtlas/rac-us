@@ -1,0 +1,47 @@
+# 42 USC Section 607(f)(1) tests
+
+may_fill_vacant_employment_position:
+    - name: "All conditions met - may fill vacant position"
+      period: 2024-01
+      inputs:
+          is_tanf_adult_receiving_federal_assistance: true
+          is_position_vacant: true
+          is_for_work_activity_described_in_d: true
+          is_nondisplacement_compliant: true
+      expect: true
+
+    - name: "Not a TANF adult - may not fill"
+      period: 2024-01
+      inputs:
+          is_tanf_adult_receiving_federal_assistance: false
+          is_position_vacant: true
+          is_for_work_activity_described_in_d: true
+          is_nondisplacement_compliant: true
+      expect: false
+
+    - name: "Position not vacant - may not fill"
+      period: 2024-01
+      inputs:
+          is_tanf_adult_receiving_federal_assistance: true
+          is_position_vacant: false
+          is_for_work_activity_described_in_d: true
+          is_nondisplacement_compliant: true
+      expect: false
+
+    - name: "Not for work activity in subsection (d) - may not fill"
+      period: 2024-01
+      inputs:
+          is_tanf_adult_receiving_federal_assistance: true
+          is_position_vacant: true
+          is_for_work_activity_described_in_d: false
+          is_nondisplacement_compliant: true
+      expect: false
+
+    - name: "Nondisplacement violation under (f)(2) - may not fill"
+      period: 2024-01
+      inputs:
+          is_tanf_adult_receiving_federal_assistance: true
+          is_position_vacant: true
+          is_for_work_activity_described_in_d: true
+          is_nondisplacement_compliant: false
+      expect: false

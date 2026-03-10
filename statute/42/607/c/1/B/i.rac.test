@@ -1,0 +1,37 @@
+# 42 USC Section 607(c)(1)(B)(i) tests
+
+two_parent_standard_work_requirement_met:
+    - name: "Both thresholds met exactly"
+      period: 2024-01
+      inputs:
+        two_parent_total_weekly_work_hours: 35
+        two_parent_core_weekly_work_hours: 30
+      expect: true
+
+    - name: "Total hours below minimum"
+      period: 2024-01
+      inputs:
+        two_parent_total_weekly_work_hours: 34
+        two_parent_core_weekly_work_hours: 30
+      expect: false
+
+    - name: "Core hours below minimum"
+      period: 2024-01
+      inputs:
+        two_parent_total_weekly_work_hours: 35
+        two_parent_core_weekly_work_hours: 29
+      expect: false
+
+    - name: "Zero hours - no participation"
+      period: 2024-01
+      inputs:
+        two_parent_total_weekly_work_hours: 0
+        two_parent_core_weekly_work_hours: 0
+      expect: false
+
+    - name: "Exceeds both thresholds"
+      period: 2024-01
+      inputs:
+        two_parent_total_weekly_work_hours: 40
+        two_parent_core_weekly_work_hours: 35
+      expect: true

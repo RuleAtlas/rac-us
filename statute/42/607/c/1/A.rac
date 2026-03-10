@@ -1,0 +1,56 @@
+# 42 USC Section 607(c)(1)(A) - Engaged in work: all families
+
+"""
+(A) In general.-- For purposes of subsection (b)(1)(B)(i), a recipient
+is engaged in work for a month in a fiscal year if the recipient is
+participating in work activities for at least the minimum average number
+of hours per week specified in the following table during the month, not
+fewer than 20 hours per week of which are attributable to an activity
+described in paragraph (1), (2), (3), (4), (5), (6), (7), (8), or (12)
+of subsection (d), subject to this subsection:
+
+If the fiscal year is:    The minimum participation hours are:
+1997                      20
+1998                      20
+1999                      25
+2000 or thereafter        30
+"""
+
+status: encoded
+
+minimum_weekly_hours_all_families:
+    description: "Minimum average hours per week of participation in work activities required for a recipient to be considered engaged in work for all-families rate per 42 USC 607(c)(1)(A)"
+    unit: hours/week
+    from 1996-10-01: 20
+    from 1998-10-01: 25
+    from 1999-10-01: 30
+
+minimum_core_activity_hours_per_week:
+    description: "Minimum hours per week that must be attributable to core work activities described in 42 USC 607(d)(1)-(8) and (d)(12) per 42 USC 607(c)(1)(A)"
+    unit: hours/week
+    from 1996-10-01: 20
+
+total_work_activity_hours_per_week:
+    entity: Person
+    period: Month
+    dtype: Integer
+    label: "Total work activity hours per week"
+    description: "Average hours per week the recipient participates in any work activities described in 42 USC 607(d)"
+    default: 0
+
+core_work_activity_hours_per_week:
+    entity: Person
+    period: Month
+    dtype: Integer
+    label: "Core work activity hours per week"
+    description: "Average hours per week attributable to core work activities described in 42 USC 607(d)(1), (2), (3), (4), (5), (6), (7), (8), or (12)"
+    default: 0
+
+is_engaged_in_work_all_families:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Engaged in work for all-families participation rate"
+    description: "Whether a recipient meets the work participation requirements for all families per 42 USC 607(c)(1)(A): participates in work activities for at least the minimum hours per week, with not fewer than the core activity minimum in core activities"
+    from 1996-10-01:
+        total_work_activity_hours_per_week >= minimum_weekly_hours_all_families and core_work_activity_hours_per_week >= minimum_core_activity_hours_per_week

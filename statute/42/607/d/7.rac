@@ -1,0 +1,24 @@
+# 42 USC Section 607(d)(7) - Community service programs
+
+"""
+(7) community service programs;
+"""
+
+status: encoded
+
+is_engaged_in_community_service_program:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Engaged in community service program"
+    description: "Whether the individual is engaged in a community service program per 42 USC 607(d)(7)"
+    default: false
+
+community_service_program_is_work_activity:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Community service program counts as work activity"
+    description: "Participation in a community service program qualifies as a work activity per 42 USC 607(d)(7)"
+    from 1996-10-01:
+        is_engaged_in_community_service_program

@@ -1,0 +1,25 @@
+# 42 USC Section 607(f)(2)(A) - Layoff restriction
+
+"""
+(A) when any other individual is on layoff from the same or any
+substantially equivalent position; or
+"""
+
+status: encoded
+
+is_other_individual_on_layoff_from_same_or_equivalent_position:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Other individual on layoff from same or equivalent position"
+    description: "Whether any other individual is on layoff from the same or any substantially equivalent position per 42 USC 607(f)(2)(A)"
+    default: false
+
+violates_layoff_restriction:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Violates layoff restriction"
+    description: "Whether the layoff restriction condition of 42 USC 607(f)(2)(A) is triggered because another individual is on layoff from the same or substantially equivalent position"
+    from 1996-10-01:
+        is_other_individual_on_layoff_from_same_or_equivalent_position

@@ -1,0 +1,25 @@
+# 42 USC Section 607(d)(7) tests
+
+community_service_program_is_work_activity:
+    - name: "Engaged in community service program - qualifies as work activity"
+      period: 2024-01
+      inputs:
+          is_engaged_in_community_service_program: true
+      expect: true
+
+    - name: "Not engaged in community service program - does not qualify"
+      period: 2024-01
+      inputs:
+          is_engaged_in_community_service_program: false
+      expect: false
+
+    - name: "Engaged in community service program in FY1997 - qualifies"
+      period: 1997-01
+      inputs:
+          is_engaged_in_community_service_program: true
+      expect: true
+
+    - name: "Default - not engaged (default false)"
+      period: 2024-01
+      inputs: {}
+      expect: false

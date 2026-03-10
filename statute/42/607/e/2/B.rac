@@ -1,0 +1,25 @@
+# 42 USC Section 607(e)(2)(B) - Unavailability or unsuitability of informal child care
+
+"""
+(B) Unavailability or unsuitability of informal child care by a
+relative or under other arrangements.
+"""
+
+status: encoded
+
+informal_child_care_unavailable_or_unsuitable:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Informal child care unavailable or unsuitable"
+    description: "Whether informal child care by a relative or under other arrangements is unavailable or unsuitable per 42 USC 607(e)(2)(B)"
+    default: false
+
+informal_child_care_exception_applies:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Informal child care exception applies"
+    description: "The work penalty exception applies due to unavailability or unsuitability of informal child care by a relative or under other arrangements per 42 USC 607(e)(2)(B)"
+    from 1997-07-01:
+        informal_child_care_unavailable_or_unsuitable

@@ -1,0 +1,34 @@
+# 42 USC Section 607(b)(1)(A) - Average monthly rate - all families
+
+"""
+(A) Average monthly rate.-- For purposes of subsection (a)(1), the
+participation rate for all families of a State for a fiscal year is
+the average of the participation rates for all families of the State
+for each month in the fiscal year.
+"""
+
+status: encoded
+
+months_in_fiscal_year:
+    description: "Number of months in a federal fiscal year"
+    unit: Month
+    from 1997-07-01: 12
+
+sum_monthly_participation_rates_all_families:
+    entity: Family
+    period: Year
+    dtype: Rate
+    label: "Sum of monthly participation rates for all families"
+    description: "Sum of the monthly TANF work participation rates for all families of the State across each month in the fiscal year, per 42 USC 607(b)(1)(A)"
+    default: 0
+
+tanf_annual_participation_rate_all_families:
+    imports:
+        - ./B#tanf_monthly_participation_rate_all_families
+    entity: Family
+    period: Year
+    dtype: Rate
+    label: "Annual TANF work participation rate - all families"
+    description: "The participation rate for all families of a State for a fiscal year, computed as the average of the monthly participation rates per 42 USC 607(b)(1)(A)"
+    from 1997-07-01:
+        sum_monthly_participation_rates_all_families / months_in_fiscal_year

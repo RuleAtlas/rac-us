@@ -1,0 +1,64 @@
+# 42 USC Section 607(e)(2) - Child care inability exception
+
+"""
+(2) Exception.-- A State may not reduce or terminate assistance under
+the State program funded under this part or any other State program
+funded with qualified State expenditures (as defined in section
+609(a)(7)(B)(i) of this title) of a single custodial parent caring
+for a child who has not attained 6 years of age based on the refusal
+of the individual to engage in work required in accordance with this
+section if the individual proves (to the satisfaction of the State)
+that the individual has a demonstrated inability to obtain needed
+child care, for 1 or more of the following reasons:
+(A) Unavailability of appropriate child care within a reasonable
+distance from the individual's home or work site.
+(B) Unavailability or unsuitability of informal child care by a
+relative or under other arrangements.
+(C) Unavailability of appropriate and affordable formal child care
+arrangements.
+"""
+
+status: encoded
+
+child_care_exception_child_age_threshold:
+    description: "Age threshold below which the child care exception applies"
+    unit: years
+    from 1997-07-01: 6
+
+is_single_custodial_parent:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Is a single custodial parent"
+    description: "Whether the individual is a single custodial parent per 42 USC 607(e)(2)"
+    default: false
+
+is_caring_for_child_under_threshold_age:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Caring for a child under threshold age"
+    description: "Whether the individual is caring for a child who has not attained the age threshold (6 years) per 42 USC 607(e)(2)"
+    default: false
+
+child_care_inability_demonstrated:
+    imports:
+        - ./2/A#child_care_distance_exception_applies
+        - ./2/B#informal_child_care_exception_applies
+        - ./2/C#formal_child_care_exception_applies
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Demonstrated inability to obtain needed child care"
+    description: "Whether the individual has demonstrated inability to obtain needed child care for 1 or more of the reasons in subparagraphs (A), (B), or (C) per 42 USC 607(e)(2)"
+    from 1997-07-01:
+        child_care_distance_exception_applies or informal_child_care_exception_applies or formal_child_care_exception_applies
+
+child_care_inability_exception_applies:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Child care inability exception applies"
+    description: "Whether the child care inability exception prevents the State from reducing or terminating assistance per 42 USC 607(e)(2)"
+    from 1997-07-01:
+        is_single_custodial_parent and is_caring_for_child_under_threshold_age and child_care_inability_demonstrated

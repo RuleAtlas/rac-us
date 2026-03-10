@@ -1,0 +1,45 @@
+# 42 USC Section 607(e)(1)(A) - Pro rata reduction of assistance
+
+"""
+(A) reduce the amount of assistance otherwise payable to the family
+pro rata (or more, at the option of the State) with respect to any
+period during a month in which the individual so refuses; or
+"""
+
+status: encoded
+
+tanf_monthly_assistance_otherwise_payable:
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "TANF monthly assistance otherwise payable"
+    description: "Amount of assistance otherwise payable to the family per 42 USC 607(e)(1)(A)"
+    default: 0
+
+days_of_work_refusal_in_month:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Days of work refusal in month"
+    description: "Number of days during the month in which the individual refuses to engage in required work per 42 USC 607(e)(1)(A)"
+    default: 0
+
+days_in_month:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Days in month"
+    description: "Total number of days in the month"
+    default: 0
+
+pro_rata_assistance_reduction:
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Pro rata assistance reduction"
+    description: "Minimum pro rata reduction in assistance due to work refusal per 42 USC 607(e)(1)(A)"
+    from 1996-10-01:
+        if days_in_month == 0: 0
+        else: tanf_monthly_assistance_otherwise_payable * days_of_work_refusal_in_month / days_in_month

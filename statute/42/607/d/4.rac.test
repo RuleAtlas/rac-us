@@ -1,0 +1,35 @@
+# 42 USC Section 607(d)(4) tests
+
+work_experience_is_work_activity:
+    - name: "Engaged in work experience, no private sector employment available - qualifies"
+      period: 2024-01
+      inputs:
+          is_engaged_in_work_experience: true
+          sufficient_private_sector_employment_available: false
+      expect: true
+
+    - name: "Engaged in work experience but sufficient private sector employment available - does not qualify"
+      period: 2024-01
+      inputs:
+          is_engaged_in_work_experience: true
+          sufficient_private_sector_employment_available: true
+      expect: false
+
+    - name: "Not engaged in work experience - does not qualify regardless"
+      period: 2024-01
+      inputs:
+          is_engaged_in_work_experience: false
+          sufficient_private_sector_employment_available: false
+      expect: false
+
+    - name: "Default inputs - not engaged (defaults to false)"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Engaged in work experience in FY1997, no private sector available - qualifies"
+      period: 1997-01
+      inputs:
+          is_engaged_in_work_experience: true
+          sufficient_private_sector_employment_available: false
+      expect: true

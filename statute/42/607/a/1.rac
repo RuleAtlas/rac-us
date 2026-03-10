@@ -1,0 +1,30 @@
+# 42 USC Section 607(a)(1) - All families
+
+"""
+(1) All families.-- A State to which a grant is made under section 603
+of this title for a fiscal year shall achieve the minimum participation
+rate specified in the following table for the fiscal year with respect to
+all families receiving assistance under the State program funded under
+this part or any other State program funded with qualified State
+expenditures (as defined in section 609(a)(7)(B)(i) of this title):
+
+If the fiscal year is:    The minimum participation rate is:
+1997                      25
+1998                      30
+1999                      35
+2000                      40
+2001                      45
+2002 or thereafter        50
+"""
+
+status: encoded
+
+min_participation_rate_all_families:
+    description: "Minimum participation rate for all families per 42 USC 607(a)(1)"
+    unit: rate
+    from 1996-10-01: 0.25
+    from 1997-10-01: 0.30
+    from 1998-10-01: 0.35
+    from 1999-10-01: 0.40
+    from 2000-10-01: 0.45
+    from 2001-10-01: 0.50

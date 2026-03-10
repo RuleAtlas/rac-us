@@ -1,0 +1,44 @@
+# 42 USC Section 607(f)(2) - No filling certain vacancies
+
+"""
+(2) No adult in a work activity described in subsection (d) which is
+funded, in whole or in part, by funds provided by the Federal Government
+shall be employed or assigned--
+(A) when any other individual is on layoff from the same or any
+substantially equivalent job; or
+(B) if the employer has terminated the employment of any regular employee
+or otherwise caused an involuntary reduction of its workforce in order
+to fill the vacancy so created with an adult described in paragraph (1).
+"""
+
+status: encoded
+
+is_work_activity_federally_funded:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Work activity is federally funded"
+    description: "Whether the work activity described in 42 USC 607(d) is funded, in whole or in part, by funds provided by the Federal Government per 42 USC 607(f)(2)"
+    default: false
+
+is_employed_or_assigned_in_work_activity:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Employed or assigned in work activity"
+    description: "Whether the adult is employed or assigned in a work activity described in subsection (d) per 42 USC 607(f)(2)"
+    default: false
+
+no_filling_certain_vacancies:
+    imports:
+        - ./2/A#violates_layoff_restriction
+        - ./2/B#violates_workforce_reduction_restriction
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Prohibited from filling vacancy"
+    description: "Whether the adult is prohibited from being employed or assigned in the position because of nondisplacement protections per 42 USC 607(f)(2)"
+    from 1996-10-01:
+        if not is_work_activity_federally_funded: false
+        elif not is_employed_or_assigned_in_work_activity: false
+        else: violates_layoff_restriction or violates_workforce_reduction_restriction

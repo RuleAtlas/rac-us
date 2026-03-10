@@ -1,0 +1,49 @@
+# 42 USC Section 607(c)(2)(B) - Single parent or relative with child under 6
+
+"""
+(B) Single parent or relative with child under age 6.-- For purposes of
+determining monthly participation rates under subsection (b)(1)(B)(i), a
+recipient who is the only parent or caretaker relative in the family of a
+child who has not attained 6 years of age is deemed to be engaged in work
+for a month if the recipient is engaged in work for an average of at least
+20 hours per week during the month.
+"""
+
+status: encoded
+
+child_age_threshold_single_parent_deeming:
+    description: "Age that the child must not have attained for the single parent/caretaker relative reduced work hour deeming rule per 42 USC 607(c)(2)(B)"
+    unit: years
+    from 1996-10-01: 6
+
+minimum_weekly_hours_single_parent_child_under_6:
+    description: "Minimum average hours per week a single parent or caretaker relative with a child under age 6 must work to be deemed engaged in work per 42 USC 607(c)(2)(B)"
+    unit: hours/week
+    from 1996-10-01: 20
+
+is_only_parent_or_caretaker_relative:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Only parent or caretaker relative in family"
+    description: "Whether the recipient is the only parent or caretaker relative in the family per 42 USC 607(c)(2)(B)"
+    default: false
+
+youngest_child_age_in_family:
+    entity: Person
+    period: Month
+    dtype: Integer
+    label: "Age of youngest child in family"
+    description: "Age in years of the youngest child in the recipient's family"
+    default: 0
+
+is_deemed_engaged_in_work_single_parent_child_under_6:
+    imports:
+        - 42/607/c/1/A#total_work_activity_hours_per_week
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Deemed engaged in work as single parent with child under 6"
+    description: "Whether a single parent or caretaker relative in a family with a child under age 6 is deemed engaged in work per 42 USC 607(c)(2)(B), for purposes of monthly participation rates under 42 USC 607(b)(1)(B)(i)"
+    from 1996-10-01:
+        is_only_parent_or_caretaker_relative and youngest_child_age_in_family < child_age_threshold_single_parent_deeming and total_work_activity_hours_per_week >= minimum_weekly_hours_single_parent_child_under_6

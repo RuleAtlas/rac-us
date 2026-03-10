@@ -1,0 +1,23 @@
+# 42 USC Section 607(a)(2) - 2-parent families
+
+"""
+(2) 2-parent families.-- A State to which a grant is made under section
+603 of this title for a fiscal year shall achieve the minimum participation
+rate specified in the following table for the fiscal year with respect to
+2-parent families receiving assistance under the State program funded under
+this part or any other State program funded with qualified State expenditures
+(as defined in section 609(a)(7)(B)(i) of this title):
+
+If the fiscal year is:  The minimum participation rate is:
+1997                     75
+1998                     75
+1999 or thereafter       90
+"""
+
+status: encoded
+
+two_parent_min_participation_rate:
+    description: "Minimum participation rate for 2-parent families per 42 USC 607(a)(2)"
+    unit: rate
+    from 1996-10-01: 0.75
+    from 1998-10-01: 0.90

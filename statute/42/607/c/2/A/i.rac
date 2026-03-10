@@ -1,0 +1,116 @@
+# 42 USC Section 607(c)(2)(A)(i) - Job search week limit
+
+"""
+(i) Notwithstanding paragraph (1) of this subsection, an individual shall
+not be considered to be engaged in work by virtue of participation in an
+activity described in subsection (d)(6) of a State program funded under
+this part or any other State program funded with qualified State
+expenditures (as defined in section 609(a)(7)(B)(i) of this title), after
+the individual has participated in such an activity for 6 weeks (or, if
+the unemployment rate of the State is at least 50 percent greater than the
+unemployment rate of the United States or the State is a needy State
+(within the meaning of section 603(b)(5) of this title), 12 weeks), or if
+the participation is for a week that immediately follows 4 consecutive
+weeks of such participation.
+"""
+
+status: encoded
+
+# Parameters
+
+job_search_annual_week_limit:
+    description: "Maximum weeks per fiscal year that job search (d)(6) may count as work activity, general rule per 42 USC 607(c)(2)(A)(i)"
+    unit: weeks
+    from 1996-10-01: 6
+
+job_search_annual_week_limit_extended:
+    description: "Maximum weeks per fiscal year that job search (d)(6) may count as work activity for high-unemployment or needy states per 42 USC 607(c)(2)(A)(i)"
+    unit: weeks
+    from 1996-10-01: 12
+
+unemployment_rate_excess_threshold:
+    description: "Minimum excess by which state unemployment rate must exceed US unemployment rate to qualify for extended job search limit per 42 USC 607(c)(2)(A)(i); 0.50 means at least 50 percent greater"
+    unit: rate
+    from 1996-10-01: 0.50
+
+job_search_max_consecutive_weeks:
+    description: "Maximum consecutive weeks of job search participation before the activity ceases to count; participation for a week immediately following this many consecutive weeks does not count per 42 USC 607(c)(2)(A)(i)"
+    unit: weeks
+    from 1996-10-01: 4
+
+# Inputs
+
+state_unemployment_rate:
+    entity: Person
+    period: Year
+    dtype: Rate
+    label: "State unemployment rate"
+    description: "Unemployment rate of the State in which the individual resides"
+    default: 0
+
+us_unemployment_rate:
+    entity: Person
+    period: Year
+    dtype: Rate
+    label: "US unemployment rate"
+    description: "Unemployment rate of the United States"
+    default: 0
+
+is_needy_state:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "State is a needy state"
+    description: "Whether the State is a needy State within the meaning of 42 USC 603(b)(5)"
+    default: false
+
+job_search_weeks_used_in_fiscal_year:
+    entity: Person
+    period: Year
+    dtype: Integer
+    label: "Job search weeks used in fiscal year"
+    description: "Number of weeks the individual has already participated in job search activity (d)(6) during the current fiscal year"
+    default: 0
+
+consecutive_job_search_weeks_prior:
+    entity: Person
+    period: Month
+    dtype: Integer
+    label: "Consecutive prior weeks of job search"
+    description: "Number of consecutive weeks of job search participation immediately preceding the current week"
+    default: 0
+
+# Computed values
+
+qualifies_for_extended_job_search_limit:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Qualifies for extended 12-week job search limit"
+    description: "Whether the state qualifies for the extended 12-week job search limit because its unemployment rate is at least 50 percent greater than the US rate or it is a needy State per 42 USC 607(c)(2)(A)(i)"
+    from 1996-10-01:
+        state_unemployment_rate >= us_unemployment_rate * (1 + unemployment_rate_excess_threshold) or is_needy_state
+
+applicable_job_search_week_limit:
+    entity: Person
+    period: Year
+    dtype: Integer
+    label: "Applicable job search week limit"
+    description: "The applicable maximum weeks of job search activity that count as work: 12 for high-unemployment or needy states, 6 otherwise per 42 USC 607(c)(2)(A)(i)"
+    from 1996-10-01:
+        if qualifies_for_extended_job_search_limit: job_search_annual_week_limit_extended
+        else: job_search_annual_week_limit
+
+job_search_counts_as_engaged_in_work:
+    imports:
+        - 42/607/d/6#is_engaged_in_job_search_and_job_readiness
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Job search counts as engaged in work"
+    description: "Whether an individual's participation in job search (d)(6) can count toward being engaged in work, subject to the annual week limit and 4-consecutive-week limit per 42 USC 607(c)(2)(A)(i)"
+    from 1996-10-01:
+        if not is_engaged_in_job_search_and_job_readiness: false
+        elif job_search_weeks_used_in_fiscal_year >= applicable_job_search_week_limit: false
+        elif consecutive_job_search_weeks_prior >= job_search_max_consecutive_weeks: false
+        else: true

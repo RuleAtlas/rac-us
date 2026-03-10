@@ -1,0 +1,35 @@
+# 42 USC Section 607(d)(10) tests
+
+education_related_to_employment_is_work_activity:
+    - name: "Engaged in education, no diploma - qualifies as work activity"
+      period: 2024-01
+      inputs:
+          is_engaged_in_education_related_to_employment: true
+          has_high_school_diploma_or_equivalency: false
+      expect: true
+
+    - name: "Engaged in education, has diploma - does not qualify"
+      period: 2024-01
+      inputs:
+          is_engaged_in_education_related_to_employment: true
+          has_high_school_diploma_or_equivalency: true
+      expect: false
+
+    - name: "Not engaged in education, no diploma - does not qualify"
+      period: 2024-01
+      inputs:
+          is_engaged_in_education_related_to_employment: false
+          has_high_school_diploma_or_equivalency: false
+      expect: false
+
+    - name: "Not engaged in education, has diploma - does not qualify"
+      period: 2024-01
+      inputs:
+          is_engaged_in_education_related_to_employment: false
+          has_high_school_diploma_or_equivalency: true
+      expect: false
+
+    - name: "Default inputs - not engaged, no diploma (both default false)"
+      period: 2024-01
+      inputs: {}
+      expect: false

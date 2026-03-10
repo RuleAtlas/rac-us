@@ -1,0 +1,31 @@
+# 42 USC Section 607(b)(2)(A) tests
+
+tanf_annual_participation_rate_two_parent_families:
+    - name: "Average of monthly rates across fiscal year"
+      period: 2024-01
+      inputs:
+        sum_monthly_participation_rates_two_parent_families: 6.0
+      expect: 0.50
+
+    - name: "Zero sum returns zero rate"
+      period: 2024-01
+      inputs:
+        sum_monthly_participation_rates_two_parent_families: 0
+      expect: 0
+
+    - name: "Full participation every month"
+      period: 2024-01
+      inputs:
+        sum_monthly_participation_rates_two_parent_families: 12.0
+      expect: 1.0
+
+    - name: "Partial participation across months"
+      period: 2024-01
+      inputs:
+        sum_monthly_participation_rates_two_parent_families: 3.0
+      expect: 0.25
+
+    - name: "Default inputs return zero"
+      period: 2024-01
+      inputs: {}
+      expect: 0

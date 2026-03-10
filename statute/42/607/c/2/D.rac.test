@@ -1,0 +1,97 @@
+# 42 USC Section 607(c)(2)(D) tests
+
+teen_deeming_included_in_cap:
+    - name: "Before FY2000 - teen deeming not included"
+      period: 1999-01
+      inputs:
+          fiscal_year: 1999
+      expect: false
+
+    - name: "FY2000 onward - teen deeming included"
+      period: 2000-10
+      inputs:
+          fiscal_year: 2000
+      expect: true
+
+educational_activity_count_all_families:
+    - name: "Before FY2000 - only vocational training counts"
+      period: 1999-01
+      inputs:
+          fiscal_year: 1999
+          individuals_engaged_via_vocational_training_all_families: 15
+          individuals_engaged_via_teen_deeming_all_families: 5
+      expect: 15
+
+    - name: "FY2000 onward - vocational training plus teen deeming"
+      period: 2001-01
+      inputs:
+          fiscal_year: 2001
+          individuals_engaged_via_vocational_training_all_families: 15
+          individuals_engaged_via_teen_deeming_all_families: 5
+      expect: 20
+
+educational_activity_cap_all_families:
+    - name: "30% of 100 engaged individuals"
+      period: 2024-01
+      inputs:
+          individuals_engaged_in_work_all_families: 100
+      expect: 30
+
+    - name: "30% of 0 engaged individuals"
+      period: 2024-01
+      inputs:
+          individuals_engaged_in_work_all_families: 0
+      expect: 0
+
+    - name: "30% of 50 - floors to 15"
+      period: 2024-01
+      inputs:
+          individuals_engaged_in_work_all_families: 50
+      expect: 15
+
+educational_activity_count_within_cap_all_families:
+    - name: "Under cap - all educational count allowed"
+      period: 2024-01
+      inputs:
+          fiscal_year: 2024
+          individuals_engaged_in_work_all_families: 100
+          individuals_engaged_via_vocational_training_all_families: 10
+          individuals_engaged_via_teen_deeming_all_families: 5
+      expect: 15
+
+    - name: "Over cap - limited to 30%"
+      period: 2024-01
+      inputs:
+          fiscal_year: 2024
+          individuals_engaged_in_work_all_families: 100
+          individuals_engaged_via_vocational_training_all_families: 25
+          individuals_engaged_via_teen_deeming_all_families: 10
+      expect: 30
+
+    - name: "Zero engaged in work - cap is zero"
+      period: 2024-01
+      inputs:
+          fiscal_year: 2024
+          individuals_engaged_in_work_all_families: 0
+          individuals_engaged_via_vocational_training_all_families: 5
+          individuals_engaged_via_teen_deeming_all_families: 0
+      expect: 0
+
+educational_activity_count_within_cap_two_parent_families:
+    - name: "2-parent families under cap"
+      period: 2024-01
+      inputs:
+          fiscal_year: 2024
+          individuals_engaged_in_work_two_parent_families: 40
+          individuals_engaged_via_vocational_training_two_parent_families: 8
+          individuals_engaged_via_teen_deeming_two_parent_families: 2
+      expect: 10
+
+    - name: "2-parent families over cap - limited to 30%"
+      period: 2024-01
+      inputs:
+          fiscal_year: 2024
+          individuals_engaged_in_work_two_parent_families: 40
+          individuals_engaged_via_vocational_training_two_parent_families: 10
+          individuals_engaged_via_teen_deeming_two_parent_families: 8
+      expect: 12

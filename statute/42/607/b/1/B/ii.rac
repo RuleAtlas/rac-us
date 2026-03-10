@@ -1,0 +1,26 @@
+# 42 USC Section 607(b)(1)(B)(ii) - Monthly rate denominator
+
+"""
+(ii) the amount by which--
+(I) the number of families receiving such assistance during the
+month that include an adult or a minor child head of household
+receiving such assistance; exceeds
+(II) the number of families receiving such assistance that are subject
+in such month to a penalty described in subsection (e)(1) but have not
+been subject to such penalty for more than 3 months within the
+preceding 12-month period (whether or not consecutive).
+"""
+
+status: encoded
+
+tanf_work_participation_denominator_family:
+    imports:
+        - ./I#is_tanf_denominator_family
+        - ./II#is_penalty_exclusion_family
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Family counted in TANF work participation rate denominator"
+    description: "Whether this family is counted in the denominator of the monthly participation rate per 42 USC 607(b)(1)(B)(ii): a family in the total denominator pool (clause I) that is not excluded due to a recent penalty (clause II)"
+    from 1996-10-01:
+        is_tanf_denominator_family and not is_penalty_exclusion_family

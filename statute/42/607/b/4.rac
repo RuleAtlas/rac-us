@@ -1,0 +1,37 @@
+# 42 USC Section 607(b)(4) - State option to include individuals receiving assistance under a tribal family assistance plan or tribal work program
+
+"""
+(4) State option to include individuals receiving assistance under
+a tribal family assistance plan or tribal work program.-- For purposes
+of paragraphs (1)(B) and (2)(B), a State may, at its option, include
+families in the State that are receiving assistance under a tribal
+family assistance plan approved under section 612 of this title or
+under a tribal work program to which funds are provided under this part.
+"""
+
+status: encoded
+
+state_elects_tribal_family_inclusion:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "State elects tribal family inclusion"
+    description: "Whether the State has elected to include families receiving assistance under a tribal family assistance plan approved under 42 USC 612 or a tribal work program in participation rate calculations per 42 USC 607(b)(4)"
+    default: false
+
+is_receiving_tribal_assistance:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Receiving tribal family assistance or tribal work program assistance"
+    description: "Whether the family is receiving assistance under a tribal family assistance plan approved under 42 USC 612 or under a tribal work program to which funds are provided under part A of title IV"
+    default: false
+
+tribal_family_included_in_participation_rate:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Tribal family included in TANF participation rate"
+    description: "Whether a family receiving tribal assistance is included in the State participation rate calculations for purposes of 42 USC 607(b)(1)(B) and (b)(2)(B), per State election under 42 USC 607(b)(4)"
+    from 1997-07-01:
+        state_elects_tribal_family_inclusion and is_receiving_tribal_assistance

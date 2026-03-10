@@ -1,0 +1,31 @@
+# 42 USC Section 607(b)(3)(A)(ii) tests
+
+baseline_avg_monthly_caseload:
+    - name: "Default baseline caseload is zero"
+      period: 2024
+      inputs: {}
+      expect: 0
+
+    - name: "Typical state baseline caseload"
+      period: 2024
+      inputs:
+        baseline_avg_monthly_caseload: 15000
+      expect: 15000
+
+    - name: "Small state baseline caseload"
+      period: 2024
+      inputs:
+        baseline_avg_monthly_caseload: 500
+      expect: 500
+
+    - name: "Explicit zero caseload"
+      period: 2024
+      inputs:
+        baseline_avg_monthly_caseload: 0
+      expect: 0
+
+    - name: "Large state baseline caseload"
+      period: 2024
+      inputs:
+        baseline_avg_monthly_caseload: 150000
+      expect: 150000

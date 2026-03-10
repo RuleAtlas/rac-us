@@ -1,0 +1,27 @@
+# 42 USC Section 607(a)(1) - All families tests
+
+min_participation_rate_all_families:
+    - name: "FY1997 - minimum participation rate is 25%"
+      period: 1997-01
+      inputs: {}
+      expect: 0.25
+
+    - name: "FY1999 - minimum participation rate is 35%"
+      period: 1999-01
+      inputs: {}
+      expect: 0.35
+
+    - name: "FY2001 - minimum participation rate is 45%"
+      period: 2001-01
+      inputs: {}
+      expect: 0.45
+
+    - name: "FY2002 - minimum participation rate is 50%"
+      period: 2002-01
+      inputs: {}
+      expect: 0.50
+
+    - name: "FY2024 - minimum participation rate is still 50% (2002 or thereafter)"
+      period: 2024-01
+      inputs: {}
+      expect: 0.50

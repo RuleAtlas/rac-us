@@ -1,0 +1,37 @@
+# 42 USC Section 607(d)(8) tests
+
+vocational_educational_training_is_work_activity:
+    - name: "Engaged with no prior months - qualifies"
+      period: 2024-01
+      inputs:
+        is_engaged_in_vocational_educational_training: true
+        vocational_educational_training_months_used: 0
+      expect: true
+
+    - name: "Engaged with 11 months used - still qualifies"
+      period: 2024-01
+      inputs:
+        is_engaged_in_vocational_educational_training: true
+        vocational_educational_training_months_used: 11
+      expect: true
+
+    - name: "Engaged with 12 months used - exceeds limit"
+      period: 2024-01
+      inputs:
+        is_engaged_in_vocational_educational_training: true
+        vocational_educational_training_months_used: 12
+      expect: false
+
+    - name: "Not engaged - does not qualify regardless of months"
+      period: 2024-01
+      inputs:
+        is_engaged_in_vocational_educational_training: false
+        vocational_educational_training_months_used: 0
+      expect: false
+
+    - name: "Not engaged with months used - does not qualify"
+      period: 2024-01
+      inputs:
+        is_engaged_in_vocational_educational_training: false
+        vocational_educational_training_months_used: 6
+      expect: false

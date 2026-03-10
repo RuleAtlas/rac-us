@@ -1,0 +1,47 @@
+# 42 USC Section 607(f)(2) tests
+
+no_filling_certain_vacancies:
+    - name: "Federally funded activity with layoff violation - prohibited"
+      period: 2024-01
+      inputs:
+          is_work_activity_federally_funded: true
+          is_employed_or_assigned_in_work_activity: true
+          violates_layoff_restriction: true
+          violates_workforce_reduction_restriction: false
+      expect: true
+
+    - name: "Federally funded activity with workforce reduction violation - prohibited"
+      period: 2024-01
+      inputs:
+          is_work_activity_federally_funded: true
+          is_employed_or_assigned_in_work_activity: true
+          violates_layoff_restriction: false
+          violates_workforce_reduction_restriction: true
+      expect: true
+
+    - name: "Federally funded activity with both violations - prohibited"
+      period: 2024-01
+      inputs:
+          is_work_activity_federally_funded: true
+          is_employed_or_assigned_in_work_activity: true
+          violates_layoff_restriction: true
+          violates_workforce_reduction_restriction: true
+      expect: true
+
+    - name: "Federally funded activity with no violations - not prohibited"
+      period: 2024-01
+      inputs:
+          is_work_activity_federally_funded: true
+          is_employed_or_assigned_in_work_activity: true
+          violates_layoff_restriction: false
+          violates_workforce_reduction_restriction: false
+      expect: false
+
+    - name: "Not federally funded - not prohibited even with violations"
+      period: 2024-01
+      inputs:
+          is_work_activity_federally_funded: false
+          is_employed_or_assigned_in_work_activity: true
+          violates_layoff_restriction: true
+          violates_workforce_reduction_restriction: true
+      expect: false

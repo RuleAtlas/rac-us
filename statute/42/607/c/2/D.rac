@@ -1,0 +1,154 @@
+# 42 USC Section 607(c)(2)(D) - 30% cap on educational activities
+
+"""
+(D) Limitation on number of persons who may be treated as engaged in
+work by reason of participation in educational activities.-- For
+purposes of determining monthly participation rates under paragraphs
+(1)(B)(i) and (2)(B) of subsection (b), not more than 30 percent of
+the number of individuals in all families and in 2-parent families,
+respectively, in a State who are treated as engaged in work for a
+month may consist of individuals who are determined to be engaged in
+work for the month by reason of participation in vocational
+educational training, or (if the month is in fiscal year 2000 or
+thereafter) deemed to be engaged in work for the month by reason of
+subparagraph (C) of this paragraph.
+"""
+
+status: encoded
+
+# Parameters
+
+educational_activity_cap_rate:
+    description: "Maximum share of individuals treated as engaged in work who may be counted by reason of vocational educational training or teen head of household deeming (subparagraph C) per 42 USC 607(c)(2)(D)"
+    unit: rate
+    from 1996-10-01: 0.30
+
+educational_activity_cap_teen_deeming_start_fiscal_year:
+    description: "Fiscal year from which the educational activity cap also applies to individuals deemed engaged in work under subparagraph (C) per 42 USC 607(c)(2)(D)"
+    unit: fiscal_year
+    from 1996-10-01: 2000
+
+# Inputs
+
+individuals_engaged_in_work_all_families:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Total individuals treated as engaged in work - all families"
+    description: "State-level count of individuals in all families who are treated as engaged in work for the month per 42 USC 607(b)(1)(B)(i)"
+    default: 0
+
+individuals_engaged_via_vocational_training_all_families:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Individuals engaged via vocational training - all families"
+    description: "State-level count of individuals in all families determined to be engaged in work by reason of participation in vocational educational training per 42 USC 607(d)(8)"
+    default: 0
+
+individuals_engaged_via_teen_deeming_all_families:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Individuals engaged via teen head of household deeming - all families"
+    description: "State-level count of individuals in all families deemed engaged in work by reason of subparagraph (C) of 42 USC 607(c)(2)"
+    default: 0
+
+individuals_engaged_in_work_two_parent_families:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Total individuals treated as engaged in work - 2-parent families"
+    description: "State-level count of individuals in 2-parent families who are treated as engaged in work for the month per 42 USC 607(b)(2)(B)"
+    default: 0
+
+individuals_engaged_via_vocational_training_two_parent_families:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Individuals engaged via vocational training - 2-parent families"
+    description: "State-level count of individuals in 2-parent families determined to be engaged in work by reason of participation in vocational educational training per 42 USC 607(d)(8)"
+    default: 0
+
+individuals_engaged_via_teen_deeming_two_parent_families:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Individuals engaged via teen head of household deeming - 2-parent families"
+    description: "State-level count of individuals in 2-parent families deemed engaged in work by reason of subparagraph (C) of 42 USC 607(c)(2)"
+    default: 0
+
+fiscal_year:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Fiscal year"
+    description: "Federal fiscal year applicable to the month"
+    default: 0
+
+# Computed values
+
+teen_deeming_included_in_cap:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Teen deeming included in educational activity cap"
+    description: "Whether individuals deemed engaged in work under subparagraph (C) are included in the 30% cap, which applies from fiscal year 2000 onward per 42 USC 607(c)(2)(D)"
+    from 1996-10-01:
+        fiscal_year >= educational_activity_cap_teen_deeming_start_fiscal_year
+
+educational_activity_count_all_families:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Educational activity count subject to cap - all families"
+    description: "Number of individuals in all families counted as engaged in work by reason of vocational educational training (and if applicable, teen deeming) per 42 USC 607(c)(2)(D)"
+    from 1996-10-01:
+        if teen_deeming_included_in_cap: individuals_engaged_via_vocational_training_all_families + individuals_engaged_via_teen_deeming_all_families
+        else: individuals_engaged_via_vocational_training_all_families
+
+educational_activity_cap_all_families:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Maximum individuals countable via educational activities - all families"
+    description: "30% cap on the number of individuals in all families who may be treated as engaged in work by reason of educational activities per 42 USC 607(c)(2)(D)"
+    from 1996-10-01:
+        floor(individuals_engaged_in_work_all_families * educational_activity_cap_rate)
+
+educational_activity_count_within_cap_all_families:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Educational activity count within cap - all families"
+    description: "Actual number of individuals in all families countable via educational activities, limited by the 30% cap per 42 USC 607(c)(2)(D)"
+    from 1996-10-01:
+        min(educational_activity_count_all_families, educational_activity_cap_all_families)
+
+educational_activity_count_two_parent_families:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Educational activity count subject to cap - 2-parent families"
+    description: "Number of individuals in 2-parent families counted as engaged in work by reason of vocational educational training (and if applicable, teen deeming) per 42 USC 607(c)(2)(D)"
+    from 1996-10-01:
+        if teen_deeming_included_in_cap: individuals_engaged_via_vocational_training_two_parent_families + individuals_engaged_via_teen_deeming_two_parent_families
+        else: individuals_engaged_via_vocational_training_two_parent_families
+
+educational_activity_cap_two_parent_families:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Maximum individuals countable via educational activities - 2-parent families"
+    description: "30% cap on the number of individuals in 2-parent families who may be treated as engaged in work by reason of educational activities per 42 USC 607(c)(2)(D)"
+    from 1996-10-01:
+        floor(individuals_engaged_in_work_two_parent_families * educational_activity_cap_rate)
+
+educational_activity_count_within_cap_two_parent_families:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Educational activity count within cap - 2-parent families"
+    description: "Actual number of individuals in 2-parent families countable via educational activities, limited by the 30% cap per 42 USC 607(c)(2)(D)"
+    from 1996-10-01:
+        min(educational_activity_count_two_parent_families, educational_activity_cap_two_parent_families)

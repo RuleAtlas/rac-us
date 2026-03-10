@@ -1,0 +1,35 @@
+# 42 USC Section 607(b)(1)(B)(ii)(II) tests
+
+is_penalty_exclusion_family:
+    - name: "Family with penalty this month and 0 prior months - excluded"
+      period: 2024-01
+      inputs:
+        work_refusal_penalty: 200
+        months_subject_to_e1_penalty_in_lookback: 0
+      expect: true
+
+    - name: "Family with penalty this month and 3 prior months - excluded (at limit)"
+      period: 2024-01
+      inputs:
+        work_refusal_penalty: 200
+        months_subject_to_e1_penalty_in_lookback: 3
+      expect: true
+
+    - name: "Family with penalty this month and 4 prior months - not excluded (exceeds limit)"
+      period: 2024-01
+      inputs:
+        work_refusal_penalty: 200
+        months_subject_to_e1_penalty_in_lookback: 4
+      expect: false
+
+    - name: "Family with no penalty this month - not excluded"
+      period: 2024-01
+      inputs:
+        work_refusal_penalty: 0
+        months_subject_to_e1_penalty_in_lookback: 1
+      expect: false
+
+    - name: "Default inputs - not excluded"
+      period: 2024-01
+      inputs: {}
+      expect: false

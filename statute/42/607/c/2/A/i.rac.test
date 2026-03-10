@@ -1,0 +1,73 @@
+# 42 USC Section 607(c)(2)(A)(i) tests
+
+job_search_counts_as_engaged_in_work:
+    - name: "Not participating in job search - does not count"
+      period: 2024-01
+      inputs:
+          is_engaged_in_job_search_and_job_readiness: false
+          job_search_weeks_used_in_fiscal_year: 0
+          consecutive_job_search_weeks_prior: 0
+      expect: false
+
+    - name: "Participating, under 6-week limit - counts"
+      period: 2024-01
+      inputs:
+          is_engaged_in_job_search_and_job_readiness: true
+          job_search_weeks_used_in_fiscal_year: 5
+          consecutive_job_search_weeks_prior: 2
+      expect: true
+
+    - name: "Participating, at 6-week limit - does not count"
+      period: 2024-01
+      inputs:
+          is_engaged_in_job_search_and_job_readiness: true
+          job_search_weeks_used_in_fiscal_year: 6
+          consecutive_job_search_weeks_prior: 0
+      expect: false
+
+    - name: "Participating, at 4 consecutive weeks - does not count"
+      period: 2024-01
+      inputs:
+          is_engaged_in_job_search_and_job_readiness: true
+          job_search_weeks_used_in_fiscal_year: 0
+          consecutive_job_search_weeks_prior: 4
+      expect: false
+
+    - name: "High-unemployment state, under 12-week extended limit - counts"
+      period: 2024-01
+      inputs:
+          is_engaged_in_job_search_and_job_readiness: true
+          job_search_weeks_used_in_fiscal_year: 10
+          consecutive_job_search_weeks_prior: 2
+          state_unemployment_rate: 0.09
+          us_unemployment_rate: 0.05
+      expect: true
+
+    - name: "High-unemployment state, at 12-week extended limit - does not count"
+      period: 2024-01
+      inputs:
+          is_engaged_in_job_search_and_job_readiness: true
+          job_search_weeks_used_in_fiscal_year: 12
+          consecutive_job_search_weeks_prior: 0
+          state_unemployment_rate: 0.09
+          us_unemployment_rate: 0.05
+      expect: false
+
+    - name: "Needy state, under 12-week extended limit - counts"
+      period: 2024-01
+      inputs:
+          is_engaged_in_job_search_and_job_readiness: true
+          job_search_weeks_used_in_fiscal_year: 8
+          consecutive_job_search_weeks_prior: 3
+          is_needy_state: true
+      expect: true
+
+    - name: "Normal state, over 6-week limit but under 12 - does not count"
+      period: 2024-01
+      inputs:
+          is_engaged_in_job_search_and_job_readiness: true
+          job_search_weeks_used_in_fiscal_year: 8
+          consecutive_job_search_weeks_prior: 0
+          state_unemployment_rate: 0.05
+          us_unemployment_rate: 0.05
+      expect: false

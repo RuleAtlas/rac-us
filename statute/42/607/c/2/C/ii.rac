@@ -1,0 +1,30 @@
+# 42 USC Section 607(c)(2)(C)(ii) - Teen head of household: employment education pathway
+
+"""
+(ii) participates in education directly related to employment for an
+average of at least 20 hours per week during the month.
+"""
+
+status: encoded
+
+teen_employment_education_min_hours_per_week:
+    description: "Minimum average hours per week of participation in education directly related to employment for teen head of household deemed engagement per 42 USC 607(c)(2)(C)(ii)"
+    unit: hours_per_week
+    from 1996-10-01: 20
+
+employment_education_hours_per_week:
+    entity: Person
+    period: Month
+    dtype: Integer
+    label: "Employment education hours per week"
+    description: "Average hours per week the recipient participates in education directly related to employment during the month"
+    default: 0
+
+teen_hoh_employment_education_met:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Teen head of household employment education requirement met"
+    description: "Whether the teen head of household or married teen meets the deemed engagement pathway by participating in education directly related to employment for at least 20 hours per week per 42 USC 607(c)(2)(C)(ii)"
+    from 1996-10-01:
+        employment_education_hours_per_week >= teen_employment_education_min_hours_per_week

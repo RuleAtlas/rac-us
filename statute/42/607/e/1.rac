@@ -1,0 +1,44 @@
+# 42 USC Section 607(e)(1) - Penalties against individuals, in general
+
+"""
+(1) In general.-- Except as provided in paragraph (2), if an individual in a
+family receiving assistance under the State program funded under this part or
+any other State program funded with qualified State expenditures (as defined
+in section 609(a)(7)(B)(i) of this title) refuses to engage in work required
+in accordance with this section, the State shall--
+(A) reduce the amount of assistance otherwise payable to the family pro rata
+(or more, at the option of the State) with respect to any period during a
+month in which the individual so refuses; or
+(B) terminate such assistance,
+subject to such good cause and other exceptions as the State may establish.
+"""
+
+status: encoded
+
+paragraph_2_exception_applies:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Paragraph (2) child care exception applies"
+    description: "Whether the exception in 42 USC 607(e)(2) applies (single custodial parent with child under 6 unable to obtain needed child care)"
+    default: false
+
+work_refusal_penalty:
+    imports:
+        - 42/607/e/1/A#pro_rata_assistance_reduction
+        - 42/607/e/1/A#tanf_monthly_assistance_otherwise_payable
+        - 42/607/e/1/B#assistance_terminated_for_work_refusal
+        - 42/607/e/1/B#refuses_to_engage_in_work
+        - 42/607/e/1/B#has_good_cause_exception
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Work refusal penalty"
+    description: "Amount by which family's assistance is reduced due to work refusal per 42 USC 607(e)(1)"
+    from 1996-10-01:
+        if paragraph_2_exception_applies: 0
+        elif not refuses_to_engage_in_work: 0
+        elif has_good_cause_exception: 0
+        elif assistance_terminated_for_work_refusal: tanf_monthly_assistance_otherwise_payable
+        else: pro_rata_assistance_reduction

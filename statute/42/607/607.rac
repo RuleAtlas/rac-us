@@ -1,0 +1,55 @@
+# 42 USC Section 607 - Mandatory work requirements
+
+"""
+Sec. 607. Mandatory work requirements.
+
+(a) Participation rate requirements.-- States must achieve minimum
+participation rates for all families and 2-parent families receiving
+TANF assistance.
+
+(b) Calculation of participation rates.-- Participation rates are
+calculated as average monthly rates, with adjustments for caseload
+reductions.
+
+(c) Engaged in work.-- Defines what constitutes being engaged in work,
+including minimum hours and special rules.
+
+(d) Work activities.-- Enumerates 12 approved work activities.
+
+(e) Penalties against individuals.-- Provides for reduction or
+termination of assistance for refusal to engage in work, with
+exception for inability to obtain child care.
+
+(f) Nondisplacement.-- Prohibits using TANF participants to displace
+regular workers.
+"""
+
+status: encoded
+
+tanf_all_families_requirement_met:
+    imports:
+        - 42/607/a/1#min_participation_rate_all_families
+        - 42/607/b/1/A#tanf_annual_participation_rate_all_families
+        - 42/607/b/3/A#caseload_reduction_credit
+    entity: Family
+    period: Year
+    dtype: Boolean
+    label: "State meets all-families participation rate requirement"
+    description: "Whether the State's annual participation rate for all families meets the applicable minimum after caseload reduction credit per 42 USC 607(a)(1) and (b)(3)(A)"
+    from 1996-10-01:
+        effective_min_rate = max(0, min_participation_rate_all_families - caseload_reduction_credit)
+        tanf_annual_participation_rate_all_families >= effective_min_rate
+
+tanf_two_parent_requirement_met:
+    imports:
+        - 42/607/a/2#two_parent_min_participation_rate
+        - 42/607/b/2/A#tanf_annual_participation_rate_two_parent_families
+        - 42/607/b/3/A#caseload_reduction_credit
+    entity: Family
+    period: Year
+    dtype: Boolean
+    label: "State meets 2-parent families participation rate requirement"
+    description: "Whether the State's annual participation rate for 2-parent families meets the applicable minimum after caseload reduction credit per 42 USC 607(a)(2) and (b)(3)(A)"
+    from 1996-10-01:
+        effective_min_rate = max(0, two_parent_min_participation_rate - caseload_reduction_credit)
+        tanf_annual_participation_rate_two_parent_families >= effective_min_rate

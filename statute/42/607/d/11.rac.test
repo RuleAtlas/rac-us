@@ -1,0 +1,35 @@
+# 42 USC Section 607(d)(11) tests
+
+secondary_school_attendance_is_work_activity:
+    - name: "Attending and has not completed secondary school - qualifies"
+      period: 2024-01
+      inputs:
+          is_attending_secondary_school_or_equivalent: true
+          has_completed_secondary_school_or_equivalent: false
+      expect: true
+
+    - name: "Attending but has already completed secondary school - does not qualify"
+      period: 2024-01
+      inputs:
+          is_attending_secondary_school_or_equivalent: true
+          has_completed_secondary_school_or_equivalent: true
+      expect: false
+
+    - name: "Not attending and has not completed - does not qualify"
+      period: 2024-01
+      inputs:
+          is_attending_secondary_school_or_equivalent: false
+          has_completed_secondary_school_or_equivalent: false
+      expect: false
+
+    - name: "Default inputs - not attending (defaults to false)"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Attending in FY1997, has not completed - qualifies"
+      period: 1997-01
+      inputs:
+          is_attending_secondary_school_or_equivalent: true
+          has_completed_secondary_school_or_equivalent: false
+      expect: true

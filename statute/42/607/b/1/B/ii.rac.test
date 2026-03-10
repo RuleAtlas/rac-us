@@ -1,0 +1,37 @@
+# 42 USC Section 607(b)(1)(B)(ii) tests
+
+tanf_work_participation_denominator_family:
+    - name: "Family in denominator pool and not penalty-excluded"
+      period: 2024-01
+      inputs:
+        is_tanf_denominator_family: true
+        is_penalty_exclusion_family: false
+      expect: true
+
+    - name: "Family in denominator pool but penalty-excluded"
+      period: 2024-01
+      inputs:
+        is_tanf_denominator_family: true
+        is_penalty_exclusion_family: true
+      expect: false
+
+    - name: "Family not in denominator pool and not penalty-excluded"
+      period: 2024-01
+      inputs:
+        is_tanf_denominator_family: false
+        is_penalty_exclusion_family: false
+      expect: false
+
+    - name: "Family not in denominator pool but penalty-excluded"
+      period: 2024-01
+      inputs:
+        is_tanf_denominator_family: false
+        is_penalty_exclusion_family: true
+      expect: false
+
+    - name: "Family in denominator pool, effective date 1997"
+      period: 1997-10
+      inputs:
+        is_tanf_denominator_family: true
+        is_penalty_exclusion_family: false
+      expect: true

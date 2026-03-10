@@ -1,0 +1,35 @@
+# 42 USC Section 607(b)(1)(B)(ii)(I) tests
+
+is_tanf_denominator_family:
+    - name: "Family not receiving TANF is not counted"
+      period: 2024-01
+      inputs:
+        is_receiving_tanf_assistance: false
+        has_adult_or_minor_child_hoh: true
+      expect: false
+
+    - name: "TANF family without adult or minor child HOH is not counted"
+      period: 2024-01
+      inputs:
+        is_receiving_tanf_assistance: true
+        has_adult_or_minor_child_hoh: false
+      expect: false
+
+    - name: "TANF family with adult or minor child HOH is counted"
+      period: 2024-01
+      inputs:
+        is_receiving_tanf_assistance: true
+        has_adult_or_minor_child_hoh: true
+      expect: true
+
+    - name: "Default inputs - not counted"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Both conditions false - not counted"
+      period: 2024-01
+      inputs:
+        is_receiving_tanf_assistance: false
+        has_adult_or_minor_child_hoh: false
+      expect: false

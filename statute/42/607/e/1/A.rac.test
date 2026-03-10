@@ -1,0 +1,42 @@
+# 42 USC Section 607(e)(1)(A) tests
+
+pro_rata_assistance_reduction:
+    - name: "Full month refusal reduces entire benefit"
+      period: 2024-01
+      inputs:
+        tanf_monthly_assistance_otherwise_payable: 500
+        days_of_work_refusal_in_month: 30
+        days_in_month: 30
+      expect: 500
+
+    - name: "Half month refusal reduces benefit by half"
+      period: 2024-01
+      inputs:
+        tanf_monthly_assistance_otherwise_payable: 600
+        days_of_work_refusal_in_month: 15
+        days_in_month: 30
+      expect: 300
+
+    - name: "No refusal means no reduction"
+      period: 2024-01
+      inputs:
+        tanf_monthly_assistance_otherwise_payable: 500
+        days_of_work_refusal_in_month: 0
+        days_in_month: 30
+      expect: 0
+
+    - name: "One day refusal in 31-day month"
+      period: 2024-01
+      inputs:
+        tanf_monthly_assistance_otherwise_payable: 620
+        days_of_work_refusal_in_month: 1
+        days_in_month: 31
+      expect: 20
+
+    - name: "Zero assistance yields zero reduction"
+      period: 2024-01
+      inputs:
+        tanf_monthly_assistance_otherwise_payable: 0
+        days_of_work_refusal_in_month: 15
+        days_in_month: 30
+      expect: 0

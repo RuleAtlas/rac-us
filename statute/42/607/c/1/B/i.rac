@@ -1,0 +1,46 @@
+# 42 USC Section 607(c)(1)(B)(i) - 2-parent families: 35hr total / 30hr core
+
+"""
+(i) the individual and the other parent in the family are participating
+in work activities for a total of at least 35 hours per week during the
+month, not fewer than 30 hours per week of which are attributable to an
+activity described in paragraph (1), (2), (3), (4), (5), (6), (7), (8),
+or (12) of subsection (d), subject to this subsection; and
+"""
+
+status: encoded
+
+two_parent_standard_total_hours_per_week:
+    description: "Minimum total weekly work hours for both parents in a 2-parent family per 42 USC 607(c)(1)(B)(i)"
+    unit: hours_per_week
+    from 1996-10-01: 35
+
+two_parent_standard_core_hours_per_week:
+    description: "Minimum core activity weekly work hours for both parents in a 2-parent family per 42 USC 607(c)(1)(B)(i)"
+    unit: hours_per_week
+    from 1996-10-01: 30
+
+two_parent_total_weekly_work_hours:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Total weekly work hours for both parents"
+    description: "Average weekly hours that the individual and the other parent are participating in work activities during the month"
+    default: 0
+
+two_parent_core_weekly_work_hours:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Core activity weekly work hours for both parents"
+    description: "Average weekly hours that the individual and the other parent participate in core work activities (d)(1)-(8),(12) during the month"
+    default: 0
+
+two_parent_standard_work_requirement_met:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "2-parent family standard work requirement met"
+    description: "Whether the 2-parent family meets the standard work participation requirement of 42 USC 607(c)(1)(B)(i): at least 35 total hours and 30 core hours per week"
+    from 1996-10-01:
+        two_parent_total_weekly_work_hours >= two_parent_standard_total_hours_per_week and two_parent_core_weekly_work_hours >= two_parent_standard_core_hours_per_week

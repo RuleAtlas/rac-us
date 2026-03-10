@@ -1,0 +1,36 @@
+# 42 USC Section 607(b)(1)(B)(i) - Monthly rate numerator - families with working adult
+
+"""
+(i) the number of families receiving assistance under the State program
+funded under this part or any other State program funded with qualified
+State expenditures (as defined in section 609(a)(7)(B)(i) of this title)
+that include an adult or a minor child head of household who is engaged
+in work for the month;
+"""
+
+status: encoded
+
+is_receiving_tanf_assistance:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Receiving TANF assistance"
+    description: "Whether the family is receiving assistance under the State TANF program or any other State program funded with qualified State expenditures as defined in 42 USC 609(a)(7)(B)(i)"
+    default: false
+
+includes_working_adult_or_minor_hoh:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Includes working adult or minor child head of household"
+    description: "Whether the family includes an adult or a minor child head of household who is engaged in work for the month"
+    default: false
+
+tanf_work_participation_numerator_family:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Family counted in TANF work participation rate numerator"
+    description: "Whether this family is counted in the numerator of the monthly participation rate per 42 USC 607(b)(1)(B)(i): a family receiving TANF assistance that includes an adult or minor child head of household engaged in work"
+    from 1996-10-01:
+        is_receiving_tanf_assistance and includes_working_adult_or_minor_hoh

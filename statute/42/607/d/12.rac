@@ -1,0 +1,25 @@
+# 42 USC Section 607(d)(12) - Child care for community service participant
+
+"""
+(12) the provision of child care services to an individual who is
+participating in a community service program.
+"""
+
+status: encoded
+
+is_providing_child_care_to_community_service_participant:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Providing child care to a community service participant"
+    description: "Whether the individual is providing child care services to an individual who is participating in a community service program per 42 USC 607(d)(12)"
+    default: false
+
+child_care_for_community_service_participant_is_work_activity:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Child care for community service participant counts as work activity"
+    description: "Provision of child care services to an individual participating in a community service program qualifies as a work activity per 42 USC 607(d)(12)"
+    from 1996-10-01:
+        is_providing_child_care_to_community_service_participant

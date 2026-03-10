@@ -1,0 +1,32 @@
+# 42 USC Section 607(c)(2)(C)(ii) tests
+
+teen_hoh_employment_education_met:
+    - name: "Meets minimum: exactly 20 hours"
+      period: 2024-01
+      inputs:
+        employment_education_hours_per_week: 20
+      expect: true
+
+    - name: "Exceeds minimum: 25 hours"
+      period: 2024-01
+      inputs:
+        employment_education_hours_per_week: 25
+      expect: true
+
+    - name: "Below minimum: 19 hours"
+      period: 2024-01
+      inputs:
+        employment_education_hours_per_week: 19
+      expect: false
+
+    - name: "Zero hours: no participation"
+      period: 2024-01
+      inputs:
+        employment_education_hours_per_week: 0
+      expect: false
+
+    - name: "Minimal participation: 1 hour"
+      period: 2024-01
+      inputs:
+        employment_education_hours_per_week: 1
+      expect: false

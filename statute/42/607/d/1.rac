@@ -1,0 +1,24 @@
+# 42 USC Section 607(d)(1) - Unsubsidized employment
+
+"""
+(1) unsubsidized employment;
+"""
+
+status: encoded
+
+is_engaged_in_unsubsidized_employment:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Engaged in unsubsidized employment"
+    description: "Whether the individual is engaged in unsubsidized employment per 42 USC 607(d)(1)"
+    default: false
+
+unsubsidized_employment_is_work_activity:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Unsubsidized employment counts as work activity"
+    description: "Unsubsidized employment qualifies as a work activity per 42 USC 607(d)(1)"
+    from 1996-10-01:
+        is_engaged_in_unsubsidized_employment

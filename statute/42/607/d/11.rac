@@ -1,0 +1,35 @@
+# 42 USC Section 607(d)(11) - Secondary school attendance
+
+"""
+(11) satisfactory attendance at secondary school or in a course of
+study leading to a certificate of general equivalence, in the case of
+a recipient who has not completed secondary school or received such a
+certificate;
+"""
+
+status: encoded
+
+is_attending_secondary_school_or_equivalent:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Attending secondary school or GED program"
+    description: "Whether the individual is satisfactorily attending secondary school or a course of study leading to a certificate of general equivalence per 42 USC 607(d)(11)"
+    default: false
+
+has_completed_secondary_school_or_equivalent:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Has completed secondary school or received GED"
+    description: "Whether the individual has completed secondary school or received a certificate of general equivalence per 42 USC 607(d)(11)"
+    default: false
+
+secondary_school_attendance_is_work_activity:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Secondary school attendance counts as work activity"
+    description: "Secondary school attendance qualifies as a work activity only for recipients who have not completed secondary school or received a GED, per 42 USC 607(d)(11)"
+    from 1996-10-01:
+        is_attending_secondary_school_or_equivalent and not has_completed_secondary_school_or_equivalent

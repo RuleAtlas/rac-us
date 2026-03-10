@@ -1,0 +1,25 @@
+# 42 USC Section 607(d)(5) tests
+
+on_the_job_training_is_work_activity:
+    - name: "Engaged in on-the-job training - qualifies as work activity"
+      period: 2024-01
+      inputs:
+          is_engaged_in_on_the_job_training: true
+      expect: true
+
+    - name: "Not engaged in on-the-job training - does not qualify"
+      period: 2024-01
+      inputs:
+          is_engaged_in_on_the_job_training: false
+      expect: false
+
+    - name: "Engaged in on-the-job training in FY1997 - qualifies"
+      period: 1997-01
+      inputs:
+          is_engaged_in_on_the_job_training: true
+      expect: true
+
+    - name: "Default - not engaged (default false)"
+      period: 2024-01
+      inputs: {}
+      expect: false

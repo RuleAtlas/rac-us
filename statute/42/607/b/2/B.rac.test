@@ -1,0 +1,35 @@
+# 42 USC Section 607(b)(2)(B) tests
+
+tanf_monthly_participation_rate_two_parent_families:
+    - name: "90 percent participation rate for 2-parent families"
+      period: 2024-01
+      inputs:
+        tanf_two_parent_families_in_numerator: 900
+        tanf_two_parent_families_in_denominator: 1000
+      expect: 0.90
+
+    - name: "Zero denominator returns zero rate"
+      period: 2024-01
+      inputs:
+        tanf_two_parent_families_in_numerator: 50
+        tanf_two_parent_families_in_denominator: 0
+      expect: 0
+
+    - name: "100 percent participation rate"
+      period: 2024-01
+      inputs:
+        tanf_two_parent_families_in_numerator: 200
+        tanf_two_parent_families_in_denominator: 200
+      expect: 1.0
+
+    - name: "Zero numerator returns zero rate"
+      period: 2024-01
+      inputs:
+        tanf_two_parent_families_in_numerator: 0
+        tanf_two_parent_families_in_denominator: 300
+      expect: 0
+
+    - name: "Default inputs return zero"
+      period: 2024-01
+      inputs: {}
+      expect: 0

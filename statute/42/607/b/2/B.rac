@@ -1,0 +1,37 @@
+# 42 USC Section 607(b)(2)(B) - Monthly participation rates - 2-parent families
+
+"""
+(B) Monthly participation rates.-- The participation rate of a State
+for 2-parent families of the State for a month shall be calculated by
+use of the formula set forth in paragraph (1)(B), except that in the
+formula the term "number of 2-parent families" shall be substituted
+for the term "number of families" each place such latter term appears.
+"""
+
+status: encoded
+
+tanf_two_parent_families_in_numerator:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Number of 2-parent families in participation rate numerator"
+    description: "State-level count of 2-parent families counted in the numerator per 42 USC 607(b)(2)(B): 2-parent families receiving TANF assistance that include an adult engaged in work, using the formula from paragraph (1)(B) with '2-parent families' substituted for 'families'"
+    default: 0
+
+tanf_two_parent_families_in_denominator:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Number of 2-parent families in participation rate denominator"
+    description: "State-level count of 2-parent families counted in the denominator per 42 USC 607(b)(2)(B): total denominator 2-parent families minus penalty-excluded 2-parent families, using the formula from paragraph (1)(B) with '2-parent families' substituted for 'families'"
+    default: 0
+
+tanf_monthly_participation_rate_two_parent_families:
+    entity: Family
+    period: Month
+    dtype: Rate
+    label: "Monthly TANF work participation rate - 2-parent families"
+    description: "The participation rate of a State for 2-parent families for a month, calculated using the formula set forth in paragraph (1)(B) with '2-parent families' substituted for 'families' per 42 USC 607(b)(2)(B)"
+    from 1996-10-01:
+        if tanf_two_parent_families_in_denominator == 0: 0
+        else: tanf_two_parent_families_in_numerator / tanf_two_parent_families_in_denominator

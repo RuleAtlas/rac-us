@@ -1,0 +1,21 @@
+# 42 USC Section 607(b)(3)(A)(ii) - Baseline year (FY2015) average monthly caseload
+
+"""
+(ii) the average monthly number of families that received assistance
+under any State program referred to in clause (i) during fiscal year
+2015.
+"""
+
+status: encoded
+
+baseline_fiscal_year:
+    description: "Baseline fiscal year for caseload reduction comparison per 42 USC 607(b)(3)(A)(ii), as amended by BBA 2018"
+    from 2015-10-01: 2015
+
+baseline_avg_monthly_caseload:
+    entity: Family
+    period: Year
+    dtype: Integer
+    label: "Baseline FY2015 average monthly caseload"
+    description: "The average monthly number of families that received assistance under the State TANF program or any other State program funded with qualified State expenditures during fiscal year 2015, per 42 USC 607(b)(3)(A)(ii). State-level aggregate provided as exogenous data."
+    default: 0

@@ -1,0 +1,42 @@
+# 42 USC Section 607(c)(2)(B) tests
+
+is_deemed_engaged_in_work_single_parent_child_under_6:
+    - name: "Single parent, child under 6, works 20 hours - deemed engaged"
+      period: 2024-01
+      inputs:
+          is_only_parent_or_caretaker_relative: true
+          youngest_child_age_in_family: 3
+          total_work_activity_hours_per_week: 20
+      expect: true
+
+    - name: "Single parent, child under 6, works 19 hours - not deemed"
+      period: 2024-01
+      inputs:
+          is_only_parent_or_caretaker_relative: true
+          youngest_child_age_in_family: 3
+          total_work_activity_hours_per_week: 19
+      expect: false
+
+    - name: "Single parent, child exactly 6 - not eligible for deeming"
+      period: 2024-01
+      inputs:
+          is_only_parent_or_caretaker_relative: true
+          youngest_child_age_in_family: 6
+          total_work_activity_hours_per_week: 25
+      expect: false
+
+    - name: "Not only parent in family - not eligible for deeming"
+      period: 2024-01
+      inputs:
+          is_only_parent_or_caretaker_relative: false
+          youngest_child_age_in_family: 3
+          total_work_activity_hours_per_week: 25
+      expect: false
+
+    - name: "Zero work hours - not deemed engaged"
+      period: 2024-01
+      inputs:
+          is_only_parent_or_caretaker_relative: true
+          youngest_child_age_in_family: 2
+          total_work_activity_hours_per_week: 0
+      expect: false

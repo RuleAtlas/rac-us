@@ -1,0 +1,34 @@
+# 42 USC Section 607(b)(2)(A) - Average monthly rate - 2-parent families
+
+"""
+(A) Average monthly rate.-- For purposes of subsection (a)(2), the
+participation rate for 2-parent families of a State for a fiscal year is
+the average of the participation rates for 2-parent families of the State
+for each month in the fiscal year.
+"""
+
+status: encoded
+
+months_in_fiscal_year:
+    description: "Number of months in a federal fiscal year"
+    unit: Month
+    from 1997-07-01: 12
+
+sum_monthly_participation_rates_two_parent_families:
+    entity: Family
+    period: Year
+    dtype: Rate
+    label: "Sum of monthly participation rates for 2-parent families"
+    description: "Sum of the monthly TANF work participation rates for 2-parent families of the State across each month in the fiscal year, per 42 USC 607(b)(2)(A)"
+    default: 0
+
+tanf_annual_participation_rate_two_parent_families:
+    imports:
+        - ./B#tanf_monthly_participation_rate_two_parent_families
+    entity: Family
+    period: Year
+    dtype: Rate
+    label: "Annual TANF work participation rate - 2-parent families"
+    description: "The participation rate for 2-parent families of a State for a fiscal year, computed as the average of the monthly participation rates per 42 USC 607(b)(2)(A)"
+    from 1997-07-01:
+        sum_monthly_participation_rates_two_parent_families / months_in_fiscal_year

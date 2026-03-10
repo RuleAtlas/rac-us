@@ -1,0 +1,19 @@
+# 42 USC Section 607(e)(2)(B) tests
+
+informal_child_care_exception_applies:
+    - name: "Exception applies when informal child care is unavailable or unsuitable"
+      period: 2024-01
+      inputs:
+        informal_child_care_unavailable_or_unsuitable: true
+      expect: true
+
+    - name: "Exception does not apply when informal child care is available and suitable"
+      period: 2024-01
+      inputs:
+        informal_child_care_unavailable_or_unsuitable: false
+      expect: false
+
+    - name: "Default is false when no input provided"
+      period: 2024-01
+      inputs: {}
+      expect: false

@@ -1,0 +1,34 @@
+# 42 USC Section 607(b)(2)(C) - Family with a disabled parent not treated as a 2-parent family
+
+"""
+(C) Family with a disabled parent not treated as a 2-parent family.--
+A family that includes a disabled parent shall not be considered a
+2-parent family for purposes of subsections (a) and (b) of this section.
+"""
+
+status: encoded
+
+has_disabled_parent:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Family includes a disabled parent"
+    description: "Whether the family includes a parent who is disabled"
+    default: false
+
+is_two_parent_family:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Family has two parents"
+    description: "Whether the family has two parents present in the household"
+    default: false
+
+is_two_parent_family_for_participation:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Treated as 2-parent family for participation rates"
+    description: "A family that includes a disabled parent shall not be considered a 2-parent family for purposes of participation rate requirements per 42 USC 607(b)(2)(C)"
+    from 1997-07-01:
+        is_two_parent_family and not has_disabled_parent

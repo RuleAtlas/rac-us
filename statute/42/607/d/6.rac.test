@@ -1,0 +1,25 @@
+# 42 USC Section 607(d)(6) tests
+
+job_search_and_job_readiness_is_work_activity:
+    - name: "Engaged in job search and job readiness - qualifies as work activity"
+      period: 2024-01
+      inputs:
+          is_engaged_in_job_search_and_job_readiness: true
+      expect: true
+
+    - name: "Not engaged in job search and job readiness - does not qualify"
+      period: 2024-01
+      inputs:
+          is_engaged_in_job_search_and_job_readiness: false
+      expect: false
+
+    - name: "Engaged in job search and job readiness in FY1997 - qualifies"
+      period: 1997-01
+      inputs:
+          is_engaged_in_job_search_and_job_readiness: true
+      expect: true
+
+    - name: "Default - not engaged (default false)"
+      period: 2024-01
+      inputs: {}
+      expect: false

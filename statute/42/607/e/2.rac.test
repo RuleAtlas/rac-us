@@ -1,0 +1,69 @@
+# 42 USC Section 607(e)(2) tests
+
+child_care_inability_demonstrated:
+    - name: "Demonstrated when distance exception applies"
+      period: 2024-01
+      inputs:
+        child_care_distance_exception_applies: true
+        informal_child_care_exception_applies: false
+        formal_child_care_exception_applies: false
+      expect: true
+
+    - name: "Not demonstrated when no reasons apply"
+      period: 2024-01
+      inputs:
+        child_care_distance_exception_applies: false
+        informal_child_care_exception_applies: false
+        formal_child_care_exception_applies: false
+      expect: false
+
+child_care_inability_exception_applies:
+    - name: "Exception applies - single custodial parent with child under 6 and demonstrated inability"
+      period: 2024-01
+      inputs:
+        is_single_custodial_parent: true
+        is_caring_for_child_under_threshold_age: true
+        child_care_distance_exception_applies: true
+        informal_child_care_exception_applies: false
+        formal_child_care_exception_applies: false
+      expect: true
+
+    - name: "Exception does not apply - not a single custodial parent"
+      period: 2024-01
+      inputs:
+        is_single_custodial_parent: false
+        is_caring_for_child_under_threshold_age: true
+        child_care_distance_exception_applies: true
+        informal_child_care_exception_applies: false
+        formal_child_care_exception_applies: false
+      expect: false
+
+    - name: "Exception does not apply - child is above age threshold"
+      period: 2024-01
+      inputs:
+        is_single_custodial_parent: true
+        is_caring_for_child_under_threshold_age: false
+        child_care_distance_exception_applies: true
+        informal_child_care_exception_applies: false
+        formal_child_care_exception_applies: false
+      expect: false
+
+    - name: "Exception does not apply - no child care inability demonstrated"
+      period: 2024-01
+      inputs:
+        is_single_custodial_parent: true
+        is_caring_for_child_under_threshold_age: true
+        child_care_distance_exception_applies: false
+        informal_child_care_exception_applies: false
+        formal_child_care_exception_applies: false
+      expect: false
+
+    - name: "Exception applies with multiple child care reasons"
+      period: 2024-01
+      inputs:
+        is_single_custodial_parent: true
+        is_caring_for_child_under_threshold_age: true
+        child_care_distance_exception_applies: true
+        informal_child_care_exception_applies: true
+        formal_child_care_exception_applies: true
+      expect: true

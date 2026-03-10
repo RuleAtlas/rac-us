@@ -1,0 +1,24 @@
+# 42 USC Section 607(d)(3) - Subsidized public sector employment
+
+"""
+(3) subsidized public sector employment;
+"""
+
+status: encoded
+
+is_engaged_in_subsidized_public_sector_employment:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Engaged in subsidized public sector employment"
+    description: "Whether the individual is engaged in subsidized public sector employment per 42 USC 607(d)(3)"
+    default: false
+
+subsidized_public_sector_employment_is_work_activity:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Subsidized public sector employment counts as work activity"
+    description: "Subsidized public sector employment qualifies as a work activity per 42 USC 607(d)(3)"
+    from 1996-10-01:
+        is_engaged_in_subsidized_public_sector_employment

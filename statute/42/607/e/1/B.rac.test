@@ -1,0 +1,42 @@
+# 42 USC Section 607(e)(1)(B) tests
+
+assistance_terminated_for_work_refusal:
+    - name: "Assistance terminated when state elects termination and individual refuses work"
+      period: 2024-01
+      inputs:
+        state_elects_assistance_termination: true
+        refuses_to_engage_in_work: true
+        has_good_cause_exception: false
+      expect: true
+
+    - name: "No termination when individual does not refuse work"
+      period: 2024-01
+      inputs:
+        state_elects_assistance_termination: true
+        refuses_to_engage_in_work: false
+        has_good_cause_exception: false
+      expect: false
+
+    - name: "No termination when state elects reduction instead"
+      period: 2024-01
+      inputs:
+        state_elects_assistance_termination: false
+        refuses_to_engage_in_work: true
+        has_good_cause_exception: false
+      expect: false
+
+    - name: "No termination when good cause exception applies"
+      period: 2024-01
+      inputs:
+        state_elects_assistance_termination: true
+        refuses_to_engage_in_work: true
+        has_good_cause_exception: true
+      expect: false
+
+    - name: "No termination when all inputs are false"
+      period: 2024-01
+      inputs:
+        state_elects_assistance_termination: false
+        refuses_to_engage_in_work: false
+        has_good_cause_exception: false
+      expect: false

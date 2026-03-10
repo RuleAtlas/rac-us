@@ -1,0 +1,19 @@
+# 42 USC Section 607(e)(2)(A) tests
+
+child_care_distance_exception_applies:
+    - name: "Exception applies when appropriate child care is unavailable within reasonable distance"
+      period: 2024-01
+      inputs:
+        appropriate_child_care_unavailable_within_reasonable_distance: true
+      expect: true
+
+    - name: "Exception does not apply when appropriate child care is available"
+      period: 2024-01
+      inputs:
+        appropriate_child_care_unavailable_within_reasonable_distance: false
+      expect: false
+
+    - name: "Default is false when no input provided"
+      period: 2024-01
+      inputs: {}
+      expect: false

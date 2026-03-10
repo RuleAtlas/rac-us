@@ -1,0 +1,25 @@
+# 42 USC Section 607(d)(1) tests
+
+unsubsidized_employment_is_work_activity:
+    - name: "Engaged in unsubsidized employment - qualifies as work activity"
+      period: 2024-01
+      inputs:
+          is_engaged_in_unsubsidized_employment: true
+      expect: true
+
+    - name: "Not engaged in unsubsidized employment - does not qualify"
+      period: 2024-01
+      inputs:
+          is_engaged_in_unsubsidized_employment: false
+      expect: false
+
+    - name: "Engaged in unsubsidized employment in FY1997 - qualifies"
+      period: 1997-01
+      inputs:
+          is_engaged_in_unsubsidized_employment: true
+      expect: true
+
+    - name: "Default - not engaged (default false)"
+      period: 2024-01
+      inputs: {}
+      expect: false

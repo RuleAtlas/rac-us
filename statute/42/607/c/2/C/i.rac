@@ -1,0 +1,25 @@
+# 42 USC Section 607(c)(2)(C)(i) - Teen head of household - school attendance
+
+"""
+(i) maintains satisfactory attendance at secondary school or the
+equivalent during the month;
+"""
+
+status: encoded
+
+maintains_satisfactory_secondary_school_attendance:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Maintains satisfactory secondary school attendance"
+    description: "Whether the recipient maintains satisfactory attendance at secondary school or the equivalent during the month per 42 USC 607(c)(2)(C)(i)"
+    default: false
+
+teen_hoh_meets_school_attendance:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Meets teen head of household school attendance requirement"
+    description: "Whether the recipient satisfies the school attendance condition for being deemed engaged in work per 42 USC 607(c)(2)(C)(i): maintains satisfactory attendance at secondary school or the equivalent during the month"
+    from 1996-10-01:
+        maintains_satisfactory_secondary_school_attendance

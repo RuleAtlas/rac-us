@@ -1,0 +1,34 @@
+# 42 USC Section 607(d)(4) - Work experience
+
+"""
+(4) work experience (including work associated with the refurbishing
+of publicly assisted housing) if sufficient private sector employment
+is not available;
+"""
+
+status: encoded
+
+is_engaged_in_work_experience:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Engaged in work experience"
+    description: "Whether the individual is engaged in work experience (including work associated with the refurbishing of publicly assisted housing) per 42 USC 607(d)(4)"
+    default: false
+
+sufficient_private_sector_employment_available:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Sufficient private sector employment available"
+    description: "Whether sufficient private sector employment is available per 42 USC 607(d)(4)"
+    default: false
+
+work_experience_is_work_activity:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Work experience counts as work activity"
+    description: "Work experience qualifies as a work activity only if sufficient private sector employment is not available, per 42 USC 607(d)(4)"
+    from 1996-10-01:
+        is_engaged_in_work_experience and not sufficient_private_sector_employment_available
