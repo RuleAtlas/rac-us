@@ -1,0 +1,13 @@
+# 26 USC 21(a)(2) - Applicable percentage
+
+"""
+(2) Applicable percentage defined.-- For purposes of paragraph (1), the
+applicable percentage means 50 percent--
+"""
+
+status: encoded
+
+base_applicable_percentage:
+    description: "Base applicable percentage before reductions per 26 USC 21(a)(2)"
+    unit: rate
+    from 2002-01-01: 0.50

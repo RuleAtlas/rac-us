@@ -15,7 +15,6 @@ earned_income_threshold:
     description: "Earned income threshold for additional child tax credit"
     unit: USD
     from 2001-01-01: 3000
-    from 2018-01-01: 2500
 
 earned_income_component:
     entity: TaxUnit

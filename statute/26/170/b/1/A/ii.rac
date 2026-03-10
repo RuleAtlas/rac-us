@@ -1,0 +1,11 @@
+# 26 USC 170(b)(1)(A)(ii) - Educational organization
+
+status: stub
+
+is_educational_organization_170:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Is an educational organization under 170(b)(1)(A)(ii)"
+    description: "Whether the organization is an educational organization described in 26 USC 170(b)(1)(A)(ii)"
+    default: false

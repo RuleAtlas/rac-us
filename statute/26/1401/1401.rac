@@ -77,9 +77,12 @@ se_additional_medicare_threshold_joint:
 
 # (b)(2)(A)(ii) Threshold for married filing separately (half of joint)
 se_additional_medicare_threshold_separate:
-    description: "Self-employment income threshold for additional Medicare tax for married filing separately per 26 USC 1401(b)(2)(A)(ii)"
+    description: "Self-employment income threshold for additional Medicare tax for married filing separately per 26 USC 1401(b)(2)(A)(ii) — 1/2 of joint threshold"
+    entity: TaxUnit
+    period: Year
+    dtype: Money
     unit: USD
-    from 2013-01-01: 125000
+    from 2013-01-01: se_additional_medicare_threshold_joint / 2
 
 # (b)(2)(A)(iii) Threshold for all other filers
 se_additional_medicare_threshold_other:

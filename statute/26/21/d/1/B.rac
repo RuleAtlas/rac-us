@@ -8,11 +8,20 @@ income of his spouse for such year.
 
 status: encoded
 
+spouse_earned_income:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    status: input
+    label: "Spouse's earned income"
+    description: "Earned income of the taxpayer's spouse for the taxable year per 26 USC 21(d)(1)(B)"
+    default: 0
+
 married_earned_income_limit:
     imports:
-        - 26/32/c/2#earned_income
+        - 26/32/c/2/A#earned_income
         - 26/7703/a#is_married
-        - 26/32/c/2#spouse_earned_income
     entity: TaxUnit
     period: Year
     dtype: Money

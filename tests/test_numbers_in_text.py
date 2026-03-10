@@ -136,6 +136,36 @@ def number_in_text(num_str: str, text: str) -> bool:
         if abs(num - frac_val) < 0.01 and re.search(frac_pattern, text):
             return True
 
+    # Fraction words (e.g. "one-half" → 0.5, "two-thirds" → 0.667)
+    fraction_words = {
+        0.5: [r"\bhalf\b", r"\bone-half\b"],
+        0.333: [r"\bone-third\b"],
+        0.667: [r"\btwo-thirds\b"],
+        0.25: [r"\bone-fourth\b", r"\bone-quarter\b"],
+        0.75: [r"\bthree-fourths\b", r"\bthree-quarters\b"],
+    }
+    for frac_val, patterns in fraction_words.items():
+        if abs(num - frac_val) < 0.01:
+            for pattern in patterns:
+                if re.search(pattern, text, re.IGNORECASE):
+                    return True
+
+    # Number words (e.g. "six" → 6, "twenty-five" → 25)
+    number_words = {
+        "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+        "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+        "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14,
+        "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18,
+        "nineteen": 19, "twenty": 20, "twenty-five": 25, "thirty": 30,
+        "forty": 40, "fifty": 50, "sixty": 60, "sixty-five": 65,
+        "seventy": 70, "eighty": 80, "ninety": 90, "one hundred": 100,
+    }
+    if num == int(num):
+        int_num = int(num)
+        for word, val in number_words.items():
+            if val == int_num and re.search(rf"\b{word}\b", text, re.IGNORECASE):
+                return True
+
     return False
 
 

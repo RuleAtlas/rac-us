@@ -11,7 +11,7 @@ status: encoded
 
 joint_return_required:
     imports:
-        - 26/7703/a#files_joint_return
+        - 26/7703/a#is_joint_return
         - 26/7703/a#is_married
     entity: TaxUnit
     period: Year
@@ -20,6 +20,6 @@ joint_return_required:
     description: "If married, taxpayer must file joint return to claim credit per 26 USC 21(e)(2)"
     from 2002-01-01:
         if is_married:
-            files_joint_return
+            is_joint_return
         else:
             1

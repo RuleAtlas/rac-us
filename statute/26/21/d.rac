@@ -25,15 +25,24 @@ to only one spouse for any one month.
 
 status: encoded
 
+spouse_earned_income:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    status: input
+    label: "Spouse's earned income"
+    description: "Earned income of the taxpayer's spouse for the taxable year, used for the earned income limitation under 26 USC 21(d)"
+    default: 0
+
 earned_income_limit:
     imports:
         - 26/21/d/1/A#unmarried_earned_income_limit
         - 26/21/d/1/B#married_earned_income_limit
         - 26/21/d/2/A#deemed_earned_income_one_qualifying
         - 26/21/d/2/B#deemed_earned_income_two_or_more_qualifying
-        - 26/32/c/2#earned_income
+        - 26/32/c/2/A#earned_income
         - 26/7703/a#is_married
-        - 26/32/c/2#spouse_earned_income
         - 26/21/b#number_of_qualifying_individuals
         - 26/21/d/2#spouse_is_student_or_incapable
         - 26/21/d/2#months_spouse_student_or_incapable

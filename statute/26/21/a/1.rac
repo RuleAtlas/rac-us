@@ -11,13 +11,9 @@ subsection (b)(2)) paid by such individual during the taxable year.
 
 status: encoded
 
-base_applicable_percentage:
-    description: "Base applicable percentage before reductions per 26 USC 21(a)(2)"
-    unit: rate
-    from 2002-01-01: 0.50
-
 applicable_percentage:
     imports:
+        - 26/21/a/2#base_applicable_percentage
         - 26/21/a/2/A#first_reduction
         - 26/21/a/2/B#further_reduction
     entity: TaxUnit

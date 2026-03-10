@@ -1,22 +1,15 @@
 # 26 USC 24(i)(2)(A) - Dollar amount multiplier
 
 """
+(2) In the case of a taxable year beginning after 2025, the $2,200 amount
+in subsection (h)(2) shall be increased by an amount equal to--
 (A) such dollar amount, multiplied by
 """
 
 status: encoded
 
+# "such dollar amount" refers to "$2,200" from parent subsection (i)(2)
 credit_amount_base:
-    description: "The $2,200 dollar amount in subsection (h)(2) used as the base for inflation adjustment per 26 USC 24(i)(2)"
+    description: "The base dollar amount ($2,200) referenced by 'such dollar amount' in 26 USC 24(i)(2)(A)"
     unit: USD
     from 2026-01-01: 2200
-
-dollar_amount_multiplier:
-    entity: TaxUnit
-    period: Year
-    dtype: Money
-    unit: USD
-    label: "Dollar amount multiplier"
-    description: "The base dollar amount component of the inflation adjustment for the credit amount per 26 USC 24(i)(2)(A)"
-    from 2026-01-01:
-        credit_amount_base

@@ -11,7 +11,6 @@ status: encoded
 disqualified_income_threshold:
     description: "Dollar threshold for disqualified income above which earned income credit is denied"
     unit: USD
-    from 1996-01-01: 2200
     from 2021-01-01: 10000
 
 eitc_excess_investment_income_denial:
@@ -22,5 +21,5 @@ eitc_excess_investment_income_denial:
     dtype: Boolean
     label: "EITC denied for excessive investment income"
     description: "Whether the earned income credit is denied because aggregate disqualified income exceeds the threshold, per 26 USC 32(i)(1)"
-    from 1996-01-01:
+    from 2021-01-01:
         disqualified_income > disqualified_income_threshold

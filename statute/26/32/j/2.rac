@@ -16,7 +16,7 @@ status: encoded
 
 rounded_earned_income_amount:
     imports:
-        - 26/32/j/2/A#rounded_b_2_A_amount
+        - 26/32/j/2/A#rounded_b_2_a_amount
     entity: TaxUnit
     period: Year
     dtype: Money
@@ -24,11 +24,11 @@ rounded_earned_income_amount:
     label: "Rounded earned income amount"
     description: "Earned income amount rounded to nearest $10 per 26 USC 32(j)(2)(A)"
     from 2016-01-01:
-        rounded_b_2_A_amount
+        rounded_b_2_a_amount
 
 rounded_phaseout_amount:
     imports:
-        - 26/32/j/2/A#rounded_b_2_A_phaseout_amount
+        - 26/32/j/2/A#rounded_b_2_a_phaseout_amount
     entity: TaxUnit
     period: Year
     dtype: Money
@@ -36,7 +36,7 @@ rounded_phaseout_amount:
     label: "Rounded phaseout amount"
     description: "Phaseout amount rounded to nearest $10 per 26 USC 32(j)(2)(A)"
     from 2016-01-01:
-        rounded_b_2_A_phaseout_amount
+        rounded_b_2_a_phaseout_amount
 
 rounded_disqualified_income_threshold:
     imports:

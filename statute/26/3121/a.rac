@@ -1,0 +1,12 @@
+# 26 USC 3121(a) - Wages
+
+status: stub
+
+wages_under_3121a:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Wages as defined in 26 USC 3121(a)"
+    description: "Wages as defined in section 3121(a) for FICA purposes"
+    default: 0

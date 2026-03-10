@@ -62,9 +62,12 @@ additional_medicare_tax_threshold_joint:
 
 # (b)(2)(B) Threshold for married filing separately (half of joint)
 additional_medicare_tax_threshold_separate:
-    description: "Wage threshold for additional Medicare tax for married filing separately per 26 USC 3101(b)(2)(B)"
+    description: "Wage threshold for additional Medicare tax for married filing separately per 26 USC 3101(b)(2)(B) — 1/2 of joint threshold"
+    entity: TaxUnit
+    period: Year
+    dtype: Money
     unit: USD
-    from 2013-01-01: 125000
+    from 2013-01-01: additional_medicare_tax_threshold_joint / 2
 
 # (b)(2)(C) Threshold for all other filers
 additional_medicare_tax_threshold_other:

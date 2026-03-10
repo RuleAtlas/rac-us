@@ -1,0 +1,12 @@
+# 26 USC 3121(l) - Agreements entered into by American employers
+
+status: stub
+
+section_3121l_agreement_amounts:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Section 3121(l) agreement amounts"
+    description: "Amounts paid under voluntary agreements under 26 USC 3121(l)"
+    default: 0

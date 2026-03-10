@@ -10,5 +10,4 @@ status: encoded
 ctc_h2_credit_amount:
     description: "Credit amount per qualifying child substituted for $1,000 in subsection (a) per 26 USC 24(h)(2)"
     unit: USD
-    from 2018-01-01: 2000
     from 2025-01-01: 2200

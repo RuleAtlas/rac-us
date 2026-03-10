@@ -16,7 +16,6 @@ basic_standard_deduction_hoh:
     description: "Basic standard deduction for head of household per 26 USC 63(c)(2)(B)"
     unit: USD
     from 1988-01-01: 4400
-    from 2018-01-01: 23625
 
 is_head_of_household:
     entity: TaxUnit
