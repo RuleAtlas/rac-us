@@ -1,0 +1,145 @@
+# 218 RICR 20-00-4.5.1 - General Requirements and Criteria (Categorical)
+
+"""
+4.5.1 General Requirements and Criteria
+
+RIW recipients fulfilling general Section 4.3 requirements meet CCAP criteria by:
+
+1. RIW-eligible acceptable need includes:
+   a. Employment plan requirement: Parent(s) must have approved, signed,
+      current employment plan on file.
+   b. RIW component activities: Must meet Rhode Island Works Program Rules
+      Section 2.11 employment plan component activity requirements.
+   c. Two-parent home requirement: Both parents must have signed, approved,
+      current employment plans.
+
+2. Youth Services (YS) participants:
+   a. YS parents under twenty (20) years without high school diploma/equivalency,
+      actively working with Youth Services Home Visiting Program, participating
+      in approved education activity.
+"""
+
+status: encoded
+
+# --- Parameters ---
+
+ccap_ys_max_parent_age:
+    description: "Maximum parent age for Youth Services categorical eligibility"
+    unit: years
+    from 1998-01-01: 20
+
+# --- Inputs ---
+
+ccap_has_employment_plan:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Has approved employment plan"
+    description: "Whether parent has approved, signed, current employment plan on file"
+    default: false
+
+ccap_meets_riw_component_activities:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Meets RIW component activities"
+    description: "Whether family meets RIW Program Rules Section 2.11 employment plan component activity requirements"
+    default: false
+
+ccap_is_two_parent_home:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Two-parent home"
+    description: "Whether family is a two-parent home"
+    default: false
+
+ccap_both_parents_have_employment_plan:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Both parents have employment plans"
+    description: "Whether both parents have signed, approved, current employment plans in a two-parent home"
+    default: false
+
+ccap_is_ys_participant:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Youth Services participant"
+    description: "Whether parent is a Youth Services participant"
+    default: false
+
+ccap_ys_parent_age:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "YS parent age"
+    description: "Age of Youth Services participant parent in years"
+    default: 0
+
+ccap_ys_parent_has_hs_diploma:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "YS parent has HS diploma"
+    description: "Whether Youth Services parent has high school diploma or equivalency"
+    default: false
+
+ccap_ys_parent_in_home_visiting:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "In YS Home Visiting Program"
+    description: "Whether parent actively works with Youth Services Home Visiting Program"
+    default: false
+
+ccap_ys_parent_in_approved_education:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "In approved education activity"
+    description: "Whether parent participates in approved education activity"
+    default: false
+
+# --- Computed ---
+
+ccap_riw_need_met:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "RIW need for services met"
+    description: "Whether RIW recipient meets need for services per 218 RICR 20-00-4.5.1(1)"
+    from 1998-01-01:
+        if ccap_is_two_parent_home:
+            ccap_both_parents_have_employment_plan and ccap_meets_riw_component_activities
+        else:
+            ccap_has_employment_plan and ccap_meets_riw_component_activities
+
+ccap_ys_eligible:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Youth Services eligible"
+    description: "Whether family meets Youth Services eligibility per 218 RICR 20-00-4.5.1(2)"
+    from 1998-01-01:
+        ccap_is_ys_participant and ccap_ys_parent_age < ccap_ys_max_parent_age and not ccap_ys_parent_has_hs_diploma and ccap_ys_parent_in_home_visiting and ccap_ys_parent_in_approved_education
+
+ccap_categorically_eligible:
+    imports:
+        - ri/218-RICR-20-00-4/4/3/1#ccap_general_eligible
+        - ri/218-RICR-20-00-4/4/5/4#ccap_is_riw_recipient
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "CCAP categorically eligible"
+    description: "Whether child is categorically eligible for CCAP per 218 RICR 20-00-4.5.1"
+    from 1998-01-01:
+        if not ccap_general_eligible:
+            false
+        elif ccap_is_riw_recipient and ccap_riw_need_met:
+            true
+        elif ccap_ys_eligible:
+            true
+        else:
+            false

@@ -1,0 +1,156 @@
+# 218 RICR 20-00-4.2 - Definitions
+
+"""
+4.2 Definitions
+
+"Allowable child care expense" - Total cost of CCAP authorized services paid
+by DHS to approved providers, minus family share.
+
+"Applicant child(ren)" - Dependent children in the financial unit for whom
+CCAP services are requested.
+
+"Authorized child care services" - Child care approved for a child based on
+assessed family need, categorized as full-time (FT), three-quarter time (3QT),
+half-time (HT), or quarter-time (QT).
+
+"Categorically eligible" - Eligibility conferred by state law or DHS policy
+based on receipt of/participation in particular public benefit.
+
+"Certification period" - Actual period eligible children obtain CCAP services,
+minimum twelve (12) months.
+
+"Child Care Assistance Program (CCAP)" - DHS-administered program consolidating
+subsidy programs for RIW recipients, income-eligible working families, families
+with parents in approved education/training, and youth services participants.
+
+"Dependent child" - Child under thirteen (13) years, or turning thirteen during
+the twelve-month certification period, or under nineteen if disabled with
+acceptable degree of relationship.
+
+"DHS authorized payment rate for providers" - Rate DHS pays approved providers:
+either actual provider rate reported in APRR or DHS CCAP Established Payment
+Rate, whichever is lower.
+
+"DHS CCAP established payment rate" - Maximum rate DHS pays providers per rate
+category, established from biennial Market Rate Survey.
+
+"Eligible child" - Dependent child meeting requirements to receive authorized
+CCAP services (excludes foster children eligible through DCYF).
+
+"Excluded income" - Certain money/goods/services not counted for eligibility
+determination: USDA donated foods value; relocation assistance under Title II;
+educational grants/loans for undergraduates; per capita Indian tribe payments;
+Title VII nutrition benefits; volunteer service reimbursements; child nutrition
+act benefits; foster care payments (child not in assistance unit); food
+assistance value; government rent/housing subsidies; home energy assistance;
+college work study income; dependent child earned income; Workforce Investment
+Act/WIOA stipends; Earned Income Tax Credit (EITC) refunds; educational
+loans/scholarships; Federal PASS/IRWE program funds; parent income (teen parent
+cases); Section 8 utility payments; veterans benefits; AmeriCorps/VISTA
+volunteer payments; Rhode Island Works cash assistance.
+
+"Family child care home" - Provider's home-based program for four (4) to
+eight (8) unrelated children, requiring DCYF licensure.
+
+"Family share" - Amount families contribute as co-payments toward child care
+cost.
+
+"Financial unit" - Dependent children (applicant and non-applicant), parent(s),
+and legal spouse(s) living in same household; determines family size for income
+purposes.
+
+"Homeless individuals" - Individuals lacking fixed/regular/adequate nighttime
+residence.
+
+"Income" - Money, goods, or services available to the financial unit for CCAP
+eligibility calculation, including: wages, salary, commissions, work-based fees,
+stipends, tips, bonuses; self-employment adjusted gross income; Social Security
+Benefits (RSDI); Supplemental Security Income (SSI); dividends/interest;
+estate/trust income; rental income; public assistance payments; unemployment
+compensation; Temporary Disability Insurance (TDI); workers' compensation;
+government/military retirement; private pensions/annuities; alimony; child
+support payments; regular household contributions; foster care payments (child
+in assistance unit).
+
+"Income eligible" - CCAP eligibility determined on income basis for non-RIW
+recipients within state law limits.
+
+"Infant" - Child from one (1) week to eighteen (18) months old.
+
+"Toddler" - Child over eighteen (18) months, up to three (3) years old.
+
+"Pre-school age child" - Child age three (3) through first-grade entry.
+
+"School-age child" - Child through age twelve, or turning thirteen during
+eligibility period, enrolled in at least first grade.
+
+"Rhode Island Works Program (RIW)" - State program per R.I. Gen. Laws
+Chapter 40-5.1 providing cash assistance; beneficiaries categorically eligible
+for fully-subsidized CCAP.
+
+"Temporary change in status" - Temporary parent status change including:
+time-limited absence from work (family care, illness); seasonal worker
+interruption between industry seasons; student holiday/break participation;
+work/training/education hour reduction while still participating; cessation
+not exceeding three (3) months.
+"""
+
+status: encoded
+
+# --- Age classification thresholds ---
+
+ccap_dependent_child_max_age:
+    description: "Maximum age for a dependent child under CCAP"
+    unit: years
+    from 1998-01-01: 13
+
+ccap_disabled_child_max_age:
+    description: "Maximum age for a disabled dependent child under CCAP"
+    unit: years
+    from 1998-01-01: 19
+
+ccap_infant_min_age_weeks:
+    description: "Minimum age in weeks for infant classification"
+    unit: weeks
+    from 1998-01-01: 1
+
+ccap_infant_max_age_months:
+    description: "Maximum age in months for infant classification"
+    unit: months
+    from 1998-01-01: 18
+
+ccap_toddler_max_age_years:
+    description: "Maximum age in years for toddler classification"
+    unit: years
+    from 1998-01-01: 3
+
+ccap_school_age_max_years:
+    description: "Maximum age in years for school-age child classification"
+    unit: years
+    from 1998-01-01: 12
+
+# --- Certification period ---
+
+ccap_certification_min_months:
+    description: "Minimum certification period for CCAP services"
+    unit: months
+    from 1998-01-01: 12
+
+# --- Family child care home ---
+
+ccap_family_child_care_min_children:
+    description: "Minimum number of unrelated children for family child care home"
+    unit: Integer
+    from 1998-01-01: 4
+
+ccap_family_child_care_max_children:
+    description: "Maximum number of unrelated children for family child care home"
+    unit: Integer
+    from 1998-01-01: 8
+
+# --- Temporary change in status ---
+
+ccap_temporary_cessation_max_months:
+    description: "Maximum months of cessation qualifying as temporary change in status"
+    unit: months
+    from 1998-01-01: 3

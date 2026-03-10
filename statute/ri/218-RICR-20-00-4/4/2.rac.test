@@ -1,0 +1,31 @@
+# 218 RICR 20-00-4.2 - Definitions tests
+
+ccap_dependent_child_max_age:
+    - name: "Dependent child max age is 13 years"
+      period: 2024-01
+      inputs: {}
+      expect: 13
+
+ccap_disabled_child_max_age:
+    - name: "Disabled child max age is 19 years"
+      period: 2024-01
+      inputs: {}
+      expect: 19
+
+ccap_certification_min_months:
+    - name: "Minimum certification period is 12 months"
+      period: 2024-01
+      inputs: {}
+      expect: 12
+
+ccap_infant_max_age_months:
+    - name: "Infant max age is 18 months"
+      period: 2024-01
+      inputs: {}
+      expect: 18
+
+ccap_family_child_care_max_children:
+    - name: "Family child care home max is 8 children"
+      period: 2024-01
+      inputs: {}
+      expect: 8

@@ -1,0 +1,49 @@
+# 218 RICR 20-00-4 - Child Care Assistance Program Rules and Regulations
+
+"""
+218-RICR-20-00-4: Child Care Assistance Program Rules and Regulations
+Title 218 - Rhode Island Department of Human Services
+Authority: R.I. Gen. Laws § 42-12-23
+
+The Starting RIght Child Care Assistance Program (CCAP) ensures access to
+developmentally appropriate early childhood education for eligible families
+through two pathways:
+1. Categorical Eligibility (§ 4.5) - RIW cash assistance recipients and
+   Youth Services participants meeting need for services
+2. Income Eligibility (§ 4.6) - Working families with income at or below
+   180% FPL (225% FPL for transitional care)
+"""
+
+status: encoded
+
+ccap_eligible:
+    imports:
+        - ri/218-RICR-20-00-4/4/3/9#ccap_eligible_with_limitations
+        - ri/218-RICR-20-00-4/4/5/1#ccap_categorically_eligible
+        - ri/218-RICR-20-00-4/4/5/2#ccap_passes_categorical_limitations
+        - ri/218-RICR-20-00-4/4/6/1/1#ccap_income_eligible
+        - ri/218-RICR-20-00-4/4/6/1/B#ccap_resource_eligible
+        - ri/218-RICR-20-00-4/4/6/2#ccap_need_for_services
+        - ri/218-RICR-20-00-4/4/6/3#ccap_income_limitation_disqualified
+        - ri/218-RICR-20-00-4/4/6/4#ccap_exception_applies
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "CCAP eligible"
+    description: "Whether child is eligible for RI CCAP through categorical or income pathway per 218 RICR 20-00-4"
+    from 1998-01-01:
+        categorical = ccap_categorically_eligible and ccap_eligible_with_limitations and ccap_passes_categorical_limitations
+        income = ccap_eligible_with_limitations and ccap_income_eligible and ccap_resource_eligible and (ccap_need_for_services or ccap_exception_applies) and not ccap_income_limitation_disqualified
+        categorical or income
+
+ccap_copayment:
+    imports:
+        - ri/218-RICR-20-00-4/4/5/4#ccap_categorical_copayment
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "CCAP family co-payment"
+    description: "Family co-payment for child care services per 218 RICR 20-00-4"
+    from 1998-01-01:
+        ccap_categorical_copayment

@@ -1,0 +1,37 @@
+# 218 RICR 20-00-4.6.1.B - Treatment of Resources
+
+"""
+4.6.1.B Treatment of Resources
+Liquid resources limit: one million dollars ($1,000,000.00). Exceeding this
+limit results in application denial.
+
+Liquid resources include: Cash, bank accounts, certificates of deposit, stocks,
+bonds, mutual funds.
+Excludes: Educational savings accounts, retirement accounts, joint accounts
+with non-household adult (documented).
+"""
+
+status: encoded
+
+ccap_liquid_resources_limit:
+    description: "Maximum liquid resources for CCAP eligibility"
+    unit: USD
+    from 1998-01-01: 1000000
+
+ccap_liquid_resources:
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Liquid resources"
+    description: "Total liquid resources of the financial unit"
+    default: 0
+
+ccap_resource_eligible:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "CCAP resource eligible"
+    description: "Whether family's liquid resources are within CCAP limit per 218 RICR 20-00-4.6.1.B"
+    from 1998-01-01:
+        ccap_liquid_resources <= ccap_liquid_resources_limit

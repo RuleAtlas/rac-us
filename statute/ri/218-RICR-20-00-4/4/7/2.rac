@@ -1,0 +1,25 @@
+# 218 RICR 20-00-4.7.2 - SSACC Limitations
+
+"""
+4.7.2 Limitations
+1. Not authorized exceeding full-time in any 24-hour period
+2. Authorized up to three (3) months initially, additional three (3) months
+   in any twelve (12)-month period
+"""
+
+status: encoded
+
+ccap_ssacc_initial_months:
+    description: "Initial SSACC authorization period in months"
+    unit: months
+    from 1998-01-01: 3
+
+ccap_ssacc_extension_months:
+    description: "Additional SSACC authorization period in months"
+    unit: months
+    from 1998-01-01: 3
+
+ccap_ssacc_review_period_months:
+    description: "Rolling period in months within which SSACC extensions are measured"
+    unit: months
+    from 1998-01-01: 12

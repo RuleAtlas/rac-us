@@ -1,0 +1,176 @@
+# 218 RICR 20-00-4.3.1 - General Eligibility Requirements
+
+"""
+4.3.1 General Eligibility Requirements
+
+Families with incomes at or below one hundred eighty percent (180%) of Federal
+Poverty Level (FPL) meeting CCAP requirements qualify for full or partial child
+care expense payment through two avenues:
+
+1. Categorical Eligibility - RIW cash assistance recipients (including Youth
+   Services participants) meeting need for services per Section 4.5
+2. Income Eligibility - Working families and those with parents in approved
+   education/training programs meeting requirements per Section 4.6
+3. Temporary Higher Education Eligibility - October 1, 2021 through June 30,
+   2022, families where parent needs child care for enrollment in Rhode Island
+   public institution of higher education, subject to available funding up to
+   $200,000.
+
+General Requirements (all applicants):
+
+1. Age of applicant child(ren) - Child must be over one (1) week old, below
+   thirteen (13) years, unless:
+   - Child is thirteen (13) to eighteen (18) with documented physical/mental
+     disability making self-care impossible; or
+   - Child turns thirteen (13) during certification period, remaining eligible
+     until redetermination
+
+2. Relationship - Applicant child must live in parent's home.
+
+3. Residency - Parent(s) and applicant children must be Rhode Island residents.
+
+4. Citizenship - Applicant child must be U.S. citizen or qualified immigrant
+   (no five-year waiting period for qualified immigrants).
+
+5. Need for Services:
+   - RIW/Youth Services parents: Must be in approved education/training
+     activity or work plan activity per Section 4.5
+   - Income-eligible: Parents must be employed or participating in approved
+     education/training program per Section 4.6
+
+6. Cooperation with Office of Child Support Services - All families with
+   absent parent(s) are referred to OCSS. Parent must cooperate in establishing
+   paternity and child support orders, unless good cause exists.
+"""
+
+status: encoded
+
+# --- Parameters ---
+
+ccap_fpl_eligibility_threshold:
+    description: "Maximum income as percentage of FPL for CCAP eligibility"
+    unit: rate
+    from 1998-01-01: 1.80
+
+ccap_child_min_age_weeks:
+    description: "Minimum age in weeks for applicant child"
+    unit: weeks
+    from 1998-01-01: 1
+
+ccap_child_max_age:
+    description: "Maximum age in years for non-disabled applicant child"
+    unit: years
+    from 1998-01-01: 13
+
+ccap_disabled_child_min_age:
+    description: "Minimum age in years for disabled child extended eligibility"
+    unit: years
+    from 1998-01-01: 13
+
+ccap_disabled_child_max_age:
+    description: "Maximum age in years for disabled child extended eligibility"
+    unit: years
+    from 1998-01-01: 18
+
+# --- Inputs ---
+
+ccap_child_age_years:
+    entity: Person
+    period: Month
+    dtype: Integer
+    label: "Child age in years"
+    description: "Age of applicant child in years"
+    default: 0
+
+ccap_child_age_weeks:
+    entity: Person
+    period: Month
+    dtype: Integer
+    label: "Child age in weeks"
+    description: "Age of applicant child in weeks"
+    default: 0
+
+ccap_child_is_disabled:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Child is disabled"
+    description: "Whether child has documented physical/mental disability making self-care impossible"
+    default: false
+
+ccap_child_turns_thirteen_during_cert:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Child turns thirteen during certification period"
+    description: "Whether child turns 13 during the current certification period"
+    default: false
+
+ccap_child_lives_with_parent:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Child lives with parent"
+    description: "Whether applicant child lives in parent's home"
+    default: false
+
+ccap_is_ri_resident:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Rhode Island resident"
+    description: "Whether parent(s) and applicant children are Rhode Island residents"
+    default: false
+
+ccap_is_us_citizen_or_qualified_immigrant:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "US citizen or qualified immigrant"
+    description: "Whether applicant child is US citizen or qualified immigrant"
+    default: false
+
+ccap_meets_need_for_services:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Meets need for services"
+    description: "Whether parent meets need for services per Section 4.5 (categorical) or Section 4.6 (income-eligible)"
+    default: false
+
+ccap_cooperates_with_ocss:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Cooperates with OCSS"
+    description: "Whether parent cooperates with Office of Child Support Services or no absent parent exists"
+    default: true
+
+# --- Computed ---
+
+ccap_age_eligible:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "CCAP age eligible"
+    description: "Whether child meets age requirements per 218 RICR 20-00-4.3.1"
+    from 1998-01-01:
+        if ccap_child_age_weeks < ccap_child_min_age_weeks:
+            false
+        elif ccap_child_age_years < ccap_child_max_age:
+            true
+        elif ccap_child_is_disabled and ccap_child_age_years >= ccap_disabled_child_min_age and ccap_child_age_years <= ccap_disabled_child_max_age:
+            true
+        elif ccap_child_turns_thirteen_during_cert:
+            true
+        else:
+            false
+
+ccap_general_eligible:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "CCAP general eligibility"
+    description: "Whether child meets all general eligibility requirements per 218 RICR 20-00-4.3.1"
+    from 1998-01-01:
+        ccap_age_eligible and ccap_child_lives_with_parent and ccap_is_ri_resident and ccap_is_us_citizen_or_qualified_immigrant and ccap_meets_need_for_services and ccap_cooperates_with_ocss

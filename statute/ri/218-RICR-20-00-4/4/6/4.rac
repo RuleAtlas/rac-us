@@ -1,0 +1,92 @@
+# 218 RICR 20-00-4.6.4 - Exceptions
+
+"""
+4.6.4 Exceptions
+1. Parents with disabilities: May be exempt from minimum work hours/minimum
+   wage requirements.
+2. Temporary Change in Status: Temporary changes not adversely affecting
+   CCAP authorization.
+3. Non-Temporary Change in Status: Continue CCAP three (3) months for
+   work-resumption or approved program attendance.
+"""
+
+status: encoded
+
+# --- Parameters ---
+
+ccap_non_temporary_continuation_months:
+    description: "Months CCAP continues after non-temporary change in status"
+    unit: months
+    from 1998-01-01: 3
+
+# --- Inputs ---
+
+ccap_parent_has_disability:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Parent has qualifying disability"
+    description: "Whether parent has a disability exempting them from minimum work hours/wage requirements per 218 RICR 20-00-4.6.4(1)"
+    default: false
+
+ccap_has_temporary_status_change:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Temporary change in status"
+    description: "Whether parent has a temporary change in status (time-limited absence, seasonal interruption, holiday/break, hour reduction, or cessation under 3 months)"
+    default: false
+
+ccap_has_non_temporary_status_change:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Non-temporary change in status"
+    description: "Whether parent has experienced a non-temporary change in work/training/education status"
+    default: false
+
+ccap_months_since_non_temporary_change:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Months since non-temporary status change"
+    description: "Number of months elapsed since non-temporary change in status"
+    default: 0
+
+# --- Computed ---
+
+ccap_disability_exception_applies:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Disability exception applies"
+    description: "Whether parent with disability is exempt from minimum work hours/wage requirements per 218 RICR 20-00-4.6.4(1)"
+    from 1998-01-01:
+        ccap_parent_has_disability
+
+ccap_temporary_change_exception_applies:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Temporary change exception applies"
+    description: "Whether temporary change in status allows continued CCAP authorization per 218 RICR 20-00-4.6.4(2)"
+    from 1998-01-01:
+        ccap_has_temporary_status_change
+
+ccap_non_temporary_change_exception_applies:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Non-temporary change exception applies"
+    description: "Whether CCAP continues during non-temporary change period (up to 3 months) per 218 RICR 20-00-4.6.4(3)"
+    from 1998-01-01:
+        ccap_has_non_temporary_status_change and ccap_months_since_non_temporary_change <= ccap_non_temporary_continuation_months
+
+ccap_exception_applies:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "CCAP exception applies"
+    description: "Whether any exception to normal need-for-services requirements applies per 218 RICR 20-00-4.6.4"
+    from 1998-01-01:
+        ccap_disability_exception_applies or ccap_temporary_change_exception_applies or ccap_non_temporary_change_exception_applies

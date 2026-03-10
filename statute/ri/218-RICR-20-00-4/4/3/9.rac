@@ -1,0 +1,51 @@
+# 218 RICR 20-00-4.3.9 - Limitations and Exclusions of Eligibility
+
+"""
+4.3.9 Limitations and Exclusions of Eligibility
+1. One CCAP Household per Applicant Child - CCAP services authorized for one
+   household per applicant child during certification period.
+2. Self-Employment as Child Care Provider - Parent deriving sole self-employment
+   income as child care provider ineligible for CCAP services.
+"""
+
+status: encoded
+
+# --- Inputs ---
+
+ccap_child_receives_ccap_other_household:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Child already receives CCAP in another household"
+    description: "Whether applicant child already receives CCAP services in another household during the certification period"
+    default: false
+
+ccap_parent_sole_self_employment_is_childcare:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Parent sole self-employment is child care"
+    description: "Whether parent derives sole self-employment income as a child care provider"
+    default: false
+
+# --- Computed ---
+
+ccap_meets_limitation_requirements:
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "Meets CCAP limitation requirements"
+    description: "Whether applicant passes limitations and exclusions per 218 RICR 20-00-4.3.9"
+    from 1998-01-01:
+        not ccap_child_receives_ccap_other_household and not ccap_parent_sole_self_employment_is_childcare
+
+ccap_eligible_with_limitations:
+    imports:
+        - ri/218-RICR-20-00-4/4/3/1#ccap_general_eligible
+    entity: Person
+    period: Month
+    dtype: Boolean
+    label: "CCAP eligible after limitations"
+    description: "Whether child meets general eligibility (4.3.1) and is not excluded by limitations (4.3.9)"
+    from 1998-01-01:
+        ccap_general_eligible and ccap_meets_limitation_requirements

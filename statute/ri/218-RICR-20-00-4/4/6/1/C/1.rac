@@ -1,0 +1,143 @@
+# 218 RICR 20-00-4.6.1.C.1 - Cost Sharing Schedule
+
+"""
+4.6.1.C.1 Cost Sharing Schedule
+
+Cost sharing: Eligible families with countable income above one hundred
+percent (100%) FPL pay service expense share.
+
+Effective through December 31, 2021:
+Level 0: <=100% FPL - No Family Share
+Level 1: >100% to <=125% FPL - 2% of Countable Gross Income
+Level 2: >125% to <=150% FPL - 5% of Countable Gross Income
+Level 3: >150% to <=180% FPL - 8% of Countable Gross Income
+Level 4: >180% to <=200% FPL - 10% of Countable Gross Income
+Level 5: >200% to <=225% FPL - 14% of Countable Gross Income
+
+Effective January 1, 2022:
+Level 0: <=100% FPL - No Family Share
+Level 1: >100% to <=125% FPL - 2% of Countable Gross Income
+Level 2: >125% to <=150% FPL - 5% of Countable Gross Income
+Level 3: >150% to <=225% FPL - 7% of Countable Gross Income
+"""
+
+status: encoded
+
+# --- FPL Percentage Thresholds ---
+
+ccap_fpl_threshold_100:
+    description: "FPL percentage threshold for Level 0 upper bound"
+    unit: rate
+    from 1998-01-01: 1.00
+
+ccap_fpl_threshold_125:
+    description: "FPL percentage threshold for Level 1 upper bound"
+    unit: rate
+    from 1998-01-01: 1.25
+
+ccap_fpl_threshold_150:
+    description: "FPL percentage threshold for Level 2 upper bound"
+    unit: rate
+    from 1998-01-01: 1.50
+
+ccap_fpl_threshold_180:
+    description: "FPL percentage threshold for Level 3 upper bound (pre-2022)"
+    unit: rate
+    from 1998-01-01: 1.80
+
+ccap_fpl_threshold_200:
+    description: "FPL percentage threshold for Level 4 upper bound (pre-2022)"
+    unit: rate
+    from 1998-01-01: 2.00
+
+# --- Cost Sharing Rates ---
+
+ccap_cost_sharing_rate_level_1:
+    description: "Cost sharing rate for income >100% to <=125% FPL"
+    unit: rate
+    from 1998-01-01: 0.02
+
+ccap_cost_sharing_rate_level_2:
+    description: "Cost sharing rate for income >125% to <=150% FPL"
+    unit: rate
+    from 1998-01-01: 0.05
+
+ccap_cost_sharing_rate_level_3_pre2022:
+    description: "Cost sharing rate for income >150% to <=180% FPL (through 2021)"
+    unit: rate
+    from 1998-01-01: 0.08
+
+ccap_cost_sharing_rate_level_4:
+    description: "Cost sharing rate for income >180% to <=200% FPL (through 2021)"
+    unit: rate
+    from 1998-01-01: 0.10
+
+ccap_cost_sharing_rate_level_5:
+    description: "Cost sharing rate for income >200% to <=225% FPL (through 2021)"
+    unit: rate
+    from 1998-01-01: 0.14
+
+ccap_cost_sharing_rate_level_3_post2022:
+    description: "Cost sharing rate for income >150% to <=225% FPL (from 2022)"
+    unit: rate
+    from 2022-01-01: 0.07
+
+# --- Inputs ---
+
+ccap_income_as_pct_fpl:
+    entity: Family
+    period: Month
+    dtype: Rate
+    label: "Income as percentage of FPL"
+    description: "Financial unit countable income expressed as ratio of Federal Poverty Level"
+    default: 0
+
+ccap_countable_gross_monthly_income:
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Countable gross monthly income"
+    description: "Financial unit countable gross income per month"
+    default: 0
+
+# --- Computed ---
+
+ccap_family_share_rate:
+    entity: Family
+    period: Month
+    dtype: Rate
+    label: "CCAP family cost sharing rate"
+    description: "Cost sharing rate applied to gross income per 218 RICR 20-00-4.6.1.C.1"
+    from 1998-01-01:
+        if ccap_income_as_pct_fpl <= ccap_fpl_threshold_100:
+            0
+        elif ccap_income_as_pct_fpl <= ccap_fpl_threshold_125:
+            ccap_cost_sharing_rate_level_1
+        elif ccap_income_as_pct_fpl <= ccap_fpl_threshold_150:
+            ccap_cost_sharing_rate_level_2
+        elif ccap_income_as_pct_fpl <= ccap_fpl_threshold_180:
+            ccap_cost_sharing_rate_level_3_pre2022
+        elif ccap_income_as_pct_fpl <= ccap_fpl_threshold_200:
+            ccap_cost_sharing_rate_level_4
+        else:
+            ccap_cost_sharing_rate_level_5
+    from 2022-01-01:
+        if ccap_income_as_pct_fpl <= ccap_fpl_threshold_100:
+            0
+        elif ccap_income_as_pct_fpl <= ccap_fpl_threshold_125:
+            ccap_cost_sharing_rate_level_1
+        elif ccap_income_as_pct_fpl <= ccap_fpl_threshold_150:
+            ccap_cost_sharing_rate_level_2
+        else:
+            ccap_cost_sharing_rate_level_3_post2022
+
+ccap_family_share:
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "CCAP family share"
+    description: "Monthly family co-payment for child care per 218 RICR 20-00-4.6.1.C.1"
+    from 1998-01-01:
+        ccap_family_share_rate * ccap_countable_gross_monthly_income

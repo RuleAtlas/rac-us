@@ -1,0 +1,50 @@
+# 218 RICR 20-00-4.6.1.C.2 - Family Share Distribution
+
+"""
+4.6.1.C.2 Family Share Distribution
+
+a. Determined without regard to eligible children enrollment number
+b. Assigned to first (youngest) eligible child enrolled receiving
+   highest-rate authorized services
+c. Only distributed among providers when total family share exceeds
+   first/youngest child rate
+"""
+
+status: encoded
+
+# --- Inputs ---
+
+ccap_first_child_provider_rate:
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "First child provider rate"
+    description: "DHS authorized payment rate for the first (youngest) eligible child enrolled receiving highest-rate authorized services"
+    default: 0
+
+# --- Computed ---
+
+ccap_family_share_first_child:
+    imports:
+        - ri/218-RICR-20-00-4/4/6/1/C/1#ccap_family_share
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Family share assigned to first child"
+    description: "Family share amount assigned to youngest eligible child's provider per 218 RICR 20-00-4.6.1.C.2(b)"
+    from 1998-01-01:
+        min(ccap_family_share, ccap_first_child_provider_rate)
+
+ccap_family_share_excess:
+    imports:
+        - ri/218-RICR-20-00-4/4/6/1/C/1#ccap_family_share
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Family share excess for other providers"
+    description: "Family share amount distributed among other providers per 218 RICR 20-00-4.6.1.C.2(c)"
+    from 1998-01-01:
+        max(0, ccap_family_share - ccap_first_child_provider_rate)

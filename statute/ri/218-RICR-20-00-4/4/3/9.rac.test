@@ -1,0 +1,79 @@
+# 218 RICR 20-00-4.3.9 - Limitations and Exclusions of Eligibility tests
+
+ccap_meets_limitation_requirements:
+    - name: "No exclusions apply - meets limitations"
+      period: 2024-01
+      inputs:
+          ccap_child_receives_ccap_other_household: false
+          ccap_parent_sole_self_employment_is_childcare: false
+      expect: true
+
+    - name: "Child already receives CCAP in another household - excluded"
+      period: 2024-01
+      inputs:
+          ccap_child_receives_ccap_other_household: true
+          ccap_parent_sole_self_employment_is_childcare: false
+      expect: false
+
+    - name: "Parent sole self-employment is child care provider - excluded"
+      period: 2024-01
+      inputs:
+          ccap_child_receives_ccap_other_household: false
+          ccap_parent_sole_self_employment_is_childcare: true
+      expect: false
+
+    - name: "Both exclusions apply - excluded"
+      period: 2024-01
+      inputs:
+          ccap_child_receives_ccap_other_household: true
+          ccap_parent_sole_self_employment_is_childcare: true
+      expect: false
+
+ccap_eligible_with_limitations:
+    - name: "General eligible and no exclusions - eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 5
+          ccap_child_age_weeks: 260
+          ccap_child_is_disabled: false
+          ccap_child_turns_thirteen_during_cert: false
+          ccap_child_lives_with_parent: true
+          ccap_is_ri_resident: true
+          ccap_is_us_citizen_or_qualified_immigrant: true
+          ccap_meets_need_for_services: true
+          ccap_cooperates_with_ocss: true
+          ccap_child_receives_ccap_other_household: false
+          ccap_parent_sole_self_employment_is_childcare: false
+      expect: true
+
+    - name: "General eligible but child receives CCAP elsewhere - not eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 5
+          ccap_child_age_weeks: 260
+          ccap_child_is_disabled: false
+          ccap_child_turns_thirteen_during_cert: false
+          ccap_child_lives_with_parent: true
+          ccap_is_ri_resident: true
+          ccap_is_us_citizen_or_qualified_immigrant: true
+          ccap_meets_need_for_services: true
+          ccap_cooperates_with_ocss: true
+          ccap_child_receives_ccap_other_household: true
+          ccap_parent_sole_self_employment_is_childcare: false
+      expect: false
+
+    - name: "Not general eligible (not RI resident) and no exclusions - not eligible"
+      period: 2024-01
+      inputs:
+          ccap_child_age_years: 5
+          ccap_child_age_weeks: 260
+          ccap_child_is_disabled: false
+          ccap_child_turns_thirteen_during_cert: false
+          ccap_child_lives_with_parent: true
+          ccap_is_ri_resident: false
+          ccap_is_us_citizen_or_qualified_immigrant: true
+          ccap_meets_need_for_services: true
+          ccap_cooperates_with_ocss: true
+          ccap_child_receives_ccap_other_household: false
+          ccap_parent_sole_self_employment_is_childcare: false
+      expect: false

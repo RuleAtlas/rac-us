@@ -1,0 +1,19 @@
+# 218 RICR 20-00-4.7.2 - SSACC Limitations tests
+
+ccap_ssacc_initial_months:
+    - name: "Initial authorization is 3 months"
+      period: 2024-01
+      inputs: {}
+      expect: 3
+
+ccap_ssacc_extension_months:
+    - name: "Extension authorization is 3 months"
+      period: 2024-01
+      inputs: {}
+      expect: 3
+
+ccap_ssacc_review_period_months:
+    - name: "Review period is 12 months"
+      period: 2024-01
+      inputs: {}
+      expect: 12

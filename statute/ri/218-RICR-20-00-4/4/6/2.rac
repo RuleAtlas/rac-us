@@ -1,0 +1,267 @@
+# 218 RICR 20-00-4.6.2 - Need for Services
+
+"""
+4.6.2 Need for Services
+
+1. General Criteria - Income Eligible:
+   a. Two-parent home: Each parent minimum average twenty (20) hours/week per
+      month employment. Each parent earns hourly average of greater of State or
+      Federal minimum wage.
+   b. One-parent home: Parent minimum average twenty (20) hours/week per month
+      employment, hourly average of greater of State or Federal minimum wage.
+
+2. Program-Specific Criteria - Non-RIW YS Participants:
+   a. YS parent under twenty (20) years, without high school degree/equivalent.
+      Employed, attending school, or combination minimum twenty (20) hours/week.
+      Authorization up to twelve (12) months.
+
+3. Program-Specific Criteria - Child Care for Training:
+   Beginning October 1, 2013, DHS provides child care to income-eligible
+   families below 180% FPL in approved training programs.
+   a. Parent participating minimum twenty (20) hours/week average monthly.
+      Authorization no less than twelve (12) months.
+
+4. Program-Specific Criteria - Child Care College:
+   Beginning October 1, 2021, for families below 180% FPL enrolled in RI
+   public institution of higher education.
+   a. Parent enrolled minimum seven (7) credit hours per semester.
+   b. Seven-credit-hour student: twenty-one (21) school-activity hours,
+      meeting minimum twenty (20) hours/week.
+"""
+
+status: encoded
+
+# --- Parameters ---
+
+ccap_min_weekly_work_hours:
+    description: "Minimum average weekly hours of employment required for CCAP eligibility"
+    unit: hours
+    from 1998-01-01: 20
+
+ccap_ys_max_parent_age:
+    description: "Maximum age for Youth Services parent eligibility"
+    unit: years
+    from 1998-01-01: 20
+
+ccap_ys_max_authorization_months:
+    description: "Maximum authorization period for YS participants"
+    unit: months
+    from 1998-01-01: 12
+
+ccap_training_min_authorization_months:
+    description: "Minimum authorization period for training program participants"
+    unit: months
+    from 2013-10-01: 12
+
+ccap_min_credit_hours_per_semester:
+    description: "Minimum credit hours per semester for college child care eligibility"
+    unit: Integer
+    from 2021-10-01: 7
+
+ccap_school_activity_hours_per_credit:
+    description: "School-activity hours counted per credit hour enrolled"
+    unit: Integer
+    from 2021-10-01: 3
+
+# --- Inputs ---
+
+ccap_is_two_parent_home:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Two-parent home"
+    description: "Whether family is a two-parent home"
+    default: false
+
+ccap_parent1_avg_weekly_hours:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Parent 1 average weekly work hours"
+    description: "Average weekly hours of employment for parent 1"
+    default: 0
+
+ccap_parent1_hourly_wage:
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Parent 1 hourly wage"
+    description: "Average hourly wage earned by parent 1"
+    default: 0
+
+ccap_parent2_avg_weekly_hours:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Parent 2 average weekly work hours"
+    description: "Average weekly hours of employment for parent 2 in two-parent home"
+    default: 0
+
+ccap_parent2_hourly_wage:
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Parent 2 hourly wage"
+    description: "Average hourly wage earned by parent 2 in two-parent home"
+    default: 0
+
+ccap_state_minimum_wage:
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "State minimum wage"
+    description: "Rhode Island state minimum hourly wage"
+    default: 0
+
+ccap_federal_minimum_wage:
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Federal minimum wage"
+    description: "Federal minimum hourly wage"
+    default: 0
+
+ccap_is_ys_participant:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Youth Services participant"
+    description: "Whether parent is a non-RIW Youth Services participant"
+    default: false
+
+ccap_ys_parent_age:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "YS parent age"
+    description: "Age of Youth Services participant parent in years"
+    default: 0
+
+ccap_ys_parent_has_hs_diploma:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "YS parent has HS diploma/equivalent"
+    description: "Whether Youth Services parent has high school diploma or equivalency"
+    default: false
+
+ccap_ys_parent_weekly_hours:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "YS parent weekly activity hours"
+    description: "Weekly hours of employment, school, or combination for YS parent"
+    default: 0
+
+ccap_in_approved_training:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "In approved training program"
+    description: "Whether parent is in a DHS-approved training program"
+    default: false
+
+ccap_training_weekly_hours:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Training weekly hours"
+    description: "Average weekly hours of participation in approved training program"
+    default: 0
+
+ccap_enrolled_ri_public_higher_ed:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Enrolled in RI public higher education"
+    description: "Whether parent is enrolled in a Rhode Island public institution of higher education"
+    default: false
+
+ccap_credit_hours_enrolled:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "Credit hours enrolled"
+    description: "Number of credit hours enrolled per semester"
+    default: 0
+
+# --- Computed ---
+
+ccap_applicable_minimum_wage:
+    entity: Family
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Applicable minimum wage"
+    description: "Greater of State or Federal minimum wage per 218 RICR 20-00-4.6.2(1)"
+    from 1998-01-01:
+        max(ccap_state_minimum_wage, ccap_federal_minimum_wage)
+
+ccap_employment_need_met:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Employment need for services met"
+    description: "Whether parent(s) meet employment criteria per 218 RICR 20-00-4.6.2(1)"
+    from 1998-01-01:
+        p1_hours = ccap_parent1_avg_weekly_hours >= ccap_min_weekly_work_hours
+        p1_wage = ccap_parent1_hourly_wage >= ccap_applicable_minimum_wage
+        p2_hours = ccap_parent2_avg_weekly_hours >= ccap_min_weekly_work_hours
+        p2_wage = ccap_parent2_hourly_wage >= ccap_applicable_minimum_wage
+        if ccap_is_two_parent_home:
+            p1_hours and p1_wage and p2_hours and p2_wage
+        else:
+            p1_hours and p1_wage
+
+ccap_ys_need_met:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "YS need for services met"
+    description: "Whether non-RIW YS participant meets need criteria per 218 RICR 20-00-4.6.2(2)"
+    from 1998-01-01:
+        ccap_is_ys_participant and ccap_ys_parent_age < ccap_ys_max_parent_age and not ccap_ys_parent_has_hs_diploma and ccap_ys_parent_weekly_hours >= ccap_min_weekly_work_hours
+
+ccap_training_need_met:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "Training need for services met"
+    description: "Whether parent meets training program criteria per 218 RICR 20-00-4.6.2(3)"
+    from 2013-10-01:
+        ccap_in_approved_training and ccap_training_weekly_hours >= ccap_min_weekly_work_hours
+
+ccap_college_school_activity_hours:
+    entity: Family
+    period: Month
+    dtype: Integer
+    label: "College school-activity hours"
+    description: "Total weekly school-activity hours based on credit hours enrolled per 218 RICR 20-00-4.6.2(4)(b)"
+    from 2021-10-01:
+        ccap_credit_hours_enrolled * ccap_school_activity_hours_per_credit
+
+ccap_college_need_met:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "College need for services met"
+    description: "Whether parent meets college program criteria per 218 RICR 20-00-4.6.2(4)"
+    from 2021-10-01:
+        ccap_enrolled_ri_public_higher_ed and ccap_credit_hours_enrolled >= ccap_min_credit_hours_per_semester and ccap_college_school_activity_hours >= ccap_min_weekly_work_hours
+
+ccap_need_for_services:
+    entity: Family
+    period: Month
+    dtype: Boolean
+    label: "CCAP need for services"
+    description: "Whether family meets need for services requirement per 218 RICR 20-00-4.6.2"
+    from 1998-01-01:
+        ccap_employment_need_met or ccap_ys_need_met
+    from 2013-10-01:
+        ccap_employment_need_met or ccap_ys_need_met or ccap_training_need_met
+    from 2021-10-01:
+        ccap_employment_need_met or ccap_ys_need_met or ccap_training_need_met or ccap_college_need_met

@@ -1,0 +1,91 @@
+# 218 RICR 20-00-4.6.1.C - Family Cost Sharing tests
+
+ccap_family_share_rate:
+    - name: "Level 0: income at 80% FPL (pre-2022)"
+      period: 2021-06
+      inputs:
+          ccap_income_as_pct_fpl: 0.80
+      expect: 0
+
+    - name: "Level 1: income at 110% FPL (pre-2022)"
+      period: 2021-06
+      inputs:
+          ccap_income_as_pct_fpl: 1.10
+      expect: 0.02
+
+    - name: "Level 2: income at 140% FPL (pre-2022)"
+      period: 2021-06
+      inputs:
+          ccap_income_as_pct_fpl: 1.40
+      expect: 0.05
+
+    - name: "Level 3: income at 170% FPL (pre-2022)"
+      period: 2021-06
+      inputs:
+          ccap_income_as_pct_fpl: 1.70
+      expect: 0.08
+
+    - name: "Level 4: income at 190% FPL (pre-2022)"
+      period: 2021-06
+      inputs:
+          ccap_income_as_pct_fpl: 1.90
+      expect: 0.10
+
+    - name: "Level 5: income at 210% FPL (pre-2022)"
+      period: 2021-06
+      inputs:
+          ccap_income_as_pct_fpl: 2.10
+      expect: 0.14
+
+    - name: "Level 0: income at 100% FPL exactly (post-2022)"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 1.00
+      expect: 0
+
+    - name: "Level 1: income at 115% FPL (post-2022)"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 1.15
+      expect: 0.02
+
+    - name: "Level 2: income at 140% FPL (post-2022)"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 1.40
+      expect: 0.05
+
+    - name: "Level 3: income at 200% FPL (post-2022)"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 2.00
+      expect: 0.07
+
+ccap_family_share:
+    - name: "No family share at 80% FPL"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 0.80
+          ccap_countable_gross_monthly_income: 2000
+      expect: 0
+
+    - name: "2% share at 115% FPL with $3000 monthly income"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 1.15
+          ccap_countable_gross_monthly_income: 3000
+      expect: 60
+
+    - name: "5% share at 140% FPL with $4000 monthly income"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 1.40
+          ccap_countable_gross_monthly_income: 4000
+      expect: 200
+
+    - name: "7% share at 200% FPL with $5000 monthly income"
+      period: 2024-01
+      inputs:
+          ccap_income_as_pct_fpl: 2.00
+          ccap_countable_gross_monthly_income: 5000
+      expect: 350
