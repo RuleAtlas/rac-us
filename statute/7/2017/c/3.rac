@@ -1,0 +1,51 @@
+# 7 USC Section 2017(c)(3) - Combined initial and following month allotment
+
+"""
+(3) A State agency may provide to an eligible household applying after the 15th
+day of a month, in lieu of the initial allotment of the household and the regular
+allotment of the household for the following month, an allotment that is equal to
+the total amount of the initial allotment and the first regular allotment. The
+allotment shall be provided in accordance with section 2020(e)(3) of this title
+in the case of a household that is not entitled to expedited service and in
+accordance with paragraphs (3) and (9) of section 2020(e) of this title in the
+case of a household that is entitled to expedited service.
+"""
+
+status: encoded
+
+combined_allotment_application_day_threshold:
+    description: "Day of month after which a State may provide combined initial and following month allotment per 7 USC 2017(c)(3)"
+    from 1977-10-01: 15
+
+state_provides_combined_allotment:
+    entity: Household
+    period: Month
+    dtype: Boolean
+    label: "State provides combined allotment"
+    description: "Whether the State agency exercises option to provide combined initial and following month allotment per 7 USC 2017(c)(3)"
+    default: false
+
+snap_application_day_of_month:
+    entity: Household
+    period: Month
+    dtype: Integer
+    label: "SNAP application day of month"
+    description: "Day of the month on which household applied for SNAP benefits"
+    default: 1
+
+snap_combined_allotment:
+    imports:
+        - 7/2017/c/1#snap_prorated_allotment
+        - 7/2017/c/1#is_initial_snap_month
+        - 7/2017/a#snap_allotment
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP combined allotment"
+    description: "Combined initial and following month allotment per 7 USC 2017(c)(3)"
+    from 1977-10-01:
+        if not is_initial_snap_month: 0
+        elif not state_provides_combined_allotment: 0
+        elif snap_application_day_of_month <= combined_allotment_application_day_threshold: 0
+        else: snap_prorated_allotment + snap_allotment

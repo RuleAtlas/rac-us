@@ -1,0 +1,57 @@
+# 7 USC Section 2017(d)(1)(B) tests
+
+snap_pa_sanction_allotment_reduction:
+    - name: "No sanction applied (zero reduction rate)"
+      period: 2024-10
+      inputs:
+        snap_eligible: true
+        household_size: 3
+        snap_net_income: 500
+        thrifty_food_plan_cost: 740
+        thrifty_food_plan_cost_1_member: 291
+        snap_pa_sanction_allotment_reduction_rate: 0
+      expect: 0
+
+    - name: "State applies maximum 25% reduction"
+      period: 2024-10
+      inputs:
+        snap_eligible: true
+        household_size: 3
+        snap_net_income: 500
+        thrifty_food_plan_cost: 740
+        thrifty_food_plan_cost_1_member: 291
+        snap_pa_sanction_allotment_reduction_rate: 0.25
+      expect: 147
+
+    - name: "State applies partial 10% reduction"
+      period: 2024-10
+      inputs:
+        snap_eligible: true
+        household_size: 2
+        snap_net_income: 400
+        thrifty_food_plan_cost: 535
+        thrifty_food_plan_cost_1_member: 291
+        snap_pa_sanction_allotment_reduction_rate: 0.10
+      expect: 41
+
+    - name: "Reduction rate exceeding 25% is capped at 25%"
+      period: 2024-10
+      inputs:
+        snap_eligible: true
+        household_size: 3
+        snap_net_income: 500
+        thrifty_food_plan_cost: 740
+        thrifty_food_plan_cost_1_member: 291
+        snap_pa_sanction_allotment_reduction_rate: 0.50
+      expect: 147
+
+    - name: "Ineligible household has zero allotment so zero reduction"
+      period: 2024-10
+      inputs:
+        snap_eligible: false
+        household_size: 3
+        snap_net_income: 500
+        thrifty_food_plan_cost: 740
+        thrifty_food_plan_cost_1_member: 291
+        snap_pa_sanction_allotment_reduction_rate: 0.25
+      expect: 0

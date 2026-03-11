@@ -1,0 +1,63 @@
+# 7 USC Section 2017(c)(1) - Proration formula
+
+"""
+(1) The value of the allotment issued to any eligible household for the initial
+month or other initial period for which an allotment is issued shall have a value
+which bears the same ratio to the value of the allotment for a full month or other
+initial period for which the allotment is issued as the number of days (from the
+date of application) remaining in the month or other initial period for which the
+allotment is issued bears to the total number of days in the month or other initial
+period for which the allotment is issued, except that no allotment may be issued to
+a household for the initial month or period if the value of the allotment which such
+household would otherwise be eligible to receive under this subsection is less than
+$10. Households shall receive full months' allotments for all months within a
+certification period, except as provided in the first sentence of this paragraph
+with respect to an initial month.
+"""
+
+status: encoded
+
+minimum_initial_month_allotment:
+    description: "Minimum prorated allotment required to issue for initial month per 7 USC 2017(c)(1)"
+    unit: USD
+    from 1977-10-01: 10
+
+is_initial_snap_month:
+    entity: Household
+    period: Month
+    dtype: Boolean
+    label: "Initial SNAP month"
+    description: "Whether this is the initial month for which an allotment is issued per 7 USC 2017(c)(2)"
+    default: false
+
+initial_month_days_remaining:
+    entity: Household
+    period: Month
+    dtype: Integer
+    label: "Days remaining in initial month"
+    description: "Number of days from date of application remaining in the initial month or period"
+    default: 0
+
+initial_month_total_days:
+    entity: Household
+    period: Month
+    dtype: Integer
+    label: "Total days in initial month"
+    description: "Total number of days in the initial month or period"
+    default: 0
+
+snap_prorated_allotment:
+    imports:
+        - 7/2017/a#snap_allotment
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP prorated allotment"
+    description: "Allotment value after initial month proration per 7 USC 2017(c)(1)"
+    from 1977-10-01:
+        if not is_initial_snap_month: snap_allotment
+        else:
+            prorated = floor(snap_allotment * initial_month_days_remaining / initial_month_total_days)
+            if prorated < minimum_initial_month_allotment: 0
+            else: prorated

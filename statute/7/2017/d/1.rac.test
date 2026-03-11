@@ -1,0 +1,67 @@
+# 7 USC Section 2017(d)(1) tests
+
+snap_allotment_after_pa_reduction:
+    - name: "PA reduction not active - allotment unchanged"
+      period: 2024-10
+      inputs:
+        snap_eligible: true
+        household_size: 3
+        snap_net_income: 500
+        thrifty_food_plan_cost: 740
+        thrifty_food_plan_cost_1_member: 291
+        pa_benefit_reduction_applies: false
+        pa_income_decrease_from_reduction: 0
+        state_applies_pa_allotment_reduction: false
+      expect: 590
+
+    - name: "PA reduction caps allotment at pre-reduction income level"
+      period: 2024-10
+      inputs:
+        snap_eligible: true
+        household_size: 3
+        snap_net_income: 500
+        thrifty_food_plan_cost: 740
+        thrifty_food_plan_cost_1_member: 291
+        pa_benefit_reduction_applies: true
+        pa_income_decrease_from_reduction: 200
+        state_applies_pa_allotment_reduction: false
+      expect: 530
+
+    - name: "PA reduction with state 25% allotment reduction"
+      period: 2024-10
+      inputs:
+        snap_eligible: true
+        household_size: 3
+        snap_net_income: 500
+        thrifty_food_plan_cost: 740
+        thrifty_food_plan_cost_1_member: 291
+        pa_benefit_reduction_applies: true
+        pa_income_decrease_from_reduction: 200
+        state_applies_pa_allotment_reduction: true
+      expect: 397
+
+    - name: "1-person household, min allotment with PA and state reduction"
+      period: 2024-10
+      inputs:
+        snap_eligible: true
+        household_size: 1
+        snap_net_income: 800
+        thrifty_food_plan_cost: 291
+        thrifty_food_plan_cost_1_member: 291
+        pa_benefit_reduction_applies: true
+        pa_income_decrease_from_reduction: 100
+        state_applies_pa_allotment_reduction: true
+      expect: 17
+
+    - name: "Ineligible household with PA reduction gets zero"
+      period: 2024-10
+      inputs:
+        snap_eligible: false
+        household_size: 1
+        snap_net_income: 0
+        thrifty_food_plan_cost: 291
+        thrifty_food_plan_cost_1_member: 291
+        pa_benefit_reduction_applies: true
+        pa_income_decrease_from_reduction: 100
+        state_applies_pa_allotment_reduction: true
+      expect: 0

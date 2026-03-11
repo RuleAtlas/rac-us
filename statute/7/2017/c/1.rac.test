@@ -1,0 +1,47 @@
+# 7 USC Section 2017(c)(1) tests
+
+snap_prorated_allotment:
+    - name: "Non-initial month receives full allotment"
+      period: 2024-10
+      inputs:
+        snap_allotment: 291
+        is_initial_snap_month: false
+        initial_month_days_remaining: 0
+        initial_month_total_days: 0
+      expect: 291
+
+    - name: "Initial month prorated - applied on day 1 of 31-day month"
+      period: 2024-10
+      inputs:
+        snap_allotment: 291
+        is_initial_snap_month: true
+        initial_month_days_remaining: 31
+        initial_month_total_days: 31
+      expect: 291
+
+    - name: "Initial month prorated - applied mid-month (15 of 30 days remaining)"
+      period: 2024-10
+      inputs:
+        snap_allotment: 291
+        is_initial_snap_month: true
+        initial_month_days_remaining: 15
+        initial_month_total_days: 30
+      expect: 145
+
+    - name: "Initial month prorated below $10 threshold yields zero"
+      period: 2024-10
+      inputs:
+        snap_allotment: 100
+        is_initial_snap_month: true
+        initial_month_days_remaining: 2
+        initial_month_total_days: 31
+      expect: 0
+
+    - name: "Initial month prorated exactly at $10 threshold"
+      period: 2024-10
+      inputs:
+        snap_allotment: 310
+        is_initial_snap_month: true
+        initial_month_days_remaining: 1
+        initial_month_total_days: 31
+      expect: 10

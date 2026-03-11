@@ -1,0 +1,41 @@
+# 7 USC Section 2017(d)(1)(A) - No increased allotment from decreased income
+
+"""
+(A) the household may not receive an increased allotment as the result of a
+decrease in the income of the household to the extent that the decrease is
+the result of the reduction; and
+"""
+
+status: encoded
+
+public_assistance_sanction_active:
+    entity: Household
+    period: Month
+    dtype: Boolean
+    label: "Public assistance sanction active"
+    description: "Whether household benefits are reduced under a means-tested public assistance program for failure to perform a required action per 7 USC 2017(d)(1)"
+    default: false
+
+income_decrease_from_sanction:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Income decrease from public assistance sanction"
+    description: "Amount of decrease in household income resulting from the public assistance benefit reduction per 7 USC 2017(d)(1)"
+    default: 0
+
+snap_net_income_after_sanction_adjustment:
+    imports:
+        - 7/2017/a#snap_net_income
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP net income adjusted for public assistance sanction"
+    description: "Net income with sanction-related decrease added back to prevent increased allotment per 7 USC 2017(d)(1)(A)"
+    from 1996-10-01:
+        if public_assistance_sanction_active:
+            snap_net_income + income_decrease_from_sanction
+        else:
+            snap_net_income

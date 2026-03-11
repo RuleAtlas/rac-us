@@ -1,0 +1,34 @@
+# 7 USC Section 2017(d)(1)(B) - Maximum allotment reduction
+
+"""
+(B) the State agency may reduce the allotment of the household by not more
+than 25 percent.
+"""
+
+status: encoded
+
+snap_pa_sanction_max_allotment_reduction_rate:
+    description: "Maximum rate by which allotment may be reduced under a public assistance sanction per 7 USC 2017(d)(1)(B)"
+    unit: rate
+    from 1996-08-22: 0.25
+
+snap_pa_sanction_allotment_reduction_rate:
+    entity: Household
+    period: Month
+    dtype: Rate
+    label: "SNAP public assistance sanction allotment reduction rate"
+    description: "State-chosen allotment reduction rate for public assistance sanction (must not exceed 25%)"
+    default: 0
+
+snap_pa_sanction_allotment_reduction:
+    imports:
+        - 7/2017/a#snap_allotment
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP allotment reduction for public assistance sanction"
+    description: "Allotment reduction capped at 25% per 7 USC 2017(d)(1)(B)"
+    from 1996-08-22:
+        capped_rate = min(snap_pa_sanction_allotment_reduction_rate, snap_pa_sanction_max_allotment_reduction_rate)
+        floor(snap_allotment * capped_rate)

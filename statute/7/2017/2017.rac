@@ -1,0 +1,37 @@
+# 7 USC Section 2017 - Value of allotment
+
+"""
+Sec. 2017. Value of allotment.
+
+(a) Calculation.-- The value of the allotment authorized for eligible
+households equals the thrifty food plan cost reduced by 30 percent of
+household income, with a minimum allotment for 1-2 person households.
+
+(c) Initial month proration and combined allotment.-- The initial month
+allotment is prorated by remaining days. States may combine initial and
+following month allotments for applications after the 15th.
+
+(d) Reduction of public assistance benefits.-- When household benefits
+are reduced under a means-tested program for failure to perform a
+required action, the allotment may not increase from the resulting income
+decrease, and the State may reduce the allotment by up to 25 percent.
+"""
+
+status: encoded
+
+snap_allotment_under_2017:
+    imports:
+        - 7/2017/c/1#snap_prorated_allotment
+        - 7/2017/d/1#pa_benefit_reduction_applies
+        - 7/2017/d/1#snap_allotment_after_pa_reduction
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP allotment under 7 USC 2017"
+    description: "Value of the allotment per 7 USC 2017, incorporating base calculation (a), initial month proration (c), and public assistance benefit reduction (d)"
+    from 1977-10-01:
+        if pa_benefit_reduction_applies:
+            snap_allotment_after_pa_reduction
+        else:
+            snap_prorated_allotment

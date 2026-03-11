@@ -1,0 +1,42 @@
+# 7 USC Section 2017(d)(1)(A) tests
+
+snap_net_income_after_sanction_adjustment:
+    - name: "No sanction - net income passes through unchanged"
+      period: 2024-10
+      inputs:
+        snap_net_income: 1000
+        public_assistance_sanction_active: false
+        income_decrease_from_sanction: 0
+      expect: 1000
+
+    - name: "Sanction active - income decrease added back"
+      period: 2024-10
+      inputs:
+        snap_net_income: 700
+        public_assistance_sanction_active: true
+        income_decrease_from_sanction: 300
+      expect: 1000
+
+    - name: "Sanction active but zero income decrease"
+      period: 2024-10
+      inputs:
+        snap_net_income: 1000
+        public_assistance_sanction_active: true
+        income_decrease_from_sanction: 0
+      expect: 1000
+
+    - name: "No sanction - income decrease input ignored"
+      period: 2024-10
+      inputs:
+        snap_net_income: 700
+        public_assistance_sanction_active: false
+        income_decrease_from_sanction: 300
+      expect: 700
+
+    - name: "Sanction active with large income decrease"
+      period: 2024-10
+      inputs:
+        snap_net_income: 200
+        public_assistance_sanction_active: true
+        income_decrease_from_sanction: 800
+      expect: 1000

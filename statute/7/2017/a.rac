@@ -1,0 +1,106 @@
+# 7 USC Section 2017(a) - Calculation
+
+"""
+(a) Calculation.-- The value of the allotment which State agencies shall be
+authorized to issue to any households certified as eligible to participate in
+the supplemental nutrition assistance program shall be equal to the cost to
+such households of the thrifty food plan reduced by an amount equal to 30 per
+centum of the household's income, as determined in accordance with section
+2014(d) and (e) of this title, rounded to the nearest lower whole dollar:
+Provided, That for households of one and two persons the minimum allotment
+shall be 8 percent of the cost of the thrifty food plan for a household
+containing 1 member, as determined by the Secretary under section 2012 of
+this title, rounded to the nearest whole dollar increment.
+"""
+
+status: encoded
+
+contribution_rate:
+    description: "Household contribution as share of net income per 7 USC 2017(a)"
+    unit: rate
+    from 1977-10-01: 0.30
+
+minimum_allotment_rate:
+    description: "Minimum allotment as share of 1-member thrifty food plan cost per 7 USC 2017(a)"
+    unit: rate
+    from 1977-10-01: 0.08
+
+minimum_allotment_household_size_threshold:
+    description: "Maximum household size eligible for minimum allotment per 7 USC 2017(a)"
+    from 1977-10-01: 2
+
+snap_eligible:
+    entity: Household
+    period: Month
+    dtype: Boolean
+    label: "SNAP eligible"
+    description: "Whether household is certified as eligible to participate per 7 USC 2014"
+    default: false
+
+household_size:
+    entity: Household
+    period: Month
+    dtype: Integer
+    label: "Household size"
+    description: "Number of persons in the SNAP household"
+    default: 1
+
+snap_net_income:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP net income"
+    description: "Household income determined under 7 USC 2014(d) and (e)"
+    default: 0
+
+thrifty_food_plan_cost:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Thrifty food plan cost"
+    description: "Cost of the thrifty food plan for the household as determined under 7 USC 2012"
+    default: 0
+
+thrifty_food_plan_cost_1_member:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Thrifty food plan cost for 1-member household"
+    description: "Cost of the thrifty food plan for a household containing 1 member per 7 USC 2012"
+    default: 0
+
+snap_calculated_allotment:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP calculated allotment"
+    description: "Thrifty food plan cost reduced by 30% of household income, rounded to nearest lower whole dollar"
+    from 1977-10-01:
+        floor(thrifty_food_plan_cost - contribution_rate * snap_net_income)
+
+snap_minimum_allotment:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP minimum allotment"
+    description: "Minimum allotment for 1-2 person households: 8% of 1-member thrifty food plan cost, rounded to nearest whole dollar"
+    from 1977-10-01:
+        round(minimum_allotment_rate * thrifty_food_plan_cost_1_member, 0)
+
+snap_allotment:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP allotment"
+    description: "Value of allotment per 7 USC 2017(a)"
+    from 1977-10-01:
+        if not snap_eligible: 0
+        elif household_size <= minimum_allotment_household_size_threshold:
+            max(snap_minimum_allotment, snap_calculated_allotment)
+        else: max(0, snap_calculated_allotment)

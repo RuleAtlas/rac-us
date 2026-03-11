@@ -1,0 +1,85 @@
+# 7 USC Section 2017(d)(1) - Reduction of public assistance benefits - General rule
+
+"""
+(1) If the benefits of a household are reduced under a Federal, State, or
+local law relating to a means-tested public assistance program for the failure
+of a member of the household to perform an action required under the law or
+program, for the duration of the reduction—
+(A) the household may not receive an increased allotment as the result of a
+decrease in the income of the household to the extent that the decrease is the
+result of the reduction; and
+(B) the State agency may reduce the allotment of the household by not more
+than 25 percent.
+"""
+
+status: encoded
+
+max_pa_allotment_reduction_rate:
+    description: "Maximum rate by which state may reduce allotment per 7 USC 2017(d)(1)(B)"
+    unit: rate
+    from 1996-08-22: 0.25
+
+pa_benefit_reduction_applies:
+    entity: Household
+    period: Month
+    dtype: Boolean
+    label: "PA benefit reduction applies"
+    description: "Whether household benefits are reduced under a means-tested public assistance program for failure to perform a required action per 7 USC 2017(d)(1)"
+    default: false
+
+pa_income_decrease_from_reduction:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Income decrease from PA benefit reduction"
+    description: "Decrease in household income resulting from the public assistance benefit reduction per 7 USC 2017(d)(1)(A)"
+    default: 0
+
+state_applies_pa_allotment_reduction:
+    entity: Household
+    period: Month
+    dtype: Boolean
+    label: "State applies PA allotment reduction"
+    description: "Whether state agency reduces allotment per 7 USC 2017(d)(1)(B)"
+    default: false
+
+snap_allotment_pa_income_adjusted:
+    imports:
+        - 7/2017/a#snap_allotment
+        - 7/2017/a#snap_net_income
+        - 7/2017/a#thrifty_food_plan_cost
+        - 7/2017/a#contribution_rate
+        - 7/2017/a#household_size
+        - 7/2017/a#minimum_allotment_household_size_threshold
+        - 7/2017/a#snap_minimum_allotment
+        - 7/2017/a#snap_eligible
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP allotment adjusted for PA income reduction"
+    description: "Allotment capped at pre-reduction level per 7 USC 2017(d)(1)(A)"
+    from 1996-08-22:
+        if not pa_benefit_reduction_applies: snap_allotment
+        elif not snap_eligible: 0
+        else:
+            pre_reduction_income = snap_net_income + pa_income_decrease_from_reduction
+            pre_reduction_calculated = floor(thrifty_food_plan_cost - contribution_rate * pre_reduction_income)
+            if household_size <= minimum_allotment_household_size_threshold:
+                max(snap_minimum_allotment, pre_reduction_calculated)
+            else:
+                max(0, pre_reduction_calculated)
+
+snap_allotment_after_pa_reduction:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP allotment after PA reduction"
+    description: "Allotment after optional state reduction per 7 USC 2017(d)(1)(B)"
+    from 1996-08-22:
+        if pa_benefit_reduction_applies and state_applies_pa_allotment_reduction:
+            floor(snap_allotment_pa_income_adjusted * (1 - max_pa_allotment_reduction_rate))
+        else:
+            snap_allotment_pa_income_adjusted

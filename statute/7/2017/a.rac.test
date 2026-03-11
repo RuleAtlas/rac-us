@@ -1,0 +1,52 @@
+# 7 USC Section 2017(a) tests
+
+snap_allotment:
+    - name: "Ineligible household receives zero"
+      period: 2024-10
+      inputs:
+        snap_eligible: false
+        household_size: 1
+        snap_net_income: 0
+        thrifty_food_plan_cost: 291
+        thrifty_food_plan_cost_1_member: 291
+      expect: 0
+
+    - name: "1-person household with zero income gets full allotment"
+      period: 2024-10
+      inputs:
+        snap_eligible: true
+        household_size: 1
+        snap_net_income: 0
+        thrifty_food_plan_cost: 291
+        thrifty_food_plan_cost_1_member: 291
+      expect: 291
+
+    - name: "1-person household with high income gets minimum allotment"
+      period: 2024-10
+      inputs:
+        snap_eligible: true
+        household_size: 1
+        snap_net_income: 900
+        thrifty_food_plan_cost: 291
+        thrifty_food_plan_cost_1_member: 291
+      expect: 23
+
+    - name: "4-person household with income, floor rounding applied"
+      period: 2024-10
+      inputs:
+        snap_eligible: true
+        household_size: 4
+        snap_net_income: 101
+        thrifty_food_plan_cost: 200
+        thrifty_food_plan_cost_1_member: 291
+      expect: 169
+
+    - name: "2-person household eligible for minimum allotment"
+      period: 2024-10
+      inputs:
+        snap_eligible: true
+        household_size: 2
+        snap_net_income: 1200
+        thrifty_food_plan_cost: 380
+        thrifty_food_plan_cost_1_member: 291
+      expect: 23

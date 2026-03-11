@@ -1,0 +1,52 @@
+# 7 USC Section 2017(c)(3) tests
+
+snap_combined_allotment:
+    - name: "Combined allotment when applying after 15th day"
+      period: 2024-10
+      inputs:
+        is_initial_snap_month: true
+        state_provides_combined_allotment: true
+        snap_application_day_of_month: 20
+        snap_prorated_allotment: 100
+        snap_allotment: 300
+      expect: 400
+
+    - name: "No combined allotment when applying on or before 15th day"
+      period: 2024-10
+      inputs:
+        is_initial_snap_month: true
+        state_provides_combined_allotment: true
+        snap_application_day_of_month: 15
+        snap_prorated_allotment: 150
+        snap_allotment: 300
+      expect: 0
+
+    - name: "No combined allotment when state does not exercise option"
+      period: 2024-10
+      inputs:
+        is_initial_snap_month: true
+        state_provides_combined_allotment: false
+        snap_application_day_of_month: 20
+        snap_prorated_allotment: 100
+        snap_allotment: 300
+      expect: 0
+
+    - name: "No combined allotment when not initial month"
+      period: 2024-10
+      inputs:
+        is_initial_snap_month: false
+        state_provides_combined_allotment: true
+        snap_application_day_of_month: 20
+        snap_prorated_allotment: 0
+        snap_allotment: 300
+      expect: 0
+
+    - name: "Combined allotment on last day of month"
+      period: 2024-10
+      inputs:
+        is_initial_snap_month: true
+        state_provides_combined_allotment: true
+        snap_application_day_of_month: 31
+        snap_prorated_allotment: 10
+        snap_allotment: 300
+      expect: 310
