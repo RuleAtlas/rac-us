@@ -1,0 +1,19 @@
+# MA GL c.62 Section 6(h)(2)(ii) tests
+
+is_domestic_abuse_victim:
+    - name: "Default is false"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Taxpayer is domestic abuse victim"
+      period: 2024-01
+      inputs:
+        is_domestic_abuse_victim: true
+      expect: true
+
+    - name: "Taxpayer is not domestic abuse victim"
+      period: 2024-01
+      inputs:
+        is_domestic_abuse_victim: false
+      expect: false

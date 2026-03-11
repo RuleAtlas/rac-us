@@ -1,0 +1,16 @@
+# MA GL c.62 Section 6(h)(2)(ii) - Domestic abuse victim
+
+"""
+(ii) is unable to file a joint return because the taxpayer is a victim
+of domestic abuse;
+"""
+
+status: encoded
+
+is_domestic_abuse_victim:
+    entity: Person
+    period: Year
+    dtype: Boolean
+    label: "Is domestic abuse victim"
+    description: "Whether the taxpayer is unable to file a joint return because the taxpayer is a victim of domestic abuse, per MA GL c.62 § 6(h)(2)(ii)"
+    default: false

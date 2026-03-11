@@ -1,0 +1,19 @@
+# Mass. General Laws c. 62 § 6(h)(2)(i) tests
+
+is_living_apart_from_spouse:
+    - name: "Default - not living apart"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Taxpayer is living apart from spouse"
+      period: 2024-01
+      inputs:
+          is_living_apart_from_spouse: true
+      expect: true
+
+    - name: "Taxpayer is not living apart from spouse"
+      period: 2024-01
+      inputs:
+          is_living_apart_from_spouse: false
+      expect: false

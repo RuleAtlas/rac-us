@@ -1,0 +1,16 @@
+# Mass. General Laws c. 62 § 6(h)(2)(i) - Living apart from spouse
+
+"""
+(i) is living apart from the taxpayer's spouse at the time the taxpayer
+files the tax return;
+"""
+
+status: encoded
+
+is_living_apart_from_spouse:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Living apart from spouse"
+    description: "Whether the taxpayer is living apart from the taxpayer's spouse at the time the taxpayer files the tax return, per Mass. GL c. 62 § 6(h)(2)(i)"
+    default: false

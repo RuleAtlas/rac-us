@@ -1,0 +1,76 @@
+# Mass. General Laws c. 62 § 6(h)(1) - MA EITC credit computation
+
+"""
+(1) A taxpayer shall be allowed a credit against the taxes imposed by this
+chapter if that person qualified for and claimed the earned income credit
+allowed under section 32 of the Code, as amended and in effect for the taxable
+year. With respect to a person who is a nonresident for part of the taxable
+year, the credit shall be limited to 40 per cent of the federal credit
+multiplied by a fraction, the numerator of which shall be the number of days
+in the taxable year the person resided in the commonwealth and the denominator
+of which shall be the number of days in the taxable year. A person who is a
+nonresident for the entire taxable year shall not be allowed the credit. The
+credit allowed by this subsection shall equal 40 per cent of the federal credit
+received by the taxpayer for the taxable year. If other credits allowed under
+this section are utilized by the taxpayer for the taxable year, the credit
+afforded by this subsection shall be applied last. If the amount of the credit
+allowed under this subsection exceeds the taxpayer's liability, the
+commissioner shall treat the excess as an overpayment and shall pay the
+taxpayer the amount of the excess without interest.
+"""
+
+status: encoded
+
+ma_eitc_match_rate:
+    description: "Percentage of federal earned income credit allowed as Massachusetts EITC"
+    unit: rate
+    from 2023-01-01: 0.40
+
+is_ma_full_year_nonresident:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Full-year Massachusetts nonresident"
+    description: "Whether the person is a nonresident for the entire taxable year"
+    default: false
+
+is_ma_part_year_resident:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Part-year Massachusetts resident"
+    description: "Whether the person is a nonresident for part of the taxable year"
+    default: false
+
+days_resided_in_ma:
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Days resided in Massachusetts"
+    description: "Number of days in the taxable year the person resided in the commonwealth"
+    default: 0
+
+days_in_taxable_year:
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Days in taxable year"
+    description: "Total number of days in the taxable year"
+    default: 365
+
+ma_eitc:
+    imports:
+        - 26/32/a#eitc_amount
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Massachusetts earned income tax credit"
+    description: "Credit equal to 40 per cent of the federal earned income credit, prorated for part-year residents, per Mass. GL c. 62 § 6(h)(1). Refundable; applied last among credits under this section."
+    from 2023-01-01:
+        if is_ma_full_year_nonresident:
+            0
+        elif is_ma_part_year_resident:
+            ma_eitc_match_rate * eitc_amount * days_resided_in_ma / days_in_taxable_year
+        else:
+            ma_eitc_match_rate * eitc_amount

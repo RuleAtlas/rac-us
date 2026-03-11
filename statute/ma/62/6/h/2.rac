@@ -1,0 +1,36 @@
+# Mass. General Laws c. 62 § 6(h)(2) - Joint filing requirement exception
+
+"""
+(2) For the purposes of this subsection, a married taxpayer shall satisfy
+the joint filing requirement under section 32 of the Code if the taxpayer
+files an income tax return using a filing status of married filing separately
+and the taxpayer: (i) is living apart from the taxpayer's spouse at the time
+the taxpayer files the tax return; (ii) is unable to file a joint return
+because the taxpayer is a victim of domestic abuse; and (iii) indicates on
+the taxpayer's income tax return that the taxpayer meets the criteria of
+clauses (i) and (ii).
+"""
+
+status: encoded
+
+is_married_filing_separately:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Married filing separately"
+    description: "Whether the taxpayer files an income tax return using a filing status of married filing separately"
+    default: false
+
+ma_eitc_satisfies_joint_filing_requirement:
+    imports:
+        - ma/62/6/h/2/i#is_living_apart_from_spouse
+        - ma/62/6/h/2/ii#is_domestic_abuse_victim
+        - ma/62/6/h/2/iii#attests_living_apart_and_abuse_on_return
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Satisfies joint filing requirement exception"
+    description: "Whether a married taxpayer filing separately satisfies the joint filing requirement under section 32 of the Code for purposes of the MA EITC, per Mass. GL c. 62 § 6(h)(2)"
+    from 2023-01-01:
+        meets_all_criteria = is_living_apart_from_spouse and is_domestic_abuse_victim and attests_living_apart_and_abuse_on_return
+        return is_married_filing_separately and meets_all_criteria

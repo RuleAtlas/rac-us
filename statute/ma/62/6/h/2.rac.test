@@ -1,0 +1,47 @@
+# Mass. General Laws c. 62 § 6(h)(2) tests
+
+ma_eitc_satisfies_joint_filing_requirement:
+    - name: "All conditions met - qualifies for exception"
+      period: 2024-01
+      inputs:
+        is_married_filing_separately: true
+        is_living_apart_from_spouse: true
+        is_domestic_abuse_victim: true
+        attests_living_apart_and_abuse_on_return: true
+      expect: true
+
+    - name: "Not filing married separately - does not qualify"
+      period: 2024-01
+      inputs:
+        is_married_filing_separately: false
+        is_living_apart_from_spouse: true
+        is_domestic_abuse_victim: true
+        attests_living_apart_and_abuse_on_return: true
+      expect: false
+
+    - name: "Not living apart from spouse - does not qualify"
+      period: 2024-01
+      inputs:
+        is_married_filing_separately: true
+        is_living_apart_from_spouse: false
+        is_domestic_abuse_victim: true
+        attests_living_apart_and_abuse_on_return: true
+      expect: false
+
+    - name: "Not a domestic abuse victim - does not qualify"
+      period: 2024-01
+      inputs:
+        is_married_filing_separately: true
+        is_living_apart_from_spouse: true
+        is_domestic_abuse_victim: false
+        attests_living_apart_and_abuse_on_return: true
+      expect: false
+
+    - name: "Does not attest on return - does not qualify"
+      period: 2024-01
+      inputs:
+        is_married_filing_separately: true
+        is_living_apart_from_spouse: true
+        is_domestic_abuse_victim: true
+        attests_living_apart_and_abuse_on_return: false
+      expect: false

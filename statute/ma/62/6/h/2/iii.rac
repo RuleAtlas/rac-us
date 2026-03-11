@@ -1,0 +1,16 @@
+# Mass. General Laws c. 62 § 6(h)(2)(iii) - Attestation on return
+
+"""
+(iii) indicates on the taxpayer's income tax return that the taxpayer meets
+the criteria of clauses (i) and (ii).
+"""
+
+status: encoded
+
+attests_living_apart_and_abuse_on_return:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Attests to living apart and domestic abuse on return"
+    description: "Whether the taxpayer indicates on the income tax return that the taxpayer meets the criteria of clauses (i) and (ii), per Mass. GL c. 62 § 6(h)(2)(iii)"
+    default: false

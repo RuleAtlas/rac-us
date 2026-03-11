@@ -1,0 +1,19 @@
+# Mass. General Laws c. 62 § 6(h)(2)(iii) tests
+
+attests_living_apart_and_abuse_on_return:
+    - name: "Default - no attestation"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Taxpayer attests on return"
+      period: 2024-01
+      inputs:
+          attests_living_apart_and_abuse_on_return: true
+      expect: true
+
+    - name: "Taxpayer does not attest on return"
+      period: 2024-01
+      inputs:
+          attests_living_apart_and_abuse_on_return: false
+      expect: false

@@ -1,0 +1,25 @@
+# Mass. General Laws c. 62 § 6(h) - Earned income credit
+
+"""
+(h) Earned income credit.-- A taxpayer shall be allowed a credit against
+the taxes imposed by this chapter equal to a percentage of the federal
+earned income credit, subject to residency requirements. A married
+taxpayer filing separately may satisfy the joint filing requirement under
+section 32 of the Code if living apart from spouse due to domestic abuse
+and attesting to same on the return.
+"""
+
+status: encoded
+
+ma_earned_income_credit:
+    imports:
+        - ma/62/6/h/1#ma_eitc
+        - ma/62/6/h/2#ma_eitc_satisfies_joint_filing_requirement
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Massachusetts earned income credit"
+    description: "Earned income credit per Mass. GL c. 62 § 6(h). Equal to 40% of the federal EITC for full-year residents, prorated for part-year residents, denied for full-year nonresidents. Married taxpayers filing separately may qualify via the joint filing exception under (h)(2)."
+    from 2023-01-01:
+        ma_eitc

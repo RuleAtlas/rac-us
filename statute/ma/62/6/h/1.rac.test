@@ -1,0 +1,39 @@
+# Mass. General Laws c. 62 § 6(h)(1) tests
+
+ma_eitc:
+    - name: "Full-year resident receives 40% of federal EITC"
+      period: 2024-01
+      inputs:
+        eitc_amount: 5000
+      expect: 2000
+
+    - name: "Full-year nonresident receives no credit"
+      period: 2024-01
+      inputs:
+        eitc_amount: 5000
+        is_ma_full_year_nonresident: true
+      expect: 0
+
+    - name: "Part-year resident receives prorated credit"
+      period: 2024-01
+      inputs:
+        eitc_amount: 5000
+        is_ma_part_year_resident: true
+        days_resided_in_ma: 183
+        days_in_taxable_year: 366
+      expect: 1000
+
+    - name: "No federal EITC means no MA EITC"
+      period: 2024-01
+      inputs:
+        eitc_amount: 0
+      expect: 0
+
+    - name: "Part-year resident with zero days in MA"
+      period: 2024-01
+      inputs:
+        eitc_amount: 5000
+        is_ma_part_year_resident: true
+        days_resided_in_ma: 0
+        days_in_taxable_year: 365
+      expect: 0
